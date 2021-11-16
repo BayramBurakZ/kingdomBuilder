@@ -14,5 +14,4 @@ public class TestCommandStringEncoder {
         assertNotNull(command);
         assertEquals(command, "iam Tester");
     }
-
 }
