@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+*.txt
 
 # BlueJ files
 *.ctxt
@@ -35,3 +36,5 @@ gradle-app.setting
 # Cache of project
 .gradletasknamecache
 .idea/
+
+.DS_Store
