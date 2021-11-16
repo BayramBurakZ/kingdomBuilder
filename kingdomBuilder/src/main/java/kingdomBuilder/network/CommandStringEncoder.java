@@ -1,111 +1,117 @@
 package kingdomBuilder.network;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommandStringEncoder implements CommandEncoder {
 
     @Override
     public String iam(String name) {
-        return null;
+        return String.format("iam %s", name);
     }
 
     @Override
     public String bye() {
-        return null;
+        return "bye";
     }
 
     @Override
     public String pong() {
-        return null;
+        return "pong";
     }
 
     @Override
     public String load(String module) {
-        return null;
+        return String.format("load %s", module);
     }
 
     @Override
     public String unload(String module) {
-        return null;
+        return String.format("unload %s", module);
     }
 
     @Override
     public String join(int gameId) {
-        return null;
+        return String.format("join %d", gameId);
     }
 
     @Override
     public String spectate(int gameId) {
-        return null;
+        return String.format("spectate %d", gameId);
     }
 
     @Override
     public String unspectate(int gameId) {
-        return null;
+        return String.format("unspectate %d", gameId);
     }
 
     @Override
     public String root(String passphrase) {
-        return null;
+        return String.format("root %s", passphrase);
     }
 
     @Override
     public String shutdown() {
-        return null;
+        return "shutdown";
     }
 
     @Override
     public String kick(int gameId) {
-        return null;
+        return String.format("kick %d", gameId);
     }
 
     @Override
     public String chat(List<Integer> clientIds, String message) {
-        return null;
+        final String clients = clientIds
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        return String.format("chat [{%s};%s]", clients, message);
     }
 
     @Override
     public String version() {
-        return null;
+        return "?version";
     }
 
     @Override
     public String whoAmI() {
-        return null;
+        return "?whoami";
     }
 
     @Override
     public String client(int clientId) {
-        return null;
+        return String.format("?client %d", clientId);
     }
 
     @Override
     public String clients() {
-        return null;
+        return "?clients";
     }
 
     @Override
     public String games() {
-        return null;
+        return "?games";
     }
 
     @Override
     public String playersOfGame(int gameId) {
-        return null;
+        return String.format("?playersofgame %d", gameId);
     }
 
     @Override
     public String modules() {
-        return null;
+        return "?modules";
     }
 
     @Override
     public String myModules() {
-        return null;
+        return "?mymodules";
     }
 
     @Override
     public String detailsOfGame(int gameId) {
-        return null;
+        return String.format("?detailsofgame %d", gameId);
     }
 }
