@@ -1,20 +1,18 @@
 package kingdomBuilder.network;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class TestCommandStringEncoder {
 
     @Test
-    public void rightAnswer() {
-        int answer = 42;
-        assertEquals(answer, 42);
-    }
+    public void testIAm() {
+        CommandEncoder encoder = new CommandStringEncoder();
+        String command = encoder.iam("Tester");
 
-    @Test
-    public void failingTest() {
-        assertTrue(false);
+        assertNotNull(command);
+        assertEquals(command, "iam Tester");
     }
 
 }
