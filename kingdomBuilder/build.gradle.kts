@@ -1,5 +1,6 @@
 plugins {
     application
+    idea
     id("org.openjfx.javafxplugin") version "0.0.10"
 }
 
@@ -10,12 +11,13 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.8.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation("org.jetbrains:annotations:16.0.2")
 }
 
 javafx {
     version = "17"
     modules("javafx.controls", "javafx.fxml")
-}
+}23
 
 application {
     mainClass.set("kingdomBuilder.Boot")
