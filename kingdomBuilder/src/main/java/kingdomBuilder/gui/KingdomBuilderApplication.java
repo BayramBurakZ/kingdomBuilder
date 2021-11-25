@@ -5,8 +5,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import kingdomBuilder.gui.controller.GameScreenController;
 
 public class KingdomBuilderApplication extends Application {
+
+    GameScreenController gsc;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -14,15 +17,35 @@ public class KingdomBuilderApplication extends Application {
         // TODO: WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @1933c126'
 
         // Setup Scene
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/chat_view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/GameScreen.fxml"));
         Parent root = fxmlLoader.load();
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1000, 600);
+
+        // Setup css Stylesheet
+        String css = this.getClass().getResource("/kingdomBuilder.gui/StyleSheet.css").toExternalForm();
+        scene.getStylesheets().add(css);
 
         // Setup stage
         primaryStage.setTitle("KingdomBuilder v0.1 Chat Client");
         primaryStage.setScene(scene);
-        primaryStage.setMinWidth(800);
+        primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(600);
         primaryStage.show();
+
+        // init Controller
+        gsc = (GameScreenController) fxmlLoader.getController();
+
+        // resize events
+        try {
+            primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+                gsc.resizePanes(newVal, primaryStage.getHeight());
+            });
+
+            primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
+                gsc.resizePanes(primaryStage.getWidth(), newVal);
+            });
+        } catch (Exception e) {
+            System.out.println("Failed window adjustment");
+        }
     }
 }
