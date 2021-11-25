@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
@@ -55,19 +56,36 @@ public class GameScreenController implements Initializable {
     }
 
     // only for demonstration
+
+    /**
+     * This methode switches the GameBorderPane with the MenuBorderPane
+     * and dis-/enable them.
+     *
+     * @author Burak & Tom
+     * @param event incoming ActionEvent
+     */
     @FXML
-    private void switchPanes( ActionEvent event){
+    private void switchPanes(ActionEvent event){
         if(GameScreenAsCurrentWindow){
+            //switch the enable-state of the panes
+            borderPaneGame.setDisable(!borderPaneGame.isDisable());
+            borderPaneMenu.setDisable(!borderPaneMenu.isDisable());
+            //set the opacity to display only one pane
             borderPaneGame.setOpacity(0);
             borderPaneMenu.setOpacity(1);
             GameScreenAsCurrentWindow = false;
         }
         else{
+            //switch the enable-state of the panes
+            borderPaneGame.setDisable(!borderPaneGame.isDisable());
+            borderPaneMenu.setDisable(!borderPaneMenu.isDisable());
+            //set the opacity to display only one pane
             borderPaneGame.setOpacity(1);
             borderPaneMenu.setOpacity(0);
             GameScreenAsCurrentWindow = true;
         }
     }
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
