@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane minHeight="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #383E42;"
+		StackPane.alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
+		fx:controller="kingdomBuilder.gui.controller.AltMenuViewController">
+
+	<center>
+		<VBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button mnemonicParsing="false" onAction="#onButtonNewGamePressed" prefHeight="25.0" prefWidth="400.0"
+						text="New Game" />
+				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="400.0" text="Option 2" />
+				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="400.0" text="Option 3" />
+			</children>
+		</VBox>
+	</center>
+	<top>
+		<Label alignment="CENTER" contentDisplay="CENTER" text="Menu Screen PlaceHolder" textAlignment="CENTER"
+				textFill="#f8efef" BorderPane.alignment="CENTER">
+			<font>
+				<Font size="41.0" />
+			</font>
+		</Label>
+	</top>
+
+</BorderPane>

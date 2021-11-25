@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+		xmlns:fx="http://javafx.com/fxml"
+		minHeight="600.0" style="-fx-background-color: #383E42;"
+		fx:controller="kingdomBuilder.gui.controller.AltGameViewController"
+		prefHeight="400.0" prefWidth="600.0">
+
+	<top>
+		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<children>
+				<Button text="Main Menu" onAction="#onButtonMainMenuPressed" minWidth="100"/>
+				<Label fx:id="player1" alignment="CENTER" prefHeight="89.0" prefWidth="130.0" text="PLAYER1 "
+						textAlignment="CENTER"
+						textFill="WHITE" />
+				<Label alignment="CENTER" prefHeight="97.0" prefWidth="148.0" text="PLAYER 2"
+						textAlignment="CENTER" textFill="WHITE" />
+				<Label alignment="CENTER" prefHeight="102.0" prefWidth="134.0" text="PLAYER 3"
+						textAlignment="CENTER" textFill="WHITE" />
+				<Label alignment="CENTER" prefHeight="104.0" prefWidth="327.0" text="3 WINCONDITIONS"
+						textFill="WHITE" />
+			</children></HBox>
+	</top>
+	<bottom>
+		<HBox prefHeight="126.0" prefWidth="740.0" BorderPane.alignment="CENTER">
+			<children>
+				<Label alignment="CENTER" prefHeight="121.0" prefWidth="139.0" text="Remaining Buildings"
+						textAlignment="CENTER" textFill="WHITE" />
+				<Label alignment="CENTER" prefHeight="122.0" prefWidth="143.0" text="TOKEN" textFill="WHITE" />
+				<Label alignment="CENTER" prefHeight="124.0" prefWidth="236.0" text="LANDSCAPE" textFill="WHITE" />
+				<Label alignment="CENTER" contentDisplay="CENTER" prefHeight="125.0" prefWidth="218.0"
+						text="PLAYER STATS (TIMER?)" textFill="WHITE" />
+			</children></HBox>
+	</bottom>
+	<center>
+		<ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+			<content>
+				<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+			</content>
+		</ScrollPane>
+	</center>
+
+</BorderPane>
