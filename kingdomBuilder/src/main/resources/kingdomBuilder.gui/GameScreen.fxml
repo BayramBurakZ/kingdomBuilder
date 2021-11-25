@@ -41,7 +41,7 @@
             </BorderPane>
             <StackPane>
                <children>
-                  <BorderPane fx:id="borderPaneMenu" minHeight="600.0" opacity="0.0" style="-fx-background-color: #383E42;" StackPane.alignment="TOP_RIGHT">
+                  <BorderPane fx:id="borderPaneMenu" disable="true" minHeight="600.0" opacity="0.0" style="-fx-background-color: #383E42;" StackPane.alignment="TOP_RIGHT">
                      <center>
                         <VBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" BorderPane.alignment="CENTER">
                            <children>
@@ -63,25 +63,25 @@
                      <top>
                         <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label alignment="CENTER" prefHeight="89.0" prefWidth="130.0" text="PLAYER1 " textAlignment="CENTER" textFill="WHITE" />
-                              <Label alignment="CENTER" prefHeight="97.0" prefWidth="148.0" text="PLAYER 2" textAlignment="CENTER" textFill="WHITE" />
-                              <Label alignment="CENTER" prefHeight="102.0" prefWidth="134.0" text="PLAYER 3" textAlignment="CENTER" textFill="WHITE" />
-                              <Label alignment="CENTER" prefHeight="104.0" prefWidth="327.0" text="3 WINCONDITIONS" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="103.0" prefWidth="130.0" text="PLAYER 1 " textAlignment="CENTER" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="103.0" prefWidth="148.0" text="PLAYER 2" textAlignment="CENTER" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="103.0" prefWidth="134.0" text="PLAYER 3" textAlignment="CENTER" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="103.0" prefWidth="327.0" text="3 WINCONDITIONS" textFill="WHITE" />
                            </children></HBox>
                      </top>
                      <bottom>
                         <HBox prefHeight="126.0" prefWidth="740.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label alignment="CENTER" prefHeight="121.0" prefWidth="139.0" text="Remaining Buildings" textAlignment="CENTER" textFill="WHITE" />
-                              <Label alignment="CENTER" prefHeight="122.0" prefWidth="143.0" text="TOKEN" textFill="WHITE" />
-                              <Label alignment="CENTER" prefHeight="124.0" prefWidth="236.0" text="LANDSCAPE" textFill="WHITE" />
-                              <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="125.0" prefWidth="218.0" text="PLAYER STATS (TIMER?)" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="120.0" prefWidth="139.0" text="Remaining Buildings" textAlignment="CENTER" textFill="WHITE" />
+                              <Label alignment="CENTER" prefHeight="120.0" prefWidth="143.0" text="TOKEN" textFill="WHITE" />
+                              <Label alignment="CENTER" onMouseClicked="#switchPanes" prefHeight="120.0" prefWidth="236.0" text="LANDSCAPE" textFill="WHITE" />
+                              <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="120.0" prefWidth="218.0" text="PLAYER STATS (TIMER?)" textFill="WHITE" />
                            </children></HBox>
                      </bottom>
                      <center>
                         <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                           <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="200.0" />
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="264.0" prefWidth="320.0" />
                           </content>
                         </ScrollPane>
                      </center></BorderPane>
