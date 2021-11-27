@@ -17,11 +17,19 @@ dependencies {
 javafx {
     version = "17"
     modules("javafx.controls", "javafx.fxml")
-}23
+}
 
 application {
     mainClass.set("kingdomBuilder.Boot")
 }
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
+}
+
 
 tasks.withType<Jar> {
     manifest {
