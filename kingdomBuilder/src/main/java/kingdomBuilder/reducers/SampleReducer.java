@@ -1,5 +1,7 @@
-package kingdomBuilder;
+package kingdomBuilder.reducers;
 
+import kingdomBuilder.SampleState;
+import kingdomBuilder.actions.IncrementAction;
 import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
 

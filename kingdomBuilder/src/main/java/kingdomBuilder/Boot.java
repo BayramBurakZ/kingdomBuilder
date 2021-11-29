@@ -1,8 +1,10 @@
 package kingdomBuilder;
 
+import kingdomBuilder.actions.IncrementAction;
 import kingdomBuilder.network.Client;
 import java.io.IOException;
 
+import kingdomBuilder.reducers.SampleReducer;
 import kingdomBuilder.redux.Store;
 
 public class Boot {

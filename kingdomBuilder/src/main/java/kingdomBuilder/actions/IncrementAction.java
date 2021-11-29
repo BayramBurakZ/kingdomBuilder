@@ -1,4 +1,4 @@
-package kingdomBuilder;
+package kingdomBuilder.actions;
 
 import kingdomBuilder.redux.Action;
 
