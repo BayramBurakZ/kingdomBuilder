@@ -1,0 +1,31 @@
+GUI:
+camelcase
+unterstriche
+...
+
+.fxml:
+
+- id: <viewname><typ><bezeichnung>
+	example: gamelobbyview_button_startgame
+			gamelobby_bt_startgame
+
+Java-Klassen:
+
+Anordnung hierarisch (bspw. GUI :
+
+stage
+scene
+Hbox
+Button
+...
+
+Variablen
+
+Klassennamen
+
+Methoden
+
+isAvailable ...
+
+hasPermission ...
+

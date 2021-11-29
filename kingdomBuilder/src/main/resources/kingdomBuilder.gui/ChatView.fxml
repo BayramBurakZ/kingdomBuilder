@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox xmlns="http://javafx.com/javafx"
+		xmlns:fx="http://javafx.com/fxml"
+		alignment="CENTER"
+		fx:controller="kingdomBuilder.gui.controller.ChatViewController">
+
+	<Label alignment="CENTER" contentDisplay="CENTER" maxHeight="100.0" maxWidth="250.0" minHeight="100.0"
+			minWidth="250.0" prefHeight="100.0" prefWidth="250.0" style="-fx-background-color: #202020;"
+			text="System Information or Client List" textAlignment="CENTER" textFill="WHITE"
+			BorderPane.alignment="CENTER" />
+
+	<TextArea fx:id="textAreaChatDisplay" prefHeight="200.0" prefWidth="200.0" editable="false"
+			VBox.vgrow="ALWAYS" BorderPane.alignment="CENTER"/>
+
+	<HBox fx:id="hBoxChat" alignment="CENTER" fillHeight="false" maxHeight="125.0" maxWidth="250.0" minHeight="123.0"
+			minWidth="250.0" prefHeight="125.0" prefWidth="250.0" style="-fx-background-color: #202020;"
+			BorderPane.alignment="TOP_RIGHT">
+		<children>
+			<VBox alignment="CENTER_LEFT" maxWidth="60.0" minWidth="60.0" prefHeight="200.0" prefWidth="60.0"
+					spacing="30.0">
+				<children>
+					<Button fx:id="switchBtn" mnemonicParsing="false"  prefHeight="25.0" prefWidth="37.0"
+							text="Button" />
+					<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="37.0" text="Button" />
+				</children>
+				<padding>
+					<Insets left="10.0" />
+				</padding>
+			</VBox>
+			<TextField fx:id="textFieldChatBox" maxHeight="102.0" maxWidth="187.0" minHeight="102.0" minWidth="187.0"
+					prefHeight="102.0" prefWidth="187.0" promptText="Type a message ..." />
+		</children>
+		<padding>
+			<Insets right="10.0" />
+		</padding>
+		<BorderPane.margin>
+			<Insets />
+		</BorderPane.margin>
+	</HBox>
+
+
+</VBox>

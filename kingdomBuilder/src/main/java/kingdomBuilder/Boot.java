@@ -1,11 +1,15 @@
 package kingdomBuilder;
 
+import javafx.application.Application;
 import kingdomBuilder.actions.IncrementAction;
 import kingdomBuilder.network.Client;
 import java.io.IOException;
 
 import kingdomBuilder.reducers.SampleReducer;
 import kingdomBuilder.redux.Store;
+
+import javafx.application.Application;
+import kingdomBuilder.gui.KingdomBuilderApplication;
 
 public class Boot {
 
@@ -16,5 +20,7 @@ public class Boot {
 
             Client client = new Client("localhost", 6666);
             var fut = client.join("Yeet42");
+
+        Application.launch(KingdomBuilderApplication.class);
     }
 }
