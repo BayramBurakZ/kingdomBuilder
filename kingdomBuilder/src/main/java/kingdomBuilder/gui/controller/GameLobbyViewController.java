@@ -4,9 +4,9 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class AltGameLobbyViewController {
+public class GameLobbyViewController {
 
-    private AltMainViewController altMainViewController;
+    private MainViewController mainViewController;
 
     @FXML
     private TextField gameLobbyTextField;
@@ -17,16 +17,16 @@ public class AltGameLobbyViewController {
         if (playerName.isEmpty()) {
 
         } else {
-            altMainViewController.showGameView(playerName);
+            mainViewController.showGameView(playerName);
         }
     }
 
     @FXML
     public void onButtonMainMenuPressed(Event event) {
-        altMainViewController.showMenuView();
+        mainViewController.showMenuView();
     }
 
-    public void setMainViewController(AltMainViewController altMainViewController) {
-        this.altMainViewController = altMainViewController;
+    public void setMainViewController(MainViewController mainViewController) {
+        this.mainViewController = mainViewController;
     }
 }

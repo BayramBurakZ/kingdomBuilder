@@ -6,12 +6,9 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 
-import java.net.URL;
-import java.util.ResourceBundle;
+public class GameViewController {
 
-public class AltGameViewController {
-
-    private AltMainViewController mainViewController;
+    private MainViewController mainViewController;
 
     @FXML
     private Label player1;
@@ -34,7 +31,7 @@ public class AltGameViewController {
         subSceneBoard.widthProperty().set(borderPane.getCenter().getBoundsInParent().getWidth());
     }
 
-    public void setMainViewController(AltMainViewController mainViewController) {
+    public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
     }
 

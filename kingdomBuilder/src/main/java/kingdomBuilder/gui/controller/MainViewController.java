@@ -15,13 +15,13 @@ die Anzahl der Spieler oder die Schwierigkeitsstufe der AI, müsste man sich üb
 Die Views werden immer wieder zerstört und neu erschaffen (!), also verschwinden auch die Daten. REDUX?
  */
 
-public class AltMainViewController implements Initializable {
+public class MainViewController implements Initializable {
 
     private FXMLLoader fxmlLoader;
 
-    private AltMenuViewController menuViewController;
-    private AltGameLobbyViewController gameLobbyViewController;
-    private AltGameViewController gameViewController;
+    private MenuViewController menuViewController;
+    private GameLobbyViewController gameLobbyViewController;
+    private GameViewController gameViewController;
 
     @FXML
     private BorderPane borderPane;
@@ -34,7 +34,7 @@ public class AltMainViewController implements Initializable {
     public void showMenuView() {
         try {
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/AltMenuView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/MenuView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             menuViewController = fxmlLoader.getController();
             menuViewController.setMainViewController(this);
@@ -46,7 +46,7 @@ public class AltMainViewController implements Initializable {
     public void showGameLobbyView() {
         try {
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/AltGameLobbyView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/GameLobbyView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             gameLobbyViewController = fxmlLoader.getController();
             gameLobbyViewController.setMainViewController(this);
@@ -59,7 +59,7 @@ public class AltMainViewController implements Initializable {
         try {
             // new FXMLLoder, due to 'root already specified' error
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/AltGameView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/GameView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             gameViewController = fxmlLoader.getController();
             gameViewController.setMainViewController(this);

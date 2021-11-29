@@ -6,7 +6,7 @@
 
 <BorderPane minHeight="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #383E42;"
 		StackPane.alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
-		fx:controller="kingdomBuilder.gui.controller.AltMenuViewController">
+		fx:controller="kingdomBuilder.gui.controller.MenuViewController">
 
 	<center>
 		<VBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" BorderPane.alignment="CENTER">

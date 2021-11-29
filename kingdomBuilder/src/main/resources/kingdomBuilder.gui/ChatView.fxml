@@ -7,7 +7,7 @@
 <VBox xmlns="http://javafx.com/javafx"
 		xmlns:fx="http://javafx.com/fxml"
 		alignment="CENTER"
-		fx:controller="kingdomBuilder.gui.controller.AltChatViewController">
+		fx:controller="kingdomBuilder.gui.controller.ChatViewController">
 
 	<Label alignment="CENTER" contentDisplay="CENTER" maxHeight="100.0" maxWidth="250.0" minHeight="100.0"
 			minWidth="250.0" prefHeight="100.0" prefWidth="250.0" style="-fx-background-color: #202020;"
