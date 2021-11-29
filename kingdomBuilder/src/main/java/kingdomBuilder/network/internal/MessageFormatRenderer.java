@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MessageFormatRenderer extends MessageFormatBase {
 
@@ -17,7 +18,19 @@ public class MessageFormatRenderer extends MessageFormatBase {
     }
 
     private static String getValueByEvaluatingMethod(Method method, Object object) {
-        try { return (String) method.invoke(object); }
+        try {
+            Object obj = method.invoke(object);
+            if(!obj.getClass().isArray())
+                return obj.toString();
+
+            Object[] objs = (Object[]) obj;
+            String ret = Arrays
+                .stream(objs)
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
+
+            return String.format("{%s}", ret);
+        }
         catch(IllegalAccessException | InvocationTargetException e) { return null; }
     }
 
@@ -37,8 +50,7 @@ public class MessageFormatRenderer extends MessageFormatBase {
         final Method method = Arrays
                 .stream(methods)
                 .filter(m -> m.getName().equals(placeholder)
-                        && m.getParameterCount() == 0
-                        && m.getReturnType() == String.class)
+                        && m.getParameterCount() == 0)
                 .findFirst()
                 .orElseThrow(
                     () -> new RuntimeException(String.format("Failed to determine substitute for placeholder '%s'.", placeholder))
@@ -52,7 +64,8 @@ public class MessageFormatRenderer extends MessageFormatBase {
 
         for(var p : placeholders) {
             if(cache.containsKey(p.name())) continue;
-            cache.put(p.name(), getValueForPlaceholder(object, p.name()));
+            String val = getValueForPlaceholder(object, p.name());
+            cache.put(p.name(), val);
         }
 
         return cache;
@@ -61,12 +74,17 @@ public class MessageFormatRenderer extends MessageFormatBase {
     private static String fillPlaceholders(String format, List<Placeholder> placeholders, Map<String, String> cache) {
         StringBuilder sb = new StringBuilder();
 
+        int fmtCur = 0;
         for(var p: placeholders) {
-            if(p.begin() != 0)
-                sb.append(format, 0, p.begin());
+            if(fmtCur != p.begin()) {
+                sb.append(format, fmtCur, p.begin());
+                fmtCur = p.end() + 1;
+            }
 
             sb.append(cache.get(p.name()));
         }
+
+        sb.append(format, fmtCur, format.length());
 
         return sb.toString();
     }

@@ -13,10 +13,10 @@ class MessageFormatBase {
     ){};
 
     protected static String getFormatString(Class<?> cls) {
-        if(!cls.isAnnotationPresent(Message.class))
+        if(!cls.isAnnotationPresent(MessageFormat.class))
             throw new RuntimeException("Data transfer objects must be annotated with @Message.");
 
-        String fmt = cls.getAnnotation(Message.class).format();
+        String fmt = cls.getAnnotation(MessageFormat.class).format();
         if(fmt.isEmpty())
             throw new RuntimeException("Data transfer objects must define non-empty format.");
 

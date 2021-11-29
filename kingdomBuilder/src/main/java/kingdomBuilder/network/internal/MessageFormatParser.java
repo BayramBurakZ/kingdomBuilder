@@ -18,10 +18,23 @@ public class MessageFormatParser extends MessageFormatBase {
         return type;
     }
 
+    public Object[] processArray(Class<?> type, String payload) {
+        String[] values = payload.split(",");
+
+        if(type.getComponentType() == Integer.class)
+            return Arrays
+                    .stream(values)
+                    .mapToInt(Integer::parseInt)
+                    .boxed()
+                    .toArray(Integer[]::new);
+
+        return null;
+    }
+
     public <T> T parseTo(@NotNull String message, @NotNull Class<T> cls) {
         final String format = getFormatString(cls);
         final List<Placeholder> placeholders = getPlaceholdersFromFormat(format);
-        final Map<String, Object> constructionArgsCache = new HashMap<>();
+        final Map<String, Object> cache = new HashMap<>();
         int nextPlaceholder = 0;
 
         for(int it = 0, jt = 0; it < message.length() && jt < format.length(); ++it, ++jt) {
@@ -34,13 +47,15 @@ public class MessageFormatParser extends MessageFormatBase {
             char delimiter = format.charAt(currentPlaceholder.end() + 1);
             int end = message.indexOf(delimiter, it);
 
-            if(type == int.class) {
-                int val = Integer.parseInt(message, it, end, 10);
-                constructionArgsCache.put(currentPlaceholder.name(), val);
-            } else if(type == String.class) {
-                String val = message.substring(it, end);
-                constructionArgsCache.put(currentPlaceholder.name(), val);
-            }
+            Object value = null;
+            if(type == int.class)
+                value = Integer.parseInt(message, it, end, 10);
+            else if(type == String.class)
+                value = message.substring(it, end);
+            else if(type.isArray())
+                value = processArray(type, message.substring(it + 1, end -1));
+
+            cache.put(currentPlaceholder.name(), value);
 
             it = end;
             jt = currentPlaceholder.end() + 1;
@@ -48,14 +63,10 @@ public class MessageFormatParser extends MessageFormatBase {
 
         final List<Object> args = new ArrayList<>();
         var ctor = cls.getConstructors()[0];
-        for(var p : ctor.getParameters())
-            args.add(constructionArgsCache.get(p.getName()));
+        Arrays.stream(ctor.getParameters()).forEach(p -> args.add(cache.get(p.getName())));
 
-        try {
-            return (T) ctor.newInstance(args.toArray());
-        } catch(Exception e) {
-            return null;
-        }
+        try { return (T) ctor.newInstance(args.toArray()); }
+        catch(Exception e) { return null; }
     }
 
 }
