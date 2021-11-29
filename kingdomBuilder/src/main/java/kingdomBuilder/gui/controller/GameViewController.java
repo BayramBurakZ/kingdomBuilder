@@ -4,7 +4,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.SubScene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
 public class GameViewController {
@@ -13,9 +12,6 @@ public class GameViewController {
 
     @FXML
     private Label player1;
-
-    @FXML
-    private BorderPane game_boarderpane;
 
     @FXML
     private HBox game_hbox;
@@ -30,15 +26,7 @@ public class GameViewController {
 
     @FXML
     public void initialize() {
-        //set height and width of the subscene to the borderpanes center
-        /*
-        game_subscene.heightProperty().set(game_boarderpane.getCenter().getBoundsInParent().getHeight());
-        game_subscene.widthProperty().set(game_boarderpane.getCenter().getBoundsInParent().getWidth());
-
-         */
-
-        // TODO: subscene/hbox/boarderpane_center resize, gets biggern, not smaller
-
+        //resize the subscene to the size of its parent (game_hbox)
         game_subscene.heightProperty().bind(game_hbox.heightProperty());
         game_subscene.widthProperty().bind(game_hbox.widthProperty());
     }

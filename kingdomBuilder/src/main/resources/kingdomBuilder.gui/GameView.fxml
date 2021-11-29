@@ -36,7 +36,7 @@
 	</bottom>
 	<center>
 		<HBox alignment="CENTER" fx:id="game_hbox">
-			<SubScene fx:id="game_subscene" height="380.0" width="600.0" BorderPane.alignment="CENTER">
+			<SubScene fx:id="game_subscene" height="380.0" width="600.0" BorderPane.alignment="CENTER" managed="false">
 				<root>
 					<fx:include source="GameBoardView.fxml"/>
 				</root>
