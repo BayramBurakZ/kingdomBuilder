@@ -9,6 +9,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import kingdomBuilder.gui.gameboard.HexagonTile;
+import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -46,7 +47,9 @@ public class GameBoardViewController implements Initializable {
     }
 
     private void setupEventHandler() {
+
         setupScrollEventHandler();
+        setupKeyEventHandler();
     }
 
     private void setupScrollEventHandler() {
@@ -62,6 +65,33 @@ public class GameBoardViewController implements Initializable {
                 gameboard_pane.setScaleX(gameboard_pane.getScaleX() * zoomFactor);
                 gameboard_pane.setScaleY(gameboard_pane.getScaleY() * zoomFactor);
                 event.consume();
+            }
+        });
+    }
+
+    /**
+     * This function translates the gameboard when the user presses the arrow keys
+     * @author Tom & Linda
+     */
+    private void setupKeyEventHandler() {
+        gameboard_pane.setOnKeyPressed(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                switch(event.getCode()){
+                    // TODO: Verschiebungsgrad anpassen
+                    case UP:
+                        gameboard_pane.setTranslateY(gameboard_pane.getTranslateY() + 20.0);
+                        break;
+                    case DOWN:
+                        gameboard_pane.setTranslateY(gameboard_pane.getTranslateY() - 20.0);
+                        break;
+                    case LEFT:
+                        gameboard_pane.setTranslateX(gameboard_pane.getTranslateX() + 20.0);
+                        break;
+                    case RIGHT:
+                        gameboard_pane.setTranslateX(gameboard_pane.getTranslateX() - 20.0);
+                        break;
+                }
             }
         });
     }

@@ -39,4 +39,6 @@ public class GameViewController {
     public void setPlayer1Name(String name) {
         player1.setText(name);
     }
+
+    public SubScene getGame_subscene() {return this.game_subscene;}
 }

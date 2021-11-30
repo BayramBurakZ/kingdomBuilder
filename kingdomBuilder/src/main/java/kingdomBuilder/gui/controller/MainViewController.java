@@ -63,6 +63,8 @@ public class MainViewController implements Initializable {
             borderPane.setCenter(fxmlLoader.load());
             gameViewController = fxmlLoader.getController();
             gameViewController.setMainViewController(this);
+            // TODO: Focus-management
+            gameViewController.getGame_subscene().getRoot().requestFocus();
 
             // Möglicherweise überflüssig (siehe GameViewController)
             gameViewController.setPlayer1Name(playerName);
