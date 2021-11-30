@@ -34,7 +34,7 @@ public class MainViewController implements Initializable {
     public void showMenuView() {
         try {
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/MenuView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/controller/MenuView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             menuViewController = fxmlLoader.getController();
             menuViewController.setMainViewController(this);
@@ -46,7 +46,7 @@ public class MainViewController implements Initializable {
     public void showGameLobbyView() {
         try {
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/GameLobbyView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/controller/GameLobbyView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             gameLobbyViewController = fxmlLoader.getController();
             gameLobbyViewController.setMainViewController(this);
@@ -59,7 +59,7 @@ public class MainViewController implements Initializable {
         try {
             // new FXMLLoder, due to 'root already specified' error
             fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/GameView.fxml"));
+            fxmlLoader.setLocation(getClass().getResource("/kingdomBuilder.gui/controller/GameView.fxml"));
             borderPane.setCenter(fxmlLoader.load());
             gameViewController = fxmlLoader.getController();
             gameViewController.setMainViewController(this);
