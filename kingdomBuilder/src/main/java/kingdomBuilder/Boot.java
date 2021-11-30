@@ -13,6 +13,7 @@ import kingdomBuilder.redux.Store;
 public class Boot {
 
     public static void main(String[] args) throws IOException {
+        /*
         Store<SampleState> store = new Store<>(new SampleState(0), new SampleReducer());
         store.subscribe(sampleState -> {
             System.out.println("Counter is now: " + sampleState.getCounter());
@@ -22,6 +23,8 @@ public class Boot {
         // TODO: handle no connection; threads still created
         Client client = new Client("localhost", 6666);
         var fut = client.join("Yeet42");
+
+         */
 
         Application.launch(KingdomBuilderApplication.class);
     }

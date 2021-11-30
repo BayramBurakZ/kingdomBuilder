@@ -37,5 +37,6 @@ public class KingdomBuilderApplication extends Application {
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(600);
         primaryStage.show();
+        //primaryStage.setMaximized(true);
     }
 }
