@@ -32,7 +32,7 @@ public class KingdomBuilderApplication extends Application {
         Scene scene = new Scene(root, 1000, 600);
 
         // Setup stage
-        primaryStage.setTitle("KingdomBuilder v0.1 Chat Client");
+        primaryStage.setTitle("KingdomBuilder v0.1 Chat ClientDAO");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(600);

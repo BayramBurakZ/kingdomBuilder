@@ -21,7 +21,7 @@ public class Boot {
         store.dispatch(new IncrementAction());
 
         // TODO: handle no connection; threads still created
-        Client client = new Client("localhost", 6666);
+        ClientDAO client = new ClientDAO("localhost", 6666);
         var fut = client.join("Yeet42");
 
          */
