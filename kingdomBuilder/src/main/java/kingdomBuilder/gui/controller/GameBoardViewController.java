@@ -4,19 +4,18 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import kingdomBuilder.gui.gameboard.HexagonTile;
 import javafx.scene.input.KeyEvent;
+import kingdomBuilder.model.Model;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class GameBoardViewController implements Initializable {
 
-    private HexagonTile[][] gameBoard = new HexagonTile[20][20];
+    private Model model = new Model();
+    private HexagonTile[][] gameBoard = model.getGameboard_model();
 
     @FXML
     private Pane gameboard_pane;
@@ -40,8 +39,11 @@ public class GameBoardViewController implements Initializable {
 
                 double yPos = y * 60;
                 HexagonTile hexagonTile = new HexagonTile(xPos, yPos);
+                //get texture from the pre-generated gameboard, later get Tile Type and then set texture
+                hexagonTile.setFill(gameBoard[x][y].getFill());
+
                 gameboard_pane.getChildren().add(hexagonTile);
-                gameBoard[x][y] = hexagonTile;
+                //gameBoard[x][y] = hexagonTile;
             }
         }
     }

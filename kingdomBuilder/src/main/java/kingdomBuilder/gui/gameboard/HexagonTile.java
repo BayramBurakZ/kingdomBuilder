@@ -1,7 +1,9 @@
 package kingdomBuilder.gui.gameboard;
 
 import javafx.event.EventHandler;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
@@ -46,5 +48,10 @@ public class HexagonTile extends Polygon {
                 setStrokeWidth(1.0);
             }
         });
+    }
+
+    //sets the texture with the correct ImagePattern
+    public void setTexture(Image texture) {
+        setFill(new ImagePattern(texture, 0.0f, 0.0f, 1.0f, 1.0f, true));
     }
 }
