@@ -4,7 +4,7 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 
-public class GameLobbyViewController {
+public class GameLobbyViewController extends Controller {
 
     private MainViewController mainViewController;
 

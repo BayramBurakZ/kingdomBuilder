@@ -3,7 +3,7 @@ package kingdomBuilder.gui.controller;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 
-public class MenuViewController {
+public class MenuViewController extends Controller{
 
     private MainViewController mainViewController;
 

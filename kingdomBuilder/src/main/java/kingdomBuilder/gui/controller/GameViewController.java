@@ -6,7 +6,7 @@ import javafx.scene.SubScene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
-public class GameViewController {
+public class GameViewController extends Controller {
 
     private MainViewController mainViewController;
 
