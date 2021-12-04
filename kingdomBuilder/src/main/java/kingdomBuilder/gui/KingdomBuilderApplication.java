@@ -29,13 +29,13 @@ public class KingdomBuilderApplication extends Application {
 
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/controller/MainView.fxml"));
         Parent root = fxmlLoader.load();
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1000, 650);
 
         // Setup stage
         primaryStage.setTitle("KingdomBuilder v0.2");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinHeight(650);
         primaryStage.show();
     }
 }
