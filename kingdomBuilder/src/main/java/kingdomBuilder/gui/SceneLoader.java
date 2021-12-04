@@ -3,7 +3,6 @@ package kingdomBuilder.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import kingdomBuilder.gui.controller.Controller;
-import kingdomBuilder.gui.controller.GameLobbyViewController;
 
 import java.io.IOException;
 
@@ -13,10 +12,14 @@ public class SceneLoader {
     private Node menuView;
     private Node gameLobbyView;
     private Node gameView;
+    private Node iAmView;
+    private Node chatView;
 
     private Controller menuViewController;
     private Controller gameLobbyViewController;
     private Controller gameViewController;
+    private Controller iAmViewController;
+    private Controller chatViewController;
 
 
     private class Tuple<X, Y> {
@@ -32,6 +35,8 @@ public class SceneLoader {
         loadMenuView();
         loadGameLobbyView();
         loadGameView();
+        loadIAmView();
+        loadChatView();
     }
 
     public Tuple<Node, Controller> loadView(String location) {
@@ -69,6 +74,18 @@ public class SceneLoader {
         gameViewController = tuple.y;
     }
 
+    public void loadIAmView() {
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/IAmView.fxml");
+        iAmView = tuple.x;
+        iAmViewController = tuple.y;
+    }
+
+    public void loadChatView() {
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/ChatView.fxml");
+        chatView = tuple.x;
+        chatViewController = tuple.y;
+    }
+
     public Node getMenuView() {
         return menuView;
     }
@@ -77,6 +94,12 @@ public class SceneLoader {
     }
     public Node getGameView() {
         return gameView;
+    }
+    public Node getIAmView() {
+        return iAmView;
+    }
+    public Node getChatView() {
+        return chatView;
     }
 
     public Controller getMenuViewController() {
@@ -87,5 +110,11 @@ public class SceneLoader {
     }
     public Controller getGameViewController() {
         return gameViewController;
+    }
+    public Controller getIAmViewController() {
+        return iAmViewController;
+    }
+    public Controller getChatViewController() {
+        return chatViewController;
     }
 }
