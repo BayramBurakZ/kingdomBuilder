@@ -24,18 +24,24 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         sceneLoader = new SceneLoader();
-        showMenuView();
+        showIAmView();
     }
 
     public void showMenuView() {
         borderPane.setCenter(sceneLoader.getMenuView());
         MenuViewController menuViewController = (MenuViewController) sceneLoader.getMenuViewController();
         menuViewController.setMainViewController(this);
+
+        //loading chat in
+        borderPane.setLeft(sceneLoader.getChatView());
+        ChatViewController chatViewController = (ChatViewController) sceneLoader.getChatViewController();
+        chatViewController.setMainViewController(this);
     }
 
     public void showGameLobbyView() {
         borderPane.setCenter(sceneLoader.getGameLobbyView());
-        GameLobbyViewController gameLobbyViewController = (GameLobbyViewController) sceneLoader.getGameLobbyViewController();
+        GameLobbyViewController gameLobbyViewController = (GameLobbyViewController)
+                sceneLoader.getGameLobbyViewController();
         gameLobbyViewController.setMainViewController(this);
     }
 
@@ -52,6 +58,12 @@ public class MainViewController implements Initializable {
 
         // TODO: Möglicherweise überflüssig (siehe GameViewController)
         gameViewController.setPlayer1Name(playerName);
+    }
+
+    public void showIAmView() {
+        borderPane.setCenter(sceneLoader.getIAmView());
+        IAmViewController iAmViewController = (IAmViewController) sceneLoader.getIAmViewController();
+        iAmViewController.setIAmViewController(this);
     }
 
     // mögliche andere Views:

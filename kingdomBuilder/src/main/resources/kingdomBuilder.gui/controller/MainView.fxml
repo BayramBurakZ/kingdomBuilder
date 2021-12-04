@@ -7,9 +7,4 @@
 		fx:controller="kingdomBuilder.gui.controller.MainViewController"
 		fx:id="borderPane"
 		prefHeight="400.0" prefWidth="600.0">
-
-	<left>
-		<fx:include source="ChatView.fxml"/>
-	</left>
-
 </BorderPane>
