@@ -45,7 +45,7 @@ public class MainViewController implements Initializable {
         gameLobbyViewController.setMainViewController(this);
     }
 
-    public void showGameView(String playerName) {
+    public void showGameView() {
         //resets the GameView and generates the board new
         sceneLoader.loadGameView();
         //loads the GameView
@@ -55,9 +55,6 @@ public class MainViewController implements Initializable {
 
         // TODO: Focus-management
         gameViewController.getGame_subscene().getRoot().requestFocus();
-
-        // TODO: Möglicherweise überflüssig (siehe GameViewController)
-        gameViewController.setPlayer1Name(playerName);
     }
 
     public void showIAmView() {

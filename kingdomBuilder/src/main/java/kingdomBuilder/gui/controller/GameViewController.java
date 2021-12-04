@@ -35,10 +35,5 @@ public class GameViewController extends Controller {
         this.mainViewController = mainViewController;
     }
 
-    // TODO: Möglicherweise wegen REDUX überflüssig, dass Daten zwischen den Controllern hin und her geschoben werden
-    public void setPlayer1Name(String name) {
-        player1.setText(name);
-    }
-
     public SubScene getGame_subscene() {return this.game_subscene;}
 }
