@@ -11,7 +11,7 @@ public class GameViewController extends Controller {
     private MainViewController mainViewController;
 
     @FXML
-    private Label player1;
+    private Label game_label_player1;
 
     @FXML
     private HBox game_hbox;
