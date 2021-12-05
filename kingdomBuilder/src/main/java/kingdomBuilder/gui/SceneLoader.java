@@ -3,7 +3,6 @@ package kingdomBuilder.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import kingdomBuilder.gui.controller.Controller;
-import kingdomBuilder.gui.controller.GameLobbyViewController;
 
 import java.io.IOException;
 
@@ -13,10 +12,12 @@ public class SceneLoader {
     private Node menuView;
     private Node gameLobbyView;
     private Node gameView;
+    private Node gameSelectionView;
 
     private Controller menuViewController;
     private Controller gameLobbyViewController;
     private Controller gameViewController;
+    private Controller gameSelectionViewController;
 
 
     private class Tuple<X, Y> {
@@ -32,6 +33,7 @@ public class SceneLoader {
         loadMenuView();
         loadGameLobbyView();
         loadGameView();
+        loadGameSelectionView();
     }
 
     public Tuple<Node, Controller> loadView(String location) {
@@ -69,6 +71,12 @@ public class SceneLoader {
         gameViewController = tuple.y;
     }
 
+    public void loadGameSelectionView() {
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameSelectionView.fxml");
+        gameSelectionView = tuple.x;
+        gameSelectionViewController = tuple.y;
+    }
+
     public Node getMenuView() {
         return menuView;
     }
@@ -78,6 +86,7 @@ public class SceneLoader {
     public Node getGameView() {
         return gameView;
     }
+    public Node getGameSelectionView() { return gameSelectionView; }
 
     public Controller getMenuViewController() {
         return menuViewController;
@@ -88,4 +97,5 @@ public class SceneLoader {
     public Controller getGameViewController() {
         return gameViewController;
     }
+    public Controller getGameSelectionViewController() { return gameSelectionViewController; }
 }
