@@ -48,7 +48,7 @@
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>
                   </Label>
-                  <Button mnemonicParsing="false" text="Create new game">
+                  <Button mnemonicParsing="false" onAction="#onButtonCreateNewGamePressed" text="Create new game">
                      <HBox.margin>
                         <Insets left="20.0" top="20.0" />
                      </HBox.margin>

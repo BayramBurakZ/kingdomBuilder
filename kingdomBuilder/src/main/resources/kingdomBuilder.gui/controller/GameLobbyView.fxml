@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Spinner?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane minHeight="600" minWidth="600" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameLobbyViewController">
+<BorderPane minHeight="600" minWidth="600" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameLobbyViewController">
     <right>
         <VBox alignment="TOP_CENTER" maxHeight="450.0" maxWidth="210.0" minHeight="450.0" minWidth="210.0">
             <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="29.0" minWidth="200.0">
@@ -103,7 +95,7 @@
    <top>
       <HBox minHeight="50.0" minWidth="500.0" BorderPane.alignment="CENTER">
          <children>
-               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onButtonMainMenuPressed" prefHeight="22.0" prefWidth="103.0" text="Game List">
+               <Button alignment="CENTER" mnemonicParsing="false" onAction="#onButtonGameListPressed" prefHeight="22.0" prefWidth="103.0" text="Game List">
                <HBox.margin>
                   <Insets left="3.0" top="3.0" />
                </HBox.margin>

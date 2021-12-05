@@ -9,7 +9,7 @@ public class MenuViewController extends Controller{
 
     @FXML
     public void onButtonNewGamePressed(Event event) {
-        mainViewController.showGameLobbyView();
+        mainViewController.showGameSelectionView();
     }
 
     public void setMainViewController(MainViewController mainViewController) {

@@ -63,6 +63,11 @@ public class MainViewController implements Initializable {
         iAmViewController.setIAmViewController(this);
     }
 
+    public void showGameSelectionView() {
+        borderPane.setCenter(sceneLoader.getGameSelectionView());
+        GameSelectionViewController gameSelectionViewController = (GameSelectionViewController) sceneLoader.getGameSelectionViewController();
+        gameSelectionViewController.setMainViewController(this);
+    }
     // mögliche andere Views:
     // public void showLobbyView()
     // public void showGameResumeView()

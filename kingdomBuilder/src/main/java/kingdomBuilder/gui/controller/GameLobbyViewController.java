@@ -24,9 +24,10 @@ public class GameLobbyViewController extends Controller implements Initializable
     }
 
     @FXML
-    public void onButtonMainMenuPressed(Event event) {
-        mainViewController.showMenuView();
+    public void onButtonGameListPressed(Event event) {
+        mainViewController.showGameSelectionView();
     }
+    
 
     public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
