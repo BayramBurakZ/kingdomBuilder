@@ -22,7 +22,7 @@ public class IAmViewController extends Controller implements Initializable {
         setupEventHandler();
     }
 
-    public void setIAmViewController(MainViewController mainViewController) {
+    public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
     }
 

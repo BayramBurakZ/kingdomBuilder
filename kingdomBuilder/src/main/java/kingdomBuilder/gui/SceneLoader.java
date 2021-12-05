@@ -6,6 +6,13 @@ import kingdomBuilder.gui.controller.Controller;
 
 import java.io.IOException;
 
+/**
+ * Class that is used for creating an object that contains every scene.
+ * With the construction of it sets all fields to the corresponding scene and controller.
+ * (The following underscores stand for the specific View)
+ * The load_View() methode is for initial loading of all scenes and for reloading them.
+ * With the get_View() you get the specific view.
+ */
 public class SceneLoader {
     private FXMLLoader fxmlLoader;
 
@@ -23,7 +30,12 @@ public class SceneLoader {
     private Controller chatViewController;
     private Controller gameSelectionViewController;
 
-
+    /**
+     * This method is used for generating a datastructure for returning two objects at the same time.
+     * Currently only used for returning a node and the controller at the same time
+     * @param <X> first object to save in the x-position of the tuple
+     * @param <Y> second object to save in the y-position of the tuple
+     */
     private class Tuple<X, Y> {
         public final X x;
         public final Y y;
@@ -33,6 +45,9 @@ public class SceneLoader {
         }
     }
 
+    /**
+     * Constructor that initially loads every view
+     */
     public SceneLoader() {
         loadMenuView();
         loadGameLobbyView();
@@ -42,7 +57,14 @@ public class SceneLoader {
         loadGameSelectionView();
     }
 
-    public Tuple<Node, Controller> loadView(String location) {
+    /**
+     * Loads the View at the specific location of the parameter and put the view on the x-position of the
+     * tuple and the corresponding controller at the  y-position of the tuple
+     *
+     * @param location String that contains the path to the location of the .fxml file
+     * @return Tuple x-position is the View as Node, y-position is the contoller
+     */
+    private Tuple<Node, Controller> loadView(String location) {
         Node node = null;
         Controller controller = null;
 
@@ -55,40 +77,69 @@ public class SceneLoader {
             e.printStackTrace();
         }
 
-        Tuple<Node, Controller> tuple = new Tuple<>(node, controller);
-        return tuple;
+        return new Tuple<>(node, controller);
     }
 
+    /**
+     * Calls the loadView() method with the path of the MenuView.fxml and
+     * sets the menuView and menuViewController fields.
+     * Used for reloading this View.
+     */
     public void loadMenuView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/MenuView.fxml");
         menuView = tuple.x;
         menuViewController = tuple.y;
     }
 
+    /**
+     * Calls the loadView() method with the path of the GameLobbyView.fxml and
+     * sets the gameLobbyView and gameLobbyViewController fields
+     * Used for reloading this View.
+     */
     public void loadGameLobbyView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameLobbyView.fxml");
         gameLobbyView = tuple.x;
         gameLobbyViewController = tuple.y;
     }
 
+    /**
+     * Calls the loadView() method with the path of the GameView.fxml and
+     * sets the gameView and gameViewController fields
+     * Used for reloading this View.
+     */
     public void loadGameView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameView.fxml");
         gameView = tuple.x;
         gameViewController = tuple.y;
     }
 
+    /**
+     * Calls the loadView() method with the path of the IAmView.fxml and
+     * sets the iAmView and iAmViewController fields
+     * Used for reloading this View.
+     */
     public void loadIAmView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/IAmView.fxml");
         iAmView = tuple.x;
         iAmViewController = tuple.y;
     }
 
+    /**
+     * Calls the loadView() method with the path of the ChatView.fxml and
+     * sets the chatView and chatViewController fields
+     * Used for reloading this View.
+     */
     public void loadChatView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/ChatView.fxml");
         chatView = tuple.x;
         chatViewController = tuple.y;
     }
 
+    /**
+     * Calls the loadView() method with the path of the GameSelectionView.fxml and
+     * sets the gameSelectionView and gameSelectionViewController fields
+     * Used for reloading this View.
+     */
     public void loadGameSelectionView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameSelectionView.fxml");
         gameSelectionView = tuple.x;
