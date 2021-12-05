@@ -26,12 +26,16 @@ public class MessageSocket {
 
     public <T> void sendMessage(T msg) {
         out.println(renderer.render(msg));
+        out.flush();
     }
 
-    public synchronized boolean receive() throws IOException {
-        String line = in.readLine();
-        if(line != null) messages.offer(line);
-        return line != null;
+    public boolean receive() throws IOException {
+        if (in.ready()) {
+            String line = in.readLine();
+            messages.offer(line);
+            return true;
+        }
+        return false;
     }
 
     public synchronized boolean hasUnprocessedMessages() {
@@ -49,6 +53,8 @@ public class MessageSocket {
         return obj;
     }
 
-
+    public synchronized void skipMessage() {
+        messages.poll();
+    }
 
 }

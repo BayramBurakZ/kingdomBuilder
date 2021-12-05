@@ -10,7 +10,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import kingdomBuilder.KBState;
 import kingdomBuilder.model.ClientDAO;
+import kingdomBuilder.network.Client;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,7 +22,8 @@ import java.util.ResourceBundle;
 
 public class ChatViewController implements Initializable {
     private String playerName;
-    private List<String> clients = new ArrayList<>();
+    private Store<KBState> store;
+    private Client client;
 
     @FXML
     private TableView<ClientDAO> tableview_chat;
@@ -47,16 +51,24 @@ public class ChatViewController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        playerName = "Player 1";
-        clients.add(playerName);
+
+        store = Store.get();
+        client = Client.getMain();
+
+        store.subscribe(kbState -> {
+            tableview_chat.getItems().setAll(kbState.clients.values());
+        });
+
+        client.onMessage.subscribe(m -> {
+            int senderID = m.clientId();
+            String senderName = store.getState().clients.get(senderID).getName();
+            textarea_globalchat.appendText(senderName + ": " + m.message());
+            textarea_globalchat.appendText(System.lineSeparator());
+        });
 
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameid"));
-
-        ClientDAO clientDAO = new ClientDAO(1337, "Dude", 1);
-
-        tableview_chat.getItems().add(clientDAO);
     }
 
     public void onButtonSendPressed(Event event) {
@@ -66,6 +78,7 @@ public class ChatViewController implements Initializable {
 
     public void onEnterPressed(KeyEvent event) {
         if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
+            // TODO: linebreak isn't supported in messages through the server protocol? or maybe it was telnet
             System.out.println("Shift linebreak");
             chatview_textarea_chatinput.appendText(System.lineSeparator());
         } else if (event.getCode() == KeyCode.ENTER) {

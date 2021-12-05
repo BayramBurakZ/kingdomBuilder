@@ -1,10 +1,11 @@
 package kingdomBuilder.network.util;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public class Event<T> {
-    private Set<Consumer<T>> consumers;
+    private final Set<Consumer<T>> consumers = new HashSet<>();
 
     public Consumer<T> subscribe(Consumer<T> c) {
         consumers.add(c);

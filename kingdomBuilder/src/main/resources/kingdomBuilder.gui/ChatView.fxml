@@ -33,7 +33,7 @@
 			   <TextArea fx:id="textarea_globalchat" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
 		   </VBox>
 	   </Tab>
-	   <Tab fx:id="tab_game" text="Game" disable="true">
+	   <Tab fx:id="tab_game" disable="true" text="Game">
 		   <VBox>
 			   <TextArea fx:id="textarea_gamechat" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
 		   </VBox>
@@ -41,7 +41,7 @@
    </TabPane>
 
 	<HBox alignment="CENTER" spacing="2.0">
-		<TextArea fx:id="chatview_textarea_chatinput" onKeyPressed="#onEnterPressed" prefRowCount="3" wrapText="true"/>
+		<TextArea fx:id="chatview_textarea_chatinput" onKeyPressed="#onEnterPressed" prefRowCount="3" promptText="Enter message..." wrapText="true" />
 		<Button minHeight="70" minWidth="50" onAction="#onButtonSendPressed" text="Send" />
 	</HBox>
 
