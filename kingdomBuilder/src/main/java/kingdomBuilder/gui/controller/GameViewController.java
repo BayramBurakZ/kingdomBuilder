@@ -11,7 +11,7 @@ public class GameViewController extends Controller {
     private MainViewController mainViewController;
 
     @FXML
-    private Label player1;
+    private Label game_label_player1;
 
     @FXML
     private HBox game_hbox;
@@ -33,11 +33,6 @@ public class GameViewController extends Controller {
 
     public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
-    }
-
-    // TODO: Möglicherweise wegen REDUX überflüssig, dass Daten zwischen den Controllern hin und her geschoben werden
-    public void setPlayer1Name(String name) {
-        player1.setText(name);
     }
 
     public SubScene getGame_subscene() {return this.game_subscene;}

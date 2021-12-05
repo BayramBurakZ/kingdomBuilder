@@ -24,22 +24,28 @@ public class MainViewController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         sceneLoader = new SceneLoader();
-        showMenuView();
+        showIAmView();
     }
 
     public void showMenuView() {
         borderPane.setCenter(sceneLoader.getMenuView());
         MenuViewController menuViewController = (MenuViewController) sceneLoader.getMenuViewController();
         menuViewController.setMainViewController(this);
+
+        //loading chat in
+        borderPane.setLeft(sceneLoader.getChatView());
+        ChatViewController chatViewController = (ChatViewController) sceneLoader.getChatViewController();
+        chatViewController.setMainViewController(this);
     }
 
     public void showGameLobbyView() {
         borderPane.setCenter(sceneLoader.getGameLobbyView());
-        GameLobbyViewController gameLobbyViewController = (GameLobbyViewController) sceneLoader.getGameLobbyViewController();
+        GameLobbyViewController gameLobbyViewController = (GameLobbyViewController)
+                sceneLoader.getGameLobbyViewController();
         gameLobbyViewController.setMainViewController(this);
     }
 
-    public void showGameView(String playerName) {
+    public void showGameView() {
         //resets the GameView and generates the board new
         sceneLoader.loadGameView();
         //loads the GameView
@@ -49,9 +55,12 @@ public class MainViewController implements Initializable {
 
         // TODO: Focus-management
         gameViewController.getGame_subscene().getRoot().requestFocus();
+    }
 
-        // TODO: Möglicherweise überflüssig (siehe GameViewController)
-        gameViewController.setPlayer1Name(playerName);
+    public void showIAmView() {
+        borderPane.setCenter(sceneLoader.getIAmView());
+        IAmViewController iAmViewController = (IAmViewController) sceneLoader.getIAmViewController();
+        iAmViewController.setIAmViewController(this);
     }
 
     // mögliche andere Views:

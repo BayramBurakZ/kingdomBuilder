@@ -12,11 +12,15 @@ public class SceneLoader {
     private Node menuView;
     private Node gameLobbyView;
     private Node gameView;
+    private Node iAmView;
+    private Node chatView;
     private Node gameSelectionView;
 
     private Controller menuViewController;
     private Controller gameLobbyViewController;
     private Controller gameViewController;
+    private Controller iAmViewController;
+    private Controller chatViewController;
     private Controller gameSelectionViewController;
 
 
@@ -33,6 +37,8 @@ public class SceneLoader {
         loadMenuView();
         loadGameLobbyView();
         loadGameView();
+        loadIAmView();
+        loadChatView();
         loadGameSelectionView();
     }
 
@@ -71,6 +77,18 @@ public class SceneLoader {
         gameViewController = tuple.y;
     }
 
+    public void loadIAmView() {
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/IAmView.fxml");
+        iAmView = tuple.x;
+        iAmViewController = tuple.y;
+    }
+
+    public void loadChatView() {
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/ChatView.fxml");
+        chatView = tuple.x;
+        chatViewController = tuple.y;
+    }
+
     public void loadGameSelectionView() {
         Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameSelectionView.fxml");
         gameSelectionView = tuple.x;
@@ -86,6 +104,12 @@ public class SceneLoader {
     public Node getGameView() {
         return gameView;
     }
+    public Node getIAmView() {
+        return iAmView;
+    }
+    public Node getChatView() {
+        return chatView;
+    }
     public Node getGameSelectionView() { return gameSelectionView; }
 
     public Controller getMenuViewController() {
@@ -96,6 +120,12 @@ public class SceneLoader {
     }
     public Controller getGameViewController() {
         return gameViewController;
+    }
+    public Controller getIAmViewController() {
+        return iAmViewController;
+    }
+    public Controller getChatViewController() {
+        return chatViewController;
     }
     public Controller getGameSelectionViewController() { return gameSelectionViewController; }
 }
