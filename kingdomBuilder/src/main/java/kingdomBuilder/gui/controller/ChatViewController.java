@@ -18,6 +18,7 @@ import kingdomBuilder.redux.Store;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ChatViewController implements Initializable {
@@ -62,7 +63,15 @@ public class ChatViewController implements Initializable {
         client.onMessage.subscribe(m -> {
             int senderID = m.clientId();
             String senderName = store.getState().clients.get(senderID).getName();
-            textarea_globalchat.appendText(senderName + ": " + m.message());
+
+            String chatText = "";
+            Integer[] receivers = m.receiverIds();
+            if (receivers.length == 1)
+                chatText = senderName + " whispers to you: " + m.message();
+            else
+                chatText = senderName + ": " + m.message();
+
+            textarea_globalchat.appendText(chatText);
             textarea_globalchat.appendText(System.lineSeparator());
         });
 
@@ -88,8 +97,33 @@ public class ChatViewController implements Initializable {
 
     private void printMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
+        String stringToSend = message;
         if (!message.isEmpty()) {
-            System.out.println(message);
+            //TEST------------------------------------------------------------------------------
+            List<Integer> messageReceiver = new ArrayList();
+            if(tab_global.isSelected()) {
+                if (!message.startsWith("@")) {
+                    for (var c : store.getState().clients.entrySet()) {
+                        messageReceiver.add(c.getKey());
+                    }
+                    message = "You: " + message;
+                } else {
+                    String pattern = "\\s";
+                    String[] s = message.split(pattern, 2);
+                    for (var c : store.getState().clients.entrySet()) {
+                        if (s[0].contains(c.getValue().getName())) {
+                            messageReceiver.add(c.getKey());
+                            break;
+                        }
+                    }
+                    message = "You whispered " + s[0] + ": " + s[1];
+                }
+            }
+
+            Client.getMain().chat(stringToSend, messageReceiver);
+            //TEST------------------------------------------------------------------------------
+
+            System.out.println("Sending this: " + stringToSend);
             textarea_globalchat.appendText(message);
             textarea_globalchat.appendText(System.lineSeparator());
         }
