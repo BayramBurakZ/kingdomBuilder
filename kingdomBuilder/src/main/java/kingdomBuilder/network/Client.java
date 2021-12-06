@@ -17,6 +17,7 @@ public class Client {
     private static Client mainClient;
 
     private final MessageSocket socket;
+
     private record Cookie(
             Class<?> expectedResponseType,
             CompletableFuture<?> future
@@ -24,7 +25,6 @@ public class Client {
     }
 
     private final Queue<Cookie> cookieQueue = new ConcurrentLinkedQueue<>();
-    private int clientId;
 
     public final Event<Message> onMessage = new Event<>();
     public final Event<ClientJoined> onClientJoined = new Event<>();
@@ -59,12 +59,8 @@ public class Client {
         return fut;
     }
 
-    public CompletableFuture<Message> chat(String message, List<Integer> receiver) {
+    public void chat(String message, List<Integer> receiver) {
         socket.sendMessage(new Chat(receiver.toArray(new Integer[0]), message));
-        CompletableFuture<Message> fut = new CompletableFuture<>();
-        Cookie ck = new Cookie(Message.class, fut);
-        cookieQueue.offer(ck);
-        return fut;
     }
 
     public CompletableFuture<ReplyClients> requestClients() {

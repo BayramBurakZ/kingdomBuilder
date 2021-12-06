@@ -11,11 +11,13 @@ public class KBState {
     // probably just make these ObservableLists directly
     public Map<Integer, ClientDAO> clients = new HashMap<>();
     public Map<Integer, GameDAO> games = new HashMap<>();
+    public int clientID;
 
     public KBState() { }
 
     public KBState(KBState other) {
         clients = new HashMap<>(other.clients);
         games = new HashMap<>(other.games);
+        clientID = other.clientID;
     }
 }

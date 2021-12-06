@@ -87,7 +87,7 @@ public class ChatViewController implements Initializable {
 
     public void onEnterPressed(KeyEvent event) {
         if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
-            // TODO: linebreak isn't supported in messages through the server protocol? or maybe it was telnet
+            // TODO: linebreak isn't supported in messages through the server protocol?
             System.out.println("Shift linebreak");
             chatview_textarea_chatinput.appendText(System.lineSeparator());
         } else if (event.getCode() == KeyCode.ENTER) {
@@ -105,6 +105,8 @@ public class ChatViewController implements Initializable {
                     for (var c : store.getState().clients.entrySet()) {
                         messageReceiver.add(c.getKey());
                     }
+                    // don't send message to ourselves
+                    messageReceiver.remove((Integer) store.getState().clientID);
                     message = "You: " + message;
                 } else {
                     String pattern = "\\s";

@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 import kingdomBuilder.actions.ClientAddAction;
 import kingdomBuilder.actions.ClientRemoveAction;
+import kingdomBuilder.actions.SetClientIDAction;
 import kingdomBuilder.gui.KingdomBuilderApplication;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.reducers.KBReducer;
@@ -30,7 +31,7 @@ public class Boot {
         Store<KBState> store = new Store<>(new KBState(), new KBReducer());
         Store.setInstance(store);
 
-        var address = "localhost";
+        var address = "juliankirsch.me";
 
         // TODO: handle no connection; threads still created
         Client client = new Client(address, 6666);
@@ -39,7 +40,7 @@ public class Boot {
         // display "Connecting..." and grey out GUI elements until this variable contains a response
         // maybe eventually timeout and ask to retry connecting
         // therefore somehow pass this variable to GUI for handling after launch()
-        var fut = client.join("Yeet42");
+        var welcomeFut = client.join("Erik");
 
         client.onClientJoined.subscribe(c -> {
             store.dispatch(new ClientAddAction(c));
@@ -49,9 +50,24 @@ public class Boot {
             store.dispatch(new ClientRemoveAction(c));
         });
 
+        // start listening to server with main client
         Thread clientThread = new Thread(client::listen);
         clientThread.start();
 
+        // wait for the WelcomeToServer message before proceeding
+        try {
+            var welcomeToServer = welcomeFut.get();
+            store.dispatch(new SetClientIDAction(welcomeToServer.clientId()));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return;
+        }
+        System.out.println("Main Client ID: " + store.getState().clientID);
+
+        // wait to receive all clients from server
         var clientsFut = client.requestClients();
         try {
             var clients = clientsFut.get().clients();
@@ -67,10 +83,10 @@ public class Boot {
             e.printStackTrace();
         }
 
-        Client testClient1 = new Client(address, 6666);
+        /*Client testClient1 = new Client(address, 6666);
         testClient1.join("TestClient1");
         Client testClient2 = new Client(address, 6666);
-        testClient2.join("TestClient2");
+        testClient2.join("TestClient2");*/
 
         Application.launch(KingdomBuilderApplication.class);
     }
