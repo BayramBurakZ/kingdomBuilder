@@ -1,4 +1,4 @@
-package kingdomBuilder.network.protocol;
+package kingdomBuilder.network.protocol.server;
 
 import kingdomBuilder.network.internal.MessageFormat;
 

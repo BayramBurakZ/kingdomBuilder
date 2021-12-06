@@ -3,14 +3,13 @@ package kingdomBuilder;
 import javafx.application.Application;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import kingdomBuilder.actions.ClientAddAction;
-import kingdomBuilder.actions.IncrementAction;
+import kingdomBuilder.actions.ClientRemoveAction;
 import kingdomBuilder.gui.KingdomBuilderApplication;
 import kingdomBuilder.network.Client;
-import kingdomBuilder.network.protocol.ClientJoined;
 import kingdomBuilder.reducers.KBReducer;
-import kingdomBuilder.reducers.SampleReducer;
 import kingdomBuilder.redux.Store;
 
 public class Boot {
@@ -31,8 +30,10 @@ public class Boot {
         Store<KBState> store = new Store<>(new KBState(), new KBReducer());
         Store.setInstance(store);
 
+        var address = "localhost";
+
         // TODO: handle no connection; threads still created
-        Client client = new Client("localhost", 6666);
+        Client client = new Client(address, 6666);
         Client.setMain(client); // TODO: same as with Store class
 
         // display "Connecting..." and grey out GUI elements until this variable contains a response
@@ -44,12 +45,31 @@ public class Boot {
             store.dispatch(new ClientAddAction(c));
         });
 
+        client.onClientLeft.subscribe(c -> {
+            store.dispatch(new ClientRemoveAction(c));
+        });
+
         Thread clientThread = new Thread(client::listen);
         clientThread.start();
 
-        Client testClient1 = new Client("localhost", 6666);
+        var clientsFut = client.requestClients();
+        try {
+            var clients = clientsFut.get().clients();
+            System.out.println(clients);
+            if (clients != null) {
+                for (var c : clients) {
+                    store.dispatch(new ClientAddAction(c));
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        Client testClient1 = new Client(address, 6666);
         testClient1.join("TestClient1");
-        Client testClient2 = new Client("localhost", 6666);
+        Client testClient2 = new Client(address, 6666);
         testClient2.join("TestClient2");
 
         Application.launch(KingdomBuilderApplication.class);

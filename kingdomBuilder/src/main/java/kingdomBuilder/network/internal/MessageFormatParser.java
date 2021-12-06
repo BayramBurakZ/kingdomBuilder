@@ -1,5 +1,6 @@
 package kingdomBuilder.network.internal;
 
+import kingdomBuilder.network.protocol.tuples.ClientTuple;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;
@@ -28,11 +29,20 @@ public class MessageFormatParser extends MessageFormatBase {
                     .boxed()
                     .toArray(Integer[]::new);
 
+        if(type.getComponentType() == ClientTuple.class) {
+            // [client_id;client_name;game_id]
+            ClientTuple[] clients = new ClientTuple[values.length];
+            for (int i = 0; i < clients.length; i++) {
+                clients[i] = parseTo(values[i], ClientTuple.class);
+            }
+            return clients;
+        }
+
         return null;
     }
 
     public <T> T parseTo(@NotNull String message, @NotNull Class<T> cls) {
-        final String format = getFormatString(cls);
+        final String format = getFormatString(cls); // "#{clientId};#{name};#{gameId}"
         final List<Placeholder> placeholders = getPlaceholdersFromFormat(format);
         final Map<String, Object> cache = new HashMap<>();
         int nextPlaceholder = 0;
@@ -52,8 +62,9 @@ public class MessageFormatParser extends MessageFormatBase {
                 value = Integer.parseInt(message, it, end, 10);
             else if(type == String.class)
                 value = message.substring(it, end);
-            else if(type.isArray())
-                value = processArray(type, message.substring(it + 1, end -1));
+            else if(type.isArray()) {
+                value = processArray(type, message.substring(it + 1, end - 1));
+            }
 
             cache.put(currentPlaceholder.name(), value);
 

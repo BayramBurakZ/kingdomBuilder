@@ -99,7 +99,6 @@ public class ChatViewController implements Initializable {
         String message = chatview_textarea_chatinput.getText().trim();
         String stringToSend = message;
         if (!message.isEmpty()) {
-            //TEST------------------------------------------------------------------------------
             List<Integer> messageReceiver = new ArrayList();
             if(tab_global.isSelected()) {
                 if (!message.startsWith("@")) {
@@ -121,7 +120,6 @@ public class ChatViewController implements Initializable {
             }
 
             Client.getMain().chat(stringToSend, messageReceiver);
-            //TEST------------------------------------------------------------------------------
 
             System.out.println("Sending this: " + stringToSend);
             textarea_globalchat.appendText(message);

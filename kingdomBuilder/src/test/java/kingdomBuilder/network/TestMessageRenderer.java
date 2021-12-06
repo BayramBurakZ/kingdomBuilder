@@ -4,8 +4,8 @@ import kingdomBuilder.network.internal.MessageFormatRenderer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import kingdomBuilder.network.protocol.Chat;
-import kingdomBuilder.network.protocol.IAm;
+import kingdomBuilder.network.protocol.server.Chat;
+import kingdomBuilder.network.protocol.server.IAm;
 import org.junit.jupiter.api.Test;
 
 

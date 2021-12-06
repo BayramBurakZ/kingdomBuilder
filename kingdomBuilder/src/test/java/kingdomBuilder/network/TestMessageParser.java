@@ -5,9 +5,9 @@ import kingdomBuilder.network.internal.MessageFormatParser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import kingdomBuilder.network.protocol.ClientJoined;
-import kingdomBuilder.network.protocol.Message;
-import kingdomBuilder.network.protocol.WelcomeToServer;
+import kingdomBuilder.network.protocol.server.ClientJoined;
+import kingdomBuilder.network.protocol.server.Message;
+import kingdomBuilder.network.protocol.server.WelcomeToServer;
 import org.junit.jupiter.api.Test;
 
 public class TestMessageParser {

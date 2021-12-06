@@ -1,12 +1,12 @@
 package kingdomBuilder.network;
 
 import kingdomBuilder.network.internal.MessageSocket;
-import kingdomBuilder.network.protocol.*;
+import kingdomBuilder.network.protocol.server.*;
+import kingdomBuilder.network.protocol.server.reply.ReplyClients;
+import kingdomBuilder.network.protocol.server.request.RequestClients;
 import kingdomBuilder.network.util.Event;
-import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +17,6 @@ public class Client {
     private static Client mainClient;
 
     private final MessageSocket socket;
-
     private record Cookie(
             Class<?> expectedResponseType,
             CompletableFuture<?> future
@@ -29,6 +28,8 @@ public class Client {
 
     public final Event<Message> onMessage = new Event<>();
     public final Event<ClientJoined> onClientJoined = new Event<>();
+    public final Event<ClientLeft> onClientLeft = new Event<>();
+
 
     public Client(String address, int port) throws IOException {
         socket = new MessageSocket(address, port);
@@ -66,6 +67,14 @@ public class Client {
         return fut;
     }
 
+    public CompletableFuture<ReplyClients> requestClients() {
+        socket.sendMessage(new RequestClients());
+        CompletableFuture<ReplyClients> fut = new CompletableFuture<>();
+        Cookie ck = new Cookie(ReplyClients.class, fut);
+        cookieQueue.offer(ck);
+        return fut;
+    }
+
     public void listen() {
         while (true) {
             boolean receivedSomething = false;
@@ -94,7 +103,7 @@ public class Client {
                 String msg = socket.peekMessageContents();
 
                 // TODO:
-                // Make this more generic and automized.
+                //  Make this more generic and automized.
                 if (msg.startsWith("[SERVER_MESSAGE] [MESSAGE]")) {
                     Message typedMsg = (Message) socket.pollMessageAs(Message.class);
                     onMessage.dispatch(typedMsg);
@@ -104,6 +113,12 @@ public class Client {
                 if(msg.startsWith("[SERVER_MESSAGE] [CLIENT_JOINED]")) {
                     ClientJoined typedMsg = (ClientJoined) socket.pollMessageAs(ClientJoined.class);
                     onClientJoined.dispatch(typedMsg);
+                    continue;
+                }
+
+                if(msg.startsWith("[SERVER_MESSAGE] [CLIENT_LEFT]")) {
+                    ClientLeft typedMsg = (ClientLeft) socket.pollMessageAs(ClientLeft.class);
+                    onClientLeft.dispatch(typedMsg);
                     continue;
                 }
 
