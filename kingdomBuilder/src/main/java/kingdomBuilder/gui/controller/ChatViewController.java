@@ -18,7 +18,6 @@ import kingdomBuilder.redux.Store;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 public class ChatViewController implements Initializable {
@@ -60,18 +59,31 @@ public class ChatViewController implements Initializable {
             tableview_chat.getItems().setAll(kbState.clients.values());
         });
 
+        //incoming chat message
         client.onMessage.subscribe(m -> {
             int senderID = m.clientId();
             String senderName = store.getState().clients.get(senderID).getName();
 
-            String chatText = "";
+            String chatText;
             Integer[] receivers = m.receiverIds();
-            if (receivers.length == 1)
+            if (receivers.length == 1 && store.getState().clients.size() > 2)
                 chatText = senderName + " whispers to you: " + m.message();
             else
                 chatText = senderName + ": " + m.message();
 
             textarea_globalchat.appendText(chatText);
+            textarea_globalchat.appendText(System.lineSeparator());
+        });
+
+        //incoming message that someone lefted the server
+        client.onClientLeft.subscribe(c -> {
+            textarea_globalchat.appendText("<--- " + c.name() + " left the server. --->");
+            textarea_globalchat.appendText(System.lineSeparator());
+        });
+
+        //incoming message that someone joined the server
+        client.onClientJoined.subscribe(c -> {
+            textarea_globalchat.appendText("<--- " + c.name() + " joined the server. --->");
             textarea_globalchat.appendText(System.lineSeparator());
         });
 
@@ -82,7 +94,7 @@ public class ChatViewController implements Initializable {
 
     public void onButtonSendPressed(Event event) {
         chatview_textarea_chatinput.appendText(System.lineSeparator());
-        printMessage();
+        printAndSendMessage();
     }
 
     public void onEnterPressed(KeyEvent event) {
@@ -91,11 +103,11 @@ public class ChatViewController implements Initializable {
             System.out.println("Shift linebreak");
             chatview_textarea_chatinput.appendText(System.lineSeparator());
         } else if (event.getCode() == KeyCode.ENTER) {
-            printMessage();
+            printAndSendMessage();
         }
     }
 
-    private void printMessage() {
+    private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
         String stringToSend = message;
         if (!message.isEmpty()) {
