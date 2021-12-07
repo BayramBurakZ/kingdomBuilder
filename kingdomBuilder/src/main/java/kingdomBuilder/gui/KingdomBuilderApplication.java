@@ -27,16 +27,15 @@ public class KingdomBuilderApplication extends Application {
          einmal.
          */
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/MainView.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/controller/MainView.fxml"));
         Parent root = fxmlLoader.load();
-        Scene scene = new Scene(root, 1000, 600);
+        Scene scene = new Scene(root, 1000, 650);
 
         // Setup stage
-        primaryStage.setTitle("KingdomBuilder v0.1 Chat ClientDAO");
+        primaryStage.setTitle("KingdomBuilder v0.1 Chat Client");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
-        primaryStage.setMinHeight(600);
+        primaryStage.setMinHeight(650);
         primaryStage.show();
-        //primaryStage.setMaximized(true);
     }
 }

@@ -20,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ChatViewController implements Initializable {
+public class ChatViewController extends Controller implements Initializable {
     private String playerName;
     private Store<KBState> store;
     private Client client;
+    private MainViewController mainViewController;
 
     @FXML
     private TableView<ClientDAO> tableview_chat;
@@ -148,5 +149,9 @@ public class ChatViewController implements Initializable {
             textarea_globalchat.appendText(System.lineSeparator());
         }
         chatview_textarea_chatinput.clear();
+    }
+
+    public void setMainViewController(MainViewController mainViewController) {
+        this.mainViewController = mainViewController;
     }
 }
