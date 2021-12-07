@@ -13,18 +13,25 @@ import javafx.scene.input.KeyEvent;
 import kingdomBuilder.KBState;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.network.Client;
+import kingdomBuilder.network.protocol.server.ClientJoined;
+import kingdomBuilder.network.protocol.server.ClientLeft;
+import kingdomBuilder.network.protocol.server.Message;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 public class ChatViewController extends Controller implements Initializable {
     private String playerName;
     private Store<KBState> store;
     private Client client;
     private MainViewController mainViewController;
+    private Consumer<ClientJoined> subOnClientJoined;
+    private Consumer<ClientLeft> subOnClientLeft;
+    private Consumer<Message> subOnMessage;
 
     @FXML
     private TableView<ClientDAO> tableview_chat;
@@ -54,11 +61,33 @@ public class ChatViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         store = Store.get();
-        client = Client.getMain();
 
         store.subscribe(kbState -> {
             tableview_chat.getItems().setAll(kbState.clients.values());
         });
+
+        column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
+        column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameid"));
+    }
+
+    public void onButtonSendPressed(Event event) {
+        chatview_textarea_chatinput.appendText(System.lineSeparator());
+        printAndSendMessage();
+    }
+
+    public void onEnterPressed(KeyEvent event) {
+        if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
+            // TODO: linebreak isn't supported in messages through the server protocol?
+            System.out.println("Shift linebreak");
+            chatview_textarea_chatinput.appendText(System.lineSeparator());
+        } else if (event.getCode() == KeyCode.ENTER) {
+            printAndSendMessage();
+        }
+    }
+
+    public void onClientConnected(){
+        client = Client.getMain();
 
         //incoming chat message
         client.onMessage.subscribe(m -> {
@@ -95,25 +124,12 @@ public class ChatViewController extends Controller implements Initializable {
             textarea_globalchat.appendText("<--- " + c.name() + " joined the server. --->");
             textarea_globalchat.appendText(System.lineSeparator());
         });
-
-        column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
-        column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameid"));
     }
 
-    public void onButtonSendPressed(Event event) {
-        chatview_textarea_chatinput.appendText(System.lineSeparator());
-        printAndSendMessage();
-    }
-
-    public void onEnterPressed(KeyEvent event) {
-        if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
-            // TODO: linebreak isn't supported in messages through the server protocol?
-            System.out.println("Shift linebreak");
-            chatview_textarea_chatinput.appendText(System.lineSeparator());
-        } else if (event.getCode() == KeyCode.ENTER) {
-            printAndSendMessage();
-        }
+    public void onClientDisconnected(){
+        client.onClientJoined.unsubscribe(subOnClientJoined);
+        client.onClientLeft.unsubscribe(subOnClientLeft);
+        client.onMessage.unsubscribe(subOnMessage);
     }
 
     private void printAndSendMessage() {

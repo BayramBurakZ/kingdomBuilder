@@ -7,18 +7,23 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import kingdomBuilder.actions.SetClientIDAction;
+import kingdomBuilder.actions.SetClientNameAction;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class IAmViewController extends Controller implements Initializable {
     private MainViewController mainViewController;
+    private Store store;
 
     @FXML
     private TextField iAmViewTextField;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        store = Store.get();
         setupEventHandler();
     }
 
@@ -28,9 +33,13 @@ public class IAmViewController extends Controller implements Initializable {
 
     @FXML
     public void onButtonMainMenueShow(Event event) {
-        //TODO: send Name from iAmViewTextField to Modul to safe it, maybe create a new client without ID
-        if(!iAmViewTextField.getText().isEmpty())
-            mainViewController.showMenuView();
+        if(iAmViewTextField.getText().isEmpty())
+            return;
+
+        String name = iAmViewTextField.getText().trim();
+
+        store.dispatch(new SetClientNameAction(name));
+        mainViewController.showMenuView();
     }
 
     private void setupEventHandler() {
@@ -43,6 +52,7 @@ public class IAmViewController extends Controller implements Initializable {
             public void handle(KeyEvent event) {
                 String playerName = iAmViewTextField.getText();
                 if (!playerName.isEmpty() && event.getCode() == KeyCode.ENTER) {
+                    store.dispatch(new SetClientNameAction(playerName));
                     mainViewController.showMenuView();
                 }
             }

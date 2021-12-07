@@ -17,20 +17,13 @@ public class Boot {
 
     public static void main(String[] args) throws IOException {
 
-        /*
-        Store<SampleState> store = new Store<>(new SampleState(0), new SampleReducer());
-        store.subscribe(sampleState -> {
-            System.out.println("Counter is now: " + sampleState.getCounter());
-        });
-        store.dispatch(new IncrementAction());
-         */
-
         // TODO: maybe move construction to Store class or replace with factory or enum singleton or whatever
         // this way the construction is visible in the Boot class
         // can also construct an object without setting it as the singleton, may or may not be desired
         Store<KBState> store = new Store<>(new KBState(), new KBReducer());
         Store.setInstance(store);
 
+        /*
         var address = "juliankirsch.me";
 
         // TODO: handle no connection; threads still created
@@ -82,12 +75,7 @@ public class Boot {
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        /*Client testClient1 = new Client(address, 6666);
-        testClient1.join("TestClient1");
-        Client testClient2 = new Client(address, 6666);
-        testClient2.join("TestClient2");*/
-
+        */
         Application.launch(KingdomBuilderApplication.class);
     }
 }

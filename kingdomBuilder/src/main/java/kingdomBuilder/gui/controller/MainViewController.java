@@ -25,7 +25,7 @@ public class MainViewController implements Initializable {
 
     /**
      * Creates the sceneLoader-Object that store and load every scene
-     * Additional sets the first view to the IAmView
+     * Additionally, sets the first view to the IAmView
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -36,7 +36,7 @@ public class MainViewController implements Initializable {
     /**
      * Loads the MenuView into the center of the main borderPane
      * and loads the chat into the left side of the main borderPane.
-     * Additional this methode sets this controller in the chatViewController
+     * Additionally, this method sets this controller in the chatViewController
      * and in the MainViewController to change the scene on the right side
      * for example via a button.
      */
@@ -53,7 +53,7 @@ public class MainViewController implements Initializable {
 
     /**
      * Loads the GameLobbyView into the center of the main borderPane.
-     * Additional this methode sets this controller in the gameLobbyViewController
+     * Additionally, this method sets this controller in the gameLobbyViewController
      * to change the scene on the right side for example via a button.
      */
     public void showGameLobbyView() {
@@ -65,7 +65,7 @@ public class MainViewController implements Initializable {
 
     /**
      * Loads the GameLobbyView into the center of the main borderPane.
-     * Additional this methode sets this controller in the gameLobbyViewController
+     * Additionally, this method sets this controller in the gameLobbyViewController
      * to change the scene on the right side for example via a button.
      */
     public void showGameView() {
@@ -84,7 +84,7 @@ public class MainViewController implements Initializable {
 
     /**
      * Loads the iAmView into the center of the main borderPane.
-     * Additional this methode sets this controller in the iAmViewController
+     * Additionally, this method sets this controller in the iAmViewController
      * to change the scene on the right side for example via a button.
      */
     public void showIAmView() {
@@ -95,12 +95,16 @@ public class MainViewController implements Initializable {
 
     /**
      * Loads the gameSelectionView into the center of the main borderPane.
-     * Additional this methode sets this controller in the gameSelectionViewController
+     * Additionally, this method sets this controller in the gameSelectionViewController
      * to change the scene on the right side for example via a button.
      */
     public void showGameSelectionView() {
         borderPane.setCenter(sceneLoader.getGameSelectionView());
         GameSelectionViewController gameSelectionViewController = (GameSelectionViewController) sceneLoader.getGameSelectionViewController();
         gameSelectionViewController.setMainViewController(this);
+    }
+
+    public SceneLoader getSceneLoader(){
+        return sceneLoader;
     }
 }

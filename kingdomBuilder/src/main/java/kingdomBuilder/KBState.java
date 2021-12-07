@@ -12,6 +12,8 @@ public class KBState {
     public Map<Integer, ClientDAO> clients = new HashMap<>();
     public Map<Integer, GameDAO> games = new HashMap<>();
     public int clientID;
+    public String clientName;
+
 
     public KBState() { }
 
