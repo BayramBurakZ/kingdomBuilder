@@ -66,11 +66,19 @@ public class ChatViewController implements Initializable {
 
             String chatText;
             Integer[] receivers = m.receiverIds();
-            if (receivers.length == 1 && store.getState().clients.size() > 2)
-                chatText = senderName + " whispers to you: " + m.message();
-            else
-                chatText = senderName + ": " + m.message();
+            String message = m.message();
 
+            if (receivers.length == 1 && store.getState().clients.size() > 2)
+                chatText = senderName + " whispers to you: " + message;
+            else {
+                //if there are only 2 clients on server and one gets a whisper message
+                if (m.message().startsWith("@")) {
+                    String pattern = "\\s";
+                    String[] s = message.split(pattern, 2);
+                    message = s[1];
+                }
+            }
+            chatText = senderName + ": " + message;
             textarea_globalchat.appendText(chatText);
             textarea_globalchat.appendText(System.lineSeparator());
         });
