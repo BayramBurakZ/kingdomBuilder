@@ -123,5 +123,12 @@ public class Client {
         }
     }
 
-
+    // created by Gui-team
+    public void closeSocket(){
+        try {
+            socket.closeSocket();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+    }
 }

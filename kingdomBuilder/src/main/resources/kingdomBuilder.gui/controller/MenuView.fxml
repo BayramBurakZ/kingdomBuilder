@@ -30,8 +30,9 @@
    <bottom>
       <HBox prefHeight="24.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="menuview_textfield_address" prefHeight="25.0" prefWidth="393.0" promptText="adresse" />
-            <TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port" />
+            <TextField fx:id="menuview_textfield_address" prefHeight="25.0" prefWidth="393.0" promptText="adresse"
+					   text="juliankirsch.me"/>
+            <TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port" text="6666"/>
             <Button fx:id="menuview_connect_button" mnemonicParsing="false" onAction="#OnConnectButtonPressed" prefHeight="25.0" prefWidth="74.0" text="connect" />
          </children>
       </HBox>

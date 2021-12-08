@@ -57,4 +57,8 @@ public class MessageSocket {
         messages.poll();
     }
 
+    // created by Gui-team
+    public void closeSocket() throws IOException{
+        socket.close();
+    }
 }

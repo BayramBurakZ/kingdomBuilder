@@ -89,6 +89,8 @@ public class ChatViewController extends Controller implements Initializable {
     public void onClientConnected(){
         client = Client.getMain();
 
+        textarea_globalchat.appendText("<--- You are connected to the server --->\n");
+
         //incoming chat message
         client.onMessage.subscribe(m -> {
             int senderID = m.clientId();
@@ -130,6 +132,8 @@ public class ChatViewController extends Controller implements Initializable {
         client.onClientJoined.unsubscribe(subOnClientJoined);
         client.onClientLeft.unsubscribe(subOnClientLeft);
         client.onMessage.unsubscribe(subOnMessage);
+
+        textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
     }
 
     private void printAndSendMessage() {
