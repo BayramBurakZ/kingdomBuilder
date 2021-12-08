@@ -109,8 +109,8 @@ public class ChatViewController extends Controller implements Initializable {
                     String[] s = message.split(pattern, 2);
                     message = s[1];
                 }
+                chatText = senderName + ": " + message;
             }
-            chatText = senderName + ": " + message;
             textarea_globalchat.appendText(chatText);
             textarea_globalchat.appendText(System.lineSeparator());
         });
