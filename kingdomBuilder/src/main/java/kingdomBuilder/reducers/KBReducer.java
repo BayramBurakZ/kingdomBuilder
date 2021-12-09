@@ -3,7 +3,7 @@ package kingdomBuilder.reducers;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ClientAddAction;
 import kingdomBuilder.actions.ClientRemoveAction;
-import kingdomBuilder.actions.SetClientIDAction;
+import kingdomBuilder.actions.SetClientAction;
 import kingdomBuilder.actions.SetClientNameAction;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.redux.Action;
@@ -25,15 +25,15 @@ public class KBReducer implements Reducer<KBState> {
             return state;
         }
 
-        if (action instanceof SetClientIDAction a) {
+        if (action instanceof SetClientAction a) {
             KBState state = new KBState(oldState);
-            state.clientID = a.clientID;
+            state.client = a.client;
             return state;
         }
 
         if (action instanceof SetClientNameAction a) {
             KBState state = new KBState(oldState);
-            state.clientName = a.clientName;
+            state.clientPreferredName = a.clientName;
             return state;
         }
 

@@ -54,6 +54,8 @@ public class MessageFormatParser extends MessageFormatBase {
             final Placeholder currentPlaceholder = placeholders.get(nextPlaceholder++);
             final Class<?> type = getTypeOfPlaceholder(cls, currentPlaceholder.name());
 
+            // TODO: check separately for chat messages, because they might contain delimiter ']'
+            //  or use a regex (or similar) to always match the longest string that ends with ']'
             char delimiter = format.charAt(currentPlaceholder.end() + 1);
             int end = message.indexOf(delimiter, it);
 

@@ -87,7 +87,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     public void onClientConnected(){
-        client = Client.getMain();
+        client = store.getState().client;
 
         textarea_globalchat.appendText("<--- You are connected to the server --->\n");
 
@@ -147,7 +147,7 @@ public class ChatViewController extends Controller implements Initializable {
                         messageReceiver.add(c.getKey());
                     }
                     // don't send message to ourselves
-                    messageReceiver.remove((Integer) store.getState().clientID);
+                    messageReceiver.remove((Integer) store.getState().client.getId());
                     message = "You: " + message;
                 } else {
                     String pattern = "\\s";
@@ -162,7 +162,7 @@ public class ChatViewController extends Controller implements Initializable {
                 }
             }
 
-            Client.getMain().chat(stringToSend, messageReceiver);
+            client.chat(stringToSend, messageReceiver);
 
             System.out.println("Sending this: " + stringToSend);
             textarea_globalchat.appendText(message);

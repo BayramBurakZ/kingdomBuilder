@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import kingdomBuilder.actions.ClientAddAction;
 import kingdomBuilder.actions.ClientRemoveAction;
-import kingdomBuilder.actions.SetClientIDAction;
+import kingdomBuilder.actions.SetClientAction;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.redux.Store;
 import kingdomBuilder.KBState;
@@ -87,9 +87,24 @@ public class MenuViewController extends Controller implements Initializable {
     public void createClient(String address, int port) {
         try {
             client = new Client(address, port);
-            Client.setMain(client);
 
-            var welcomeFut = client.join(store.getState().clientName);
+            // start listening to server with main client
+            Thread clientThread = new Thread(client::listen);
+            clientThread.start();
+
+            var welcomeFut = client.join(store.getState().clientPreferredName);
+
+            // wait for the WelcomeToServer message before proceeding
+            try {
+                var welcomeToServer = welcomeFut.get();
+                store.dispatch(new SetClientAction(client));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return;
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+                return;
+            }
 
             client.onClientJoined.subscribe(c -> {
                 store.dispatch(new ClientAddAction(c));
@@ -99,25 +114,7 @@ public class MenuViewController extends Controller implements Initializable {
                 store.dispatch(new ClientRemoveAction(c));
             });
 
-            // start listening to server with main client
-            Thread clientThread = new Thread(client::listen);
-            clientThread.start();
-
-            // TODO: move following Block to Client.join()
-            // wait for the WelcomeToServer message before proceeding
-            try {
-                var welcomeToServer = welcomeFut.get();
-                store.dispatch(new SetClientIDAction(welcomeToServer.clientId()));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-                return;
-            }
-
-
-            System.out.println("Main Client ID: " + store.getState().clientID);
+            System.out.println("Main Client ID: " + client.getId());
 
             // wait to receive all clients from server
             var clientsFut = client.requestClients();

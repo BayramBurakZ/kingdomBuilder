@@ -14,9 +14,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class Client {
-    private static Client mainClient;
+    private int id;
+    private String name;
+    private int gameId;
 
     private final MessageSocket socket;
+
 
     private record Cookie(
             Class<?> expectedResponseType,
@@ -35,6 +38,7 @@ public class Client {
         socket = new MessageSocket(address, port);
     }
 
+    /*
     public static void setMain(Client client) {
         if (mainClient == null) {
             mainClient = client;
@@ -50,13 +54,20 @@ public class Client {
         }
         return mainClient;
     }
+    */
 
     public CompletableFuture<WelcomeToServer> join(String name) {
         socket.sendMessage(new IAm(name));
         CompletableFuture<WelcomeToServer> fut = new CompletableFuture<>();
+        var newFut = fut.thenApply( m-> {
+            this.id = m.clientId();
+            this.name = m.name();
+            this.gameId = m.gameId();
+            return m;
+        });
         Cookie ck = new Cookie(WelcomeToServer.class, fut);
         cookieQueue.offer(ck);
-        return fut;
+        return newFut;
     }
 
     public void chat(String message, List<Integer> receiver) {
@@ -130,5 +141,17 @@ public class Client {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getGameId() {
+        return gameId;
     }
 }

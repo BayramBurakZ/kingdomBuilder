@@ -3,13 +3,8 @@ package kingdomBuilder;
 import javafx.application.Application;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
-import kingdomBuilder.actions.ClientAddAction;
-import kingdomBuilder.actions.ClientRemoveAction;
-import kingdomBuilder.actions.SetClientIDAction;
 import kingdomBuilder.gui.KingdomBuilderApplication;
-import kingdomBuilder.network.Client;
 import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
 
