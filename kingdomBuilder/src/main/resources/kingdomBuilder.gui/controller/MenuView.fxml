@@ -40,8 +40,8 @@
 						text="juliankirsch.me"/>
 				<TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port"
 						text="6666"/>
-				<Button fx:id="menuview_connect_button" mnemonicParsing="false" onAction="#OnConnectButtonPressed"
-						prefHeight="25.0" prefWidth="74.0" text="Connect"/>
+				<Button fx:id="menuview_connect_button" maxWidth="75.0" minWidth="75.0" mnemonicParsing="false"
+						onAction="#OnConnectButtonPressed" text="Connect"/>
 			</children>
 			<BorderPane.margin>
 				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
