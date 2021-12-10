@@ -20,6 +20,12 @@ public class MenuViewController extends Controller implements Initializable {
     private boolean connected = false;
 
     @FXML
+    private Button menuview_localgame_button;
+
+    @FXML
+    private Button menuview_onlinegame_button;
+
+    @FXML
     private TextField menuview_textfield_address;
 
     @FXML
@@ -34,7 +40,7 @@ public class MenuViewController extends Controller implements Initializable {
     }
 
     @FXML
-    public void onButtonNewGamePressed(Event event) {
+    public void onButtonLocalGamePressed(Event event) {
         mainViewController.showGameSelectionView();
     }
 
@@ -57,6 +63,12 @@ public class MenuViewController extends Controller implements Initializable {
             menuview_textfield_port.setDisable(false);
             //menuview_textfield_address.setText("");
             //menuview_textfield_port.setText("");
+            menuview_textfield_address.setText("");
+            menuview_textfield_port.setText("");
+
+            menuview_localgame_button.setDisable(true);
+            menuview_onlinegame_button.setDisable(true);
+
             connected = false;
 
         } else {
@@ -73,6 +85,9 @@ public class MenuViewController extends Controller implements Initializable {
             menuview_textfield_address.setDisable(true);
             menuview_textfield_port.setDisable(true);
             menuview_connect_button.setText("disconnect");
+
+            menuview_localgame_button.setDisable(false);
+            menuview_onlinegame_button.setDisable(false);
 
             connected = true;
         }
