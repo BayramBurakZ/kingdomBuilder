@@ -38,4 +38,10 @@ public class KingdomBuilderApplication extends Application {
         primaryStage.setMinHeight(650);
         primaryStage.show();
     }
+
+    // TODO: general closing mechanism
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+    }
 }
