@@ -68,7 +68,7 @@ public class MenuViewController extends Controller implements Initializable {
             store.dispatch(new ClientDisconnectAction());
             chatViewController.onClientDisconnected();
 
-            menuview_connect_button.setText("connect");
+            menuview_connect_button.setText("Connect");
             menuview_textfield_address.setDisable(false);
             menuview_textfield_port.setDisable(false);
 
@@ -90,7 +90,7 @@ public class MenuViewController extends Controller implements Initializable {
             // change gui buttons
             menuview_textfield_address.setDisable(true);
             menuview_textfield_port.setDisable(true);
-            menuview_connect_button.setText("disconnect");
+            menuview_connect_button.setText("Disconnect");
 
             menuview_localgame_button.setDisable(false);
             menuview_onlinegame_button.setDisable(false);
