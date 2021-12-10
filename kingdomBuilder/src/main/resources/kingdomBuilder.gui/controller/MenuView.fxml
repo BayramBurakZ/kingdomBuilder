@@ -5,36 +5,46 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane minHeight="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #383E42;" StackPane.alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.MenuViewController">
+<BorderPane minHeight="600.0" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #383E42;"
+		StackPane.alignment="TOP_RIGHT" xmlns="http://javafx.com/javafx/11.0.2"
+		fx:id="menuview_boarderpane" xmlns:fx="http://javafx.com/fxml/1"
+		fx:controller="kingdomBuilder.gui.controller.MenuViewController">
 
 	<center>
 		<VBox alignment="CENTER" prefHeight="100.0" prefWidth="400.0" spacing="10.0" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="menuview_localgame_button" disable="true" mnemonicParsing="false" onAction="#onButtonLocalGamePressed" prefHeight="25.0" prefWidth="300.0" text="Local Game" />
-				<Button fx:id="menuview_onlinegame_button" disable="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="Online Game" />
-				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="Settings" />
-				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="Exit" />
+				<Button fx:id="menuview_localgame_button" disable="true" mnemonicParsing="false"
+						onAction="#onLocalGameButtonPressed" prefHeight="25.0" prefWidth="300.0" text="Local Game"/>
+				<Button fx:id="menuview_onlinegame_button" disable="true" mnemonicParsing="false" prefHeight="25.0"
+						prefWidth="300.0" text="Online Game"/>
+				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="Settings"/>
+				<Button mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="Exit"
+						onAction="#onExitButtonPressed"/>
 			</children>
 		</VBox>
 	</center>
 	<top>
-		<Label alignment="CENTER" contentDisplay="CENTER" text="Kingdom Builder" textAlignment="CENTER" textFill="#f8efef" BorderPane.alignment="CENTER">
+		<Label alignment="CENTER" contentDisplay="CENTER" text="Kingdom Builder" textAlignment="CENTER"
+				textFill="#f8efef" BorderPane.alignment="CENTER">
 			<font>
-				<Font size="41.0" />
+				<Font size="41.0"/>
 			</font>
-         <padding>
-            <Insets top="30.0" />
-         </padding>
+			<padding>
+				<Insets top="30.0"/>
+			</padding>
 		</Label>
 	</top>
-   <bottom>
-      <HBox prefHeight="24.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-         <children>
-            <TextField fx:id="menuview_textfield_address" prefHeight="25.0" prefWidth="393.0" promptText="adresse" text="juliankirsch.me" />
-            <TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port" text="6666" />
-            <Button fx:id="menuview_connect_button" mnemonicParsing="false" onAction="#OnConnectButtonPressed" prefHeight="25.0" prefWidth="74.0" text="connect" />
-         </children>
-      </HBox>
-   </bottom>
+	<bottom>
+		<HBox prefHeight="24.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+			<children>
+				<TextField fx:id="menuview_textfield_address" prefHeight="25.0" prefWidth="393.0" promptText="adresse"
+						text="juliankirsch.me"/>
+				<TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port"
+						text="6666"/>
+				<Button fx:id="menuview_connect_button" mnemonicParsing="false" onAction="#OnConnectButtonPressed"
+						prefHeight="25.0" prefWidth="74.0" text="connect"/>
+			</children>
+		</HBox>
+	</bottom>
 
 </BorderPane>

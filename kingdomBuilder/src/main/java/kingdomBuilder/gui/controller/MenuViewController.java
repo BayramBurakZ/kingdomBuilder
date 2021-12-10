@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.redux.Store;
 import kingdomBuilder.KBState;
@@ -18,6 +20,9 @@ public class MenuViewController extends Controller implements Initializable {
     private ChatViewController chatViewController;
     private Store<KBState> store;
     private boolean connected = false;
+
+    @FXML
+    private BorderPane menuview_boarderpane;
 
     @FXML
     private Button menuview_localgame_button;
@@ -40,10 +45,15 @@ public class MenuViewController extends Controller implements Initializable {
     }
 
     @FXML
-    public void onButtonLocalGamePressed(Event event) {
+    public void onLocalGameButtonPressed(Event event) {
         mainViewController.showGameSelectionView();
     }
 
+    public void onExitButtonPressed() {
+        // TODO: general application close mechanism
+        Stage stage = (Stage) menuview_boarderpane.getScene().getWindow();
+        stage.close();
+    }
 
     //TODO: This is an awful solution to connect/disconnect
     // send a "bye" message to a server and handle this method within an event.
