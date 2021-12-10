@@ -71,10 +71,6 @@ public class MenuViewController extends Controller implements Initializable {
             menuview_connect_button.setText("connect");
             menuview_textfield_address.setDisable(false);
             menuview_textfield_port.setDisable(false);
-            //menuview_textfield_address.setText("");
-            //menuview_textfield_port.setText("");
-            menuview_textfield_address.setText("");
-            menuview_textfield_port.setText("");
 
             menuview_localgame_button.setDisable(true);
             menuview_onlinegame_button.setDisable(true);
