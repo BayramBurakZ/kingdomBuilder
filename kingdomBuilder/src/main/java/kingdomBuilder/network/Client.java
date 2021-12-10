@@ -20,6 +20,8 @@ public class Client {
 
     private final MessageSocket socket;
 
+    private boolean running;
+
     private record Cookie(
             Class<?> expectedResponseType,
             CompletableFuture<?> future
@@ -70,7 +72,8 @@ public class Client {
     }
 
     public void listen() {
-        while (true) {
+        running = true;
+        while (running) {
             boolean receivedSomething = false;
             do {
                 try {
@@ -131,6 +134,7 @@ public class Client {
         }catch (IOException e){
             e.printStackTrace();
         }
+        running = false;
     }
 
     public int getId() {
