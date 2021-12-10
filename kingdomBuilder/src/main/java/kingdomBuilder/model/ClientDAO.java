@@ -4,15 +4,15 @@ public class ClientDAO {
 
     int id;
     String name;
-    int gameid;
+    int gameId;
 
     public ClientDAO() {
     }
 
-    public ClientDAO(int id, String name, int gameid) {
+    public ClientDAO(int id, String name, int gameId) {
         this.id = id;
         this.name = name;
-        this.gameid = gameid;
+        this.gameId = gameId;
     }
 
     public int getId() {
@@ -31,11 +31,11 @@ public class ClientDAO {
         this.name = name;
     }
 
-    public int getGameid() {
-        return gameid;
+    public int getGameId() {
+        return gameId;
     }
 
-    public void setGameid(int gameid) {
-        this.gameid = gameid;
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 }

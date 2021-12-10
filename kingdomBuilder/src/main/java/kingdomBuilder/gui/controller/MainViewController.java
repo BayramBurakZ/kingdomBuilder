@@ -3,7 +3,9 @@ package kingdomBuilder.gui.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
+import kingdomBuilder.actions.SetMainControllerAction;
 import kingdomBuilder.gui.SceneLoader;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -29,6 +31,7 @@ public class MainViewController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        Store.get().dispatch(new SetMainControllerAction(this));
         sceneLoader = new SceneLoader();
         showIAmView();
     }

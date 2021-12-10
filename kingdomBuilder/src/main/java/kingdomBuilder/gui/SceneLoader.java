@@ -2,7 +2,7 @@ package kingdomBuilder.gui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import kingdomBuilder.gui.controller.Controller;
+import kingdomBuilder.gui.controller.*;
 
 import java.io.IOException;
 
@@ -161,22 +161,26 @@ public class SceneLoader {
     public Node getChatView() {
         return chatView;
     }
-    public Node getGameSelectionView() { return gameSelectionView; }
+    public Node getGameSelectionView() {
+        return gameSelectionView;
+    }
 
-    public Controller getMenuViewController() {
-        return menuViewController;
+    public MenuViewController getMenuViewController() {
+        return (MenuViewController) menuViewController;
     }
-    public Controller getGameLobbyViewController() {
-        return gameLobbyViewController;
+    public GameLobbyViewController getGameLobbyViewController() {
+        return (GameLobbyViewController) gameLobbyViewController;
     }
-    public Controller getGameViewController() {
-        return gameViewController;
+    public GameViewController getGameViewController() {
+        return (GameViewController) gameViewController;
     }
-    public Controller getIAmViewController() {
-        return iAmViewController;
+    public IAmViewController getIAmViewController() {
+        return (IAmViewController) iAmViewController;
     }
-    public Controller getChatViewController() {
-        return chatViewController;
+    public ChatViewController getChatViewController() {
+        return (ChatViewController) chatViewController;
     }
-    public Controller getGameSelectionViewController() { return gameSelectionViewController; }
+    public GameSelectionViewController getGameSelectionViewController() {
+        return (GameSelectionViewController) gameSelectionViewController;
+    }
 }

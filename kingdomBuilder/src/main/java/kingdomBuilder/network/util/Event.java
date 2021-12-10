@@ -16,6 +16,8 @@ public class Event<T> {
         consumers.remove(c);
     }
 
+    public void unsubscribeAll() { consumers.clear(); }
+
     public void dispatch(T payload) {
         consumers.forEach(c -> c.accept(payload));
     }

@@ -1,8 +1,15 @@
 package kingdomBuilder;
 
+import com.sun.javafx.scene.SceneEventDispatcher;
+import kingdomBuilder.gui.SceneLoader;
+import kingdomBuilder.gui.controller.MainViewController;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
+import kingdomBuilder.network.protocol.server.ClientJoined;
+import kingdomBuilder.network.protocol.server.ClientLeft;
+import kingdomBuilder.network.protocol.server.Message;
+import kingdomBuilder.network.util.Event;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +18,7 @@ public class KBState {
     // public for testing
     // probably just make these ObservableLists directly
 
+    public MainViewController controller;
     // map of clientID -> client
     public Map<Integer, ClientDAO> clients = new HashMap<>();
     // map of gameID -> game
@@ -23,8 +31,9 @@ public class KBState {
     public KBState() { }
 
     public KBState(KBState other) {
-        clients = new HashMap<>(other.clients);
-        games = new HashMap<>(other.games);
+        controller = other.controller;
+        clients = other.clients;
+        games = other.games;
         client = other.client;
         clientPreferredName = other.clientPreferredName;
     }

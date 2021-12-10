@@ -20,7 +20,6 @@ public class Client {
 
     private final MessageSocket socket;
 
-
     private record Cookie(
             Class<?> expectedResponseType,
             CompletableFuture<?> future
@@ -33,29 +32,17 @@ public class Client {
     public final Event<ClientJoined> onClientJoined = new Event<>();
     public final Event<ClientLeft> onClientLeft = new Event<>();
 
-
     public Client(String address, int port) throws IOException {
         socket = new MessageSocket(address, port);
     }
 
-    /*
-    public static void setMain(Client client) {
-        if (mainClient == null) {
-            mainClient = client;
-            System.out.println("Main client was set.");
-        } else {
-            System.out.println("Main client has already been set.");
-        }
-    }
-
-    public static Client getMain() {
-        if (mainClient == null) {
-            System.out.println("Tried to access null main client.");
-        }
-        return mainClient;
-    }
-    */
-
+    /**
+     * Sends the 'IAm' message to the server and internally sets the client's ID, name and gameID once the
+     * response arrives. Start a client::listen thread to allow the client to listen for the response.
+     * @param name The preferred name of the client, if the name is already in use, it will append 'the n-th'.
+     * @return The CompletableFuture that carriers the WelcomeToServer message.
+     * Use future.get() to wait until the response has arrived after a client::listen thread has been started.
+     */
     public CompletableFuture<WelcomeToServer> join(String name) {
         socket.sendMessage(new IAm(name));
         CompletableFuture<WelcomeToServer> fut = new CompletableFuture<>();
@@ -134,8 +121,11 @@ public class Client {
         }
     }
 
-    // created by Gui-team
-    public void closeSocket(){
+    /**
+     * Sends 'Bye' message to the server, closes the socket and unsubscribes all listeners from events.
+     */
+    public void disconnect() {
+        socket.sendMessage(new Bye());
         try {
             socket.closeSocket();
         }catch (IOException e){
