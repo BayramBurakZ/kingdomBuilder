@@ -124,6 +124,7 @@ public class KBReducer implements Reducer<KBState> {
             KBState state = new KBState(oldState);
             state.clients.clear();
             state.games.clear();
+            state.controller.getSceneLoader().getChatViewController().onDisconnect();
             return state;
         }
 

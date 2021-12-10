@@ -3,10 +3,7 @@ package kingdomBuilder.gui.controller;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -47,6 +44,9 @@ public class ChatViewController extends Controller implements Initializable {
     private TextArea chatview_textarea_chatinput;
 
     @FXML
+    private Button chatview_button_send;
+
+    @FXML
     private TextArea textarea_globalchat;
 
     @Override
@@ -81,6 +81,9 @@ public class ChatViewController extends Controller implements Initializable {
     public void onWelcomeToServer() {
         textarea_globalchat.appendText("<--- You are connected to the server --->\n");
 
+        chatview_textarea_chatinput.setDisable(false);
+        chatview_button_send.setDisable(false);
+
         /*
         // incoming chat message
         state.onMessage.subscribe(this::onMessage);
@@ -91,6 +94,11 @@ public class ChatViewController extends Controller implements Initializable {
         // incoming message that someone joined the server
         state.onClientJoined.subscribe(this::onClientJoined);
         */
+    }
+
+    public void onDisconnect() {
+        chatview_textarea_chatinput.setDisable(true);
+        chatview_button_send.setDisable(true);
     }
 
     public void onMessage(Message chatMsg) {
