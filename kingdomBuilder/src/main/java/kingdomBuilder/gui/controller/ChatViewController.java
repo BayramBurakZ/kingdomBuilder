@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 
 public class ChatViewController extends Controller implements Initializable {
     private Store<KBState> store;
+    private KBState state;
     private MainViewController mainViewController;
 
     @FXML
@@ -51,11 +52,18 @@ public class ChatViewController extends Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         store = Store.get();
+        state = store.getState();
 
-        store.subscribe(kbState -> {
-            tableview_chat.getItems().setAll(kbState.clients.values());
+        store.subscribe(newState -> {
+            tableview_chat.getItems().setAll(newState.clients.values());
+            // Client connection
+            if (newState.isConnected && !state.isConnected) {
+                onConnect();
+            } else if (!newState.isConnected && state.isConnected){
+                onDisconnect();
+            }
+            state = newState;
         });
 
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -78,25 +86,16 @@ public class ChatViewController extends Controller implements Initializable {
         }
     }
 
-    public void onWelcomeToServer() {
+    public void onConnect() {
         textarea_globalchat.appendText("<--- You are connected to the server --->\n");
 
         chatview_textarea_chatinput.setDisable(false);
         chatview_button_send.setDisable(false);
-
-        /*
-        // incoming chat message
-        state.onMessage.subscribe(this::onMessage);
-
-        // incoming message that someone left the server
-        state.onClientLeft.subscribe(this::onClientLeft);
-
-        // incoming message that someone joined the server
-        state.onClientJoined.subscribe(this::onClientJoined);
-        */
     }
 
     public void onDisconnect() {
+        textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
+
         chatview_textarea_chatinput.setDisable(true);
         chatview_button_send.setDisable(true);
     }
@@ -132,10 +131,6 @@ public class ChatViewController extends Controller implements Initializable {
     public void onClientJoined(int clientId, String name, int gameId) {
         textarea_globalchat.appendText("<--- " + name + " joined the server. --->");
         textarea_globalchat.appendText(System.lineSeparator());
-    }
-
-    public void onClientDisconnected() {
-        textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
     }
 
     public void onYouHaveBeenKicked() {

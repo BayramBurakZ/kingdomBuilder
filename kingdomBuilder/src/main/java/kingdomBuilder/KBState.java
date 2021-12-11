@@ -28,6 +28,8 @@ public class KBState {
     public Thread clientThread;
     // preferred client name that gets passed to the server when we join
     public String clientPreferredName;
+    // Client connection to server socket
+    public boolean isConnected = false;
 
     public KBState() { }
 
@@ -38,5 +40,6 @@ public class KBState {
         client = other.client;
         clientThread = other.clientThread;
         clientPreferredName = other.clientPreferredName;
+        isConnected = other.isConnected;
     }
 }

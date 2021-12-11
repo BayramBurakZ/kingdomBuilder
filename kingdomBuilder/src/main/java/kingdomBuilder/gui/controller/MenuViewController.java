@@ -17,9 +17,8 @@ import java.util.ResourceBundle;
 public class MenuViewController extends Controller implements Initializable {
 
     private MainViewController mainViewController;
-    private ChatViewController chatViewController;
     private Store<KBState> store;
-    private boolean connected = false;
+    private KBState state;
 
     @FXML
     private BorderPane menuview_boarderpane;
@@ -42,6 +41,17 @@ public class MenuViewController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         store = Store.get();
+        state = store.getState();
+
+        store.subscribe(newState -> {
+            // Client connection
+            if (newState.isConnected && !state.isConnected) {
+                onConnect();
+            } else if (!newState.isConnected && state.isConnected){
+                onDisconnect();
+            }
+            state = newState;
+        });
     }
 
     @FXML
@@ -60,25 +70,10 @@ public class MenuViewController extends Controller implements Initializable {
     // delete Client so we can reconnect -> Client state move to store
     // and update Client list on disconnect
     public void OnConnectButtonPressed() {
-        if(chatViewController == null)
-            chatViewController = mainViewController.getSceneLoader().getChatViewController();
 
-        if (connected) {
+        if (state.isConnected) {
             // Disconnect from server
             store.dispatch(new DisconnectAction());
-            chatViewController.onClientDisconnected();
-
-            menuview_connect_button.setText("Connect");
-            menuview_textfield_address.setDisable(false);
-            menuview_textfield_port.setDisable(false);
-            //menuview_textfield_address.setText("");
-            //menuview_textfield_port.setText("");
-
-            menuview_localgame_button.setDisable(true);
-            menuview_onlinegame_button.setDisable(true);
-
-            connected = false;
-
         } else {
             // Connect to server
             String address = menuview_textfield_address.getText().trim();
@@ -89,22 +84,28 @@ public class MenuViewController extends Controller implements Initializable {
 
             // TODO: handle failed connection
             store.dispatch(new ConnectAction(address, Integer.parseInt(port)));
-
-            // change gui buttons
-            menuview_textfield_address.setDisable(true);
-            menuview_textfield_port.setDisable(true);
-            menuview_connect_button.setText("Disconnect");
-
-            menuview_localgame_button.setDisable(false);
-            menuview_onlinegame_button.setDisable(false);
-
-            connected = true;
         }
+    }
+
+    private void onConnect() {
+        menuview_textfield_address.setDisable(true);
+        menuview_textfield_port.setDisable(true);
+        menuview_connect_button.setText("Disconnect");
+
+        menuview_localgame_button.setDisable(false);
+        menuview_onlinegame_button.setDisable(false);
+    }
+
+    private void onDisconnect() {
+        menuview_textfield_address.setDisable(false);
+        menuview_textfield_port.setDisable(false);
+        menuview_connect_button.setText("Connect");
+
+        menuview_localgame_button.setDisable(true);
+        menuview_onlinegame_button.setDisable(true);
     }
 
     public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
     }
-
-
 }

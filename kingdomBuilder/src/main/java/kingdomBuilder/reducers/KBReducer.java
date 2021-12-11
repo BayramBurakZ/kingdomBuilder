@@ -89,6 +89,9 @@ public class KBReducer implements Reducer<KBState> {
             // create new state after client creation in case client connection fails
             state = new KBState(oldState);
 
+            // Client is connected
+            state.isConnected = true;
+
             // start listening to server with main client
             Thread clientThread = new Thread(client::listen, "Main-Client");
             clientThread.start();
@@ -138,20 +141,21 @@ public class KBReducer implements Reducer<KBState> {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
-
-            var sceneLoader = oldState.controller.getSceneLoader();
-            sceneLoader.getChatViewController().onWelcomeToServer();
-
         } catch (IOException e) {
             //TODO: maybe a popup
             System.out.println("Address not found");
-            return oldState;
+            state = new KBState(oldState);
+
+            // Client connection failed
+            state.isConnected = false;
+            return state;
         }
         return state;
     }
 
     private KBState reduce(KBState oldState, DisconnectAction a) {
         KBState state = new KBState(oldState);
+        // TODO: kicked action ?
         if (a.wasKicked) {
             var sceneLoader = oldState.controller.getSceneLoader();
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
@@ -160,6 +164,7 @@ public class KBReducer implements Reducer<KBState> {
         state.clients.clear();
         state.games.clear();
         state.client = null;
+        state.isConnected = false;
         return state;
     }
 
