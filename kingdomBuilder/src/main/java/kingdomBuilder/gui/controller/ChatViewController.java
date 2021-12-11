@@ -147,15 +147,10 @@ public class ChatViewController extends Controller implements Initializable {
         if (!message.isEmpty()) {
             List<Integer> receiverIds = new ArrayList();
             if (tab_global.isSelected()) {
-                if (!message.startsWith("@")) {
-                    for (var c : store.getState().clients.entrySet()) {
-                        receiverIds.add(c.getKey());
-                    }
-                    // don't send message to ourselves
-                    receiverIds.remove((Integer) store.getState().client.getId());
-                    message = "You: " + message;
-                } else {
-                    String pattern = "\\s";
+
+                // Whisper message
+                if (message.startsWith("@")) {
+                    String pattern = "\\s"; // TODO: whitespaces pattern for duplicate name "... the second"
                     String[] s = message.split(pattern, 2);
                     for (var c : store.getState().clients.entrySet()) {
                         if (s[0].contains(c.getValue().getName())) {
@@ -163,13 +158,38 @@ public class ChatViewController extends Controller implements Initializable {
                             break;
                         }
                     }
+
+                    // Empty receivers
                     if (receiverIds.isEmpty()) {
-                        textarea_globalchat.appendText("<--- " + s[0] + " is not online. --->");
+                        textarea_globalchat.appendText("<--- " + s[0] + " is not online --->");
                         textarea_globalchat.appendText(System.lineSeparator());
                         chatview_textarea_chatinput.clear();
                         return;
                     }
-                    message = "You whispered " + s[0] + ": " + s[1];
+
+                    // Catch whisper message to self
+                    String playerName = s[0].substring(1); // TODO: cleanup substring, @-usage, ...
+                    if (playerName.equals(state.client.getName())) {
+                        textarea_globalchat.appendText("<--- You cannot whisper to yourself --->");
+                        textarea_globalchat.appendText(System.lineSeparator());
+                        chatview_textarea_chatinput.clear();
+                        return;
+                    }
+
+                    if (s.length > 1) {
+                        message = "You whispered " + s[0] + ": " + s[1];
+                    } else {
+                        // empty whisper message
+                        chatview_textarea_chatinput.clear();
+                        return;
+                    }
+                } else { // Global chat message
+                    for (var c : store.getState().clients.entrySet()) {
+                        receiverIds.add(c.getKey());
+                    }
+                    // don't send message to ourselves
+                    receiverIds.remove((Integer) store.getState().client.getId());
+                    message = "You: " + message;
                 }
             }
 
