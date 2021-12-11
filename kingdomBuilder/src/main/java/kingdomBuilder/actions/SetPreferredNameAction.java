@@ -2,11 +2,11 @@ package kingdomBuilder.actions;
 
 import kingdomBuilder.redux.Action;
 
-public class SetClientNameAction extends Action {
+public class SetPreferredNameAction extends Action {
 
     public String clientName;
 
-    public SetClientNameAction(String clientName){
+    public SetPreferredNameAction(String clientName){
         this.clientName = clientName;
     }
 }

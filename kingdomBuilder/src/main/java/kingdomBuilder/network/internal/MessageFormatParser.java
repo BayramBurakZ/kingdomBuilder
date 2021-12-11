@@ -1,5 +1,6 @@
 package kingdomBuilder.network.internal;
 
+import kingdomBuilder.network.protocol.server.Message;
 import kingdomBuilder.network.protocol.tuples.ClientTuple;
 import org.jetbrains.annotations.NotNull;
 
@@ -63,6 +64,10 @@ public class MessageFormatParser extends MessageFormatBase {
             if(type == int.class)
                 value = Integer.parseInt(message, it, end, 10);
             else if(type == String.class)
+                // TODO
+                //if (cls == Message.class) {
+                //  end = message.lastIndexOf(delimiter, it);
+                //}
                 value = message.substring(it, end);
             else if(type.isArray()) {
                 value = processArray(type, message.substring(it + 1, end - 1));

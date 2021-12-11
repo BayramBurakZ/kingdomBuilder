@@ -65,12 +65,14 @@ public class MenuViewController extends Controller implements Initializable {
 
         if (connected) {
             // Disconnect from server
-            store.dispatch(new ClientDisconnectAction());
+            store.dispatch(new DisconnectAction());
             chatViewController.onClientDisconnected();
 
             menuview_connect_button.setText("Connect");
             menuview_textfield_address.setDisable(false);
             menuview_textfield_port.setDisable(false);
+            //menuview_textfield_address.setText("");
+            //menuview_textfield_port.setText("");
 
             menuview_localgame_button.setDisable(true);
             menuview_onlinegame_button.setDisable(true);
@@ -85,7 +87,8 @@ public class MenuViewController extends Controller implements Initializable {
             if (address.isEmpty() || port.isEmpty())
                 return;
 
-            store.dispatch(new ClientConnectAction(address, Integer.parseInt(port)));
+            // TODO: handle failed connection
+            store.dispatch(new ConnectAction(address, Integer.parseInt(port)));
 
             // change gui buttons
             menuview_textfield_address.setDisable(true);

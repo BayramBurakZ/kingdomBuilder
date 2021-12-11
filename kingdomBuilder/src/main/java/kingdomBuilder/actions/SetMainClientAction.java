@@ -3,8 +3,8 @@ package kingdomBuilder.actions;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.redux.Action;
 
-public class SetClientAction extends Action {
+public class SetMainClientAction extends Action {
     public Client client;
 
-    public SetClientAction(Client client) { this.client = client; }
+    public SetMainClientAction(Client client) { this.client = client; }
 }

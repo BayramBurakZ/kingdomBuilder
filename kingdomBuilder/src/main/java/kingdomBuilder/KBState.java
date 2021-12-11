@@ -25,6 +25,7 @@ public class KBState {
     public Map<Integer, GameDAO> games = new HashMap<>();
     // main client
     public Client client;
+    public Thread clientThread;
     // preferred client name that gets passed to the server when we join
     public String clientPreferredName;
 
@@ -35,6 +36,7 @@ public class KBState {
         clients = other.clients;
         games = other.games;
         client = other.client;
+        clientThread = other.clientThread;
         clientPreferredName = other.clientPreferredName;
     }
 }

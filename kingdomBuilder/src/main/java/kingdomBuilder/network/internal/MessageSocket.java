@@ -59,6 +59,12 @@ public class MessageSocket {
 
     // created by Gui-team
     public void closeSocket() throws IOException{
-        socket.close();
+        if (socket.isConnected()) {
+            socket.close();
+        }
+    }
+
+    public boolean isConnected() {
+        return socket.isConnected();
     }
 }

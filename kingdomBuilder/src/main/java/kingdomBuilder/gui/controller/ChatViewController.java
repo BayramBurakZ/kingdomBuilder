@@ -138,6 +138,10 @@ public class ChatViewController extends Controller implements Initializable {
         textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
     }
 
+    public void onYouHaveBeenKicked() {
+        textarea_globalchat.appendText("<--- You have been kicked from the server --->\n");
+    }
+
     private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
         String stringToSend = message;

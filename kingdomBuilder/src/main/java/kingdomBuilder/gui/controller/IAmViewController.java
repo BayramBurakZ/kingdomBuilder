@@ -7,7 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import kingdomBuilder.actions.SetClientNameAction;
+import kingdomBuilder.actions.SetPreferredNameAction;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -37,7 +37,7 @@ public class IAmViewController extends Controller implements Initializable {
 
         String name = iAmViewTextField.getText().trim();
 
-        store.dispatch(new SetClientNameAction(name));
+        store.dispatch(new SetPreferredNameAction(name));
         mainViewController.showMenuView();
     }
 
@@ -51,7 +51,7 @@ public class IAmViewController extends Controller implements Initializable {
             public void handle(KeyEvent event) {
                 String playerName = iAmViewTextField.getText();
                 if (!playerName.isEmpty() && event.getCode() == KeyCode.ENTER) {
-                    store.dispatch(new SetClientNameAction(playerName));
+                    store.dispatch(new SetPreferredNameAction(playerName));
                     mainViewController.showMenuView();
                 }
             }
