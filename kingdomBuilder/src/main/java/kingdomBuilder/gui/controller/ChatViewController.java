@@ -76,12 +76,16 @@ public class ChatViewController extends Controller implements Initializable {
         printAndSendMessage();
     }
 
-    public void onEnterPressed(KeyEvent event) {
+    public void onKeyPressed(KeyEvent event) {
+        /*
         if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
             // TODO: linebreak isn't supported in messages through the server protocol?
             System.out.println("Shift linebreak");
             chatview_textarea_chatinput.appendText(System.lineSeparator());
-        } else if (event.getCode() == KeyCode.ENTER) {
+        } else
+
+         */
+        if (event.getCode() == KeyCode.ENTER) {
             printAndSendMessage();
         }
     }

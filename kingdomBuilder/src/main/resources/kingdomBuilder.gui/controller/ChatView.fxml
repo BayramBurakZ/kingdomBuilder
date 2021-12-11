@@ -42,7 +42,7 @@
 	</TabPane>
 
 	<HBox alignment="CENTER" spacing="2.0">
-		<TextArea fx:id="chatview_textarea_chatinput" disable="true" onKeyPressed="#onEnterPressed" prefRowCount="3"
+		<TextArea fx:id="chatview_textarea_chatinput" disable="true" onKeyPressed="#onKeyPressed" prefRowCount="3"
 				promptText="Enter message..." wrapText="true"/>
 		<Button fx:id="chatview_button_send" disable="true" minHeight="70" minWidth="50" onAction="#onButtonSendPressed"
 				text="Send"/>
