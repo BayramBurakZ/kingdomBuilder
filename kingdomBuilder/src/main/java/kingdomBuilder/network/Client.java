@@ -18,9 +18,9 @@ public class Client {
     private String name;
     private int gameId;
 
-    private final MessageSocket socket;
-
     private boolean running;
+
+    private final MessageSocket socket;
 
     private record Cookie(
             Class<?> expectedResponseType,
@@ -33,6 +33,7 @@ public class Client {
     public final Event<Message> onMessage = new Event<>();
     public final Event<ClientJoined> onClientJoined = new Event<>();
     public final Event<ClientLeft> onClientLeft = new Event<>();
+    public final Event<YouHaveBeenKicked> onYouHaveBeenKicked = new Event<>();
 
     public Client(String address, int port) throws IOException {
         socket = new MessageSocket(address, port);
@@ -43,7 +44,7 @@ public class Client {
      * response arrives. Start a client::listen thread to allow the client to listen for the response.
      * @param name The preferred name of the client, if the name is already in use, it will append 'the n-th'.
      * @return The CompletableFuture that carriers the WelcomeToServer message.
-     * Use future.get() to wait until the response has arrived after a client::listen thread has been started.
+     * Use future.get() to wait until the response arrives after a client::listen thread has been started.
      */
     public CompletableFuture<WelcomeToServer> join(String name) {
         socket.sendMessage(new IAm(name));
@@ -74,6 +75,7 @@ public class Client {
     public void listen() {
         running = true;
         while (running) {
+            // TODO: ping pong with onTimeout.dispatch(timeSinceLastMessage);
             boolean receivedSomething = false;
             do {
                 try {
@@ -119,22 +121,36 @@ public class Client {
                     continue;
                 }
 
+                if(msg.startsWith("[SERVER_MESSAGE] [YOU_HAVE_BEEN_KICKED]")) {
+                    YouHaveBeenKicked typedMsg = (YouHaveBeenKicked) socket.pollMessageAs(YouHaveBeenKicked.class);
+                    onYouHaveBeenKicked.dispatch(typedMsg);
+                    continue;
+                }
+
                 socket.skipMessage();
             }
         }
+        // TODO: maybe add onStoppedListening.dispatch(); here for debugging
     }
 
     /**
-     * Sends 'Bye' message to the server, closes the socket and unsubscribes all listeners from events.
+     * Sends 'Bye' message to the server and closes the socket if it was still connected,
+     * then stops the listening thread (client::listen).
      */
     public void disconnect() {
-        socket.sendMessage(new Bye());
-        try {
-            socket.closeSocket();
-        }catch (IOException e){
-            e.printStackTrace();
+        if (socket.isConnected()) {
+            socket.sendMessage(new Bye());
+            try {
+                socket.closeSocket();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         running = false;
+    }
+
+    public boolean isConnected() {
+        return socket.isConnected();
     }
 
     public int getId() {
