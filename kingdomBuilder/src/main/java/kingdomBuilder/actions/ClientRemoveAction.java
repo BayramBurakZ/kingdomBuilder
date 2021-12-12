@@ -12,8 +12,17 @@ import kingdomBuilder.redux.Action;
  * </p>
  */
 public class ClientRemoveAction extends Action {
+    /**
+     * id of the client that left the server
+     */
     public int id;
+    /**
+     * name of the client that left the server
+     */
     public String name;
+    /**
+     * gameId of the client that left the server
+     */
     public int gameId;
 
     /**
