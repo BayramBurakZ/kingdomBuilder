@@ -82,73 +82,61 @@ public class KBReducer implements Reducer<KBState> {
     }
 
     private KBState reduce(KBState oldState, ConnectAction a) {
-        KBState state = oldState;
+        Client client;
         try {
-            Client client = new Client(a.address, a.port);
-
-            // create new state after client creation in case client connection fails
-            state = new KBState(oldState);
-
-            // Client is connected
-            state.isConnected = true;
-
-            // start listening to server with main client
-            Thread clientThread = new Thread(client::listen, "Main-Client");
-            clientThread.start();
-            state.clientThread = clientThread;
-
-            var welcomeFut = client.join(state.clientPreferredName);
-
-            // wait for the WelcomeToServer message before proceeding
-            try {
-                var welcomeToServer = welcomeFut.get();
-                state.client = client;
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-                return oldState;
-            }
-
-            Store<KBState> store = Store.get();
-
-            client.onClientJoined.subscribe(c -> {
-                store.dispatch(new ClientAddAction(c));
-            });
-
-            client.onClientLeft.subscribe(c -> {
-                store.dispatch(new ClientRemoveAction(c));
-            });
-
-            client.onMessage.subscribe(m -> {
-                store.dispatch(new ChatReceiveAction(m));
-            });
-
-            client.onYouHaveBeenKicked.subscribe(m -> {
-                store.dispatch(new DisconnectAction(true));
-            });
-
-            System.out.println("Main Client ID: " + client.getId());
-
-            // wait to receive all clients from server
-            var clientsFut = client.requestClients();
-            try {
-                var clients = clientsFut.get().clients();
-                if (clients != null) {
-                    for (var c : clients) {
-                        // add without an action to avoid many notifications when joining
-                        state.clients.put(c.clientId(), new ClientDAO(c.clientId(), c.name(), c.gameId()));
-                    }
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            client = new Client(a.address, a.port);
         } catch (IOException e) {
             //TODO: maybe a popup
             System.out.println("Address not found");
-            state = new KBState(oldState);
+            return oldState;
+        }
 
-            // Client connection failed
-            state.isConnected = false;
-            return state;
+        // create new state after client creation in case client connection fails
+        KBState state = new KBState(oldState);
+
+        // Client is connected
+        state.isConnected = true;
+
+        // start listening to server with main client
+        Thread clientThread = new Thread(client::listen, "Main-Client");
+        clientThread.start();
+        state.clientThread = clientThread;
+
+        var welcomeFut = client.join(state.clientPreferredName);
+
+        // wait for the WelcomeToServer message before proceeding
+        try {
+            welcomeFut.get();
+            state.client = client;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            return oldState;
+        }
+
+        Store<KBState> store = Store.get();
+
+        client.onClientJoined.subscribe(c -> store.dispatch(new ClientAddAction(c)));
+
+        client.onClientLeft.subscribe(c -> store.dispatch(new ClientRemoveAction(c)));
+
+        client.onMessage.subscribe(m -> store.dispatch(new ChatReceiveAction(m)));
+
+        client.onYouHaveBeenKicked.subscribe(m -> store.dispatch(new DisconnectAction(true)));
+
+        System.out.println("Main Client ID: " + client.getId());
+
+        // wait to receive all clients from server
+        var clientsFut = client.requestClients();
+        try {
+            var clients = clientsFut.get().clients();
+            if (clients != null) {
+                for (var c : clients) {
+                    // add without an action to avoid many notifications when joining
+                    state.clients.put(c.clientId(), new ClientDAO(c.clientId(), c.name(), c.gameId()));
+                }
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
         }
         return state;
     }
