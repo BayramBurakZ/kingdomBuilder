@@ -37,7 +37,7 @@ public class MessageSocket {
     public boolean receive() throws IOException {
         if (in.ready()) {
             String line = in.readLine();
-            messages.offer(line);
+            messages.add(line);
             return true;
         }
         return false;

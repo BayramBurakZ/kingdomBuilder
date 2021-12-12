@@ -10,6 +10,8 @@ import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class KBReducer implements Reducer<KBState> {
 
@@ -106,9 +108,9 @@ public class KBReducer implements Reducer<KBState> {
 
         // wait for the WelcomeToServer message before proceeding
         try {
-            welcomeFut.get();
+            welcomeFut.get(1000, TimeUnit.MILLISECONDS);
             state.client = client;
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
             return oldState;
         }
@@ -128,15 +130,16 @@ public class KBReducer implements Reducer<KBState> {
         // wait to receive all clients from server
         var clientsFut = client.requestClients();
         try {
-            var clients = clientsFut.get().clients();
+            var clients = clientsFut.get(1000, TimeUnit.MILLISECONDS).clients();
             if (clients != null) {
                 for (var c : clients) {
                     // add without an action to avoid many notifications when joining
                     state.clients.put(c.clientId(), new ClientDAO(c.clientId(), c.name(), c.gameId()));
                 }
             }
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException | ExecutionException | TimeoutException e) {
             e.printStackTrace();
+            return oldState;
         }
         return state;
     }

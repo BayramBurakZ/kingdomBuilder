@@ -30,6 +30,15 @@ public class MessageFormatParser extends MessageFormatBase {
                     .boxed()
                     .toArray(Integer[]::new);
 
+        if(type.getComponentType() == ClientTuple.class) {
+            // [client_id;client_name;game_id]
+            ClientTuple[] clients = new ClientTuple[values.length];
+            for (int i = 0; i < clients.length; i++) {
+                clients[i] = parseTo(values[i], ClientTuple.class);
+            }
+            return clients;
+        }
+        /*
         if(type.getComponentType().isAnnotationPresent(MessageFormat.class)) {
             Class<?> ct = type.getComponentType();
             List<Object> objects = new ArrayList<>();
@@ -38,6 +47,7 @@ public class MessageFormatParser extends MessageFormatBase {
 
             return objects.toArray(Object[]::new);
         }
+        */
 
         return null;
     }
@@ -84,7 +94,11 @@ public class MessageFormatParser extends MessageFormatBase {
         Arrays.stream(ctor.getParameters()).forEach(p -> args.add(cache.get(p.getName())));
 
         try { return (T) ctor.newInstance(args.toArray()); }
-        catch(Exception e) { return null; }
+
+        catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

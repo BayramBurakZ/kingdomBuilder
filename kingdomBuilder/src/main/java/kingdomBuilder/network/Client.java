@@ -85,7 +85,7 @@ public class Client {
 
         // Sets the isRunning flag, if it's not set yet;
         // otherwise just exits the method.
-        if(isRunning.compareAndSet(false, true))
+        if(!isRunning.compareAndSet(false, true))
             throw new IllegalStateException("Client::listen may be called only from one thread.");
 
         while (isRunning.compareAndSet(true, true)) {
@@ -106,8 +106,13 @@ public class Client {
                         CompletableFuture<Object> fut = (CompletableFuture<Object>) ck.future();
                         fut.complete(resp);
                         cookieQueue.poll();
-                    } else
+                    } else {
+                        System.out.println("Warning: Cookie didn't match");
+                        // TODO: if the cookie doesn't match and we have more messages, we should check our cookie
+                        //   against the other messages as well. If the cookie never matches (maybe if a fitting
+                        //   response doesn't arrive within a time limit), it should print an error or something.
                         break;
+                    }
                 }
             }
 
