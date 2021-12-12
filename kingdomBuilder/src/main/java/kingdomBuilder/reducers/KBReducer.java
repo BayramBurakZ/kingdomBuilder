@@ -90,7 +90,9 @@ public class KBReducer implements Reducer<KBState> {
         } catch (IOException e) {
             //TODO: maybe a popup
             System.out.println("Address not found");
-            return oldState;
+            KBState state = new KBState(oldState);
+            state.failedToConnect = true;
+            return state;
         }
 
         // create new state after client creation in case client connection fails
@@ -98,6 +100,9 @@ public class KBReducer implements Reducer<KBState> {
 
         // Client is connected
         state.isConnected = true;
+
+        // Reset failedToConnect
+        state.failedToConnect = false;
 
         // start listening to server with main client
         Thread clientThread = new Thread(client::listen, "Main-Client");

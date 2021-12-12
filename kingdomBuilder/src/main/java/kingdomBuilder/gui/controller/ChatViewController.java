@@ -63,6 +63,11 @@ public class ChatViewController extends Controller implements Initializable {
             } else if (!newState.isConnected && state.isConnected){
                 onDisconnect();
             }
+            // TODO: failedToConnect mechanism, multiple output in chatarea 
+            // Failed to connect
+            if (newState.failedToConnect) {
+                textarea_globalchat.appendText("<--- Failed to connect to server --->\n");
+            }
             state = newState;
         });
 

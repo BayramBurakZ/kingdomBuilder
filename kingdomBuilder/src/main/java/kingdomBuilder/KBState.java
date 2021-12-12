@@ -30,6 +30,8 @@ public class KBState {
     public String clientPreferredName;
     // Client connection to server socket
     public boolean isConnected = false;
+    // Address not found flag
+    public boolean failedToConnect = false;
 
     public KBState() { }
 
@@ -41,5 +43,6 @@ public class KBState {
         clientThread = other.clientThread;
         clientPreferredName = other.clientPreferredName;
         isConnected = other.isConnected;
+        failedToConnect = other.failedToConnect;
     }
 }
