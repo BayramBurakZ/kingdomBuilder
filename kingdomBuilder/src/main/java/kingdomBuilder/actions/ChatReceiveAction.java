@@ -17,7 +17,7 @@ public class ChatReceiveAction extends Action {
     public Message chatMessage;
 
     /**
-     * Constructor that creates a new ChatReceivedAction that sets the chatMessage-field to the given message
+     * Constructor that creates a new ChatReceiveAction that sets the chatMessage-field to the given message
      * @param chatMessage the received chat message
      */
     public ChatReceiveAction(Message chatMessage) {

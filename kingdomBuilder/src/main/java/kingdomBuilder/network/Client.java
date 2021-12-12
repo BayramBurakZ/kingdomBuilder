@@ -60,10 +60,19 @@ public class Client {
         return newFut;
     }
 
+    /**
+     * Sends a chat message to the specified client IDs.
+     * @param message The chat message to be sent.
+     * @param receiver The list of the receivers' IDs.
+     */
     public void chat(String message, List<Integer> receiver) {
         socket.sendMessage(new Chat(receiver.toArray(new Integer[0]), message));
     }
 
+    /**
+     * Requests a list of all the clients that are on the server.
+     * @return The CompletableFuture that will contain the list of the client IDs on the server.
+     */
     public CompletableFuture<ReplyClients> requestClients() {
         socket.sendMessage(new RequestClients());
         CompletableFuture<ReplyClients> fut = new CompletableFuture<>();
@@ -163,10 +172,18 @@ public class Client {
         }
     }
 
+    /**
+     * Checks if the client is connected.
+     * @return True if the client is connected, false otherwise.
+     */
     public boolean isConnected() {
         return socket.isConnected();
     }
 
+    /**
+     * Checks if the client's listening thread is currently running.
+     * @return True if the listening thread is running, false otherwise.
+     */
     public boolean isRunning() {
         return isRunning.compareAndSet(true, true);
     }
