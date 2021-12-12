@@ -11,14 +11,13 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class Client {
     private int id;
     private String name;
     private int gameId;
-
-    private boolean running;
 
     private final MessageSocket socket;
 
@@ -29,22 +28,23 @@ public class Client {
     }
 
     private final Queue<Cookie> cookieQueue = new ConcurrentLinkedQueue<>();
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
     public final Event<Message> onMessage = new Event<>();
     public final Event<ClientJoined> onClientJoined = new Event<>();
     public final Event<ClientLeft> onClientLeft = new Event<>();
     public final Event<YouHaveBeenKicked> onYouHaveBeenKicked = new Event<>();
+    public final Event<Void> onDisconnect = new Event<>();
 
     public Client(String address, int port) throws IOException {
         socket = new MessageSocket(address, port);
     }
 
     /**
-     * Sends the 'IAm' message to the server and internally sets the client's ID, name and gameID once the
-     * response arrives. Start a client::listen thread to allow the client to listen for the response.
-     * @param name The preferred name of the client, if the name is already in use, it will append 'the n-th'.
-     * @return The CompletableFuture that carriers the WelcomeToServer message.
-     * Use future.get() to wait until the response arrives after a client::listen thread has been started.
+     * Announces the client's preferred name to the server.
+     * @param name The preferred name of the client.
+     * @return A future holding the response of the server. The name in the response object may be changed by the server,
+     * to avoid name collisions.
      */
     public CompletableFuture<WelcomeToServer> join(String name) {
         socket.sendMessage(new IAm(name));
@@ -73,9 +73,13 @@ public class Client {
     }
 
     public void listen() {
-        running = true;
-        while (running) {
-            // TODO: ping pong with onTimeout.dispatch(timeSinceLastMessage);
+
+        // Sets the isRunning flag, if it's not set yet;
+        // otherwise just exits the method.
+        if(isRunning.compareAndSet(false, true))
+            throw new IllegalStateException("Client::listen may be called only from one thread.");
+
+        while (isRunning.compareAndSet(true, true)) {
             boolean receivedSomething = false;
             do {
                 try {
@@ -102,7 +106,10 @@ public class Client {
                 String msg = socket.peekMessageContents();
 
                 // TODO:
-                //  Make this more generic and automized.
+                //   Automatically generate a semantically equivalent segment using annotation processors,
+                //   once regression in Gradle 7.3 has been fixed.
+                //
+
                 if (msg.startsWith("[SERVER_MESSAGE] [MESSAGE]")) {
                     Message typedMsg = (Message) socket.pollMessageAs(Message.class);
                     onMessage.dispatch(typedMsg);
@@ -127,10 +134,16 @@ public class Client {
                     continue;
                 }
 
+                if(msg.startsWith("[SERVER_MESSAGE] [PING]")) {
+                    socket.sendString("pong");
+                    continue;
+                }
+
                 socket.skipMessage();
             }
         }
-        // TODO: maybe add onStoppedListening.dispatch(); here for debugging
+
+        onDisconnect.dispatch(null);
     }
 
     /**
@@ -138,6 +151,8 @@ public class Client {
      * then stops the listening thread (client::listen).
      */
     public void disconnect() {
+        isRunning.set(false);
+
         if (socket.isConnected()) {
             socket.sendMessage(new Bye());
             try {
@@ -146,11 +161,14 @@ public class Client {
                 e.printStackTrace();
             }
         }
-        running = false;
     }
 
     public boolean isConnected() {
         return socket.isConnected();
+    }
+
+    public boolean isRunning() {
+        return isRunning.compareAndSet(true, true);
     }
 
     public int getId() {

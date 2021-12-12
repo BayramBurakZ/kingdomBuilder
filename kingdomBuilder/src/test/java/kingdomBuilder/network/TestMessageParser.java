@@ -48,4 +48,13 @@ public class TestMessageParser {
         assertEquals(msg.message(), "Hallo Du!");
     }
 
+    @Test
+    public void testParsingMessageWithSpecialCharacters() {
+        MessageFormatParser parser = new MessageFormatParser();
+        String str = "[SERVER_MESSAGE] [MESSAGE] <[1;{2,3,42};Hallo []>{}Du!]>";
+        Message msg = parser.parseTo(str, Message.class);
+
+        assertNotNull(msg);
+    }
+
 }

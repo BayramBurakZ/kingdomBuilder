@@ -29,6 +29,11 @@ public class MessageSocket {
         out.flush();
     }
 
+    public void sendString(String msg) {
+        out.println(msg);
+        out.flush();
+    }
+
     public boolean receive() throws IOException {
         if (in.ready()) {
             String line = in.readLine();

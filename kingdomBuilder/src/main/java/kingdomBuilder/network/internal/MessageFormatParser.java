@@ -30,20 +30,20 @@ public class MessageFormatParser extends MessageFormatBase {
                     .boxed()
                     .toArray(Integer[]::new);
 
-        if(type.getComponentType() == ClientTuple.class) {
-            // [client_id;client_name;game_id]
-            ClientTuple[] clients = new ClientTuple[values.length];
-            for (int i = 0; i < clients.length; i++) {
-                clients[i] = parseTo(values[i], ClientTuple.class);
-            }
-            return clients;
+        if(type.getComponentType().isAnnotationPresent(MessageFormat.class)) {
+            Class<?> ct = type.getComponentType();
+            List<Object> objects = new ArrayList<>();
+            for(var val: values)
+                objects.add(parseTo(val, ct));
+
+            return objects.toArray(Object[]::new);
         }
 
         return null;
     }
 
     public <T> T parseTo(@NotNull String message, @NotNull Class<T> cls) {
-        final String format = getFormatString(cls); // "#{clientId};#{name};#{gameId}"
+        final String format = getFormatString(cls);
         final List<Placeholder> placeholders = getPlaceholdersFromFormat(format);
         final Map<String, Object> cache = new HashMap<>();
         int nextPlaceholder = 0;
@@ -52,22 +52,22 @@ public class MessageFormatParser extends MessageFormatBase {
             if(message.charAt(it) == format.charAt(jt)) continue;
             if(!format.startsWith("#{", jt)) return null;
 
-            final Placeholder currentPlaceholder = placeholders.get(nextPlaceholder++);
+            final int currentPlaceholderIdx = nextPlaceholder++;
+            final Placeholder currentPlaceholder = placeholders.get(currentPlaceholderIdx);
             final Class<?> type = getTypeOfPlaceholder(cls, currentPlaceholder.name());
 
-            // TODO: check separately for chat messages, because they might contain delimiter ']'
-            //  set end to last character explicitly for chat messages
-            char delimiter = format.charAt(currentPlaceholder.end() + 1);
-            int end = message.indexOf(delimiter, it);
+            final String delimiter = String.valueOf(format.charAt(currentPlaceholder.end() + 1));
+            final boolean isLastPlaceholder = currentPlaceholderIdx == placeholders.size() - 1;
+            final boolean endsPayload = isLastPlaceholder && format.startsWith("]>", currentPlaceholder.end() + 1);
+
+            int end = endsPayload
+                    ? message.lastIndexOf("]>")
+                    : message.indexOf(delimiter, it);
 
             Object value = null;
             if(type == int.class)
                 value = Integer.parseInt(message, it, end, 10);
             else if(type == String.class)
-                // TODO
-                //if (cls == Message.class) {
-                //  end = message.lastIndexOf(delimiter, it);
-                //}
                 value = message.substring(it, end);
             else if(type.isArray()) {
                 value = processArray(type, message.substring(it + 1, end - 1));
