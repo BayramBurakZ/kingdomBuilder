@@ -16,52 +16,52 @@ public class KBState {
     // TODO? :probably just make these ObservableLists directly
 
     /**
-     * Represents the MainViewController
+     * Represents the MainViewController.
      */
     public MainViewController controller;
 
     /**
-     * Contains the connected clients with its id and ClientDAO.
+     * Maps client id to the client info of connected clients.
      */
     public Map<Integer, ClientDAO> clients = new HashMap<>();
 
     /**
-     * Contains the running games with its id and GameDAO.
+     * Maps game id to the game info of created games.
      */
     public Map<Integer, GameDAO> games = new HashMap<>();
 
     /**
-     * Represents the main client
+     * Represents the main client.
      */
     public Client client;
 
     /**
-     * Represents the thread of the client
+     * Represents the thread of the client.
      */
     public Thread clientThread;
 
     /**
-     * Represents the login name entered by the player
+     * Represents the login name entered by the player.
      */
     public String clientPreferredName;
 
     /**
-     * Shows whether the client is connected to the server
+     * Shows whether the client is connected to the server.
      */
     public boolean isConnected = false;
 
     /**
-     * Shows whether the connection to the server failed
+     * Shows whether the connection to the server failed.
      */
     public boolean failedToConnect = false;
 
     /**
-     * Represents the default constructor
+     * Represents the default constructor.
      */
     public KBState() { }
 
     /**
-     * Creates the same KBState object as the given KBState object
+     * Creates the same KBState object as the given KBState object.
      * @param other the received KBState
      */
     public KBState(KBState other) {
