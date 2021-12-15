@@ -1,40 +1,69 @@
 package kingdomBuilder;
 
-import com.sun.javafx.scene.SceneEventDispatcher;
-import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.controller.MainViewController;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
-import kingdomBuilder.network.protocol.server.ClientJoined;
-import kingdomBuilder.network.protocol.server.ClientLeft;
-import kingdomBuilder.network.protocol.server.Message;
-import kingdomBuilder.network.util.Event;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Represents the state of the Kingdom Builder application.
+ */
 public class KBState {
     // public for testing
-    // probably just make these ObservableLists directly
+    // TODO? :probably just make these ObservableLists directly
 
+    /**
+     * Represents the MainViewController
+     */
     public MainViewController controller;
-    // map of clientID -> client
+
+    /**
+     * Contains the connected clients with its id and ClientDAO.
+     */
     public Map<Integer, ClientDAO> clients = new HashMap<>();
-    // map of gameID -> game
+
+    /**
+     * Contains the running games with its id and GameDAO.
+     */
     public Map<Integer, GameDAO> games = new HashMap<>();
-    // main client
+
+    /**
+     * Represents the main client
+     */
     public Client client;
+
+    /**
+     * Represents the thread of the client
+     */
     public Thread clientThread;
-    // preferred client name that gets passed to the server when we join
+
+    /**
+     * Represents the login name entered by the player
+     */
     public String clientPreferredName;
-    // Client connection to server socket
+
+    /**
+     * Shows whether the client is connected to the server
+     */
     public boolean isConnected = false;
-    // Address not found flag
+
+    /**
+     * Shows whether the connection to the server failed
+     */
     public boolean failedToConnect = false;
 
+    /**
+     * Represents the default constructor
+     */
     public KBState() { }
 
+    /**
+     * Creates the same KBState object as the given KBState object
+     * @param other the received KBState
+     */
     public KBState(KBState other) {
         controller = other.controller;
         clients = other.clients;

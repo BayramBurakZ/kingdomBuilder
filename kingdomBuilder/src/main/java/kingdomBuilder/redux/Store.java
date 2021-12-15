@@ -1,7 +1,5 @@
 package kingdomBuilder.redux;
 
-import kingdomBuilder.KBState;
-
 import java.util.ArrayList;
 import java.util.List;
 
