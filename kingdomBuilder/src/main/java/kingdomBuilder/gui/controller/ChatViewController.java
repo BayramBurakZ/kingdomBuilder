@@ -50,9 +50,12 @@ public class ChatViewController extends Controller implements Initializable {
     @FXML
     private TextArea textarea_globalchat;
 
+    public ChatViewController(Store<KBState> store) {
+        this.store = store;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store = Store.get();
         state = store.getState();
 
         store.subscribe(newState -> {

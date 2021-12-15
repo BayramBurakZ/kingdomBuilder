@@ -7,6 +7,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import kingdomBuilder.KBState;
 import kingdomBuilder.actions.SetPreferredNameAction;
 import kingdomBuilder.redux.Store;
 
@@ -15,14 +16,17 @@ import java.util.ResourceBundle;
 
 public class IAmViewController extends Controller implements Initializable {
     private MainViewController mainViewController;
-    private Store store;
+    private final Store<KBState> store;
 
     @FXML
     private TextField iAmViewTextField;
 
+    public IAmViewController(Store<KBState> store) {
+        this.store = store;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store = Store.get();
         setupEventHandler();
     }
 

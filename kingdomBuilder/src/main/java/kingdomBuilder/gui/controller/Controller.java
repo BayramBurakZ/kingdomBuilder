@@ -1,4 +1,3 @@
 package kingdomBuilder.gui.controller;
 
-public class Controller {
-}
+public class Controller { }

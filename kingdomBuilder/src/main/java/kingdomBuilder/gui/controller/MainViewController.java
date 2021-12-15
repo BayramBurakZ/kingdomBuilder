@@ -3,6 +3,7 @@ package kingdomBuilder.gui.controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
+import kingdomBuilder.KBState;
 import kingdomBuilder.actions.SetMainControllerAction;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.redux.Store;
@@ -19,11 +20,17 @@ TODO: Update functions for every scene to update its data from the REDUX subscri
  */
 
 public class MainViewController implements Initializable {
-    private SceneLoader sceneLoader;
+    private final Store<KBState> store;
+    private final SceneLoader sceneLoader;
 
     @FXML
     private BorderPane borderPane;
 
+
+    public MainViewController(Store<KBState> store) {
+        this.store = store;
+        this.sceneLoader = new SceneLoader(this.store);
+    }
 
     /**
      * Creates the sceneLoader-Object that store and load every scene
@@ -31,8 +38,7 @@ public class MainViewController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Store.get().dispatch(new SetMainControllerAction(this));
-        sceneLoader = new SceneLoader();
+        store.dispatch(new SetMainControllerAction(this));
         showIAmView();
     }
 

@@ -5,8 +5,33 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import kingdomBuilder.KBState;
+import kingdomBuilder.reducers.KBReducer;
+import kingdomBuilder.redux.Store;
+
+import java.lang.reflect.Constructor;
+import java.net.URL;
 
 public class KingdomBuilderApplication extends Application {
+    private final Store<KBState> store = new Store<>(new KBState(), new KBReducer());
+
+    private FXMLLoader makeLoader(URL resource) {
+        FXMLLoader loader = new FXMLLoader(resource);
+        loader.setControllerFactory(controllerType -> {
+            try {
+                for(Constructor<?> ctor: controllerType.getConstructors()) {
+                    if(ctor.getParameterCount() == 1 && ctor.getParameterTypes()[0] == Store.class)
+                        return ctor.newInstance(store);
+                }
+
+                return controllerType.getConstructor().newInstance();
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        });
+
+        return loader;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -27,7 +52,11 @@ public class KingdomBuilderApplication extends Application {
          einmal.
          */
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder/gui/controller/MainView.fxml"));
+        // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder/gui/controller/MainView.fxml"));
+
+        URL resource = getClass().getResource("controller/MainView.fxml");
+        FXMLLoader fxmlLoader = makeLoader(resource);
+
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 1000, 650);
 

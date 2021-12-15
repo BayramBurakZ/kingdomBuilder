@@ -16,7 +16,7 @@ import java.util.concurrent.TimeoutException;
 public class KBReducer implements Reducer<KBState> {
 
     @Override
-    public KBState reduce(KBState oldState, Action action) {
+    public KBState reduce(Store<KBState> store, KBState oldState, Action action) {
         System.out.println("Reducer Log: " + action.getClass().getSimpleName());
 
         /*
@@ -35,7 +35,7 @@ public class KBReducer implements Reducer<KBState> {
         } else if (action instanceof ChatReceiveAction a) {
             return reduce(oldState, a);
         } else if (action instanceof ConnectAction a) {
-            return reduce(oldState, a);
+            return reduce(store, oldState, a);
         } else if (action instanceof DisconnectAction a) {
             return reduce(oldState, a);
         } else if (action instanceof SetMainControllerAction a) {
@@ -83,7 +83,7 @@ public class KBReducer implements Reducer<KBState> {
         return oldState;
     }
 
-    private KBState reduce(KBState oldState, ConnectAction a) {
+    private KBState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
         Client client;
         try {
             client = new Client(a.address, a.port);
@@ -120,14 +120,9 @@ public class KBReducer implements Reducer<KBState> {
             return oldState;
         }
 
-        Store<KBState> store = Store.get();
-
         client.onClientJoined.subscribe(c -> store.dispatch(new ClientAddAction(c)));
-
         client.onClientLeft.subscribe(c -> store.dispatch(new ClientRemoveAction(c)));
-
         client.onMessage.subscribe(m -> store.dispatch(new ChatReceiveAction(m)));
-
         client.onYouHaveBeenKicked.subscribe(m -> store.dispatch(new DisconnectAction(true)));
 
         System.out.println("Main Client ID: " + client.getId());

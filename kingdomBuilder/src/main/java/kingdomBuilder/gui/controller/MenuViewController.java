@@ -38,12 +38,17 @@ public class MenuViewController extends Controller implements Initializable {
     @FXML
     private Button menuview_connect_button;
 
+    public MenuViewController(Store<KBState> store) {
+        this.store = store;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store = Store.get();
-        state = store.getState();
-
         store.subscribe(newState -> {
+            if(state == null) {
+                state = newState;
+                return;
+            }
             // Client connection
             if (newState.isConnected && !state.isConnected) {
                 onConnect();
@@ -88,6 +93,7 @@ public class MenuViewController extends Controller implements Initializable {
     }
 
     private void onConnect() {
+
         menuview_textfield_address.setDisable(true);
         menuview_textfield_port.setDisable(true);
         menuview_connect_button.setText("Disconnect");

@@ -11,10 +11,6 @@ import kingdomBuilder.redux.Store;
 public class Boot {
 
     public static void main(String[] args) throws IOException {
-
-        Store<KBState> store = new Store<>(new KBState(), new KBReducer());
-        Store.setInstance(store);
-
         Application.launch(KingdomBuilderApplication.class);
     }
 }
