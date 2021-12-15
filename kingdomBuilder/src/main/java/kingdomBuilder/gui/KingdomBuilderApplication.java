@@ -27,7 +27,7 @@ public class KingdomBuilderApplication extends Application {
          einmal.
          */
 
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder.gui/controller/MainView.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder/gui/controller/MainView.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 1000, 650);
 

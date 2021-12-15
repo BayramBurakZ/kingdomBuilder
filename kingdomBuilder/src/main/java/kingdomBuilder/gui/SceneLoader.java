@@ -86,7 +86,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadMenuView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/MenuView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/MenuView.fxml");
         menuView = tuple.x;
         menuViewController = tuple.y;
     }
@@ -97,7 +97,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadGameLobbyView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameLobbyView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/GameLobbyView.fxml");
         gameLobbyView = tuple.x;
         gameLobbyViewController = tuple.y;
     }
@@ -108,7 +108,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadGameView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/GameView.fxml");
         gameView = tuple.x;
         gameViewController = tuple.y;
     }
@@ -119,7 +119,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadIAmView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/IAmView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/IAmView.fxml");
         iAmView = tuple.x;
         iAmViewController = tuple.y;
     }
@@ -130,7 +130,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadChatView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/ChatView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/ChatView.fxml");
         chatView = tuple.x;
         chatViewController = tuple.y;
     }
@@ -141,7 +141,7 @@ public class SceneLoader {
      * Used for reloading this View.
      */
     public void loadGameSelectionView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameSelectionView.fxml");
+        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder/gui/controller/GameSelectionView.fxml");
         gameSelectionView = tuple.x;
         gameSelectionViewController = tuple.y;
     }

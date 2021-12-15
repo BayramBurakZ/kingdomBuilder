@@ -6,13 +6,13 @@ import kingdomBuilder.model.TileType;
 
 
 public class TextureLoader {
-    private final Image CANYON = new Image("kingdomBuilder.gui/textures/CANYON.png");
-    private final Image DESERT = new Image("kingdomBuilder.gui/textures/DESERT.png");
-    private final Image FLOWER = new Image("kingdomBuilder.gui/textures/FLOWER.png");
-    private final Image FORREST = new Image("kingdomBuilder.gui/textures/FORREST.png");
-    private final Image GRAS = new Image("kingdomBuilder.gui/textures/GRAS.png");
-    private final Image MOUNTAIN = new Image("kingdomBuilder.gui/textures/MOUNTAIN.png");
-    private final Image WATER = new Image("kingdomBuilder.gui/textures/WATER.png");
+    private final Image CANYON = new Image("kingdomBuilder/gui/textures/CANYON.png");
+    private final Image DESERT = new Image("kingdomBuilder/gui/textures/DESERT.png");
+    private final Image FLOWER = new Image("kingdomBuilder/gui/textures/FLOWER.png");
+    private final Image FORREST = new Image("kingdomBuilder/gui/textures/FORREST.png");
+    private final Image GRAS = new Image("kingdomBuilder/gui/textures/GRAS.png");
+    private final Image MOUNTAIN = new Image("kingdomBuilder/gui/textures/MOUNTAIN.png");
+    private final Image WATER = new Image("kingdomBuilder/gui/textures/WATER.png");
 
     public TextureLoader() {
     }
