@@ -12,9 +12,20 @@ import kingdomBuilder.redux.Store;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 
+/**
+ * Represents the specified JavaFX application for the KingdomBuilder.
+ */
 public class KingdomBuilderApplication extends Application {
+    /**
+     * Stores the whole state of the application.
+     */
     private final Store<KBState> store = new Store<>(new KBState(), new KBReducer());
 
+    /**
+     * Returns the FXMLLoader of the application.
+     * @param resource location of the MainView XML document.
+     * @return the FXMLLoader of the application.
+     */
     private FXMLLoader makeLoader(URL resource) {
         FXMLLoader loader = new FXMLLoader(resource);
         loader.setControllerFactory(controllerType -> {
@@ -33,6 +44,12 @@ public class KingdomBuilderApplication extends Application {
         return loader;
     }
 
+    /**
+     * Creates Scene object with given Stage object as root Node.
+     * Attempts to show the stage/window.
+     * @param primaryStage primary stage for this application onto which application scene can be set.
+     * @throws Exception
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
         // TODO: resources instead of path for .fxml-files
@@ -40,7 +57,7 @@ public class KingdomBuilderApplication extends Application {
 
         /*
 
-        // Setup css Stylesheet
+        Setup css Stylesheet
         String css = this.getClass().getResource("/kingdomBuilder.gui/StyleSheet.css").toExternalForm();
         scene.getStylesheets().add(css);
 
@@ -68,6 +85,10 @@ public class KingdomBuilderApplication extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Prepares for application exit and destroys resources.
+     * @throws Exception
+     */
     // TODO: general closing mechanism
     @Override
     public void stop() throws Exception {
