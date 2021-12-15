@@ -33,7 +33,7 @@ public class SceneLoader {
     private Controller chatViewController;
     private Controller gameSelectionViewController;
 
-    private Store<KBState> store;
+    private final Store<KBState> store;
 
     /**
      * Constructor that initially loads every view
@@ -65,7 +65,7 @@ public class SceneLoader {
                         return ctor.newInstance(store);
                 }
 
-                return controllerType.newInstance();
+                return controllerType.getConstructor().newInstance();
             } catch(Exception exc) {
                 throw new RuntimeException(exc);
             }

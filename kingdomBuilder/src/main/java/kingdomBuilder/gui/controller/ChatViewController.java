@@ -153,7 +153,7 @@ public class ChatViewController extends Controller implements Initializable {
         String message = chatview_textarea_chatinput.getText().trim();
         String stringToSend = message;
         if (!message.isEmpty()) {
-            List<Integer> receiverIds = new ArrayList();
+            List<Integer> receiverIds = new ArrayList<>();
             if (tab_global.isSelected()) {
 
                 // Whisper message
