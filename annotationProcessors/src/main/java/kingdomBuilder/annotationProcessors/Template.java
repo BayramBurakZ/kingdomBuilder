@@ -8,8 +8,6 @@ import java.lang.annotation.Target;
 /**
  * Used to annotate classes as template classes, which are used as data providers
  * for the template engine during rendering.
- *
- * @author Julian Kirsch
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

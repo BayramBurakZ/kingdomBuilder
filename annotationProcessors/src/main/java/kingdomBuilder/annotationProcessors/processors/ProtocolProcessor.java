@@ -2,6 +2,7 @@ package kingdomBuilder.annotationProcessors.processors;
 
 import kingdomBuilder.annotationProcessors.TemplateRenderer;
 import kingdomBuilder.annotationProcessors.templates.ProtocolConsumer;
+import kingdomBuilder.annotationProcessors.templates.ProtocolDeserializer;
 import kingdomBuilder.annotationProcessors.templates.ProtocolSerializer;
 import kingdomBuilder.annotations.Protocol;
 
@@ -68,6 +69,14 @@ public class ProtocolProcessor extends AbstractProcessor {
 
             generateFromTemplate(
                     new ProtocolSerializer("kingdomBuilder.network.generated", requests),
+                    responses.toArray(new TypeElement[0])
+            );
+
+            generateFromTemplate(
+                    new ProtocolDeserializer(
+                            "kingdomBuilder.network.generated",
+                            responses,
+                            processingEnv.getTypeUtils()),
                     responses.toArray(new TypeElement[0])
             );
         } catch(Exception exc) {

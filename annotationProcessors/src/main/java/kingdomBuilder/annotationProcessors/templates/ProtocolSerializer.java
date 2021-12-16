@@ -5,11 +5,10 @@ import kingdomBuilder.annotationProcessors.TemplateRenderer;
 
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Template
 public class ProtocolSerializer {

@@ -1,0 +1,7 @@
+            case <%= case %>: {
+                final List<String> tokens = split(sections[2], <%= componentCount %>);
+                <%= constructionVariables %>
+                <%= body %>
+                <%= packetType %> packet = new <%= packetType %>(<%= constructionArgs %>);
+                consumer.accept(packet);
+            } break;
