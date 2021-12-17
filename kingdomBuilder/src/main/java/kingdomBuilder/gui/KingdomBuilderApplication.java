@@ -22,7 +22,8 @@ public class KingdomBuilderApplication extends Application {
     private final Store<KBState> store = new Store<>(new KBState(), new KBReducer());
 
     /**
-     * Returns the FXMLLoader of the application.
+     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
+     * construction.
      * @param resource location of the MainView XML document.
      * @return the FXMLLoader of the application.
      */
@@ -56,20 +57,10 @@ public class KingdomBuilderApplication extends Application {
         // TODO: WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @1933c126'
 
         /*
-
-        Setup css Stylesheet
-        String css = this.getClass().getResource("/kingdomBuilder.gui/StyleSheet.css").toExternalForm();
-        scene.getStylesheets().add(css);
-
-         */
-
-        /*
         TODO: achtet darauf, dass die .fxml-Files (und Java-Klassen natürlich) nicht zu "breit" werden, also dass der
          Code durch Zeilenumbrüche innerhalb der Linie bleibt, die IntelliJ  rechts anzeigt. Dann sieht man alles auf
          einmal.
          */
-
-        // FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/kingdomBuilder/gui/controller/MainView.fxml"));
 
         URL resource = getClass().getResource("controller/MainView.fxml");
         FXMLLoader fxmlLoader = makeLoader(resource);
@@ -77,7 +68,6 @@ public class KingdomBuilderApplication extends Application {
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 1000, 650);
 
-        // Setup stage
         primaryStage.setTitle("KingdomBuilder v0.1 Chat Client");
         primaryStage.setScene(scene);
         primaryStage.setMinWidth(1000);
