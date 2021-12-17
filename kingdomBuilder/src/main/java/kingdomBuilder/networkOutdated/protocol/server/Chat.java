@@ -1,6 +1,6 @@
-package kingdomBuilder.network.protocol.server;
+package kingdomBuilder.networkOutdated.protocol.server;
 
-import kingdomBuilder.network.internal.MessageFormat;
+import kingdomBuilder.networkOutdated.internal.MessageFormat;
 
 @MessageFormat(format="chat [#{receiverIds};#{message}]")
 public record Chat(

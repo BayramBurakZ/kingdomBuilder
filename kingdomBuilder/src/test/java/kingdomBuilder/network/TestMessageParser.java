@@ -1,13 +1,13 @@
 package kingdomBuilder.network;
 
-import kingdomBuilder.network.internal.MessageFormatParser;
+import kingdomBuilder.networkOutdated.internal.MessageFormatParser;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import kingdomBuilder.network.protocol.server.ClientJoined;
-import kingdomBuilder.network.protocol.server.Message;
-import kingdomBuilder.network.protocol.server.WelcomeToServer;
+import kingdomBuilder.networkOutdated.protocol.server.ClientJoined;
+import kingdomBuilder.networkOutdated.protocol.server.Message;
+import kingdomBuilder.networkOutdated.protocol.server.WelcomeToServer;
 import org.junit.jupiter.api.Test;
 
 public class TestMessageParser {

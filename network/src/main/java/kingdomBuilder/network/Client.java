@@ -1,3 +1,2 @@
-package kingdomBuilder.network;
-
-public interface Client {}
+package kingdomBuilder.network.protocol;public interface Client {
+}

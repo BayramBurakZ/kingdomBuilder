@@ -1,4 +1,4 @@
-package kingdomBuilder.network.internal;
+package kingdomBuilder.networkOutdated.internal;
 
 import java.util.ArrayList;
 import java.util.List;

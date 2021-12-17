@@ -1,6 +1,6 @@
-package kingdomBuilder.network.protocol.tuples;
+package kingdomBuilder.networkOutdated.protocol.tuples;
 
-import kingdomBuilder.network.internal.MessageFormat;
+import kingdomBuilder.networkOutdated.internal.MessageFormat;
 
 @MessageFormat(format="[#{clientId};#{name};#{gameId}]")
 public record ClientTuple(

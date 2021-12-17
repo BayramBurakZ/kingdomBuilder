@@ -1,10 +1,10 @@
-package kingdomBuilder.network;
+package kingdomBuilder.networkOutdated;
 
-import kingdomBuilder.network.internal.MessageSocket;
-import kingdomBuilder.network.protocol.server.*;
-import kingdomBuilder.network.protocol.server.reply.ReplyClients;
-import kingdomBuilder.network.protocol.server.request.RequestClients;
-import kingdomBuilder.network.util.Event;
+import kingdomBuilder.networkOutdated.internal.MessageSocket;
+import kingdomBuilder.networkOutdated.protocol.server.*;
+import kingdomBuilder.networkOutdated.protocol.server.reply.ReplyClients;
+import kingdomBuilder.networkOutdated.protocol.server.request.RequestClients;
+import kingdomBuilder.networkOutdated.util.Event;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
-public class Client {
+public class ClientOld {
     private int id;
     private String name;
     private int gameId;
@@ -36,7 +36,7 @@ public class Client {
     public final Event<YouHaveBeenKicked> onYouHaveBeenKicked = new Event<>();
     public final Event<Void> onDisconnect = new Event<>();
 
-    public Client(String address, int port) throws IOException {
+    public ClientOld(String address, int port) throws IOException {
         socket = new MessageSocket(address, port);
     }
 

@@ -1,12 +1,13 @@
 package kingdomBuilder.actions;
 
+import kingdomBuilder.networkOutdated.protocol.server.YouHaveBeenKicked;
 import kingdomBuilder.redux.Action;
 
 /**
  * <p>
  * Represents the DisConnectAction.
  * Triggered if the User wants to disconnect from a server or if the server send the
- * {@link kingdomBuilder.network.protocol.server.YouHaveBeenKicked YouHaveBeenKicked-Message}.
+ * {@link YouHaveBeenKicked YouHaveBeenKicked-Message}.
  * This Action has a wasKicked Boolean, that represents if the server has kicked you or the user left
  * voluntarily.
  * </p> <p>

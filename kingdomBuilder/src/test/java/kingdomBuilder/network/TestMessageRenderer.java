@@ -1,11 +1,11 @@
 package kingdomBuilder.network;
 
-import kingdomBuilder.network.internal.MessageFormatRenderer;
+import kingdomBuilder.networkOutdated.internal.MessageFormatRenderer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import kingdomBuilder.network.protocol.server.Chat;
-import kingdomBuilder.network.protocol.server.IAm;
+import kingdomBuilder.networkOutdated.protocol.server.Chat;
+import kingdomBuilder.networkOutdated.protocol.server.IAm;
 import org.junit.jupiter.api.Test;
 
 

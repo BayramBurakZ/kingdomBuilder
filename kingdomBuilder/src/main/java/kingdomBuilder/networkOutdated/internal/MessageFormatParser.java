@@ -1,7 +1,6 @@
-package kingdomBuilder.network.internal;
+package kingdomBuilder.networkOutdated.internal;
 
-import kingdomBuilder.network.protocol.server.Message;
-import kingdomBuilder.network.protocol.tuples.ClientTuple;
+import kingdomBuilder.networkOutdated.protocol.tuples.ClientTuple;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Field;

@@ -3,7 +3,7 @@ package kingdomBuilder;
 import kingdomBuilder.gui.controller.MainViewController;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
-import kingdomBuilder.network.Client;
+import kingdomBuilder.networkOutdated.ClientOld;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class KBState {
     /**
      * Represents the main client.
      */
-    public Client client;
+    public ClientOld client;
 
     /**
      * Represents the thread of the client.

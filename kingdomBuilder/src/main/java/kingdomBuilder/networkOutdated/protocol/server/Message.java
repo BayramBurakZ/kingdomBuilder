@@ -1,6 +1,6 @@
-package kingdomBuilder.network.protocol.server;
+package kingdomBuilder.networkOutdated.protocol.server;
 
-import kingdomBuilder.network.internal.MessageFormat;
+import kingdomBuilder.networkOutdated.internal.MessageFormat;
 
 @MessageFormat(format="[SERVER_MESSAGE] [MESSAGE] <[#{clientId};#{receiverIds};#{message}]>")
 public record Message(

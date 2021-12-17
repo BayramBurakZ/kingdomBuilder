@@ -10,7 +10,7 @@ import javafx.scene.input.KeyEvent;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ChatSendAction;
 import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.network.protocol.server.Message;
+import kingdomBuilder.networkOutdated.protocol.server.Message;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;

@@ -1,4 +1,4 @@
-package kingdomBuilder.network.util;
+package kingdomBuilder.networkOutdated.util;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -3,7 +3,7 @@ package kingdomBuilder.reducers;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.network.Client;
+import kingdomBuilder.networkOutdated.ClientOld;
 import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
@@ -84,9 +84,9 @@ public class KBReducer implements Reducer<KBState> {
     }
 
     private KBState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
-        Client client;
+        ClientOld client;
         try {
-            client = new Client(a.address, a.port);
+            client = new ClientOld(a.address, a.port);
         } catch (IOException e) {
             //TODO: maybe a popup
             System.out.println("Address not found");

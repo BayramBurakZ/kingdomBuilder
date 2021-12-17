@@ -1,4 +1,4 @@
-package kingdomBuilder.network.internal;
+package kingdomBuilder.networkOutdated.internal;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -1,7 +1,6 @@
-package kingdomBuilder.network.protocol.server;
+package kingdomBuilder.networkOutdated.protocol.server;
 
-import kingdomBuilder.network.internal.MessageFormat;
-import kingdomBuilder.network.protocol.tuples.ClientTuple;
+import kingdomBuilder.networkOutdated.internal.MessageFormat;
 
 @MessageFormat(format="[SERVER_MESSAGE] [CLIENT_JOINED] <[#{clientId};#{name};#{gameId}]>")
 public record ClientJoined(

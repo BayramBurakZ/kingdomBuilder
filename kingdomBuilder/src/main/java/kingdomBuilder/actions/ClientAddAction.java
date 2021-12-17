@@ -1,7 +1,7 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.network.protocol.server.ClientJoined;
-import kingdomBuilder.network.protocol.tuples.ClientTuple;
+import kingdomBuilder.networkOutdated.protocol.server.ClientJoined;
+import kingdomBuilder.networkOutdated.protocol.tuples.ClientTuple;
 import kingdomBuilder.redux.Action;
 
 /**
@@ -29,7 +29,7 @@ public class ClientAddAction extends Action {
     /**
      * <p>
      * Constructor that creates a new ClientAddAction. Sets the fields according to the given
-     * {@link kingdomBuilder.network.protocol.server.ClientJoined ClientJoined} Message that the server
+     * {@link ClientJoined ClientJoined} Message that the server
      * has sent. Sets the clientId, name and the gameId to the values inside the ClientJoined-object.
      * </p>
      * @param c represents the message, that the server sent
@@ -41,7 +41,7 @@ public class ClientAddAction extends Action {
     /**
      * <p>
      * Constructor that creates a new ClientAddAction. Sets the fields according to the given
-     * {@link kingdomBuilder.network.protocol.tuples.ClientTuple ClientTuple}.
+     * {@link ClientTuple ClientTuple}.
      * Sets the clientId, name and the gameId to the values inside the ClientTuple.
      * </p>
      * @param c the ClientTuple that joined the server
