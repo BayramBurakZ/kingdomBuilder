@@ -19,41 +19,88 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ChatViewController extends Controller implements Initializable {
+    /**
+     * Represents the store of the application.
+     */
     private Store<KBState> store;
+    /**
+     * Represents the state for internal use.
+     */
+    // TODO: remove it?
     private KBState state;
+    /**
+     * Represents the MainViewController for access to switch Views-methods.
+     */
     private MainViewController mainViewController;
 
+    /**
+     * Represents the table for the clients on the server.
+     */
     @FXML
     private TableView<ClientDAO> tableview_chat;
 
+    /**
+     * Represents the column for the client ids of the clients on the server in the table.
+     */
     @FXML
     private TableColumn<ClientDAO, String> column_id;
 
+    /**
+     * Represents the column for the client names of the clients on the server.
+     */
     @FXML
     private TableColumn<ClientDAO, String> column_name;
 
+    /**
+     * Represents the column for the game-ids of the clients on the server.
+     */
     @FXML
     private TableColumn<ClientDAO, String> column_gameid;
 
+    /**
+     * Represents the tab for the global chat.
+     */
     @FXML
     private Tab tab_global;
 
+    /**
+     * Represents the tab for the game chat.
+     */
     @FXML
     private Tab tab_game;
 
+    /**
+     * Represents the textarea used for the input for the chat.
+     */
     @FXML
     private TextArea chatview_textarea_chatinput;
 
+    /**
+     * Represents the button to send chat messages.
+     */
     @FXML
     private Button chatview_button_send;
 
+    /**
+     * Represents the textarea used for displaying the globalchat.
+     */
     @FXML
     private TextArea textarea_globalchat;
 
+    /**
+     * Constructs the ChatViewController.
+     * @param store The Application's store to set the field.
+     */
     public ChatViewController(Store<KBState> store) {
         this.store = store;
     }
-
+    
+    /**
+     * Called to initialize this controller after its root element has been completely processed.
+     * @param location The location used to resolve relative paths for the root object,
+     *                 or null if the location is not known.
+     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         state = store.getState();
@@ -79,11 +126,19 @@ public class ChatViewController extends Controller implements Initializable {
         column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameId"));
     }
 
+    /**
+     * Sets the functionality for the Send Button.
+     * @param event Contains the data from the event source.
+     */
     public void onButtonSendPressed(Event event) {
         chatview_textarea_chatinput.appendText(System.lineSeparator());
         printAndSendMessage();
     }
 
+    /**
+     * Sets the functionality for KeyEvents.
+     * @param event Contains the data from the event source.
+     */
     public void onKeyPressed(KeyEvent event) {
         /*
         if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
@@ -98,6 +153,9 @@ public class ChatViewController extends Controller implements Initializable {
         }
     }
 
+    /**
+     * Updates the UI elements that are important when the client connects to a server.
+     */
     public void onConnect() {
         textarea_globalchat.appendText("<--- You are connected to the server --->\n");
 
@@ -105,6 +163,9 @@ public class ChatViewController extends Controller implements Initializable {
         chatview_button_send.setDisable(false);
     }
 
+    /**
+     * Updates the UI elements that are important when the client disconnects from a server.
+     */
     public void onDisconnect() {
         textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
 
@@ -112,6 +173,10 @@ public class ChatViewController extends Controller implements Initializable {
         chatview_button_send.setDisable(true);
     }
 
+    /**
+     * Updates the ChatView with the specific incoming message correctly.
+     * @param chatMsg Contains all information of the incoming chat message.
+     */
     public void onMessage(Message chatMsg) {
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients.get(senderID).getName();
@@ -135,20 +200,39 @@ public class ChatViewController extends Controller implements Initializable {
         textarea_globalchat.appendText(System.lineSeparator());
     }
 
+    /**
+     * Updates the UI when another client left the server.
+     * @param clientId the ID of the client which left the server.
+     * @param name the name of the client which left the server.
+     * @param gameId the game ID of the client which left the server.
+     */
     public void onClientLeft(int clientId, String name, int gameId) {
         textarea_globalchat.appendText("<--- " + name + " left the server. --->");
         textarea_globalchat.appendText(System.lineSeparator());
     }
 
+    /**
+     * Updates the UI when another client joined the server.
+     * @param clientId the ID of the client which left the server.
+     * @param name the name of the client which left the server.
+     * @param gameId the game ID of the client which left the server.
+     */
     public void onClientJoined(int clientId, String name, int gameId) {
         textarea_globalchat.appendText("<--- " + name + " joined the server. --->");
         textarea_globalchat.appendText(System.lineSeparator());
     }
 
+    /**
+     * Updates the UI when this client was kicked from the server.
+     */
     public void onYouHaveBeenKicked() {
         textarea_globalchat.appendText("<--- You have been kicked from the server --->\n");
     }
 
+    /**
+     * Sends the message from the textarea to the specified clients.
+     * When the message starts with "@", the message is only to the following client.
+     */
     private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
         String stringToSend = message;
@@ -209,6 +293,10 @@ public class ChatViewController extends Controller implements Initializable {
         chatview_textarea_chatinput.clear();
     }
 
+    /**
+     * Sets the MainViewController.
+     * @param mainViewController MainViewController with all functions.
+     */
     public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
     }
