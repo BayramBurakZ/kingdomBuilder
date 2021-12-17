@@ -19,24 +19,63 @@ import java.net.URL;
  * With the get_View() you get the specific view.
  */
 public class SceneLoader {
+    /**
+     * Stores the current menuView.
+     */
     private Node menuView;
+    /**
+     * Stores the current gameLobbyView.
+     */
     private Node gameLobbyView;
+    /**
+     * Stores the current gameView.
+     */
     private Node gameView;
+    /**
+     * Stores the current iAmView.
+     */
     private Node iAmView;
+    /**
+     * Stores the current chatView.
+     */
     private Node chatView;
+    /**
+     * Stores the current gameSelectionView.
+     */
     private Node gameSelectionView;
 
+    /**
+     * Stores the menuViewController.
+     */
     private Controller menuViewController;
+    /**
+     * Stores the gameLobbyController.
+     */
     private Controller gameLobbyViewController;
+    /**
+     * Stores the gameViewController.
+     */
     private Controller gameViewController;
+    /**
+     * Stores the iAmViewController.
+     */
     private Controller iAmViewController;
+    /**
+     * Stores the chatViewController.
+     */
     private Controller chatViewController;
+    /**
+     * Stores the gameSelectionViewController.
+     */
     private Controller gameSelectionViewController;
 
+    /**
+     * Represents the store of the application.
+     */
     private final Store<KBState> store;
 
     /**
-     * Constructor that initially loads every view
+     * Constructor that initially loads every view.
      */
     public SceneLoader(Store<KBState> store) {
         this.store = store;
@@ -78,10 +117,10 @@ public class SceneLoader {
 
     /**
      * Loads the View at the specific location of the parameter and put the view on the x-position of the
-     * tuple and the corresponding controller at the  y-position of the tuple
+     * tuple and the corresponding controller at the  y-position of the tuple.
      *
-     * @param location String that contains the path to the location of the .fxml file
-     * @return Tuple x-position is the View as Node, y-position is the contoller
+     * @param location String that contains the path to the location of the .fxml file.
+     * @return Tuple x-position is the View as Node, y-position is the contoller.
      */
     private Pair<Node, Controller> loadView(String location) {
         Node node = null;
@@ -165,40 +204,88 @@ public class SceneLoader {
         gameSelectionViewController = pair.getValue();
     }
 
+    /**
+     * Returns the current parent node of the MenuView.
+     * @return The current parent node of the MenuView.
+     */
     public Node getMenuView() {
         return menuView;
     }
+    /**
+     * Returns the current parent node of the GameLobbyView.
+     * @return The current parent node of the GameLobbyView.
+     */
     public Node getGameLobbyView() {
         return gameLobbyView;
     }
+    /**
+     * Returns the current parent node of the GameView.
+     * @return The current parent node of the GameView.
+     */
     public Node getGameView() {
         return gameView;
     }
+    /**
+     * Returns the current parent node of the IAmView.
+     * @return The current parent node of the IAmView.
+     */
     public Node getIAmView() {
         return iAmView;
     }
+    /**
+     * Returns the current parent node of the ChatView.
+     * @return The current parent node of the ChatView.
+     */
     public Node getChatView() {
         return chatView;
     }
+    /**
+     * Returns the current parent node of the GameSelectionView.
+     * @return The current parent node of the GameSelectionView.
+     */
     public Node getGameSelectionView() {
         return gameSelectionView;
     }
 
+    /**
+     * Returns the MenuViewController.
+     * @return The MenuViewController with all functionalities for the MenuView.
+     */
     public MenuViewController getMenuViewController() {
         return (MenuViewController) menuViewController;
     }
+    /**
+     * Returns the GameLobbyViewController.
+     * @return The GameLobbyViewController with all functionalities for the GameLobbyView.
+     */
     public GameLobbyViewController getGameLobbyViewController() {
         return (GameLobbyViewController) gameLobbyViewController;
     }
+    /**
+     * Returns the GameViewController.
+     * @return The GameViewController with all functionalities for the GameView.
+     */
     public GameViewController getGameViewController() {
         return (GameViewController) gameViewController;
     }
+    /**
+     * Returns the IAmViewController.
+     * @return The IAmViewController with all functionalities for the IAmView.
+     */
     public IAmViewController getIAmViewController() {
         return (IAmViewController) iAmViewController;
     }
+    /**
+     * Returns the ChatViewController.
+     * @return The ChatViewController with all functionalities for the ChatView.
+     */
     public ChatViewController getChatViewController() {
         return (ChatViewController) chatViewController;
     }
+    /**
+     * Returns the GameSelectionViewController.
+     * @return The GameSelectionViewController with all functionalities for the GameSelectionView.
+     */
     public GameSelectionViewController getGameSelectionViewController() {
         return (GameSelectionViewController) gameSelectionViewController;
     }
