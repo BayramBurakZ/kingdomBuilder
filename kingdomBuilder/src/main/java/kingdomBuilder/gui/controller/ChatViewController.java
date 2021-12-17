@@ -18,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * This class is used to control every user input on the ChatView. Additionally, it updates its
+ * containing data.
+ */
 public class ChatViewController extends Controller implements Initializable {
     /**
      * Represents the store of the application.
@@ -94,7 +98,7 @@ public class ChatViewController extends Controller implements Initializable {
     public ChatViewController(Store<KBState> store) {
         this.store = store;
     }
-    
+
     /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
