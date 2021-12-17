@@ -67,11 +67,16 @@ public class IOHandler {
             while(bytesRead > 0 && buffer.hasRemaining());
         } catch(IOException ignored) {}
 
-        if(totalBytesRead <= 0) return;
+        if(totalBytesRead <= 0) {
+            System.out.println("Selector woke up with no data.");
+            return;
+        }
 
         String contents = new String(buffer.array(), 0, totalBytesRead).trim();
         buffer.clear();
         buffer.rewind();
+
+        System.out.println("Received: " + contents);
 
         if(consumer != null)
             ProtocolDeserializer.deserialize(contents, consumer);
@@ -114,6 +119,10 @@ public class IOHandler {
             SelectionKey key = channel.keyFor(selector);
             key.interestOpsOr(SelectionKey.OP_WRITE);
         }
+    }
+
+    public boolean hasPendingCommands() {
+        return !writeQueue.isEmpty();
     }
 
     public boolean isConnected() {

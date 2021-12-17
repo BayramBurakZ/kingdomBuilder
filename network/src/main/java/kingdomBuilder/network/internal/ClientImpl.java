@@ -46,6 +46,11 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     }
 
     @Override
+    public boolean hasPendingCommands() {
+        return ioHandler.hasPendingCommands();
+    }
+
+    @Override
     public void onFailure(String packet) {
         System.out.println("Failed to decode the following packet:");
         System.out.print("\t");
@@ -99,5 +104,15 @@ public class ClientImpl extends Client implements ProtocolConsumer {
         this.ioHandler.disconnect();
         this.onKicked.dispatch(this);
         System.out.println("KICKED!");
+    }
+
+    /**
+     * Responds with a 'PONG' to the server.
+     * @param message Not used.
+     */
+    @Override
+    public void accept(Ping message) {
+        final String command = ProtocolSerializer.serialize(new Pong());
+        ioHandler.sendCommand(command);
     }
 }
