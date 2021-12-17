@@ -1,5 +1,8 @@
             case <%= case %>: {
-                final List<String> tokens = split(sections[2], <%= componentCount %>);
+                List<String> tokens = null;
+                if(sections.length >= 3)
+                    tokens = split(sections[2], <%= componentCount %>);
+
                 <%= constructionVariables %>
                 <%= body %>
                 <%= packetType %> packet = new <%= packetType %>(<%= constructionArgs %>);

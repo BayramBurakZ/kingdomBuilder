@@ -1,10 +1,7 @@
 package kingdomBuilder.network;
 
 import kingdomBuilder.network.generated.ProtocolConsumer;
-import kingdomBuilder.network.protocol.ClientJoined;
-import kingdomBuilder.network.protocol.ClientLeft;
-import kingdomBuilder.network.protocol.Message;
-import kingdomBuilder.network.protocol.WelcomeToServer;
+import kingdomBuilder.network.protocol.*;
 
 public class ProtocolTestConsumer implements ProtocolConsumer {
     private Object object = null;
@@ -32,6 +29,11 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
 
     @Override
     public void accept(ClientJoined message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(YouHaveBeenKicked message) {
         object = message;
     }
 
