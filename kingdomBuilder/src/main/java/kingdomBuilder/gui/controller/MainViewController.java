@@ -19,22 +19,39 @@ All data will be stored in the states or substates of the store (REDUX)
 TODO: Update functions for every scene to update its data from the REDUX subscriber system
  */
 
+/**
+ * This class controls which View is shown.
+ */
 public class MainViewController implements Initializable {
+    /**
+     * Represents the store of the application.
+     */
     private final Store<KBState> store;
+    /**
+     * Represents the SceneLoader that contains all Views and Controllers.
+     */
     private final SceneLoader sceneLoader;
 
+    /**
+     * Represents the BorderPane layout of the MainView.
+     */
     @FXML
     private BorderPane borderPane;
 
-
+    /**
+     * Constructs the MainViewController.
+     * @param store  The Application's store to set the field.
+     */
     public MainViewController(Store<KBState> store) {
         this.store = store;
         this.sceneLoader = new SceneLoader(this.store);
     }
 
     /**
-     * Creates the sceneLoader-Object that store and load every scene
-     * Additionally, sets the first view to the IAmView
+     * Called to initialize this controller after its root element has been completely processed.
+     * @param location The location used to resolve relative paths for the root object,
+     *                 or null if the location is not known.
+     * @param resources The resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -113,6 +130,10 @@ public class MainViewController implements Initializable {
         gameSelectionViewController.setMainViewController(this);
     }
 
+    /**
+     * Gets the SceneLoader
+     * @return SceneLoader with all Views
+     */
     public SceneLoader getSceneLoader(){
         return sceneLoader;
     }
