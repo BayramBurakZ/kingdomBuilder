@@ -6,7 +6,6 @@ import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
-import kingdomBuilder.networkOutdated.ClientOld;
 
 import java.io.IOException;
 import java.util.HashMap;

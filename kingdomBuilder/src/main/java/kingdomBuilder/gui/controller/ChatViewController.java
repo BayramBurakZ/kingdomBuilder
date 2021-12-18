@@ -10,7 +10,7 @@ import javafx.scene.input.KeyEvent;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ChatSendAction;
 import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.networkOutdated.protocol.server.Message;
+import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -186,10 +186,10 @@ public class ChatViewController extends Controller implements Initializable {
         String senderName = store.getState().clients.get(senderID).getName();
 
         String chatText;
-        Integer[] receivers = chatMsg.receiverIds();
+        List<Integer> receivers = chatMsg.receiverIds();
         String message = chatMsg.message();
 
-        if (receivers.length == 1 && store.getState().clients.size() > 2)
+        if (receivers.size() == 1 && store.getState().clients.size() > 2)
             chatText = senderName + " whispers to you: " + message;
         else {
             //if there are only 2 clients on server and one gets a whisper message

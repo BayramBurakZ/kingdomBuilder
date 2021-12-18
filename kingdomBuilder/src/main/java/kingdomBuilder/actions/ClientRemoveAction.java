@@ -1,6 +1,6 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.networkOutdated.protocol.server.ClientLeft;
+import kingdomBuilder.network.protocol.ClientLeft;
 import kingdomBuilder.redux.Action;
 
 /**

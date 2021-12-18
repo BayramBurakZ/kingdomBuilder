@@ -5,15 +5,11 @@ import kingdomBuilder.actions.*;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
-import kingdomBuilder.networkOutdated.ClientOld;
 import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class KBReducer implements Reducer<KBState> {
 
@@ -111,7 +107,7 @@ public class KBReducer implements Reducer<KBState> {
         client.onLoggedIn.subscribe(c -> store.dispatch(new LoggedInAction(c)));
         client.onClientJoined.subscribe(c -> store.dispatch(new ClientAddAction(c.clientId(), c.name(), c.gameId())));
         client.onClientLeft.subscribe(c -> store.dispatch(new ClientRemoveAction(c.clientId(), c.name(), c.gameId())));
-        // client.onMessageReceived.subscribe(m -> store.dispatch(new ChatReceiveAction()))
+        client.onMessageReceived.subscribe(m -> store.dispatch(new ChatReceiveAction(m)));
 
         client.login(oldState.clientPreferredName);
 

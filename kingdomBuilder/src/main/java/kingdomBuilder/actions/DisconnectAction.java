@@ -1,6 +1,6 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.networkOutdated.protocol.server.YouHaveBeenKicked;
+import kingdomBuilder.network.protocol.YouHaveBeenKicked;
 import kingdomBuilder.redux.Action;
 
 /**
