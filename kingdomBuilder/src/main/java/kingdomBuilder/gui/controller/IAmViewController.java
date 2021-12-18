@@ -34,7 +34,7 @@ public class IAmViewController extends Controller implements Initializable {
     private TextField iAmViewTextField;
 
     /**
-     * Constructor that sets the Store
+     * Constructor that sets the Store.
      * @param store
      */
     public IAmViewController(Store<KBState> store) {
@@ -66,39 +66,43 @@ public class IAmViewController extends Controller implements Initializable {
      */
     @FXML
     public void onButtonMainMenuShow(Event event) {
-        if(iAmViewTextField.getText().isEmpty())
-            return;
-
-        String name = iAmViewTextField.getText().trim();
-
-        store.dispatch(new SetPreferredNameAction(name));
-        mainViewController.showMenuView();
+        SetPreferredName();
     }
 
     /**
-     * Setup all connected EventHandler
+     * Setup all connected EventHandler.
      */
     private void setupEventHandler() {
         setupKeyEventHandler();
     }
 
     /**
-     * Creates the EventHandler that is responsible for the Key events
+     * Creates the EventHandler that is responsible for the Key events.
      */
     private void setupKeyEventHandler() {
         iAmViewTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             /**
              * Invoked when a specific event of the type for which this handler is registered happens.
-             * @param event the event which occurred
+             * @param event the event which occurred.
              */
             @Override
             public void handle(KeyEvent event) {
-                String playerName = iAmViewTextField.getText();
-                if (!playerName.isEmpty() && event.getCode() == KeyCode.ENTER) {
-                    store.dispatch(new SetPreferredNameAction(playerName));
-                    mainViewController.showMenuView();
+                if (event.getCode() == KeyCode.ENTER) {
+                    SetPreferredName();
                 }
             }
         });
+    }
+
+    /**
+     * Sets the user's preferred name.
+     */
+    private void SetPreferredName() {
+        String preferredName = iAmViewTextField.getText().trim();
+        if (!preferredName.isEmpty()) {
+            // TODO: could let dispatch throw in case the name isn't valid
+            store.dispatch(new SetPreferredNameAction(preferredName));
+            mainViewController.showMenuView();
+        }
     }
 }
