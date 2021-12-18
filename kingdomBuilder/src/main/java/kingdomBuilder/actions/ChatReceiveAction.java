@@ -1,6 +1,7 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.networkOutdated.protocol.server.Message;
+// import kingdomBuilder.networkOutdated.protocol.server.Message;
+import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Action;
 
 /**
@@ -14,7 +15,7 @@ public class ChatReceiveAction extends Action {
     /**
      * The actual incoming chat message
      */
-    public Message chatMessage;
+    public final Message chatMessage;
 
     /**
      * Constructor that creates a new ChatReceiveAction that sets the chatMessage-field to the given message

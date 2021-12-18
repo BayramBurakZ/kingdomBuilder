@@ -84,6 +84,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
         name = message.name();
         clientId = message.clientId();
         gameId = message.gameId();
+        onLoggedIn.dispatch(this);
     }
 
     /**

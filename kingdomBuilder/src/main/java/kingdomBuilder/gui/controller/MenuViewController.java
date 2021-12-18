@@ -88,6 +88,9 @@ public class MenuViewController extends Controller implements Initializable {
                 state = newState;
                 return;
             }
+
+            menuview_connect_button.setDisable(newState.isConnecting);
+
             // Client connection
             if (newState.isConnected && !state.isConnected) {
                 onConnect();

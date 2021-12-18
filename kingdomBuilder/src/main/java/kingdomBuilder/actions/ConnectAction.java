@@ -2,6 +2,8 @@ package kingdomBuilder.actions;
 
 import kingdomBuilder.redux.Action;
 
+import java.net.InetSocketAddress;
+
 /**
  * <p>
  * Represents the ConnectAction. Only triggered if this client wants to connect to a server.
@@ -11,14 +13,15 @@ import kingdomBuilder.redux.Action;
  * </p>
  */
 public class ConnectAction extends Action {
+
     /**
-     * String that represents the server address
+     * Stores the address to connect to.
      */
-    public String address;
-    /**
-     * int that contains the port
-     */
-    public int port;
+    public final InetSocketAddress address;
+
+    public ConnectAction(InetSocketAddress address) {
+        this.address = address;
+    }
 
     /**
      * Creates a new ConnectAction. Sets the own fields to the value given: Sets the address to the address parameter
@@ -27,7 +30,6 @@ public class ConnectAction extends Action {
      * @param port int that represents the port for the server connection
      */
     public ConnectAction(String address, int port) {
-        this.address = address;
-        this.port = port;
+        this.address = new InetSocketAddress(address, port);
     }
 }

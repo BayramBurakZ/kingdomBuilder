@@ -3,6 +3,8 @@ package kingdomBuilder.reducers;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.model.ClientDAO;
+import kingdomBuilder.network.Client;
+import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.networkOutdated.ClientOld;
 import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
@@ -40,7 +42,10 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         } else if (action instanceof SetMainControllerAction a) {
             return reduce(oldState, a);
-        }
+        } else if (action instanceof LoggedInAction a)
+            return reduce(oldState, a);
+        else if(action instanceof ApplicationExitAction a)
+            return reduce(oldState, a);
 
         return oldState;
     }
@@ -71,76 +76,70 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private KBState reduce(KBState oldState, ChatSendAction a) {
-        oldState.client.chat(a.message, a.receiverIds);
-        return oldState;
+    private KBState reduce(KBState state, ChatSendAction a) {
+        state.client.chat(a.receiverIds, a.message);
+        return state;
     }
 
     private KBState reduce(KBState oldState, ChatReceiveAction a) {
         var sceneLoader = oldState.controller.getSceneLoader();
         var chatViewController = sceneLoader.getChatViewController();
-        chatViewController.onMessage(a.chatMessage);
+        // chatViewController.onMessage(a.chatMessage);
         return oldState;
     }
 
     private KBState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
-        ClientOld client;
-        try {
-            client = new ClientOld(a.address, a.port);
-        } catch (IOException e) {
-            //TODO: maybe a popup
-            System.out.println("Address not found");
-            KBState state = new KBState(oldState);
+        Client client;
+        try { client = oldState.selector.connect(a.address); }
+        catch(IOException exc) {
+            System.out.println("Failed to connect to server.");
+
+            final KBState state = new KBState(oldState);
             state.failedToConnect = true;
             return state;
         }
 
-        // create new state after client creation in case client connection fails
+        Thread selectorThread = oldState.selectorThread;
+        if(selectorThread == null || !selectorThread.isAlive()) {
+            assert !oldState.selector.isRunning();
+            selectorThread = new Thread(oldState.selector);
+            selectorThread.start();
+
+            System.out.println("Started selector thread!");
+        }
+
+        client.onLoggedIn.subscribe(c -> store.dispatch(new LoggedInAction(c)));
+        client.onClientJoined.subscribe(c -> store.dispatch(new ClientAddAction(c.clientId(), c.name(), c.gameId())));
+        client.onClientLeft.subscribe(c -> store.dispatch(new ClientRemoveAction(c.clientId(), c.name(), c.gameId())));
+        // client.onMessageReceived.subscribe(m -> store.dispatch(new ChatReceiveAction()))
+
+        client.login(oldState.clientPreferredName);
+
         KBState state = new KBState(oldState);
+        state.client = client;
+        state.isConnecting = true;
+        state.selectorThread = selectorThread;
 
-        // Client is connected
-        state.isConnected = true;
+        return state;
+    }
 
-        // Reset failedToConnect
-        state.failedToConnect = false;
+    private KBState reduce(KBState oldState, ApplicationExitAction a) {
+        ClientSelector selector = oldState.selector;
+        if(selector != null && selector.isRunning())
+            selector.stop();
 
-        // start listening to server with main client
-        Thread clientThread = new Thread(client::listen, "Main-Client");
-        clientThread.start();
-        state.clientThread = clientThread;
+        Thread selectorThread = oldState.selectorThread;
+        if(selectorThread != null && selectorThread.isAlive())
+            selectorThread.interrupt();
 
-        var welcomeFut = client.join(state.clientPreferredName);
+        // Return old state, so that no other subscribers are called.
+        return oldState;
+    }
 
-        // wait for the WelcomeToServer message before proceeding
-        try {
-            welcomeFut.get(1000, TimeUnit.MILLISECONDS);
-            state.client = client;
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            return oldState;
-        }
-
-        client.onClientJoined.subscribe(c -> store.dispatch(new ClientAddAction(c)));
-        client.onClientLeft.subscribe(c -> store.dispatch(new ClientRemoveAction(c)));
-        client.onMessage.subscribe(m -> store.dispatch(new ChatReceiveAction(m)));
-        client.onYouHaveBeenKicked.subscribe(m -> store.dispatch(new DisconnectAction(true)));
-
-        System.out.println("Main Client ID: " + client.getId());
-
-        // wait to receive all clients from server
-        var clientsFut = client.requestClients();
-        try {
-            var clients = clientsFut.get(1000, TimeUnit.MILLISECONDS).clients();
-            if (clients != null) {
-                for (var c : clients) {
-                    // add without an action to avoid many notifications when joining
-                    state.clients.put(c.clientId(), new ClientDAO(c.clientId(), c.name(), c.gameId()));
-                }
-            }
-        } catch (InterruptedException | ExecutionException | TimeoutException e) {
-            e.printStackTrace();
-            return oldState;
-        }
+    private KBState reduce(KBState oldState, LoggedInAction a) {
+        System.out.println("Logged in!");
+        KBState state = new KBState(oldState);
+        state.isConnecting = false;
         return state;
     }
 

@@ -37,6 +37,11 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
         object = message;
     }
 
+    @Override
+    public void accept(Ping message) {
+        object = message;
+    }
+
     public Object getObject() {
         return object;
     }

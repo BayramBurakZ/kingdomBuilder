@@ -50,6 +50,20 @@ public class TestProtocolDeserializer {
     }
 
     @Test
+    void testParsingClientJoinedWithSpacesName() {
+        final String packet = "[SERVER_MESSAGE] [CLIENT_JOINED] <[4; H a h;-1]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
+        assertInstanceOf(ClientJoined.class, testConsumer.getObject());
+
+        ClientJoined typedPacket = (ClientJoined) testConsumer.getObject();
+        assertEquals(4, typedPacket.clientId());
+        assertEquals(" H a h", typedPacket.name());
+        assertEquals(-1, typedPacket.gameId());
+    }
+
+    @Test
     void testParsingMessage() {
         final String packet = "[SERVER_MESSAGE] [MESSAGE] <[1;{2,3,42};Hallo Du!]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);

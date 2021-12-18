@@ -42,9 +42,10 @@ public class IOHandler {
         this.consumer = consumer;
     }
 
-    public void onIsConnectable(SelectionKey key) {
+    public synchronized void onIsConnectable(SelectionKey key) {
         try {
             if (channel.finishConnect()) {
+                System.out.println("DID CONNECT!");
                 connected = true;
 
                 key.interestOps(SelectionKey.OP_READ);
@@ -52,11 +53,15 @@ public class IOHandler {
 
                 int bufferSize = channel.socket().getReceiveBufferSize();
                 buffer = ByteBuffer.allocate(bufferSize);
+
+                // Transmit all messages, that might have been 'send' before the connection
+                // process finished.
+                onIsWriteable(key);
             }
         } catch(IOException ignored) {}
     }
 
-    public void onIsReadable(SelectionKey key) {
+    public synchronized void onIsReadable(SelectionKey key) {
         int bytesRead = 0;
         int totalBytesRead = 0;
         try {
@@ -83,7 +88,7 @@ public class IOHandler {
 
     }
 
-    public void onIsWriteable(SelectionKey key) {
+    public synchronized void onIsWriteable(SelectionKey key) {
         while(!writeQueue.isEmpty()) {
             final ByteBuffer buffer = writeQueue.peek();
             int bytesWritten = 0;
@@ -93,13 +98,16 @@ public class IOHandler {
                 while(bytesWritten > 0 && buffer.hasRemaining());
             } catch(IOException ignored) {}
 
-            if(buffer.hasRemaining()) return;
+            if(buffer.hasRemaining()) {
+                key.interestOpsOr(SelectionKey.OP_WRITE);
+                return;
+            }
         }
 
         key.interestOps(SelectionKey.OP_READ);
     }
 
-    public void sendCommand(String command) {
+    public synchronized void sendCommand(String command) {
         final String commandLine = command + COMMAND_TERMINATOR;
         final ByteBuffer buffer = ByteBuffer.wrap(commandLine.getBytes());
         int bytesWritten = 0;

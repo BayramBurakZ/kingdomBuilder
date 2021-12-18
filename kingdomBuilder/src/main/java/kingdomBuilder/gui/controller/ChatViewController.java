@@ -284,7 +284,7 @@ public class ChatViewController extends Controller implements Initializable {
                         receiverIds.add(c.getKey());
                     }
                     // don't send message to ourselves
-                    receiverIds.remove((Integer) store.getState().client.getId());
+                    //receiverIds.remove((Integer) store.getState().client.getId());
                     message = "You: " + message;
                 }
             }
