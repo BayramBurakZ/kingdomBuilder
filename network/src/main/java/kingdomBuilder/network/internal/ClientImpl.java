@@ -7,6 +7,7 @@ import kingdomBuilder.network.generated.ProtocolConsumer;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public class ClientImpl extends Client implements ProtocolConsumer {
@@ -20,19 +21,19 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void login(String preferredName) {
         final String command = ProtocolSerializer.serialize(new IAm(preferredName));
-        ioHandler.sendCommand(command);
+        trySendCommand(command);
     }
 
     @Override
     public void logout() {
         final String command = ProtocolSerializer.serialize(new Bye());
-        ioHandler.sendCommand(command);
+        trySendCommand(command);
     }
 
     @Override
     public void chat(List<Integer> recipients, String message) {
         final String command = ProtocolSerializer.serialize(new Chat(recipients, message));
-        ioHandler.sendCommand(command);
+        trySendCommand(command);
     }
 
     @Override
@@ -48,6 +49,11 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public boolean hasPendingCommands() {
         return ioHandler.hasPendingCommands();
+    }
+
+    private void trySendCommand(String command) {
+        try { ioHandler.sendCommand(command); }
+        catch (IOException exc) { this.onConnectionLost.dispatch(this); }
     }
 
     @Override
@@ -114,6 +120,6 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void accept(Ping message) {
         final String command = ProtocolSerializer.serialize(new Pong());
-        ioHandler.sendCommand(command);
+        trySendCommand(command);
     }
 }

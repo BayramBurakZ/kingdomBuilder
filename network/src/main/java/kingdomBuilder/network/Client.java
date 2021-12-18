@@ -4,10 +4,13 @@ import kingdomBuilder.network.protocol.ClientJoined;
 import kingdomBuilder.network.protocol.ClientLeft;
 import kingdomBuilder.network.protocol.Message;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 /**
  * Represents a client, which interacts with the server it is connected to.
+ * <br>
+ * Clients must be created through {@link ClientSelector#connect(InetSocketAddress)}.
  */
 public abstract class Client {
     public static final int NO_ID = -1;
@@ -16,8 +19,10 @@ public abstract class Client {
     protected int clientId;
     protected int gameId;
 
-    public final Event<Client> onConnected;
-    public final Event<Client> onDisconnected;
+    /**
+     * Event, that gets dispatched, when the connection closed unexpectedly.
+     */
+    public final Event<Client> onConnectionLost;
 
     /**
      * Event, that gets dispatched, when the client successfully logged into the server.
@@ -46,11 +51,10 @@ public abstract class Client {
 
     public Client() {
         name = null;
-        clientId = -1;
-        gameId = -1;
+        clientId = NO_ID;
+        gameId = NO_ID;
 
-        onConnected = new Event<>();
-        onDisconnected = new Event<>();
+        onConnectionLost = new Event<>();
         onLoggedIn = new Event<>();
         onKicked = new Event<>();
         onClientJoined = new Event<>();
@@ -83,14 +87,14 @@ public abstract class Client {
      * Logs into the server with a preferred name.
      * @param preferredName The preferred name.
      *
-     * @implSpec This method may be implemented non-blocking.
+     * @apiNote This method may be non-blocking.
      */
     public abstract void login(String preferredName);
 
     /**
      * Logs out from the server.
      *
-     * @implSpec This method may be implemented non-blocking.
+     * @apiNote This method may be non-blocking.
      */
     public abstract void logout();
 
@@ -113,7 +117,7 @@ public abstract class Client {
 
     /**
      * {@return Returns whether the client has commands stored internally,
-     *          that weren't transmitted sucessfully to the server yet.}
+     *          that weren't transmitted successfully to the server yet.}
      */
     public abstract boolean hasPendingCommands();
 
