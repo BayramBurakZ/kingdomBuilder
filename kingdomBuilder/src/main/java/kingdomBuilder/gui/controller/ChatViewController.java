@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -36,6 +37,12 @@ public class ChatViewController extends Controller implements Initializable {
      * Represents the MainViewController for access to switch Views-methods.
      */
     private MainViewController mainViewController;
+
+    /**
+     * Represents the button to clear the selection.
+     */
+    @FXML
+    private Button chatview_button_clear;
 
     /**
      * Represents the table for the clients on the server.
@@ -86,6 +93,11 @@ public class ChatViewController extends Controller implements Initializable {
     private Button chatview_button_send;
 
     /**
+     * Represents the button to send a whisper message.
+     */
+    @FXML
+    private Button chatview_button_whisper;
+    /**
      * Represents the textarea used for displaying the globalchat.
      */
     @FXML
@@ -125,18 +137,34 @@ public class ChatViewController extends Controller implements Initializable {
             state = newState;
         });
 
+        tableview_chat.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameId"));
     }
 
     /**
-     * Sets the functionality for the Send Button.
+     * Sets the functionality for the clear selection button.
+     * @param event Contains the data from the event source.
+     */
+    public void onButtonClearSelectionPressed(Event event) {
+        tableview_chat.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Sets the functionality for the send button.
      * @param event Contains the data from the event source.
      */
     public void onButtonSendPressed(Event event) {
-        chatview_textarea_chatinput.appendText(System.lineSeparator());
         printAndSendMessage();
+    }
+
+    /**
+     * Sets the functionality for the whisper button.
+     * @param event Contains the data from the event source.
+     */
+    public void onButtonWhisperPressed(Event event) {
+        printAndSendWhisper();
     }
 
     /**
@@ -153,7 +181,11 @@ public class ChatViewController extends Controller implements Initializable {
 
          */
         if (event.getCode() == KeyCode.ENTER) {
-            printAndSendMessage();
+            if (event.isShiftDown()) {
+                printAndSendWhisper();
+            } else {
+                printAndSendMessage();
+            }
         }
     }
 
@@ -165,6 +197,7 @@ public class ChatViewController extends Controller implements Initializable {
 
         chatview_textarea_chatinput.setDisable(false);
         chatview_button_send.setDisable(false);
+        chatview_button_whisper.setDisable(false);
     }
 
     /**
@@ -175,6 +208,7 @@ public class ChatViewController extends Controller implements Initializable {
 
         chatview_textarea_chatinput.setDisable(true);
         chatview_button_send.setDisable(true);
+        chatview_button_whisper.setDisable(true);
     }
 
     /**
@@ -184,23 +218,28 @@ public class ChatViewController extends Controller implements Initializable {
     public void onMessage(Message chatMsg) {
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients.get(senderID).getName();
-
-        String chatText;
         Integer[] receivers = chatMsg.receiverIds();
         String message = chatMsg.message();
+        String chatMessage = "";
 
-        if (receivers.length == 1 && store.getState().clients.size() > 2)
-            chatText = senderName + " whispers to you: " + message;
-        else {
-            //if there are only 2 clients on server and one gets a whisper message
-            if (chatMsg.message().startsWith("@")) {
-                String pattern = "\\s";
-                String[] s = message.split(pattern, 2);
-                message = s[1];
+        if (receivers.length < store.getState().clients.size()) {
+            // whisper message
+            chatMessage = senderName + " whispers to you";
+            for (int i = 0; i < receivers.length; i++) {
+                if (receivers[i].equals(state.client.getId())) {
+                    continue;
+                }
+
+                chatMessage += ", @" + state.clients.get(receivers[i]).getName();
             }
-            chatText = senderName + ": " + message;
+            chatMessage += ": " + message;
+        } else {
+            // global message
+            chatMessage = senderName + ": " + message;
         }
-        textarea_globalchat.appendText(chatText);
+
+        // TODO: check if all receiver IDs match our game's client IDs, then only print in game channel
+        textarea_globalchat.appendText(chatMessage);
         textarea_globalchat.appendText(System.lineSeparator());
     }
 
@@ -234,65 +273,72 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sends the message from the textarea to the specified clients.
-     * When the message starts with "@", the message is only to the following client.
+     * Sends the message from the textarea to all clients in the current channel.
      */
     private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
-        String stringToSend = message;
+        String chatMessage = message;
         if (!message.isEmpty()) {
             List<Integer> receiverIds = new ArrayList<>();
-            if (tab_global.isSelected()) {
 
-                // Whisper message
-                if (message.startsWith("@")) {
-                    String pattern = "\\s"; // TODO: whitespaces pattern for duplicate name "... the second"
-                    String[] s = message.split(pattern, 2);
-                    for (var c : store.getState().clients.entrySet()) {
-                        if (s[0].contains(c.getValue().getName())) {
-                            receiverIds.add(c.getKey());
-                            break;
-                        }
-                    }
+            for (var c : store.getState().clients.entrySet()) {
+                receiverIds.add(c.getKey());
+            }
+            // don't send message to ourselves
+            receiverIds.remove((Integer) store.getState().client.getId());
 
-                    // Empty receivers
-                    if (receiverIds.isEmpty()) {
-                        textarea_globalchat.appendText("<--- " + s[0] + " is not online --->");
-                        textarea_globalchat.appendText(System.lineSeparator());
-                        chatview_textarea_chatinput.clear();
-                        return;
-                    }
+            message = "You: " + message;
 
-                    // Catch whisper message to self
-                    String playerName = s[0].substring(1); // TODO: cleanup substring, @-usage, ...
-                    if (playerName.equals(state.client.getName())) {
-                        textarea_globalchat.appendText("<--- You cannot whisper to yourself --->");
-                        textarea_globalchat.appendText(System.lineSeparator());
-                        chatview_textarea_chatinput.clear();
-                        return;
-                    }
-
-                    if (s.length > 1) {
-                        message = "You whispered " + s[0] + ": " + s[1];
-                    } else {
-                        // empty whisper message
-                        chatview_textarea_chatinput.clear();
-                        return;
-                    }
-                } else { // Global chat message
-                    for (var c : store.getState().clients.entrySet()) {
-                        receiverIds.add(c.getKey());
-                    }
-                    // don't send message to ourselves
-                    receiverIds.remove((Integer) store.getState().client.getId());
-                    message = "You: " + message;
-                }
+            if(tab_global.isSelected()) {
+                textarea_globalchat.appendText(message);
+                textarea_globalchat.appendText(System.lineSeparator());
+            } else {
+                // TODO: text output for game chat
             }
 
-            store.dispatch(new ChatSendAction(receiverIds, stringToSend));
+            store.dispatch(new ChatSendAction(receiverIds, chatMessage));
+        }
+        chatview_textarea_chatinput.clear();
+    }
 
-            textarea_globalchat.appendText(message);
-            textarea_globalchat.appendText(System.lineSeparator());
+    /**
+     * Sends the message from the textarea to the selected clients.
+     */
+    private void printAndSendWhisper() {
+        String message = chatview_textarea_chatinput.getText().trim();
+        String chatMessage = "";
+        if (!message.isEmpty()) {
+            List<Integer> receiverIds = new ArrayList<>();
+
+            // don't send message to ourselves
+            var receivers = tableview_chat.getSelectionModel().getSelectedItems()
+                    .filtered(clientDAO -> clientDAO.getId() != state.client.getId());
+
+            // no receivers selected
+            if (receivers.isEmpty()) {
+                return;
+            }
+
+            // creates message for the chat textarea
+            chatMessage = "You whispered ";
+            for (int i = 0; i < receivers.size() - 1; i++) {
+                if (receivers.get(i).getId() == state.client.getId()) {
+                    continue;
+                }
+                receiverIds.add(receivers.get(i).getId());
+                chatMessage += "@" + receivers.get(i).getName() + ", ";
+            }
+            receiverIds.add(receivers.get(receivers.size()-1).getId());
+            chatMessage += "@" + receivers.get(receivers.size()-1).getName() + ": " + message;
+
+            if (tab_global.isSelected()) {
+                textarea_globalchat.appendText(chatMessage);
+                textarea_globalchat.appendText(System.lineSeparator());
+            } else {
+                // text output for game chat
+            }
+
+            store.dispatch(new ChatSendAction(receiverIds, message));
         }
         chatview_textarea_chatinput.clear();
     }

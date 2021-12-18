@@ -37,7 +37,7 @@
 		<HBox alignment="CENTER" spacing="5.0">
 			<children>
 				<TextField fx:id="menuview_textfield_address" prefHeight="25.0" prefWidth="393.0" promptText="adresse"
-						text="juliankirsch.me"/>
+						text="localhost"/>
 				<TextField fx:id="menuview_textfield_port" prefHeight="25.0" prefWidth="134.0" promptText="port"
 						text="6666"/>
 				<Button fx:id="menuview_connect_button" maxWidth="75.0" minWidth="75.0" mnemonicParsing="false"
