@@ -10,6 +10,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Handles IO events reported by {@link ClientSelectorImpl} and acts as "glue" between
@@ -23,7 +24,8 @@ public class IOHandler {
     private final Queue<ByteBuffer> writeQueue;
     private ByteBuffer buffer;
     private ProtocolConsumer consumer;
-    private boolean connected;
+
+    private AtomicBoolean connected;
 
 
     public IOHandler(Selector selector, SocketChannel channel) {
@@ -32,7 +34,7 @@ public class IOHandler {
         this.writeQueue = new ConcurrentLinkedQueue<>();
         this.buffer = null;
         this.consumer = null;
-        this.connected = false;
+        this.connected = new AtomicBoolean(false);
     }
 
     public void setConsumer(ProtocolConsumer consumer) {
@@ -47,7 +49,7 @@ public class IOHandler {
     public void onIsConnectable(SelectionKey key) {
         try {
             if (channel.finishConnect()) {
-                connected = true;
+                connected.set(true);
 
                 key.interestOps(SelectionKey.OP_READ);
                 selector.wakeup();
@@ -58,7 +60,7 @@ public class IOHandler {
                 tryFlush();
             }
         } catch(IOException exc) {
-            connected = false;
+            connected.set(false);
             /* TODO: Notify consumer, that connection was lost. */
         }
     }
@@ -102,7 +104,7 @@ public class IOHandler {
     public void onIsWriteable(SelectionKey key) {
         try { tryFlush(); }
         catch(IOException exc) {
-            connected = false;
+            connected.set(false);
             /* TODO: Notify consumer, that connection was lost. */
         }
     }
@@ -120,7 +122,7 @@ public class IOHandler {
         try {
             tryFlush();
         } catch(Exception e) {
-            connected = false;
+            connected.set(false);
             throw e;
         }
     }
@@ -130,7 +132,7 @@ public class IOHandler {
     }
 
     public boolean isConnected() {
-        return connected;
+        return connected.get();
     }
 
     public void disconnect() {
@@ -152,6 +154,12 @@ public class IOHandler {
     private void tryFlush() throws IOException {
         SelectionKey key = channel.keyFor(selector);
 
+        if(!connected.get()) {
+            key.interestOpsOr(SelectionKey.OP_WRITE);
+            selector.wakeup();
+            return;
+        }
+
         // Queue needs to be synchronized, because buffer is only popped,
         // once it's been transmitted completely.
         synchronized (writeQueue) {
@@ -170,6 +178,7 @@ public class IOHandler {
                     // Internal buffer is full; register to be notified,
                     // when it is writeable again.
                     key.interestOpsOr(SelectionKey.OP_WRITE);
+                    selector.wakeup();
                     return;
                 }
             }
@@ -179,6 +188,7 @@ public class IOHandler {
         // we are not interested in writing until
         // sendCommand is being called again.
         key.interestOps(SelectionKey.OP_READ);
+        selector.wakeup();
     }
 
 }

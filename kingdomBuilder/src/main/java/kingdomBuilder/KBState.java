@@ -89,6 +89,7 @@ public class KBState {
         clients = other.clients;
         games = other.games;
         selector = other.selector;
+        selectorThread = other.selectorThread;
         client = other.client;
         clientPreferredName = other.clientPreferredName;
         isConnecting = other.isConnecting;

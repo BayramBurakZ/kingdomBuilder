@@ -115,18 +115,22 @@ public class KBReducer implements Reducer<KBState> {
         state.client = client;
         state.isConnecting = true;
         state.selectorThread = selectorThread;
+        System.out.println("Set thread");
 
         return state;
     }
 
     private KBState reduce(KBState oldState, ApplicationExitAction a) {
+        System.out.println("Stopping selector.");
         ClientSelector selector = oldState.selector;
         if(selector != null && selector.isRunning())
             selector.stop();
 
         Thread selectorThread = oldState.selectorThread;
-        if(selectorThread != null && selectorThread.isAlive())
+        if(selectorThread != null && selectorThread.isAlive()) {
+            System.out.println("Did interrupt.");
             selectorThread.interrupt();
+        }
 
         // Return old state, so that no other subscribers are called.
         return oldState;
