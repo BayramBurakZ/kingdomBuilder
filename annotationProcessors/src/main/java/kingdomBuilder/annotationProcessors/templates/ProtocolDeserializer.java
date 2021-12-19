@@ -2,6 +2,7 @@ package kingdomBuilder.annotationProcessors.templates;
 
 import kingdomBuilder.annotationProcessors.Template;
 import kingdomBuilder.annotationProcessors.TemplateRenderer;
+import kingdomBuilder.annotations.Protocol;
 
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
@@ -30,8 +31,10 @@ public class ProtocolDeserializer {
 
     public String getCases() throws IOException {
         List<String> cases = new ArrayList<>();
-        for(TypeElement element: elements)
-            cases.add(makeCase(element));
+        for(TypeElement element: elements) {
+            if(!element.getAnnotation(Protocol.class).isComponent())
+                cases.add(makeCase(element));
+        }
 
         return String.join("\n", cases);
     }

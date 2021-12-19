@@ -18,7 +18,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ProtocolProcessor extends AbstractProcessor {
-    private final static String RESPONSE_PREFIX = "[SERVER_MESSAGE]";
+    private final static String SERVER_MESSAGE_PREFIX = "[SERVER_MESSAGE]";
+    private final static String REPLY_MESSAGE_PREFIX = "[REPLY_MESSAGE]";
 
     private Filer filer;
     private Messager messager;
@@ -27,9 +28,14 @@ public class ProtocolProcessor extends AbstractProcessor {
     private final Set<TypeElement> requests = new HashSet<>();
 
     private void sortByFormatPrefix(Element element) {
-        final String format = element.getAnnotation(Protocol.class).format();
-        if(format.startsWith(RESPONSE_PREFIX)) responses.add((TypeElement) element);
-        else requests.add((TypeElement) element);
+        final Protocol protocol = element.getAnnotation(Protocol.class);
+        final String format = protocol.format();
+        boolean isIncomingMessage = format.startsWith(SERVER_MESSAGE_PREFIX)
+                                    || format.startsWith(REPLY_MESSAGE_PREFIX)
+                                    || protocol.isComponent();
+
+        if(isIncomingMessage)   responses.add((TypeElement) element);
+        else                    requests.add((TypeElement) element);
     }
 
     @Override

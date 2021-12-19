@@ -1,6 +1,7 @@
 package kingdomBuilder.annotationProcessors.templates;
 
 import kingdomBuilder.annotationProcessors.Template;
+import kingdomBuilder.annotations.Protocol;
 
 import javax.lang.model.element.TypeElement;
 import java.util.Set;
@@ -27,6 +28,7 @@ public class ProtocolConsumer {
     public String getHooks() {
         return elements
                 .stream()
+                .filter(e -> !e.getAnnotation(Protocol.class).isComponent())
                 .map(e -> String.format("void accept(%s message);", e.getSimpleName()))
                 .collect(Collectors.joining("\n    "));
     }

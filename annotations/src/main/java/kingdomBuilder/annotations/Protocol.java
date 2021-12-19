@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 public @interface Protocol {
     String format();
+    boolean isComponent() default false;
 }
