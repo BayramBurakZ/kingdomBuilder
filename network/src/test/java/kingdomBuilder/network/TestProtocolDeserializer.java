@@ -2,10 +2,7 @@ package kingdomBuilder.network;
 
 import kingdomBuilder.network.generated.ProtocolDeserializer;
 
-import kingdomBuilder.network.protocol.ClientJoined;
-import kingdomBuilder.network.protocol.ClientLeft;
-import kingdomBuilder.network.protocol.Message;
-import kingdomBuilder.network.protocol.WelcomeToServer;
+import kingdomBuilder.network.protocol.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +24,8 @@ public class TestProtocolDeserializer {
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        assertInstanceOf(ClientLeft.class, testConsumer.getObject());
+        ClientLeft typedPacket = assertInstanceOf(ClientLeft.class, testConsumer.getObject());
 
-        ClientLeft typedPacket = (ClientLeft) testConsumer.getObject();
         assertEquals(4, typedPacket.clientId());
         assertEquals("Ich", typedPacket.name());
         assertEquals(-1, typedPacket.gameId());
@@ -41,9 +37,8 @@ public class TestProtocolDeserializer {
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        assertInstanceOf(ClientJoined.class, testConsumer.getObject());
+        ClientJoined typedPacket = assertInstanceOf(ClientJoined.class, testConsumer.getObject());
 
-        ClientJoined typedPacket = (ClientJoined) testConsumer.getObject();
         assertEquals(4, typedPacket.clientId());
         assertEquals("Ich", typedPacket.name());
         assertEquals(-1, typedPacket.gameId());
@@ -55,9 +50,8 @@ public class TestProtocolDeserializer {
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        assertInstanceOf(ClientJoined.class, testConsumer.getObject());
+        ClientJoined typedPacket = assertInstanceOf(ClientJoined.class, testConsumer.getObject());
 
-        ClientJoined typedPacket = (ClientJoined) testConsumer.getObject();
         assertEquals(4, typedPacket.clientId());
         assertEquals(" H a h", typedPacket.name());
         assertEquals(-1, typedPacket.gameId());
@@ -69,9 +63,8 @@ public class TestProtocolDeserializer {
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        assertInstanceOf(Message.class, testConsumer.getObject());
+        Message typedPacket = assertInstanceOf(Message.class, testConsumer.getObject());
 
-        Message typedPacket = (Message) testConsumer.getObject();
         assertEquals(1, typedPacket.clientId());
         assertEquals(List.of(2, 3, 42), typedPacket.receiverIds());
         assertEquals("Hallo Du!", typedPacket.message());
@@ -83,12 +76,31 @@ public class TestProtocolDeserializer {
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        assertInstanceOf(WelcomeToServer.class, testConsumer.getObject());
+        WelcomeToServer typedPacket = assertInstanceOf(
+                WelcomeToServer.class, testConsumer.getObject()
+        );
 
-        WelcomeToServer typedPacket = (WelcomeToServer) testConsumer.getObject();
         assertEquals(4, typedPacket.clientId());
         assertEquals("Test", typedPacket.name());
         assertEquals(-1, typedPacket.gameId());
+    }
+
+    @Test
+    void testParsingRequestClientsResponse() {
+        final String packet = "[REPLY MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
+        RequestClientsResponse typePacket = assertInstanceOf(
+                RequestClientsResponse.class, testConsumer.getObject()
+        );
+
+        final var expectedClients = List.of(
+            new ClientData(4, "Ich", -1),
+            new ClientData(42, "Du", 100)
+        );
+
+        assertEquals(expectedClients, typePacket.clients());
     }
 
 }

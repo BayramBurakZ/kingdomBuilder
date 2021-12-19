@@ -42,6 +42,11 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
         object = message;
     }
 
+    @Override
+    public void accept(RequestClientsResponse message) {
+        object = message;
+    }
+
     public Object getObject() {
         return object;
     }

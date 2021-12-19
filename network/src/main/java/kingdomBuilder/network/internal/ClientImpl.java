@@ -122,4 +122,9 @@ public class ClientImpl extends Client implements ProtocolConsumer {
         final String command = ProtocolSerializer.serialize(new Pong());
         trySendCommand(command);
     }
+
+    @Override
+    public void accept(RequestClientsResponse message) {
+
+    }
 }
