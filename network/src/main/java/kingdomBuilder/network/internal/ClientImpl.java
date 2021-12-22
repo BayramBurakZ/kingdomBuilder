@@ -127,4 +127,99 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(RequestClientsResponse message) {
 
     }
+
+    @Override
+    public void accept(GameHosted message) {
+
+    }
+
+    @Override
+    public void accept(YouAreRoot message) {
+
+    }
+
+    @Override
+    public void accept(NamespaceLoaded message) {
+
+    }
+
+    @Override
+    public void accept(NamespaceUnloaded message) {
+
+    }
+
+    @Override
+    public void accept(YouSpectateGame message) {
+
+    }
+
+    @Override
+    public void accept(StoppedSpectating message) {
+
+    }
+
+    @Override
+    public void accept(YouLeftGame message) {
+
+    }
+
+    @Override
+    public void accept(WelcomeToGame message) {
+
+    }
+
+    @Override
+    public void accept(PlayerJoined message) {
+
+    }
+
+    @Override
+    public void accept(PlayerLeft message) {
+
+    }
+
+    @Override
+    public void accept(TurnEndedByServer message) {
+
+    }
+
+    @Override
+    public void accept(VersionReply message) {
+
+    }
+
+    @Override
+    public void accept(WhoAmIReply message) {
+
+    }
+
+    @Override
+    public void accept(ClientReply message) {
+
+    }
+
+    @Override
+    public void accept(GamesReply message) {
+
+    }
+
+    @Override
+    public void accept(PlayersOfGameReply message) {
+
+    }
+
+    @Override
+    public void accept(ModulesReply message) {
+
+    }
+
+    @Override
+    public void accept(MyNamespacesReply message) {
+
+    }
+
+    @Override
+    public void accept(DetailsOfGameReply message) {
+
+    }
 }
