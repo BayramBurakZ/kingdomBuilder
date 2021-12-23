@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.reducers.KBReducer;
@@ -30,16 +31,17 @@ public class KingdomBuilderApplication extends Application {
      * Creates Scene object with given Stage object as root Node.
      * Attempts to show the stage/window.
      * @param primaryStage primary stage for this application onto which application scene can be set.
-     * @throws Exception
      */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         // TODO: resources instead of path for .fxml-files
         // TODO: WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @1933c126'
 
         sceneLoader = new SceneLoader(store);
-        
-        primaryStage.setTitle("KingdomBuilder v0.1 Chat Client");
+
+        primaryStage.getIcons().add(new Image("kingdomBuilder/gui/textures/icons/StageIcon.png"));
+
+        primaryStage.setTitle("KingdomBuilder");
         primaryStage.setScene(sceneLoader.getScene());
         primaryStage.setMinWidth(1000);
         primaryStage.setMinHeight(650);
@@ -48,7 +50,7 @@ public class KingdomBuilderApplication extends Application {
 
     /**
      * Prepares for application exit and destroys resources.
-     * @throws Exception
+     * @throws Exception an Exception.
      */
     // TODO: general closing mechanism
     @Override
