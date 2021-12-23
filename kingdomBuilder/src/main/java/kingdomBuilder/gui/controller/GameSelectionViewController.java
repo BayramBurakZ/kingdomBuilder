@@ -13,24 +13,39 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameSelectionView.
  */
 public class GameSelectionViewController extends Controller implements Initializable {
+
     /**
      * Represents the MainViewController for access to switch Views-methods.
      */
     private MainViewController mainViewController;
 
+    /**
+     * Layout that contains the games table (left side) and the preview of a single game (right side)
+     */
     @FXML
     private HBox hbox_gameselection;
 
+    /**
+     * Layout that contains the games table with its buttons
+     */
     @FXML
     private VBox vbox_table;
 
+    /**
+     * Layout that contains the preview of a game
+     */
     @FXML
     private VBox vbox_preview;
 
+    /**
+     * Called to initialize this controller after its root element has been completely processed.
+     * @param location The location used to resolve relative paths for the root object,
+     *                 or null if the location is not known.
+     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        vbox_table.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
-        vbox_preview.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
+        setupLayout();
     }
 
     /**
@@ -48,5 +63,13 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     public void setMainViewController(MainViewController mainViewController) {
         this.mainViewController = mainViewController;
+    }
+
+    /**
+     * Initializes layout arrangement
+     */
+    private void setupLayout() {
+        vbox_table.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
+        vbox_preview.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
     }
 }
