@@ -3,7 +3,7 @@ package kingdomBuilder.gamelogic;
 import static kingdomBuilder.gamelogic.Game.*;
 
 /**
- * Contains the data of a player
+ * Contains the data of a player.
  */
 public class Player {
 

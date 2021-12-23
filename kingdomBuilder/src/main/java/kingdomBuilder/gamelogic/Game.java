@@ -46,13 +46,13 @@ public class Game {
     }
 
     /**
-     * Tiles that represent a hexagon in gameboard.
+     * Tiles that represent a hexagon in game board.
      */
     public enum TileType {
         // normal tiles
         GRAS,
         FLOWER,
-        FOREST,
+        FORREST,
         CANYON,
         DESERT,
         WATER,
@@ -60,7 +60,16 @@ public class Game {
 
         // token tiles
         CASTLE,
-        SPECIAL_PLACE;
+        SPECIAL_PLACE,
+
+        ORACLE,
+        FARM,
+        TAVERN,
+        TOWER,
+        HARBOR,
+        PADDOCK,
+        BARN,
+        OASIS;
     }
 
     /**

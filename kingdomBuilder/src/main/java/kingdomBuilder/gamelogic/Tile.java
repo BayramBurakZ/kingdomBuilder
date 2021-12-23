@@ -15,6 +15,12 @@ public class Tile {
     private Player occupiedBy;
     private int remainingTokens;
 
+    public Tile(TileType tileType, int remainingTokens) {
+        this.tileType = tileType;
+        this.occupiedBy = null;
+        this.remainingTokens = remainingTokens;
+    }
+
     /**
      * Place a settlement on the tile that belongs to the given player.
      *
@@ -22,6 +28,9 @@ public class Tile {
      */
     public void placeSettlement(Player ownerOfSettlement) {
         // TODO: throw exception if already occupied.
+        if (occupiedBy != null)
+            return;
+
         occupiedBy = ownerOfSettlement;
     }
 
@@ -32,6 +41,9 @@ public class Tile {
      */
     public Player removeSettlement() {
         // TODO: throw exception if not occupied.
+        if (occupiedBy == null)
+            return null;
+
         Player previousPlayer = occupiedBy;
         occupiedBy = null;
 
