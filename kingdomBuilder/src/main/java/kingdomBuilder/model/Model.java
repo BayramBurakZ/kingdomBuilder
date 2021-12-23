@@ -15,7 +15,7 @@ public class Model {
                 generates random textures instead of tile type based on given layout
                 because of using the HexagonTile class that is concepted for the gui
                 */
-                int random = (int) ((Math.random() * (7 - 1)) + 1);
+                int random = (int) ((Math.random() * (16 - 1)) + 1);
                 gameboard_model[x][y] = new HexagonTile(x, y);
                 gameboard_model[x][y].setTexture(textureLoader.getTexture(TileType.valueOf(random)));
             }
