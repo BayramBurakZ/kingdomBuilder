@@ -1,36 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<BorderPane fx:id="game_boarderpane" minHeight="600.0" prefHeight="600.0" prefWidth="600.0" style="-fx-background-color: #383E42;" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameViewController">
+<VBox fx:id="game_vbox" style="-fx-background-color: #383E42;" xmlns="http://javafx.com/javafx/11.0.2"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameViewController">
 
-	<top>
-		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-			<Button minWidth="100" onAction="#onButtonMainMenuPressed" text="Main Menu" />
-			<Label fx:id="game_label_player1" alignment="CENTER" prefHeight="102.0" prefWidth="130.0" text="PLAYER 1 " textAlignment="CENTER" textFill="WHITE" />
-			<Label alignment="CENTER" prefHeight="102.0" prefWidth="148.0" text="PLAYER 2" textAlignment="CENTER" textFill="WHITE" />
-			<Label alignment="CENTER" prefHeight="102.0" prefWidth="134.0" text="PLAYER 3" textAlignment="CENTER" textFill="WHITE" />
-			<Label alignment="CENTER" prefHeight="102.0" prefWidth="327.0" text="3 WINCONDITIONS" textFill="WHITE" />
-		</HBox>
-	</top>
-	<bottom>
-		<HBox prefHeight="126.0" prefWidth="740.0" BorderPane.alignment="CENTER">
-			<Label alignment="CENTER" prefHeight="121.0" prefWidth="139.0" text="Remaining Buildings" textAlignment="CENTER" textFill="WHITE" />
-			<Label alignment="CENTER" prefHeight="122.0" prefWidth="143.0" text="TOKEN" textFill="WHITE" />
-			<Label alignment="CENTER" prefHeight="124.0" prefWidth="236.0" text="LANDSCAPE" textFill="WHITE" />
-			<Label alignment="CENTER" contentDisplay="CENTER" prefHeight="125.0" prefWidth="218.0" text="PLAYER STATS (TIMER?)" textFill="WHITE" />
-		</HBox>
-	</bottom>
-	<center>
-		<HBox fx:id="game_hbox" alignment="CENTER">
-			<SubScene fx:id="game_subscene" height="380.0" managed="false" width="600.0" BorderPane.alignment="CENTER">
-				<root>
-					<fx:include source="GameBoardView.fxml" />
-				</root>
-			</SubScene>
-		</HBox>
-	</center>
+    <HBox fx:id="game_hbox_statistic" alignment="CENTER" VBox.vgrow="ALWAYS">
 
-</BorderPane>
+        <!-- Player information for player 1-->
+        <Label fx:id="game_label_player1_name" text="PLAYER 1" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player1_settlements" text="40" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player1_score" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Player information for player 2-->
+        <Label fx:id="game_label_player2_name" text="PLAYER 2" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player2_settlements" text="40" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player2_score" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Player information for player 3-->
+        <Label fx:id="game_label_player3_name" text="PLAYER 3" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player3_settlements" text="40" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player3_score" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Player information for player 4-->
+        <Label fx:id="game_label_player4_name" text="PLAYER 4" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player4_settlements" text="40" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+        <Label fx:id="game_label_player4_score" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Turn information of the game-->
+        <Label fx:id="game_label_turn" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+
+        <Region HBox.hgrow="ALWAYS"/>
+        <!-- Time information of the game-->
+        <Label fx:id="game_label_time" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Label>
+    </HBox>
+
+    <!-- HBox that contains the Subscene with the gameboard-->
+    <HBox fx:id="game_hbox_subscene" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <SubScene fx:id="game_subscene" managed="false" BorderPane.alignment="CENTER">
+            <root>
+                <fx:include source="GameBoardView.fxml"/>
+            </root>
+        </SubScene>
+    </HBox>
+
+    <!--HBox that displays the player specific information like the tokens.-->
+    <HBox fx:id="game_hbox_playerinformation">
+
+
+        <!-- VBox that displays the information of the current card-->
+        <VBox fx:id="game_vbox_terraincard" style="-fx-border-color: white;
+            -fx-background-color: ANTIQUEWHITE;" alignment="CENTER">
+            <Rectangle fx:id="game_rectangle_card" stroke="BLACK" strokeType="INSIDE"/>
+            <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Flower"/>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </VBox>
+
+        <!-- HBox for Tokens-->
+        <HBox fx:id="gameview_hbox_tokens" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
+
+        <Button fx:id="game_button_endturn" text="End Turn">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+            </padding>
+        </Button>
+    </HBox>
+</VBox>
