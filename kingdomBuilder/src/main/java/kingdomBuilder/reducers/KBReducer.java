@@ -38,28 +38,30 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(store, oldState, a);
         } else if (action instanceof DisconnectAction a) {
             return reduce(oldState, a);
-        } else if (action instanceof SetMainControllerAction a) {
+        } else if (action instanceof SetSceneLoaderAction a) {
             return reduce(oldState, a);
         }
 
         return oldState;
     }
 
+    // TODO: remove sceneloader/controller
     private KBState reduce(KBState oldState, ClientAddAction a) {
         KBState state = new KBState(oldState);
         state.clients.put(a.id, new ClientDAO(a.id, a.name, a.gameId));
 
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         sceneLoader.getChatViewController().onClientJoined(a.id, a.name, a.gameId);
 
         return state;
     }
 
+    // TODO: remove sceneloader/controller
     private KBState reduce(KBState oldState, ClientRemoveAction a) {
         KBState state = new KBState(oldState);
         state.clients.remove(a.id);
 
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         sceneLoader.getChatViewController().onClientLeft(a.id, a.name, a.gameId);
 
         return state;
@@ -76,8 +78,9 @@ public class KBReducer implements Reducer<KBState> {
         return oldState;
     }
 
+    // TODO: remove sceneloader/controller
     private KBState reduce(KBState oldState, ChatReceiveAction a) {
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         var chatViewController = sceneLoader.getChatViewController();
         chatViewController.onMessage(a.chatMessage);
         return oldState;
@@ -144,11 +147,12 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
+    // TODO: remove sceneloader/controller
     private KBState reduce(KBState oldState, DisconnectAction a) {
         KBState state = new KBState(oldState);
         // TODO: kicked action ?
         if (a.wasKicked) {
-            var sceneLoader = oldState.controller.getSceneLoader();
+            var sceneLoader = oldState.sceneLoader;
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
         state.client.disconnect();
@@ -159,9 +163,10 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private KBState reduce(KBState oldState, SetMainControllerAction a) {
+    // TODO: remove controller
+    private KBState reduce(KBState oldState, SetSceneLoaderAction a) {
         KBState state = new KBState(oldState);
-        state.controller = a.controller;
+        state.sceneLoader = a.sceneLoader;
         return state;
     }
 }

@@ -24,19 +24,17 @@ import java.util.ResourceBundle;
  * containing data.
  */
 public class ChatViewController extends Controller implements Initializable {
+
     /**
      * Represents the store of the application.
      */
     private Store<KBState> store;
+
     /**
      * Represents the state for internal use.
      */
     // TODO: remove it?
     private KBState state;
-    /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
 
     /**
      * Represents the button to clear the selection.
@@ -97,6 +95,7 @@ public class ChatViewController extends Controller implements Initializable {
      */
     @FXML
     private Button chatview_button_whisper;
+
     /**
      * Represents the textarea used for displaying the globalchat.
      */
@@ -172,14 +171,6 @@ public class ChatViewController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     public void onKeyPressed(KeyEvent event) {
-        /*
-        if (event.isShiftDown() && event.getCode().equals(KeyCode.ENTER)) {
-            // TODO: linebreak isn't supported in messages through the server protocol?
-            System.out.println("Shift linebreak");
-            chatview_textarea_chatinput.appendText(System.lineSeparator());
-        } else
-
-         */
         if (event.getCode() == KeyCode.ENTER) {
             if (event.isShiftDown()) {
                 printAndSendWhisper();
@@ -341,13 +332,5 @@ public class ChatViewController extends Controller implements Initializable {
             store.dispatch(new ChatSendAction(receiverIds, message));
         }
         chatview_textarea_chatinput.clear();
-    }
-
-    /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
     }
 }

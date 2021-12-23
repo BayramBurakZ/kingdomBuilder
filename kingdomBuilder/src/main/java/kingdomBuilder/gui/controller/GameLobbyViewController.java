@@ -11,10 +11,6 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameLobbyView.
  */
 public class GameLobbyViewController extends Controller implements Initializable {
-    /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
@@ -31,7 +27,7 @@ public class GameLobbyViewController extends Controller implements Initializable
      */
     @FXML
     public void onButtonGameStartPressed(Event event) {
-        mainViewController.showGameView();
+        sceneLoader.showGameView();
     }
 
     /**
@@ -40,14 +36,6 @@ public class GameLobbyViewController extends Controller implements Initializable
      */
     @FXML
     public void onButtonGameListPressed(Event event) {
-        mainViewController.showGameSelectionView();
-    }
-
-    /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
+        sceneLoader.showGameSelectionView();
     }
 }

@@ -2,8 +2,11 @@ package kingdomBuilder.gui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.SetSceneLoaderAction;
 import kingdomBuilder.gui.controller.*;
 import kingdomBuilder.redux.Store;
 
@@ -47,27 +50,27 @@ public class SceneLoader {
     /**
      * Stores the menuViewController.
      */
-    private Controller menuViewController;
+    private MenuViewController menuViewController;
     /**
      * Stores the gameLobbyController.
      */
-    private Controller gameLobbyViewController;
+    private GameLobbyViewController gameLobbyViewController;
     /**
      * Stores the gameViewController.
      */
-    private Controller gameViewController;
+    private GameViewController gameViewController;
     /**
      * Stores the iAmViewController.
      */
-    private Controller iAmViewController;
+    private IAmViewController iAmViewController;
     /**
      * Stores the chatViewController.
      */
-    private Controller chatViewController;
+    private ChatViewController chatViewController;
     /**
      * Stores the gameSelectionViewController.
      */
-    private Controller gameSelectionViewController;
+    private GameSelectionViewController gameSelectionViewController;
 
     /**
      * Represents the store of the application.
@@ -75,10 +78,21 @@ public class SceneLoader {
     private final Store<KBState> store;
 
     /**
+     * Represents the main scene of the application.
+     */
+    private Scene scene;
+
+    /**
+     * Represents the main layout of the application.
+     */
+    private BorderPane borderPane;
+
+    /**
      * Constructor that initially loads every view.
      */
     public SceneLoader(Store<KBState> store) {
         this.store = store;
+        this.store.dispatch(new SetSceneLoaderAction(this));
 
         loadMenuView();
         loadGameLobbyView();
@@ -86,34 +100,69 @@ public class SceneLoader {
         loadIAmView();
         loadChatView();
         loadGameSelectionView();
+
+        borderPane = new BorderPane();
+        borderPane.setCenter(iAmView);
+        scene = new Scene(borderPane, 1000, 650);
     }
 
     /**
-     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
-     * construction.
-     * @param location The location to load the FXML file from.
-     * @return The newly created loader.
+     * Returns the main scene for the application.
+     * @return main scene.
      */
-    private FXMLLoader makeLoader(URL location) {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(controllerType -> {
-            try {
-                for (Constructor<?> ctor: controllerType.getConstructors()) {
-                    if(ctor.getParameterCount() == 1
-                       && ctor.getParameterTypes()[0] == Store.class)
-                        return ctor.newInstance(store);
-                }
-
-                return controllerType.getConstructor().newInstance();
-            } catch(Exception exc) {
-                throw new RuntimeException(exc);
-            }
-        });
-
-        loader.setLocation(location);
-
-        return loader;
+    public Scene getScene() {
+        return scene;
     }
+
+    // show-methods
+
+    /**
+     * Loads the MenuView into the center of the main borderPane
+     * and loads the chat into the left side of the main borderPane.
+     */
+    public void showMenuView() {
+        borderPane.setCenter(menuView);
+
+        borderPane.setLeft(chatView);
+    }
+
+    /**
+     * Loads the GameLobbyView into the center of the main borderPane.
+     */
+    public void showGameLobbyView() {
+        borderPane.setCenter(gameLobbyView);
+    }
+
+    /**
+     * Loads the GameLobbyView into the center of the main borderPane.
+     */
+    public void showGameView() {
+        //TODO: currently it reloads the gameview to generate a random board
+        // fix with an update function and REDUX
+        //resets the GameView and generates the board new
+        loadGameView();
+
+        borderPane.setCenter(gameView);
+
+        //TODO: Focus-management
+        gameViewController.getGame_subscene().getRoot().requestFocus();
+    }
+
+    /**
+     * Loads the iAmView into the center of the main borderPane.
+     */
+    public void showIAmView() {
+        borderPane.setCenter(iAmView);
+    }
+
+    /**
+     * Loads the gameSelectionView into the center of the main borderPane.
+     */
+    public void showGameSelectionView() {
+        borderPane.setCenter(gameSelectionView);
+    }
+
+    // load-methods
 
     /**
      * Loads the View at the specific location of the parameter and put the view on the x-position of the
@@ -130,7 +179,8 @@ public class SceneLoader {
 
         try {
             node = loader.load();
-            controller =  loader.getController();
+            controller = loader.getController();
+            controller.setSceneLoader(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -146,7 +196,7 @@ public class SceneLoader {
     public void loadMenuView() {
         Pair<Node, Controller> pair = loadView("controller/MenuView.fxml");
         menuView = pair.getKey();
-        menuViewController = pair.getValue();
+        menuViewController = (MenuViewController) pair.getValue();
     }
 
     /**
@@ -157,7 +207,7 @@ public class SceneLoader {
     public void loadGameLobbyView() {
         Pair<Node, Controller> pair = loadView("controller/GameLobbyView.fxml");
         gameLobbyView = pair.getKey();
-        gameLobbyViewController = pair.getValue();
+        gameLobbyViewController = (GameLobbyViewController) pair.getValue();
     }
 
     /**
@@ -168,7 +218,7 @@ public class SceneLoader {
     public void loadGameView() {
         Pair<Node, Controller> pair = loadView("controller/GameView.fxml");
         gameView = pair.getKey();
-        gameViewController = pair.getValue();
+        gameViewController = (GameViewController) pair.getValue();
     }
 
     /**
@@ -179,7 +229,7 @@ public class SceneLoader {
     public void loadIAmView() {
         Pair<Node, Controller> pair = loadView("controller/IAmView.fxml");
         iAmView = pair.getKey();
-        iAmViewController = pair.getValue();
+        iAmViewController = (IAmViewController) pair.getValue();
     }
 
     /**
@@ -190,7 +240,7 @@ public class SceneLoader {
     public void loadChatView() {
         Pair<Node, Controller> pair = loadView("controller/ChatView.fxml");
         chatView = pair.getKey();
-        chatViewController = pair.getValue();
+        chatViewController = (ChatViewController) pair.getValue();
     }
 
     /**
@@ -201,8 +251,10 @@ public class SceneLoader {
     public void loadGameSelectionView() {
         Pair<Node, Controller> pair = loadView("controller/GameSelectionView.fxml");
         gameSelectionView = pair.getKey();
-        gameSelectionViewController = pair.getValue();
+        gameSelectionViewController = (GameSelectionViewController) pair.getValue();
     }
+
+    // getter
 
     /**
      * Returns the current parent node of the MenuView.
@@ -288,5 +340,32 @@ public class SceneLoader {
      */
     public GameSelectionViewController getGameSelectionViewController() {
         return (GameSelectionViewController) gameSelectionViewController;
+    }
+
+    /**
+     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
+     * construction.
+     * @param location The location to load the FXML file from.
+     * @return The newly created loader.
+     */
+    private FXMLLoader makeLoader(URL location) {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setControllerFactory(controllerType -> {
+            try {
+                for (Constructor<?> ctor: controllerType.getConstructors()) {
+                    if(ctor.getParameterCount() == 1
+                            && ctor.getParameterTypes()[0] == Store.class)
+                        return ctor.newInstance(store);
+                }
+
+                return controllerType.getConstructor().newInstance();
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        });
+
+        loader.setLocation(location);
+
+        return loader;
     }
 }

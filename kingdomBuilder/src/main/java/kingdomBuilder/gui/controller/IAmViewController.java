@@ -18,10 +18,7 @@ import java.util.ResourceBundle;
  * This class controls the functions of the IAmView.
  */
 public class IAmViewController extends Controller implements Initializable {
-    /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
+
     /**
      * Represents the store of the application.
      */
@@ -53,19 +50,11 @@ public class IAmViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
-    }
-
-    /**
      * Sets the functionality for the MainMenu Button.
      * @param event Contains the data from the event source.
      */
     @FXML
-    public void onButtonMainMenuShow(Event event) {
+    private void onButtonMainMenuShow(Event event) {
         SetPreferredName();
     }
 
@@ -102,7 +91,7 @@ public class IAmViewController extends Controller implements Initializable {
         if (!preferredName.isEmpty()) {
             // TODO: could let dispatch throw in case the name isn't valid
             store.dispatch(new SetPreferredNameAction(preferredName));
-            mainViewController.showMenuView();
+            sceneLoader.showMenuView();
         }
     }
 }

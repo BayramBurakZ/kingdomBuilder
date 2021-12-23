@@ -15,11 +15,6 @@ import java.util.ResourceBundle;
 public class GameSelectionViewController extends Controller implements Initializable {
 
     /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
-
-    /**
      * Layout that contains the games table (left side) and the preview of a single game (right side)
      */
     @FXML
@@ -54,15 +49,7 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     @FXML
     public void onButtonCreateNewGamePressed(Event event) {
-        mainViewController.showGameLobbyView();
-    }
-
-    /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
+        sceneLoader.showGameLobbyView();
     }
 
     /**

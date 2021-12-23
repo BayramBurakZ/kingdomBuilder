@@ -1,6 +1,5 @@
 package kingdomBuilder.gui.controller;
 
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
@@ -17,10 +16,6 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
-    /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
 
     /**
      * Represents the initial VBox.
@@ -179,14 +174,6 @@ public class GameViewController extends Controller implements Initializable {
         // resize the subScene
         game_subscene.widthProperty().bind(game_hbox_subscene.widthProperty());
         game_subscene.heightProperty().bind(game_hbox_subscene.heightProperty());
-    }
-
-    /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
     }
 
     /**

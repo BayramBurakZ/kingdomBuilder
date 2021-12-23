@@ -18,10 +18,7 @@ import java.util.ResourceBundle;
  * This Class controls the MenuViewController with all its functions.
  */
 public class MenuViewController extends Controller implements Initializable {
-    /**
-     * Represents the MainViewController for access to switch Views-methods.
-     */
-    private MainViewController mainViewController;
+    
     /**
      * Represents the store of the application.
      */
@@ -104,7 +101,7 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     public void onLocalGameButtonPressed(Event event) {
-        mainViewController.showGameSelectionView();
+        sceneLoader.showGameSelectionView();
     }
 
     /**
@@ -163,13 +160,5 @@ public class MenuViewController extends Controller implements Initializable {
 
         menuview_localgame_button.setDisable(true);
         menuview_onlinegame_button.setDisable(true);
-    }
-
-    /**
-     * Sets the MainViewController.
-     * @param mainViewController MainViewController with all functions.
-     */
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
     }
 }

@@ -1,6 +1,6 @@
 package kingdomBuilder;
 
-import kingdomBuilder.gui.controller.MainViewController;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
@@ -16,9 +16,9 @@ public class KBState {
     // TODO? :probably just make these ObservableLists directly
 
     /**
-     * Represents the MainViewController.
+     * Represents the SceneLoader.
      */
-    public MainViewController controller;
+    public SceneLoader sceneLoader;
 
     /**
      * Maps client id to the client info of connected clients.
@@ -65,7 +65,7 @@ public class KBState {
      * @param other the received KBState
      */
     public KBState(KBState other) {
-        controller = other.controller;
+        sceneLoader = other.sceneLoader;
         clients = other.clients;
         games = other.games;
         client = other.client;
