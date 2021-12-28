@@ -11,5 +11,4 @@ public class Player {
     String name;
     PlayerColor color;
     int remainingSettlements;
-    TokenType tokens[];
 }

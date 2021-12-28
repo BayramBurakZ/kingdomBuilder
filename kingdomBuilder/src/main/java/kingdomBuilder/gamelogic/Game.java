@@ -1,5 +1,7 @@
 package kingdomBuilder.gamelogic;
 
+import java.util.EnumSet;
+
 /**
  * Contains all the information of a game hosted on the server.
  */
@@ -58,10 +60,10 @@ public class Game {
         WATER,
         MOUNTAIN,
 
-        // token tiles
+        // special place
         CASTLE,
-        SPECIAL_PLACE,
 
+        // token tiles
         ORACLE,
         FARM,
         TAVERN,
@@ -73,18 +75,24 @@ public class Game {
     }
 
     /**
+     * Types of regular tiles.
+     */
+    public static EnumSet<TileType> regularTileTypes = EnumSet.range(TileType.GRAS, TileType.MOUNTAIN);
+
+    /**
+     * Types of tiles where the settlement can be placed without a token.
+     */
+    public static EnumSet<TileType> placeableTileTypes = EnumSet.range(TileType.GRAS, TileType.DESERT);
+
+    /**
+     * Types of tiles where a settlement can never be placed.
+     */
+    public static EnumSet<TileType> nonPlaceableTileTypes = EnumSet.range(TileType.MOUNTAIN, TileType.OASIS);
+
+    /**
      * Types of token that can be acquired.
      */
-    public enum TokenType {
-        ORACLE,
-        FARM,
-        TAVERN,
-        TOWER,
-        HARBOR,
-        PADDOCK,
-        BARN,
-        OASIS;
-    }
+    public static EnumSet<TileType> tokenType = EnumSet.range(TileType.ORACLE, TileType.OASIS);
 
     /**
      * Colors for each player that are assign in order of joining the game.

@@ -6,16 +6,13 @@ import kingdomBuilder.gamelogic.Game.*;
  * Contains the data of a tile.
  */
 public class Tile {
-    // TODO: Possibly refactor enums of tiles and tokens here and maybe merge them together into a single enum class.
-    // TODO: how does a Player own a specific token?
-    // TODO: Split this class into three subclasses with token, normal tile and castle OR two seperate classes.
 
-    TileType tileType;
-    TokenType tokenType;
+    private TileType tileType;
     private Player occupiedBy;
     private int remainingTokens;
 
     public Tile(TileType tileType, int remainingTokens) {
+
         this.tileType = tileType;
         this.occupiedBy = null;
         this.remainingTokens = remainingTokens;
@@ -27,9 +24,9 @@ public class Tile {
      * @param ownerOfSettlement Player that places a settlement.
      */
     public void placeSettlement(Player ownerOfSettlement) {
-        // TODO: throw exception if already occupied.
+
         if (occupiedBy != null)
-            return;
+            throw new TileIsAlreadyOccupiedException("Is already occupied by Player: " + occupiedBy.name);
 
         occupiedBy = ownerOfSettlement;
     }
@@ -40,9 +37,9 @@ public class Tile {
      * @return The previous player that occupied the tile.
      */
     public Player removeSettlement() {
-        // TODO: throw exception if not occupied.
+
         if (occupiedBy == null)
-            return null;
+            throw new NullPointerException("Tile is not occupied!");
 
         Player previousPlayer = occupiedBy;
         occupiedBy = null;
@@ -54,10 +51,24 @@ public class Tile {
      * Take a token from a special place.
      *
      * @return The token type of the special place.
+     * @throws HasNoTokenException when tile is not a special place.
      */
-    public TokenType takeTokenFromSpecialPlace() {
-        // TODO: throw exception if no token is available or if it's not a special place.
+    public TileType takeTokenFromSpecialPlace() throws HasNoTokenException {
+
+        if (Game.tokenType.contains(tileType))
+            throw new HasNoTokenException("Can't take a token from a non special place!");
+        if (remainingTokens <= 0)
+            throw new HasNoTokenException("No more tokens remaining!");
+
         remainingTokens--;
-        return tokenType;
+        return tileType;
+    }
+
+    /**
+     * Gets the tile type of the tile.
+     * @return The tile type of the tile.
+     */
+    public TileType getTileType() {
+        return tileType;
     }
 }

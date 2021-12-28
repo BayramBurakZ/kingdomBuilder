@@ -3,13 +3,14 @@ package kingdomBuilder.gamelogic;
 import static kingdomBuilder.gamelogic.Game.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
-public class TestMap {
+public class MapTest {
 
+    // quadrants that are stored in the server
     String first = "FORREST;FORREST;FLOWER;DESERT;DESERT;DESERT;DESERT;CANYON;DESERT;DESERT;FORREST;MOUNTAIN;" +
             "FLOWER;FLOWER;DESERT;CANYON;DESERT;CANYON;CANYON;CANYON;FORREST;FORREST;FORREST;FLOWER;DESERT;DESERT;" +
             "CANYON;TOWER;WATER;CANYON;FORREST;FORREST;FLOWER;FLOWER;DESERT;DESERT;DESERT;DESERT;WATER;WATER;" +
@@ -53,42 +54,49 @@ public class TestMap {
             "CANYON;DESERT;FORREST;FORREST;FORREST;FORREST;WATER;DESERT;DESERT;CANYON;CANYON;CANYON";
 
 
+    // Converted quadrants in array
+    TileType quadrant1[];
+    TileType quadrant2[];
+    TileType quadrant3[];
+    TileType quadrant4[];
 
-   /* @Test
-    public void testMapcreationFromQuadrantIDs(int first, int second, int third, int fourth){
+    private final int QUADRANT_WIDTH = 10;
 
+    @BeforeEach
+    public void initialize() {
+        quadrant1 = Arrays.stream(first.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
+        quadrant2 = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
+        quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
+        quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
     }
-*/
+
 
     @Test
     public void testMapCreationFromQuadrants() {
-
-        TileType quadrant1[] = Arrays.stream(first.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
-        TileType quadrant2[] = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
-        TileType quadrant3[] = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
-        TileType quadrant4[] = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
+        // Test if each tile is in the correct position.
 
         Map map = new Map(2);
         map.createMap(quadrant1, quadrant2, quadrant3, quadrant4);
 
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                assertEquals(map.getTile(x, y).tileType, quadrant1[y * 10 + x]);
+        for (int y = 0; y < QUADRANT_WIDTH; y++) {
+            for (int x = 0; x < QUADRANT_WIDTH; x++) {
+                assertEquals(map.getTileType(x, y), quadrant1[y * QUADRANT_WIDTH + x]);
             }
         }
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                assertEquals(map.getTile(x + 10, y).tileType, quadrant2[y * 10 + x]);
+        for (int y = 0; y < QUADRANT_WIDTH; y++) {
+            for (int x = 0; x < QUADRANT_WIDTH; x++) {
+                assertEquals(map.getTileType(x + QUADRANT_WIDTH, y), quadrant2[y * QUADRANT_WIDTH + x]);
             }
         }
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                assertEquals(map.getTile(x, y + 10).tileType, quadrant3[y * 10 + x]);
+        for (int y = 0; y < QUADRANT_WIDTH; y++) {
+            for (int x = 0; x < QUADRANT_WIDTH; x++) {
+                assertEquals(map.getTileType(x, y + QUADRANT_WIDTH), quadrant3[y * QUADRANT_WIDTH + x]);
             }
         }
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                assertEquals(map.getTile(x + 10, y + 10).tileType, quadrant4[y * 10 + x]);
+        for (int y = 0; y < QUADRANT_WIDTH; y++) {
+            for (int x = 0; x < QUADRANT_WIDTH; x++) {
+                assertEquals(map.getTileType(x + QUADRANT_WIDTH,
+                        y + QUADRANT_WIDTH), quadrant4[y * QUADRANT_WIDTH + x]);
             }
         }
     }

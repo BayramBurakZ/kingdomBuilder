@@ -17,7 +17,12 @@ public class Map {
     /**
      * Represents the width of a quadrant.
      */
-    private int width;
+    private int quadrantWidth;
+
+    /**
+     * Represents the width of the map.
+     */
+    private int mapWidth;
 
     /**
      * Represents the amount of tokens that a special place contains at game start.
@@ -57,26 +62,31 @@ public class Map {
             throw new InvalidParameterException();
         }
 
-        width = (int) roundedWith;
+        quadrantWidth = (int) roundedWith;
+        mapWidth = 2 * quadrantWidth;
         tiles = new Tile[topLeft.length * 4];
 
         // combines top left and top right into tiles array
-        for (int y = 0; y < width; y++) {
-            for (int x = 0; x < width; x++) {
-                tiles[to1DIndexTopLeft(x, y, width)] = new Tile(topLeft[y * width + x], startingTokenCount);
+        for (int y = 0; y < quadrantWidth; y++) {
+            for (int x = 0; x < quadrantWidth; x++) {
+                tiles[to1DIndexTopLeft(x, y, quadrantWidth)] =
+                        new Tile(topLeft[y * quadrantWidth + x], startingTokenCount);
             }
-            for (int x = 0; x < width; x++) {
-                tiles[to1DIndexTopRight(x, y, width)] = new Tile(topRight[y * width + x], startingTokenCount);
+            for (int x = 0; x < quadrantWidth; x++) {
+                tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
+                        new Tile(topRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
 
         // combines bottom left and bottom right into tiles array
-        for (int y = 0; y < width; y++) {
-            for (int x = 0; x < width; x++) {
-                tiles[to1DIndexBottomLeft(x, y, width)] = new Tile(bottomLeft[y * width + x], startingTokenCount);
+        for (int y = 0; y < quadrantWidth; y++) {
+            for (int x = 0; x < quadrantWidth; x++) {
+                tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
+                        new Tile(bottomLeft[y * quadrantWidth + x], startingTokenCount);
             }
-            for (int x = 0; x < width; x++) {
-                tiles[to1DIndexBottomRight(x, y, width)] = new Tile(bottomRight[y * width + x], startingTokenCount);
+            for (int x = 0; x < quadrantWidth; x++) {
+                tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
+                        new Tile(bottomRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
     }
@@ -111,8 +121,9 @@ public class Map {
      * @param x The x coordinate of the tile.
      * @param y The y coordinate of the tile.
      * @return The token.
+     * @throws UnsupportedOperationException when tile is not a special place.
      */
-    public TokenType takeToken(int x, int y) {
+    public TileType takeToken(int x, int y) throws HasNoTokenException {
         return getTile(x, y).takeTokenFromSpecialPlace();
     }
 
@@ -125,9 +136,10 @@ public class Map {
      * @return The position in a 1D array.
      */
     private int to1DIndex(int x, int y, int width) {
-        return y * 2 * width + x;
+        return y * width + x;
     }
 
+    //TODO: eliminate width from return
     private int to1DIndexTopLeft(int x, int y, int width) {
         return y * 2 * width + x;
     }
@@ -145,14 +157,104 @@ public class Map {
     }
 
     /**
-     * Get the tile at the given index.
+     * The tile at the given index.
      *
      * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile
-     * @return The tile.
+     * @param y The y coordinate of the tile.
+     * @return The tile at the index.
      */
-    public Tile getTile(int x, int y) {
+    private Tile getTile(int x, int y) {
         //TODO: make package default accessible.
-        return tiles[to1DIndex(x, y, width)];
+        if (x < 0 || y < 0 || x >= mapWidth || y >= mapWidth)
+            throw new IndexOutOfBoundsException();
+
+        return tiles[to1DIndex(x, y, mapWidth)];
+    }
+
+    /**
+     * Get the tile type at the given index.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return The tile type of the tile.
+     */
+    public TileType getTileType(int x, int y) {
+        //TODO: make package default accessible.
+        return getTile(x, y).getTileType();
+    }
+
+    /**
+     * Check whether the tile at given index is at the border of the map.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return Whether the tile is at the border.
+     */
+    public boolean isTileAtBorder(int x, int y) {
+
+        if (x == 0 || y == 0 || x == mapWidth || y == mapWidth)
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Checks whether the tile at given index is placeable excluding water which is only placeable with a token.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return whether the tile is placeable.
+     */
+    public boolean isTilePlaceable(int x, int y) {
+
+        if (placeableTileTypes.contains(getTileType(x, y)))
+            return true;
+
+        return false;
+    }
+
+
+    /**
+     * Checks if two tiles are neighbours in the hexagon map.
+     *
+     * @param firstX  The x coordinate of the first tile.
+     * @param firstY  The y coordinate of the first tile.
+     * @param secondX The x coordinate of the second tile.
+     * @param secondY The y coordinate of the second tile.
+     * @return Whether both tiles are neighbors.
+     * @throws InvalidParameterException When either of the tile coordinates are out of bounds.
+     */
+    public boolean areNeighbouringTiles(int firstX, int firstY, int secondX, int secondY)
+            throws InvalidParameterException {
+
+        if (firstX < 0 || firstY < 0 || firstX >= mapWidth || firstY >= mapWidth)
+            throw new InvalidParameterException("First tile coordinates are out of bounds with x:" + firstX +
+                    " y:" + firstY);
+        if (secondX < 0 || secondY < 0 || secondX >= mapWidth || secondY >= mapWidth)
+            throw new InvalidParameterException("Second tile coordinates are out of bounds with x:" + secondX +
+                    " y:" + secondY);
+
+        // Compare Y
+        if (Math.abs(firstY - secondY) > 1)
+            return false;
+
+        // Neighbour in same row
+        if (firstY == secondY && Math.abs(firstX - secondX) > 1)
+            return false;
+
+        if (firstY % 2 == 0) {
+            // even
+
+            if (firstX == secondX - 1 || firstX == secondX)
+                return true;
+
+        } else {
+            // odd
+
+            if (firstX == secondX + 1 || firstX == secondX)
+                return true;
+        }
+
+        return false;
     }
 }
