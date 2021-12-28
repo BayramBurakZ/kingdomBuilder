@@ -7,6 +7,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
+import kingdomBuilder.model.TileType;
 
 import java.util.ArrayList;
 
@@ -35,11 +36,17 @@ public class HexagonTile extends Polygon {
     private static ArrayList<Point> corners;
 
     /**
-     * Creates a new Hexagon Tile at the given position.
+     * Represents the texture loader which all hexagons share.
+     */
+    private static final TextureLoader textureLoader = new TextureLoader();
+
+    /**
+     * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos The x-coordinate of the upper-left corner position.
      * @param yPos The y-coordinate of the upper-left corner position.
+     * @param tileType The TileType of the Hexagon.
      */
-    public HexagonTile(double xPos, double yPos) {
+    public HexagonTile(double xPos, double yPos, TileType tileType) {
         // only calculate the corners once and not for every hexagon
         if (corners == null) {
             //ToDo: extract the hard coded radius
@@ -52,48 +59,16 @@ public class HexagonTile extends Polygon {
             getPoints().add(yPos + corners.get(i).getY());
         }
 
-        setStroke(Paint.valueOf("BLACK"));
-        setStrokeType(StrokeType.INSIDE);
-        setFill(Paint.valueOf("WHITE"));
-
-        //ToDo: StrokeColor depends on TileType (eg. normal tile black and tokens gold)
-        setOnMouseEntered(new EventHandler<MouseEvent>() {
-            /**
-             * A MouseEvent handler to highlight the hexagon.
-             * @param event A MouseEvent
-             */
-            @Override
-            public void handle(MouseEvent event) {
-                setStroke(Paint.valueOf("RED"));
-                setStrokeWidth(2.0);
-            }
-        });
-
-        setOnMouseExited(new EventHandler<MouseEvent>() {
-            /**
-             * A MouseEvent handler to end the highlight of the hexagon.
-             * @param event A MouseEvent
-             */
-            @Override
-            public void handle(MouseEvent event) {
-                setStroke(Paint.valueOf("BLACK"));
-                setStrokeWidth(1.0);
-            }
-        });
+        setTexture(textureLoader.getTexture(tileType));
+        setHexagonStroke(tileType);
+        setMouseHandler(tileType);
     }
 
     /**
-     * Sets the texture with the given Image.
-     * @param texture The Image for the texture.
-     */
-    public void setTexture(Image texture) {
-        setFill(new ImagePattern(texture, 0.0f, 0.0f, 1.0f, 1.0f, true));
-    }
-
-    /**
-     * Class the represents a point.
+     * Class that represents a point.
      */
     private class Point {
+
         /**
          * Represents the x-coordinate of the point.
          */
@@ -102,7 +77,6 @@ public class HexagonTile extends Polygon {
          * Represents the y-coordinate of the point.
          */
         private int y;
-
         /**
          * Constructs a new point with the given parameters.
          * @param x The x-coordinate of the point.
@@ -128,8 +102,23 @@ public class HexagonTile extends Polygon {
         public int getY() {
             return y;
         }
-    }
 
+        /**
+         * Translates the x-coordinate of a point with the given distance.
+         * @param x The value that the point is moved on the x-axis.
+         */
+        public void translateX(int x) {
+            this.x += x;
+        }
+
+        /**
+         * Translates the y-coordinate of a point with the given distance.
+         * @param y The value that the point is moved on the y-axis.
+         */
+        public void translateY(int y) {
+            this.y += y;
+        }
+    }
     /**
      * Calculates the corners of a hexagon with the given radius.
      * @param radius The radius from the center of a hexagon to one of its corners.
@@ -153,6 +142,91 @@ public class HexagonTile extends Polygon {
             y = movedY;
         }
 
+        // search the distance from the center to the far left side
+        int minX = Integer.MAX_VALUE;
+        for (Point e : corners) {
+            if (e.x < minX) {
+                minX = e.x;
+            }
+        }
+
+        //translate the hexagon corners to positive values
+        for (int i = 0; i < corners.size(); i++) {
+            corners.get(i).translateX(-minX);
+            corners.get(i).translateY(radius);
+        }
+
         return corners;
+    }
+
+    /**
+     * Sets the texture with the given Image.
+     * @param texture The Image for the texture.
+     */
+    private void setTexture(Image texture) {
+        setFill(new ImagePattern(texture, 0.0f, 0.0f, 1.0f, 1.0f, true));
+    }
+
+    /**
+     * Sets the Stroke of a hexagon based on its type.
+     * @param tileType The type of the hexagon.
+     */
+    private void setHexagonStroke(TileType tileType) {
+        // TODO: Adjust to gameLogic enums
+        // sets the stroke
+        if (tileType.getValue() < 9) {
+            // normal Tile
+            setStrokeWidth(0.0);
+        } else {
+            // special Place
+            setStroke(Paint.valueOf("GOLD"));
+            setStrokeWidth(1.0);
+        }
+
+        setStrokeType(StrokeType.INSIDE);
+    }
+
+    /**
+     * Sets the MouseHandler of a hexagon based on its type.
+     * @param tileType The type of the hexagon.
+     */
+    private void setMouseHandler(TileType tileType) {
+        setOnMouseEntered(new EventHandler<MouseEvent>() {
+            /**
+             * A MouseEvent handler to highlight the hexagon.
+             * @param event A MouseEvent
+             */
+            @Override
+            public void handle(MouseEvent event) {
+                setStroke(Paint.valueOf("RED"));
+                setStrokeWidth(2.0);
+            }
+        });
+
+        // TODO: Adjust to gameLogic enums (only Tiles have no Border and Gold Border for Tokens)
+        if (tileType.getValue() < 9) {
+            setOnMouseExited(new EventHandler<MouseEvent>() {
+                /**
+                 * A MouseEvent handler to end the highlight of the hexagon.
+                 * @param event A MouseEvent
+                 */
+                @Override
+                public void handle(MouseEvent event) {
+                    setStrokeWidth(0.0);
+                }
+            });
+        } else {
+            setOnMouseExited(new EventHandler<MouseEvent>() {
+                /**
+                 * A MouseEvent handler to end the highlight of the hexagon.
+                 * @param event A MouseEvent
+                 */
+                @Override
+                public void handle(MouseEvent event) {
+                    setStroke(Paint.valueOf("GOLD"));
+                    setStrokeWidth(1.0);
+                }
+            });
+        }
     }
 }

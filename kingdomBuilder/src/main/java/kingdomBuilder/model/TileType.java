@@ -2,7 +2,7 @@ package kingdomBuilder.model;
 
 import java.util.HashMap;
 import java.util.Map;
-//TODO: this class should be part of Model
+//TODO: this class should be part of DataLogic - so no javadoc needed right now
 
 public enum TileType {
     CANYON(1),
@@ -13,6 +13,7 @@ public enum TileType {
     MOUNTAIN(6),
     WATER(7),
     CASTLE(8),
+
     BARN(9),
     FARM(10),
     HARBOR(11),

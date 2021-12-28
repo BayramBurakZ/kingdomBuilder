@@ -8,7 +8,7 @@
 
 <Pane xmlns="http://javafx.com/javafx"
 		xmlns:fx="http://javafx.com/fxml"
-		fx:id="gameboard_pane"
+		fx:id="gameBoard_pane"
 		fx:controller="kingdomBuilder.gui.controller.GameBoardViewController"
 		prefHeight="800.0" prefWidth="1200.0">
 

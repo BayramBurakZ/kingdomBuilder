@@ -1,12 +1,9 @@
 package kingdomBuilder.model;
 
-import kingdomBuilder.gui.gameboard.HexagonTile;
-import kingdomBuilder.gui.gameboard.TextureLoader;
+//TODO remove all
 
 public class Model {
-    //TODO this class should be part of Model and only here to test setting the textures
-    private TextureLoader textureLoader = new TextureLoader();
-    private HexagonTile[][] gameboard_model = new HexagonTile[20][20];
+    private TileType[][] gameBoardData = new TileType[20][20];
 
     public Model() {
         for (int y = 0; y < 20; y++) {
@@ -15,14 +12,23 @@ public class Model {
                 generates random textures instead of tile type based on given layout
                 because of using the HexagonTile class that is concepted for the gui
                 */
-                int random = (int) ((Math.random() * (16 - 1)) + 1);
-                gameboard_model[x][y] = new HexagonTile(x, y);
-                gameboard_model[x][y].setTexture(textureLoader.getTexture(TileType.valueOf(random)));
+                int random = (int) ((Math.random() * 7) + 1);
+                gameBoardData[x][y] = TileType.valueOf(random);
             }
+        }
+
+        //generates at random places on the map random special places
+        for (int i = 0; i < 12; i++) {
+            int x = (int) ((Math.random() * 20));
+            int y = (int) ((Math.random() * 20));
+
+            int random = (int) ((Math.random() * 9) + 7);
+            gameBoardData[x][y] = TileType.valueOf(random);
         }
     }
 
-    public HexagonTile[][] getGameboard_model() {
-        return gameboard_model;
+    public TileType[][] getGameBoardData() {
+        return gameBoardData;
     }
 }
+
