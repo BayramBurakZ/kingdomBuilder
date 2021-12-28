@@ -181,6 +181,7 @@ public class SceneLoader {
             node = loader.load();
             controller = loader.getController();
             controller.setSceneLoader(this);
+            controller.setStore(store);
         } catch (IOException e) {
             e.printStackTrace();
         }

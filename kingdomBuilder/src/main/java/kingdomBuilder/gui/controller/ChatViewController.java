@@ -24,12 +24,6 @@ import java.util.ResourceBundle;
  * containing data.
  */
 public class ChatViewController extends Controller implements Initializable {
-
-    /**
-     * Represents the store of the application.
-     */
-    private Store<KBState> store;
-
     /**
      * Represents the state for internal use.
      */

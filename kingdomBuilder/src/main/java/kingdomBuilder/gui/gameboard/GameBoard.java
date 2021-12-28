@@ -6,15 +6,14 @@ import kingdomBuilder.model.TileType;
 import kingdomBuilder.redux.Store;
 
 /**
- * This class is used to contains all functions in terms of the boards gui.
+ * This class is used to contain all functions in terms of the boards gui.
  */
 public class GameBoard {
-    /*
     /**
      * Represents the store of the application.
-     *\/
-    * private final Store<KBState> store;
-    */
+     */
+    private final Store<KBState> store;
+
 
     /**
      * Represents the board that contains the hexagons.
@@ -24,7 +23,9 @@ public class GameBoard {
     /**
      * Constructor to instantiate the GameBoard.
      */
-    public GameBoard() { }
+    public GameBoard(Store<KBState> store) {
+        this.store = store;
+    }
 
     /**
      * Setup the GameBoard with textured hexagons.

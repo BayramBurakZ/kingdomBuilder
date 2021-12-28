@@ -18,25 +18,11 @@ import java.util.ResourceBundle;
  * This class controls the functions of the IAmView.
  */
 public class IAmViewController extends Controller implements Initializable {
-
-    /**
-     * Represents the store of the application.
-     */
-    private final Store<KBState> store;
-
     /**
      * Represents the TextField to enter the preferred name.
      */
     @FXML
     private TextField iAmViewTextField;
-
-    /**
-     * Constructor that sets the Store.
-     * @param store
-     */
-    public IAmViewController(Store<KBState> store) {
-        this.store = store;
-    }
 
     /**
      * Called to initialize this controller after its root element has been completely processed.

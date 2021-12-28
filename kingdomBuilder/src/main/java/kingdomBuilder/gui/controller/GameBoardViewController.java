@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 /**
  * This class controls all functions for the board that shows the hexagon tiles and the current board.
  */
-public class GameBoardViewController implements Initializable {
+public class GameBoardViewController extends Controller implements Initializable {
 
     //TODO:
     // - replace by the GameBoard.java object
@@ -26,7 +26,7 @@ public class GameBoardViewController implements Initializable {
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
-    private GameBoard gameBoard = new GameBoard();
+    private GameBoard gameBoard = new GameBoard(store);
 
     /**
      * Represents the pane for all hexagons
