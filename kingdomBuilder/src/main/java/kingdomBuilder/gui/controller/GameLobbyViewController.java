@@ -26,7 +26,7 @@ public class GameLobbyViewController extends Controller implements Initializable
      * @param event Contains the data from the event source.
      */
     @FXML
-    public void onButtonGameStartPressed(Event event) {
+    private void onButtonGameStartPressed(Event event) {
         sceneLoader.showGameView();
     }
 
@@ -35,7 +35,7 @@ public class GameLobbyViewController extends Controller implements Initializable
      * @param event Contains the data from the event source.
      */
     @FXML
-    public void onButtonGameListPressed(Event event) {
+    private void onButtonGameListPressed(Event event) {
         sceneLoader.showGameSelectionView();
     }
 }

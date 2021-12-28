@@ -1,6 +1,5 @@
 package kingdomBuilder.gui.controller;
 
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -140,7 +139,8 @@ public class ChatViewController extends Controller implements Initializable {
      * Sets the functionality for the clear selection button.
      * @param event Contains the data from the event source.
      */
-    public void onButtonClearSelectionPressed(Event event) {
+    @FXML
+    private void onButtonClearSelectionPressed(Event event) {
         tableview_chat.getSelectionModel().clearSelection();
     }
 
@@ -148,7 +148,8 @@ public class ChatViewController extends Controller implements Initializable {
      * Sets the functionality for the send button.
      * @param event Contains the data from the event source.
      */
-    public void onButtonSendPressed(Event event) {
+    @FXML
+    private void onButtonSendPressed(Event event) {
         printAndSendMessage();
     }
 
@@ -156,7 +157,8 @@ public class ChatViewController extends Controller implements Initializable {
      * Sets the functionality for the whisper button.
      * @param event Contains the data from the event source.
      */
-    public void onButtonWhisperPressed(Event event) {
+    @FXML
+    private void onButtonWhisperPressed(Event event) {
         printAndSendWhisper();
     }
 

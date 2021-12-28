@@ -18,11 +18,6 @@ import java.util.ResourceBundle;
  * This Class controls the MenuViewController with all its functions.
  */
 public class MenuViewController extends Controller implements Initializable {
-    
-    /**
-     * Represents the store of the application.
-     */
-    private Store<KBState> store;
     /**
      * Represents the state for internal use.
      */
@@ -65,14 +60,6 @@ public class MenuViewController extends Controller implements Initializable {
     private Button menuview_connect_button;
 
     /**
-     * Constructs the MenuViewController.
-     * @param store  The Application's store to set the field.
-     */
-    public MenuViewController(Store<KBState> store) {
-        this.store = store;
-    }
-
-    /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
@@ -100,14 +87,15 @@ public class MenuViewController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     @FXML
-    public void onLocalGameButtonPressed(Event event) {
+    private void onLocalGameButtonPressed(Event event) {
         sceneLoader.showGameSelectionView();
     }
 
     /**
      * Sets the functionality for the Exit Button.
      */
-    public void onExitButtonPressed() {
+    @FXML
+    private void onExitButtonPressed() {
         // TODO: general application close mechanism
         Stage stage = (Stage) menuview_boarderpane.getScene().getWindow();
         stage.close();
@@ -116,7 +104,8 @@ public class MenuViewController extends Controller implements Initializable {
     /**
      * Sets the functionality for the Connect Button.
      */
-    public void OnConnectButtonPressed() {
+    @FXML
+    private void OnConnectButtonPressed() {
         //TODO: This is an awful solution to connect/disconnect
         // send a "bye" message to a server and handle this method within an event.
         // delete Client so we can reconnect -> Client state move to store

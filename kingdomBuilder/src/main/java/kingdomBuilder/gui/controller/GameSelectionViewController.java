@@ -48,7 +48,7 @@ public class GameSelectionViewController extends Controller implements Initializ
      * @param event Contains the data from the event source.
      */
     @FXML
-    public void onButtonCreateNewGamePressed(Event event) {
+    private void onButtonCreateNewGamePressed(Event event) {
         sceneLoader.showGameLobbyView();
     }
 
