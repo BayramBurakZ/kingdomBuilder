@@ -160,10 +160,23 @@ public class IAmViewController extends Controller implements Initializable {
      */
     private void SetPreferredName() {
         String preferredName = iAmViewTextField.getText().trim();
-        if (!preferredName.isEmpty()) {
+        if (isNameValid(preferredName)) {
             // TODO: could let dispatch throw in case the name isn't valid
             store.dispatch(new SetPreferredNameAction(preferredName));
             sceneLoader.showMenuView();
         }
+    }
+
+    /**
+     * Checks if the String is a valid name for the server.
+     * @param name The String to check.
+     * @return whether the string is valid (true) or not (false)
+     */
+    private boolean isNameValid(String name) {
+        if(name.isEmpty()) return false;
+        // invalid characters: [ ] ( )
+        if (name.matches(".*\\[.*|.*\\].*|.*\\(.*|.*\\).*"))
+            return false;
+        return true;
     }
 }
