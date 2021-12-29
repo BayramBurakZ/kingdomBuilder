@@ -142,6 +142,66 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
         object = message;
     }
 
+    @Override
+    public void accept(InitStart message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(WinCondition message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(GameStart message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(YourTerrainCard message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TurnStart message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TerrainTypeOfTurn message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(SettlementPlaced message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(SettlementRemoved message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TokenReceived message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TokenLost message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(PlayerUsedLastSettlement message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(GameOver message) {
+        object = message;
+    }
+
     public Object getObject() {
         return object;
     }

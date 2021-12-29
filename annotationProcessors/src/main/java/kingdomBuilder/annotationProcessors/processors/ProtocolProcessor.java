@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class ProtocolProcessor extends AbstractProcessor {
     private final static String SERVER_MESSAGE_PREFIX = "[SERVER_MESSAGE]";
     private final static String REPLY_MESSAGE_PREFIX = "[REPLY_MESSAGE]";
+    private final static String GAME_MESSAGE_PREFIX = "[GAME_MESSAGE]";
 
     private Filer filer;
     private Messager messager;
@@ -32,6 +33,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         final String format = protocol.format();
         boolean isIncomingMessage = format.startsWith(SERVER_MESSAGE_PREFIX)
                                     || format.startsWith(REPLY_MESSAGE_PREFIX)
+                                    || format.startsWith(GAME_MESSAGE_PREFIX)
                                     || protocol.isComponent();
 
         if(isIncomingMessage)   responses.add((TypeElement) element);

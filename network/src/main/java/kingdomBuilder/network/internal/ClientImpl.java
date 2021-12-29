@@ -222,4 +222,64 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(DetailsOfGameReply message) {
 
     }
+
+    @Override
+    public void accept(InitStart message) {
+
+    }
+
+    @Override
+    public void accept(WinCondition message) {
+
+    }
+
+    @Override
+    public void accept(GameStart message) {
+
+    }
+
+    @Override
+    public void accept(YourTerrainCard message) {
+
+    }
+
+    @Override
+    public void accept(TurnStart message) {
+
+    }
+
+    @Override
+    public void accept(TerrainTypeOfTurn message) {
+
+    }
+
+    @Override
+    public void accept(SettlementPlaced message) {
+
+    }
+
+    @Override
+    public void accept(SettlementRemoved message) {
+
+    }
+
+    @Override
+    public void accept(TokenReceived message) {
+
+    }
+
+    @Override
+    public void accept(TokenLost message) {
+
+    }
+
+    @Override
+    public void accept(PlayerUsedLastSettlement message) {
+
+    }
+
+    @Override
+    public void accept(GameOver message) {
+
+    }
 }

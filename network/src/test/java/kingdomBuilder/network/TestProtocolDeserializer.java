@@ -348,4 +348,151 @@ public class TestProtocolDeserializer {
 
         assertEquals("???", typedPacket.details());
     }
+
+    @Test
+    void testDeserializingInitStart(){
+        final String packet = "[GAME_MESSAGE] [INIT_START]";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        assertInstanceOf(InitStart.class, testConsumer.getObject());
+    }
+
+    @Test
+    void testDeserializingWinCondition() {
+        final String packet = "[GAME_MESSAGE] [WIN_CONDITION] <[MINDER;FISHER;KNIGHT]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        WinCondition typedPacket = assertInstanceOf(WinCondition.class, testConsumer.getObject());
+
+        assertEquals("MINDER", typedPacket.winCondition1());
+        assertEquals("FISHER", typedPacket.winCondition2());
+        assertEquals("KNIGHT", typedPacket.winCondition3());
+    }
+
+    @Test
+    void testDeserializingGameStart() {
+        final String packet = "[GAME_MESSAGE] [GAME_START]";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        assertInstanceOf(GameStart.class, testConsumer.getObject());
+    }
+
+    @Disabled("Disabled until parsing is fixed")
+    @Test
+    void testDeserializingYourTerrainCard(){
+        final String packet = "[GAME_MESSAGE] [YOUR_TERRAIN_CARD] <GRAS>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        YourTerrainCard typedPacket = assertInstanceOf(YourTerrainCard.class, testConsumer.getObject());
+
+        assertEquals("GRAS", typedPacket.terrainType());
+    }
+
+    @Disabled("Disabled until parsing is fixed")
+    @Test
+    void testDeserializingTurnStart() {
+        final String packet = " [GAME_MESSAGE] [TURN_START] <42>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TurnStart typedPacket = assertInstanceOf(TurnStart.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+    }
+
+    @Disabled("Disabled until parsing is fixed")
+    @Test
+    void testDeserializingTerrainTypeOfTurn(){
+        final String packet = "[GAME_MESSAGE] [TERRAIN_TYPE_OF_TURN] <GRAS>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TerrainTypeOfTurn typedPacket = assertInstanceOf(TerrainTypeOfTurn.class, testConsumer.getObject());
+
+        assertEquals("GRAS", typedPacket.terrainType());
+    }
+
+    @Test
+    void testDeserializingSettlementPlaced(){
+        final String packet = "[GAME_MESSAGE] [SETTLEMENT_PLACED] <[42;10;9]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        SettlementPlaced typedPacket = assertInstanceOf(SettlementPlaced.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+        assertEquals(10, typedPacket.row());
+        assertEquals(9, typedPacket.column());
+    }
+
+    @Test
+    void testDeserializingSettlementRemoved(){
+        final String packet = "[GAME_MESSAGE] [SETTLEMENT_REMOVED] <[42;10;9]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        SettlementRemoved typedPacket = assertInstanceOf(SettlementRemoved.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+        assertEquals(10, typedPacket.row());
+        assertEquals(9, typedPacket.column());
+    }
+
+    @Test
+    void testDeserializingTokenReceived(){
+        final String packet = "[GAME_MESSAGE] [TOKEN_RECEIVED] <[42;FARM;10;9]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TokenReceived typedPacket = assertInstanceOf(TokenReceived.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+        assertEquals("FARM", typedPacket.tokenType());
+        assertEquals(10, typedPacket.row());
+        assertEquals(9, typedPacket.column());
+    }
+
+    @Test
+    void testDeserializingTokenLost(){
+        final String packet = "[GAME_MESSAGE] [TOKEN_LOST] <[42;FARM;10;9]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TokenLost typedPacket = assertInstanceOf(TokenLost.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+        assertEquals("FARM", typedPacket.tokenType());
+        assertEquals(10, typedPacket.row());
+        assertEquals(9, typedPacket.column());
+    }
+
+    @Disabled("Disabled until parsing fixed")
+    @Test
+    void testDeserializingPlayerUsedLastSettlement(){
+        final String packet = "[GAME_MESSAGE] [PLAYER_USED_LAST_SETTLEMENT] <42>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        PlayerUsedLastSettlement typedPacket = assertInstanceOf(PlayerUsedLastSettlement.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+    }
+
+    @Disabled("Disabled until parsing fixed")
+    @Test
+    void testDeserializingGameOver(){
+        final String packet = "[GAME_MESSAGE] [GAME_OVER] <{1,24,78,156,8}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        GameOver typedPacket = assertInstanceOf(GameOver.class, testConsumer.getObject());
+
+        final var expectedClientIds = List.of(1, 24, 78, 156, 8);
+
+        assertEquals(expectedClientIds, typedPacket.clientIds());
+    }
 }
