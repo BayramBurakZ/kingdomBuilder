@@ -60,7 +60,7 @@ public class MenuViewController extends Controller implements Initializable {
     private Button menuview_connect_button;
 
     /**
-     * Sets the store in the {@link Controller}.
+     * Sets the store.
      * @param store The store to set.
      */
     public MenuViewController(Store<KBState> store) {
@@ -97,6 +97,15 @@ public class MenuViewController extends Controller implements Initializable {
     @FXML
     private void onLocalGameButtonPressed(Event event) {
         sceneLoader.showGameSelectionView();
+    }
+
+    /**
+     * Sets the functionality for the Settings Button.
+     * @param event  Contains the data from the event source.
+     */
+    @FXML
+    private void OnSettingsButtonPressed(Event event) {
+        sceneLoader.showSettingsView();
     }
 
     /**

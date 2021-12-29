@@ -48,6 +48,10 @@ public class SceneLoader {
      * Stores the current gameSelectionView.
      */
     private Node gameSelectionView;
+    /**
+     * Stores the current settingsView.
+     */
+    private Node settingsView;
 
     /**
      * Stores the menuViewController.
@@ -73,6 +77,10 @@ public class SceneLoader {
      * Stores the gameSelectionViewController.
      */
     private GameSelectionViewController gameSelectionViewController;
+    /**
+     * Stores the settingsViewController
+     */
+    private SettingsController settingsViewController;
 
     /**
      * Represents the store of the application.
@@ -115,6 +123,7 @@ public class SceneLoader {
         loadIAmView(locale);
         loadChatView(locale);
         loadGameSelectionView(locale);
+        loadSettingsView(locale);
     }
 
     /**
@@ -171,6 +180,13 @@ public class SceneLoader {
      */
     public void showGameSelectionView() {
         borderPane.setCenter(gameSelectionView);
+    }
+
+    /**
+     * Loads the SettingsView into the center of the main borderPane.
+     */
+    public void showSettingsView() {
+        borderPane.setCenter(settingsView);
     }
 
     // load-methods
@@ -272,6 +288,18 @@ public class SceneLoader {
         gameSelectionViewController = (GameSelectionViewController) pair.getValue();
     }
 
+    /**
+     * Calls the loadView() method with the path of the GameSelectionView.fxml and
+     * sets the gameSelectionView and gameSelectionViewController fields
+     * Used for reloading this View.
+     * @param locale The locale for language support.
+     */
+    public void loadSettingsView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/SettingsView.fxml", locale);
+        settingsView = pair.getKey();
+        settingsViewController = (SettingsController) pair.getValue();
+    }
+
     // getter
 
     /**
@@ -315,6 +343,13 @@ public class SceneLoader {
      */
     public Node getGameSelectionView() {
         return gameSelectionView;
+    }
+    /**
+     * Returns the current parent node of the SettingsView.
+     * @return The current parent node of the SettingsView.
+     */
+    public Node getSettingsView() {
+        return settingsView;
     }
 
     /**

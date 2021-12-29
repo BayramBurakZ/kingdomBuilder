@@ -8,7 +8,11 @@
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.IAmViewController">
 
     <HBox alignment="CENTER">
-        <Label text="%selectLanguage" />
+        <Label text="%selectLanguage">
+            <padding>
+                <Insets right="5.0" />
+            </padding>
+        </Label>
         <ComboBox fx:id="comboBox_language" onAction="#onCheckBoxSelectionPressed" prefWidth="150.0" visibleRowCount="2" />
     </HBox>
 

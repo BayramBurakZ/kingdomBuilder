@@ -16,7 +16,8 @@
 						onAction="#onLocalGameButtonPressed" prefHeight="25.0" prefWidth="300.0" text="%localGame"/>
 				<Button fx:id="menuview_onlinegame_button" disable="false" mnemonicParsing="false" prefHeight="25.0"
 						prefWidth="300.0" text="%onlineGame"/>
-				<Button disable="true" mnemonicParsing="false" prefHeight="25.0" prefWidth="300.0" text="%settings"/>
+				<Button mnemonicParsing="false" onAction="#OnSettingsButtonPressed" prefHeight="25.0" prefWidth="300.0"
+						text="%settings"/>
 				<Button mnemonicParsing="false" onAction="#onExitButtonPressed" prefHeight="25.0" prefWidth="300.0"
 						text="%exit"/>
 			</children>
