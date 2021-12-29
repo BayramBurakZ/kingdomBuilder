@@ -13,6 +13,8 @@ import kingdomBuilder.redux.Store;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Class that is used for creating an object that contains every scene.
@@ -94,16 +96,25 @@ public class SceneLoader {
         this.store = store;
         this.store.dispatch(new SetSceneLoaderAction(this));
 
-        loadMenuView();
-        loadGameLobbyView();
-        loadGameView();
-        loadIAmView();
-        loadChatView();
-        loadGameSelectionView();
+        Locale initialLocale = Locale.ENGLISH;
+        loadViews(initialLocale);
 
         borderPane = new BorderPane();
         borderPane.setCenter(iAmView);
         scene = new Scene(borderPane, 1000, 650);
+    }
+
+    /**
+     * loads every view with the given locale.
+     * @param locale the language in which the views are loaded.
+     */
+    public void loadViews(Locale locale) {
+        loadMenuView(locale);
+        loadGameLobbyView(locale);
+        loadGameView(locale);
+        loadIAmView(locale);
+        loadChatView(locale);
+        loadGameSelectionView(locale);
     }
 
     /**
@@ -140,7 +151,7 @@ public class SceneLoader {
         //TODO: currently it reloads the gameview to generate a random board
         // fix with an update function and REDUX
         //resets the GameView and generates the board new
-        loadGameView();
+        loadGameView(Locale.ENGLISH);
 
         borderPane.setCenter(gameView);
 
@@ -171,17 +182,17 @@ public class SceneLoader {
      * @param location String that contains the path to the location of the .fxml file.
      * @return Tuple x-position is the View as Node, y-position is the contoller.
      */
-    private Pair<Node, Controller> loadView(String location) {
+    private Pair<Node, Controller> loadView(String location, Locale locale) {
         Node node = null;
         Controller controller = null;
 
         FXMLLoader loader = makeLoader(getClass().getResource(location));
+        loader.setResources(ResourceBundle.getBundle("kingdomBuilder/gui/gui", locale));
 
         try {
             node = loader.load();
             controller = loader.getController();
             controller.setSceneLoader(this);
-            controller.setStore(store);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -193,9 +204,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the MenuView.fxml and
      * sets the menuView and menuViewController fields.
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadMenuView() {
-        Pair<Node, Controller> pair = loadView("controller/MenuView.fxml");
+    public void loadMenuView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/MenuView.fxml", locale);
         menuView = pair.getKey();
         menuViewController = (MenuViewController) pair.getValue();
     }
@@ -204,9 +216,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameLobbyView.fxml and
      * sets the gameLobbyView and gameLobbyViewController fields
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadGameLobbyView() {
-        Pair<Node, Controller> pair = loadView("controller/GameLobbyView.fxml");
+    public void loadGameLobbyView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameLobbyView.fxml", locale);
         gameLobbyView = pair.getKey();
         gameLobbyViewController = (GameLobbyViewController) pair.getValue();
     }
@@ -215,9 +228,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameView.fxml and
      * sets the gameView and gameViewController fields
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadGameView() {
-        Pair<Node, Controller> pair = loadView("controller/GameView.fxml");
+    public void loadGameView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameView.fxml", locale);
         gameView = pair.getKey();
         gameViewController = (GameViewController) pair.getValue();
     }
@@ -226,9 +240,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the IAmView.fxml and
      * sets the iAmView and iAmViewController fields
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadIAmView() {
-        Pair<Node, Controller> pair = loadView("controller/IAmView.fxml");
+    public void loadIAmView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/IAmView.fxml", locale);
         iAmView = pair.getKey();
         iAmViewController = (IAmViewController) pair.getValue();
     }
@@ -237,9 +252,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the ChatView.fxml and
      * sets the chatView and chatViewController fields
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadChatView() {
-        Pair<Node, Controller> pair = loadView("controller/ChatView.fxml");
+    public void loadChatView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/ChatView.fxml", locale);
         chatView = pair.getKey();
         chatViewController = (ChatViewController) pair.getValue();
     }
@@ -248,9 +264,10 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameSelectionView.fxml and
      * sets the gameSelectionView and gameSelectionViewController fields
      * Used for reloading this View.
+     * @param locale The locale for language support.
      */
-    public void loadGameSelectionView() {
-        Pair<Node, Controller> pair = loadView("controller/GameSelectionView.fxml");
+    public void loadGameSelectionView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameSelectionView.fxml", locale);
         gameSelectionView = pair.getKey();
         gameSelectionViewController = (GameSelectionViewController) pair.getValue();
     }

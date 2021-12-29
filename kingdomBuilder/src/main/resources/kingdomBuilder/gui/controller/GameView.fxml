@@ -125,7 +125,7 @@
         <!-- HBox for Tokens-->
         <HBox fx:id="gameview_hbox_tokens" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS"/>
 
-        <Button fx:id="game_button_endturn" text="End Turn">
+        <Button fx:id="game_button_endturn" text="%endTurn">
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
             </padding>

@@ -8,8 +8,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import kingdomBuilder.actions.*;
-import kingdomBuilder.redux.Store;
 import kingdomBuilder.KBState;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -58,6 +58,14 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     private Button menuview_connect_button;
+
+    /**
+     * Sets the store in the {@link Controller}.
+     * @param store The store to set.
+     */
+    public MenuViewController(Store<KBState> store) {
+        super.store = store;
+    }
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
