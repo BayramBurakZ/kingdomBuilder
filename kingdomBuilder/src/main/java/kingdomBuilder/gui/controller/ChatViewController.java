@@ -134,7 +134,7 @@ public class ChatViewController extends Controller implements Initializable {
             // TODO: failedToConnect mechanism, multiple output in chatarea 
             // Failed to connect
             if (newState.failedToConnect) {
-                print("<--- Failed to connect to server --->\n", MessageStyle.WARNING);
+                print("<--- Failed to connect to server --->", MessageStyle.WARNING);
             }
             state = newState;
         });
@@ -229,9 +229,11 @@ public class ChatViewController extends Controller implements Initializable {
         Integer[] receivers = chatMsg.receiverIds();
         String message = chatMsg.message();
         String chatMessage;
+        MessageStyle messageStyle = MessageStyle.SERVER;
 
-        if (receivers.length < store.getState().clients.size()) {
+        if (receivers.length < store.getState().clients.size() - 1) {
             // whisper message
+            messageStyle = MessageStyle.WHISPER;
             chatMessage = senderName + " whispers to you";
             for (int i = 0; i < receivers.length; i++) {
                 if (receivers[i].equals(state.client.getId())) {
@@ -243,11 +245,12 @@ public class ChatViewController extends Controller implements Initializable {
             chatMessage += ": " + message;
         } else {
             // global message
+            messageStyle = MessageStyle.GLOBAL_CHAT;
             chatMessage = senderName + ": " + message;
         }
 
         // TODO: check if all receiver IDs match our game's client IDs, then only print in game channel
-        print(chatMessage);
+        print(chatMessage, messageStyle);
     }
 
     /**
@@ -425,7 +428,6 @@ public class ChatViewController extends Controller implements Initializable {
             int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
             int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
             boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
-            System.out.println("scrollY: "+ scrollY + ", scrollHeight: " + scrollHeight + ", clientHeight: " + clientHeight);
 
             Element elem = doc.createElement(tagName);
             elem.setTextContent(message);
