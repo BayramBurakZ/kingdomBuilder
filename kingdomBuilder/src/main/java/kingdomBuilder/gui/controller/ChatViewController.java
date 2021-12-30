@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -7,11 +8,15 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ChatSendAction;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.network.protocol.server.Message;
 import kingdomBuilder.redux.Store;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -90,10 +95,15 @@ public class ChatViewController extends Controller implements Initializable {
     private Button chatview_button_whisper;
 
     /**
-     * Represents the textarea used for displaying the globalchat.
+     * Represents the webview used for displaying the globalchat.
      */
     @FXML
-    private TextArea textarea_globalchat;
+    private WebView webview_globalchat;
+
+    /**
+     * The body of the html file used for displaying the global chat.
+     */
+    private Element globalChatBody;
 
     /**
      * Constructs the ChatViewController.
@@ -124,7 +134,7 @@ public class ChatViewController extends Controller implements Initializable {
             // TODO: failedToConnect mechanism, multiple output in chatarea 
             // Failed to connect
             if (newState.failedToConnect) {
-                textarea_globalchat.appendText("<--- Failed to connect to server --->\n");
+                print("<--- Failed to connect to server --->\n", MessageStyle.WARNING);
             }
             state = newState;
         });
@@ -133,6 +143,17 @@ public class ChatViewController extends Controller implements Initializable {
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameId"));
+
+        webview_globalchat.setContextMenuEnabled(false);
+
+        WebEngine webEngine = webview_globalchat.getEngine();
+        webEngine.setUserStyleSheetLocation(
+                this.getClass().getResource("/kingdomBuilder/gui/chatStylesheets/global.css").toString());
+        webEngine.loadContent("<html><body></body></html>");
+
+        webEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
+            globalChatBody = (Element) webEngine.getDocument().getElementsByTagName("body").item(0);
+        });
     }
 
     /**
@@ -180,7 +201,7 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the UI elements that are important when the client connects to a server.
      */
     public void onConnect() {
-        textarea_globalchat.appendText("<--- You are connected to the server --->\n");
+        print("<--- You are connected to the server --->", MessageStyle.SERVER);
 
         chatview_textarea_chatinput.setDisable(false);
         chatview_button_send.setDisable(false);
@@ -191,7 +212,7 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the UI elements that are important when the client disconnects from a server.
      */
     public void onDisconnect() {
-        textarea_globalchat.appendText("<--- You are disconnected from the server --->\n");
+        print("<--- You are disconnected from the server --->", MessageStyle.SERVER);
 
         chatview_textarea_chatinput.setDisable(true);
         chatview_button_send.setDisable(true);
@@ -207,7 +228,7 @@ public class ChatViewController extends Controller implements Initializable {
         String senderName = store.getState().clients.get(senderID).getName();
         Integer[] receivers = chatMsg.receiverIds();
         String message = chatMsg.message();
-        String chatMessage = "";
+        String chatMessage;
 
         if (receivers.length < store.getState().clients.size()) {
             // whisper message
@@ -226,8 +247,7 @@ public class ChatViewController extends Controller implements Initializable {
         }
 
         // TODO: check if all receiver IDs match our game's client IDs, then only print in game channel
-        textarea_globalchat.appendText(chatMessage);
-        textarea_globalchat.appendText(System.lineSeparator());
+        print(chatMessage);
     }
 
     /**
@@ -237,8 +257,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @param gameId the game ID of the client which left the server.
      */
     public void onClientLeft(int clientId, String name, int gameId) {
-        textarea_globalchat.appendText("<--- " + name + " left the server. --->");
-        textarea_globalchat.appendText(System.lineSeparator());
+        print("<--- " + name + " left the server. --->", MessageStyle.SERVER);
     }
 
     /**
@@ -248,15 +267,14 @@ public class ChatViewController extends Controller implements Initializable {
      * @param gameId the game ID of the client which left the server.
      */
     public void onClientJoined(int clientId, String name, int gameId) {
-        textarea_globalchat.appendText("<--- " + name + " joined the server. --->");
-        textarea_globalchat.appendText(System.lineSeparator());
+        print("<--- " + name + " joined the server. --->", MessageStyle.SERVER);
     }
 
     /**
      * Updates the UI when this client was kicked from the server.
      */
     public void onYouHaveBeenKicked() {
-        textarea_globalchat.appendText("<--- You have been kicked from the server --->\n");
+        print("<--- You have been kicked from the server --->", MessageStyle.WARNING);
     }
 
     /**
@@ -277,8 +295,7 @@ public class ChatViewController extends Controller implements Initializable {
             message = "You: " + message;
 
             if(tab_global.isSelected()) {
-                textarea_globalchat.appendText(message);
-                textarea_globalchat.appendText(System.lineSeparator());
+                print(message, MessageStyle.GLOBAL_CHAT);
             } else {
                 // TODO: text output for game chat
             }
@@ -319,8 +336,7 @@ public class ChatViewController extends Controller implements Initializable {
             chatMessage += "@" + receivers.get(receivers.size()-1).getName() + ": " + message;
 
             if (tab_global.isSelected()) {
-                textarea_globalchat.appendText(chatMessage);
-                textarea_globalchat.appendText(System.lineSeparator());
+                print(chatMessage, MessageStyle.WHISPER);
             } else {
                 // text output for game chat
             }
@@ -328,5 +344,97 @@ public class ChatViewController extends Controller implements Initializable {
             store.dispatch(new ChatSendAction(receiverIds, message));
         }
         chatview_textarea_chatinput.clear();
+    }
+
+    /**
+     * Defines the message highlighting style.
+     */
+    private enum MessageStyle {
+        /**
+         * Text should be highlighted as a global chat message.
+         */
+        GLOBAL_CHAT,
+
+        /**
+         * Text should be highlighted as a game chat message.
+         */
+        GAME_CHAT,
+
+        /**
+         * Text should be highlighted as a whisper message.
+         */
+        WHISPER,
+
+        /**
+         * Text should be highlighted as a warning message.
+         */
+        WARNING,
+
+        /**
+         * Text should be highlighted as a regular server message.
+         */
+        SERVER
+    }
+
+    /**
+     * Prints the message to the chat as a regular server message.
+     * @param message The message to print.
+     */
+    private void print(String message) {
+        print(message, MessageStyle.SERVER);
+    }
+
+    /**
+     * Prints the message to the chat in the specified message highlighting style.
+     * @param message The message to print.
+     * @param style The style for highlighting the message.
+     */
+    private void print(String message, MessageStyle style) {
+
+        switch(style) {
+            case SERVER -> globalChatAddElement(message, "server");
+            case WARNING -> globalChatAddElement(message, "warning");
+            case GLOBAL_CHAT -> globalChatAddElement(message, "global");
+            case GAME_CHAT -> globalChatAddElement(message,"game");
+            case WHISPER -> globalChatAddElement(message,"whisper");
+        }
+    }
+
+    /**
+     * Appends the element with the specified tag name to the global chat html body.
+     * @param message The text content of the element.
+     * @param tagName The tag/type of the element.
+     */
+    private void globalChatAddElement(String message, String tagName) {
+
+        if (globalChatBody == null) {
+            System.out.println("Global chat body was null!");
+            return;
+        }
+
+        WebEngine webEngine = webview_globalchat.getEngine();
+        Document doc = webEngine.getDocument();
+
+        if (doc == null) {
+            System.out.println("Document was null!");
+            return;
+        }
+
+        Platform.runLater(() -> {
+            int scrollY = (Integer) webEngine.executeScript("window.scrollY");
+            int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
+            int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
+            boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
+            System.out.println("scrollY: "+ scrollY + ", scrollHeight: " + scrollHeight + ", clientHeight: " + clientHeight);
+
+            Element elem = doc.createElement(tagName);
+            elem.setTextContent(message);
+            globalChatBody.appendChild(elem);
+            elem.appendChild(doc.createElement("br"));
+
+            if (scrollToBottom) {
+                webEngine.executeScript("window.scrollTo(0, document.documentElement.scrollHeight);");
+            }
+        });
     }
 }
