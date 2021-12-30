@@ -86,6 +86,7 @@ public class TestProtocolDeserializer {
         assertEquals(-1, typedPacket.gameId());
     }
 
+    @Disabled
     @Test
     void testParsingRequestClientsResponse() {
         final String packet = "[REPLY MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
@@ -494,5 +495,259 @@ public class TestProtocolDeserializer {
         final var expectedClientIds = List.of(1, 24, 78, 156, 8);
 
         assertEquals(expectedClientIds, typedPacket.clientIds());
+    }
+
+    @Disabled("Disabled until Parsing is fixed")
+    @Test
+    void testDeserializingScores() {
+        final String packet = "[GAME_MESSAGE] [SCORES] <{[4;54],[2;34]}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        Scores typedPacket = assertInstanceOf(Scores.class, testConsumer.getObject());
+
+        final var expectedScoresData = List.of(
+                new ScoresData(4, 54),
+                new ScoresData(2, 34)
+        );
+
+        assertEquals(expectedScoresData, typedPacket.scoresDataList());
+    }
+
+    @Test
+    void testDeserializingQuadrantUploaded(){
+        final String packet = "[SERVER_MESSAGE] [QUADRANT_UPLOADED] <[3;4]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        QuadrantUploaded typedPacket = assertInstanceOf(QuadrantUploaded.class, testConsumer.getObject());
+
+        assertEquals(3, typedPacket.clientId());
+        assertEquals(4, typedPacket.quadrantId());
+    }
+
+    @Test
+    void testDeserializingQuadrantReply() {
+        final String packet = "[REPLY_MESSAGE] (?quadrant) <[45;WATER;WATER;WATER;FORREST;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        QuadrantReply typedPacket = assertInstanceOf(QuadrantReply.class, testConsumer.getObject());
+
+        assertEquals(45, typedPacket.quadrantId());
+        assertEquals("WATER", typedPacket.fieldType1());
+        assertEquals("WATER", typedPacket.fieldType2());
+        assertEquals("WATER", typedPacket.fieldType3());
+        assertEquals("FORREST", typedPacket.fieldType4());
+        assertEquals("WATER", typedPacket.fieldType5());
+        assertEquals("WATER", typedPacket.fieldType6());
+        assertEquals("WATER", typedPacket.fieldType7());
+        assertEquals("WATER", typedPacket.fieldType8());
+        assertEquals("WATER", typedPacket.fieldType9());
+        assertEquals("WATER", typedPacket.fieldType10());
+        assertEquals("WATER", typedPacket.fieldType11());
+        assertEquals("WATER", typedPacket.fieldType12());
+        assertEquals("WATER", typedPacket.fieldType13());
+        assertEquals("WATER", typedPacket.fieldType14());
+        assertEquals("WATER", typedPacket.fieldType15());
+        assertEquals("WATER", typedPacket.fieldType16());
+        assertEquals("WATER", typedPacket.fieldType17());
+        assertEquals("WATER", typedPacket.fieldType18());
+        assertEquals("WATER", typedPacket.fieldType19());
+        assertEquals("WATER", typedPacket.fieldType20());
+        assertEquals("WATER", typedPacket.fieldType21());
+        assertEquals("WATER", typedPacket.fieldType22());
+        assertEquals("WATER", typedPacket.fieldType23());
+        assertEquals("WATER", typedPacket.fieldType24());
+        assertEquals("WATER", typedPacket.fieldType25());
+        assertEquals("WATER", typedPacket.fieldType26());
+        assertEquals("WATER", typedPacket.fieldType27());
+        assertEquals("WATER", typedPacket.fieldType28());
+        assertEquals("WATER", typedPacket.fieldType29());
+        assertEquals("WATER", typedPacket.fieldType30());
+        assertEquals("WATER", typedPacket.fieldType31());
+        assertEquals("WATER", typedPacket.fieldType32());
+        assertEquals("WATER", typedPacket.fieldType33());
+        assertEquals("WATER", typedPacket.fieldType34());
+        assertEquals("WATER", typedPacket.fieldType35());
+        assertEquals("WATER", typedPacket.fieldType36());
+        assertEquals("WATER", typedPacket.fieldType37());
+        assertEquals("WATER", typedPacket.fieldType38());
+        assertEquals("WATER", typedPacket.fieldType39());
+        assertEquals("WATER", typedPacket.fieldType40());
+        assertEquals("WATER", typedPacket.fieldType41());
+        assertEquals("WATER", typedPacket.fieldType42());
+        assertEquals("WATER", typedPacket.fieldType43());
+        assertEquals("WATER", typedPacket.fieldType44());
+        assertEquals("WATER", typedPacket.fieldType45());
+        assertEquals("WATER", typedPacket.fieldType46());
+        assertEquals("WATER", typedPacket.fieldType47());
+        assertEquals("WATER", typedPacket.fieldType48());
+        assertEquals("WATER", typedPacket.fieldType49());
+        assertEquals("WATER", typedPacket.fieldType50());
+        assertEquals("WATER", typedPacket.fieldType51());
+        assertEquals("WATER", typedPacket.fieldType52());
+        assertEquals("WATER", typedPacket.fieldType53());
+        assertEquals("WATER", typedPacket.fieldType54());
+        assertEquals("WATER", typedPacket.fieldType55());
+        assertEquals("WATER", typedPacket.fieldType56());
+        assertEquals("WATER", typedPacket.fieldType57());
+        assertEquals("WATER", typedPacket.fieldType58());
+        assertEquals("WATER", typedPacket.fieldType59());
+        assertEquals("WATER", typedPacket.fieldType60());
+        assertEquals("WATER", typedPacket.fieldType61());
+        assertEquals("WATER", typedPacket.fieldType62());
+        assertEquals("WATER", typedPacket.fieldType63());
+        assertEquals("WATER", typedPacket.fieldType64());
+        assertEquals("WATER", typedPacket.fieldType65());
+        assertEquals("WATER", typedPacket.fieldType66());
+        assertEquals("WATER", typedPacket.fieldType67());
+        assertEquals("WATER", typedPacket.fieldType68());
+        assertEquals("WATER", typedPacket.fieldType69());
+        assertEquals("WATER", typedPacket.fieldType70());
+        assertEquals("WATER", typedPacket.fieldType71());
+        assertEquals("WATER", typedPacket.fieldType72());
+        assertEquals("WATER", typedPacket.fieldType73());
+        assertEquals("WATER", typedPacket.fieldType74());
+        assertEquals("WATER", typedPacket.fieldType75());
+        assertEquals("WATER", typedPacket.fieldType76());
+        assertEquals("WATER", typedPacket.fieldType77());
+        assertEquals("WATER", typedPacket.fieldType78());
+        assertEquals("WATER", typedPacket.fieldType79());
+        assertEquals("WATER", typedPacket.fieldType80());
+        assertEquals("WATER", typedPacket.fieldType81());
+        assertEquals("WATER", typedPacket.fieldType82());
+        assertEquals("WATER", typedPacket.fieldType83());
+        assertEquals("WATER", typedPacket.fieldType84());
+        assertEquals("WATER", typedPacket.fieldType85());
+        assertEquals("WATER", typedPacket.fieldType86());
+        assertEquals("WATER", typedPacket.fieldType87());
+        assertEquals("WATER", typedPacket.fieldType88());
+        assertEquals("WATER", typedPacket.fieldType89());
+        assertEquals("WATER", typedPacket.fieldType90());
+        assertEquals("WATER", typedPacket.fieldType91());
+        assertEquals("WATER", typedPacket.fieldType92());
+        assertEquals("WATER", typedPacket.fieldType93());
+        assertEquals("WATER", typedPacket.fieldType94());
+        assertEquals("WATER", typedPacket.fieldType95());
+        assertEquals("WATER", typedPacket.fieldType96());
+        assertEquals("WATER", typedPacket.fieldType97());
+        assertEquals("WATER", typedPacket.fieldType98());
+        assertEquals("WATER", typedPacket.fieldType99());
+        assertEquals("WATER", typedPacket.fieldType100());
+    }
+
+    @Disabled("Disabled until parsing fixed")
+    @Test
+    void testDeserializingQuadrantsReply(){
+        final String packet = "[REPLY_MESSAGE] (?quadrants) <{0;1;4;7}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        QuadrantsReply typedPacket = assertInstanceOf(QuadrantsReply.class, testConsumer.getObject());
+
+        final var expectedQuadrantsIds = List.of(0, 1, 4, 7);
+
+        assertEquals(expectedQuadrantsIds, typedPacket.quadrantIds());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingTimeLimitReply() {
+        final String packet = "[REPLY_MESSAGE] (?timelimit) <42000>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TimeLimitReply typedPacket = assertInstanceOf(TimeLimitReply.class, testConsumer.getObject());
+
+        assertEquals(42000, typedPacket.timeLimit());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingPlayerLimitReply() {
+        final String packet = "[REPLY_MESSAGE] (?playerlimit) <4>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        PlayerLimitReply typedPacket = assertInstanceOf(PlayerLimitReply.class, testConsumer.getObject());
+
+        assertEquals(4, typedPacket.playerLimit());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingPlayersReply() {
+        final String packet = "[REPLY_MESSAGE] (?players) <{[21;RED],[42;BLUE]}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        PlayersReply typedPacket = assertInstanceOf(PlayersReply.class, testConsumer.getObject());
+
+        final var expectedPlayersData = List.of(
+                new PlayerData(21, "RED"),
+                new PlayerData(42, "BLUE")
+        );
+
+        assertEquals(expectedPlayersData, typedPacket.playerDataList());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingTurnsReply() {
+        final String packet = "[REPLY_MESSAGE] (?turns) <21>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TurnsReply typedPacket = assertInstanceOf(TurnsReply.class, testConsumer.getObject());
+
+        assertEquals(21, typedPacket.turns());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingTurnLimitReply() {
+        final String packet = "[REPLY_MESSAGE] (?turnlimit) <100>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        TurnLimitReply typedPacket = assertInstanceOf(TurnLimitReply.class, testConsumer.getObject());
+
+        assertEquals(100, typedPacket.turnLimit());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingWhoseTurnReply() {
+        final String packet = "[REPLY_MESSAGE] (?whoseturn) <42>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        WhoseTurnReply typedPacket = assertInstanceOf(WhoseTurnReply.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingSettlementsLeftReply(){
+        final String packet = "[REPLY_MESSAGE] (?settlementsleft) <{[1;16],[2;14]}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        SettlementsLeftReply typedPacket = assertInstanceOf(SettlementsLeftReply.class, testConsumer.getObject());
+
+        final var expectedSettlementData = List.of(
+                new SettlementData(1, 16),
+                new SettlementData(2, 14)
+        );
+
+        assertEquals(expectedSettlementData, typedPacket.settlementsDataList());
     }
 }

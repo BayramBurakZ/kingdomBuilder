@@ -282,4 +282,59 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(GameOver message) {
 
     }
+
+    @Override
+    public void accept(Scores message) {
+
+    }
+
+    @Override
+    public void accept(QuadrantUploaded message) {
+
+    }
+
+    @Override
+    public void accept(QuadrantReply message) {
+
+    }
+
+    @Override
+    public void accept(QuadrantsReply message) {
+
+    }
+
+    @Override
+    public void accept(TimeLimitReply message) {
+
+    }
+
+    @Override
+    public void accept(PlayerLimitReply message) {
+
+    }
+
+    @Override
+    public void accept(PlayersReply message) {
+
+    }
+
+    @Override
+    public void accept(TurnsReply message) {
+
+    }
+
+    @Override
+    public void accept(TurnLimitReply message) {
+
+    }
+
+    @Override
+    public void accept(WhoseTurnReply message) {
+
+    }
+
+    @Override
+    public void accept(SettlementsLeftReply message) {
+
+    }
 }

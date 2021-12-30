@@ -202,6 +202,61 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
         object = message;
     }
 
+    @Override
+    public void accept(Scores message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(QuadrantUploaded message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(QuadrantReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(QuadrantsReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TimeLimitReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(PlayerLimitReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(PlayersReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TurnsReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(TurnLimitReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(WhoseTurnReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(SettlementsLeftReply message) {
+        object = message;
+    }
+
     public Object getObject() {
         return object;
     }

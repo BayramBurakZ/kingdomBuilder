@@ -2,22 +2,23 @@ package kingdomBuilder.network.protocol;
 
 import kingdomBuilder.annotations.Protocol;
 
-@Protocol(format = "upload quadrant [#{fieldType1};#{fieldType2};#{fieldType3};#{fieldType4};#{fieldType5};#{fieldType6};" +
-        "#{fieldType7};#{fieldType8};#{fieldType9};#{fieldType10};#{fieldType11};#{fieldType12};#{fieldType13};" +
-        "#{fieldType14};#{fieldType15};#{fieldType16};#{fieldType17};#{fieldType18};#{fieldType19};#{fieldType20};" +
-        "#{fieldType21};#{fieldType22};#{fieldType23};#{fieldType24};#{fieldType25};#{fieldType26};#{fieldType27};" +
-        "#{fieldType28};#{fieldType29};#{fieldType30};#{fieldType31};#{fieldType32};#{fieldType33};#{fieldType34};" +
-        "#{fieldType35};#{fieldType36};#{fieldType37};#{fieldType38};#{fieldType39};#{fieldType40};#{fieldType41};" +
-        "#{fieldType42};#{fieldType43};#{fieldType44};#{fieldType45};#{fieldType46};#{fieldType47};#{fieldType48};" +
-        "#{fieldType49};#{fieldType50};#{fieldType51};#{fieldType52};#{fieldType53};#{fieldType54};#{fieldType55};" +
-        "#{fieldType56};#{fieldType57};#{fieldType58};#{fieldType59};#{fieldType60};#{fieldType61};#{fieldType62};" +
-        "#{fieldType63};#{fieldType64};#{fieldType65};#{fieldType66};#{fieldType67};#{fieldType68};#{fieldType69};" +
-        "#{fieldType70};#{fieldType71};#{fieldType72};#{fieldType73};#{fieldType74};#{fieldType75};#{fieldType76};" +
-        "#{fieldType77};#{fieldType78};#{fieldType79};#{fieldType80};#{fieldType81};#{fieldType82};#{fieldType83};" +
-        "#{fieldType84};#{fieldType85};#{fieldType86};#{fieldType87};#{fieldType88};#{fieldType89};#{fieldType90};" +
-        "#{fieldType91};#{fieldType92};#{fieldType93};#{fieldType94};#{fieldType95};#{fieldType96};#{fieldType97};" +
-        "#{fieldType98};#{fieldType99};#{fieldType100}]")
-public record UploadQuadrant(
+@Protocol(format = "[REPLY_MESSAGE] (?quadrant) <[#{quadrantId};#{fieldType1};#{fieldType2};#{fieldType3};#{fieldType4};" +
+        "#{fieldType5};#{fieldType6};#{fieldType7};#{fieldType8};#{fieldType9};#{fieldType10};#{fieldType11};" +
+        "#{fieldType12};#{fieldType13};#{fieldType14};#{fieldType15};#{fieldType16};#{fieldType17};#{fieldType18};" +
+        "#{fieldType19};#{fieldType20};#{fieldType21};#{fieldType22};#{fieldType23};#{fieldType24};#{fieldType25};" +
+        "#{fieldType26};#{fieldType27};#{fieldType28};#{fieldType29};#{fieldType30};#{fieldType31};#{fieldType32};" +
+        "#{fieldType33};#{fieldType34};#{fieldType35};#{fieldType36};#{fieldType37};#{fieldType38};#{fieldType39};" +
+        "#{fieldType40};#{fieldType41};#{fieldType42};#{fieldType43};#{fieldType44};#{fieldType45};#{fieldType46};" +
+        "#{fieldType47};#{fieldType48};#{fieldType49};#{fieldType50};#{fieldType51};#{fieldType52};#{fieldType53};" +
+        "#{fieldType54};#{fieldType55};#{fieldType56};#{fieldType57};#{fieldType58};#{fieldType59};#{fieldType60};" +
+        "#{fieldType61};#{fieldType62};#{fieldType63};#{fieldType64};#{fieldType65};#{fieldType66};#{fieldType67};" +
+        "#{fieldType68};#{fieldType69};#{fieldType70};#{fieldType71};#{fieldType72};#{fieldType73};#{fieldType74};" +
+        "#{fieldType75};#{fieldType76};#{fieldType77};#{fieldType78};#{fieldType79};#{fieldType80};#{fieldType81};" +
+        "#{fieldType82};#{fieldType83};#{fieldType84};#{fieldType85};#{fieldType86};#{fieldType87};#{fieldType88};" +
+        "#{fieldType89};#{fieldType90};#{fieldType91};#{fieldType92};#{fieldType93};#{fieldType94};#{fieldType95};" +
+        "#{fieldType96};#{fieldType97};#{fieldType98};#{fieldType99};#{fieldType100}]>")
+public record QuadrantReply(
+        int quadrantId,
         String fieldType1,
         String fieldType2,
         String fieldType3,
