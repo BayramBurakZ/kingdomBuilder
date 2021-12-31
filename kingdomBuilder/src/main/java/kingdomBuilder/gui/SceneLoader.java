@@ -99,6 +99,7 @@ public class SceneLoader {
 
     /**
      * Constructor that initially loads every view.
+     * @param store The Store to have access to the state.
      */
     public SceneLoader(Store<KBState> store) {
         this.store = store;

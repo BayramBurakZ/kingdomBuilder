@@ -4,10 +4,14 @@ import javafx.fxml.FXML;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import kingdomBuilder.gui.gameboard.TextureLoader;
+import kingdomBuilder.model.TileType;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -141,6 +145,16 @@ public class GameViewController extends Controller implements Initializable {
     private Button game_button_endturn;
 
     /**
+     * Represents the texture loader which all hexagons share.
+     */
+    private static final TextureLoader textureLoader = new TextureLoader();
+
+    /**
+     * Represents the resourceBundle that used for language support.
+     */
+    private ResourceBundle resourceBundle;
+
+    /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
@@ -148,6 +162,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        resourceBundle = resources;
         setupLayout();
     }
 
@@ -177,8 +192,33 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     /**
+     * Updates the Card to the current card of the turn
+     * @param tileType
+     */
+    private void updateTerrainCard(TileType tileType) {
+        // TODO read TileType from Datalogic/Store instead of parameter
+
+        //Update Image
+        Image img = textureLoader.getTexture(tileType);
+        game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
+
+        //Update Text
+        String cardDescribtion = "";
+        switch(tileType) {
+            case GRAS -> cardDescribtion = resourceBundle.getObject("gras").toString();
+            case FLOWER -> cardDescribtion = resourceBundle.getObject("flower").toString();
+            case DESERT -> cardDescribtion = resourceBundle.getObject("desert").toString();
+            case CANYON -> cardDescribtion = resourceBundle.getObject("canyon").toString();
+            case FORREST -> cardDescribtion = resourceBundle.getObject("forrest").toString();
+        }
+        game_label_carddescribtion.setText(cardDescribtion);
+    }
+
+    /**
      * Gets the SubScene for the game board.
      * @return SubScene for displaying the game board
      */
-    public SubScene getGame_subscene() {return this.game_subscene;}
+    public SubScene getGame_subscene() {
+        return this.game_subscene;
+    }
 }

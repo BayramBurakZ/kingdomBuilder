@@ -10,6 +10,7 @@ import javafx.scene.shape.StrokeType;
 import kingdomBuilder.model.TileType;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * Class that is used to display the hexagon tiles in the UI.
@@ -18,22 +19,17 @@ public class HexagonTile extends Polygon {
     /**
      * Represents the angle in degree to turn the corners around the center;
      */
-    private final int TURN_ANGLE_DEGREE = 60;
+    private static final int TURN_ANGLE_DEGREE = 60;
 
     /**
      * Represents the angle in radian to turn the corners around the center;
      */
-    private final double TURN_ANGLE_RADIAN = Math.toRadians(TURN_ANGLE_DEGREE);
+    private static final double TURN_ANGLE_RADIAN = Math.toRadians(TURN_ANGLE_DEGREE);
 
     /**
      * Represents the number of corners of a hexagon.
      */
-    private final int NUMBER_OF_CORNERS = 6;
-
-    /**
-     * Represents the six corners of a hexagon.
-     */
-    private static ArrayList<Point> corners;
+    private static final int NUMBER_OF_CORNERS = 6;
 
     /**
      * Represents the texture loader which all hexagons share.
@@ -41,16 +37,31 @@ public class HexagonTile extends Polygon {
     private static final TextureLoader textureLoader = new TextureLoader();
 
     /**
+     * Represents the resourceBundle that used for language support.
+     */
+    private static ResourceBundle resourceBundle;
+
+    /**
+     * Represents the six corners of a hexagon.
+     */
+    private static ArrayList<Point> corners;
+
+    /**
      * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos The x-coordinate of the upper-left corner position.
      * @param yPos The y-coordinate of the upper-left corner position.
      * @param tileType The TileType of the Hexagon.
+     * @param resource The ResourceBundle to translate text.
      */
-    public HexagonTile(double xPos, double yPos, TileType tileType) {
+    public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
         // only calculate the corners once and not for every hexagon
         if (corners == null) {
             //ToDo: extract the hard coded radius
             corners = calculateCorners(40);
+        }
+
+        if (resourceBundle == null) {
+            resourceBundle = resource;
         }
 
         // calculate all corners of a hexagon

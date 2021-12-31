@@ -17,6 +17,9 @@ import java.net.URL;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * This class controls all functions for the settings menu.
+ */
 public class SettingsController extends Controller implements Initializable {
 
     /**
@@ -31,6 +34,10 @@ public class SettingsController extends Controller implements Initializable {
     @FXML
     private TextField textField_name;
 
+    /**
+     * Constructs the Settings View with the given store.
+     * @param store The Store for access to the state.
+     */
     public SettingsController(Store<KBState> store) {
         this.store = store;
     }

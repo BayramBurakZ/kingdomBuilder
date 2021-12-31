@@ -35,6 +35,11 @@ public class GameBoardViewController extends Controller implements Initializable
     private Pane gameBoard_pane;
 
     /**
+     * Represents the resourceBundle that used for language support.
+     */
+    private ResourceBundle resourceBundle;
+
+    /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
@@ -43,6 +48,8 @@ public class GameBoardViewController extends Controller implements Initializable
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //gameboard_pane.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE, null, null)));
+
+        resourceBundle = resources;
 
         // TODO: Remove
         Model model = new Model();
@@ -57,7 +64,7 @@ public class GameBoardViewController extends Controller implements Initializable
      */
     private void setupGameBoard() {
         // TODO: access data via state
-        gameBoard.setupGameBoard(gameBoard_pane, gameBoardData);
+        gameBoard.setupGameBoard(gameBoard_pane, gameBoardData, resourceBundle);
     }
 
     /**
