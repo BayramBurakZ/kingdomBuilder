@@ -29,12 +29,6 @@ import java.util.ResourceBundle;
  */
 public class ChatViewController extends Controller implements Initializable {
     /**
-     * Represents the state for internal use.
-     */
-    // TODO: remove it?
-    private KBState state;
-
-    /**
      * Represents the button to clear the selection.
      */
     @FXML
@@ -106,6 +100,16 @@ public class ChatViewController extends Controller implements Initializable {
     private Element globalChatBody;
 
     /**
+     * Represents the Gui State, if the client is connected.
+     */
+    private boolean isConnected;
+
+    /**
+     * Represents the resourceBundle that used for language support.
+     */
+    private ResourceBundle resourceBundle;
+
+    /**
      * Constructs the ChatViewController.
      * @param store The Application's store to set the field.
      */
@@ -121,22 +125,32 @@ public class ChatViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        state = store.getState();
+        resourceBundle = resources;
 
-        store.subscribe(newState -> {
-            tableview_chat.getItems().setAll(newState.clients.values());
-            // Client connection
-            if (newState.isConnected && !state.isConnected) {
+        if(store.getState().isConnected) {
+            isConnected = true;
+            onConnect();
+        } else {
+            isConnected = false;
+            onDisconnect();
+        }
+
+        store.subscribe(state -> {
+            tableview_chat.getItems().setAll(state.clients.values());
+
+            if (state.isConnected && !isConnected) {
                 onConnect();
-            } else if (!newState.isConnected && state.isConnected){
+                isConnected = true;
+            } else if (!state.isConnected && isConnected){
                 onDisconnect();
+                isConnected = false;
             }
-            // TODO: failedToConnect mechanism, multiple output in chatarea 
+
+            // TODO: failedToConnect mechanism, multiple output in chatarea
             // Failed to connect
-            if (newState.failedToConnect) {
-                print("<--- Failed to connect to server --->", MessageStyle.WARNING);
+            if (state.failedToConnect) {
+                print("<--- " + resourceBundle.getObject("failedToConnect") +" --->", MessageStyle.WARNING);
             }
-            state = newState;
         });
 
         tableview_chat.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -201,7 +215,7 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the UI elements that are important when the client connects to a server.
      */
     public void onConnect() {
-        print("<--- You are connected to the server --->", MessageStyle.SERVER);
+        print("<--- " + resourceBundle.getObject("youAreConnected") + " --->", MessageStyle.SERVER);
 
         chatview_textarea_chatinput.setDisable(false);
         chatview_button_send.setDisable(false);
@@ -212,7 +226,7 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the UI elements that are important when the client disconnects from a server.
      */
     public void onDisconnect() {
-        print("<--- You are disconnected from the server --->", MessageStyle.SERVER);
+        print("<--- " + resourceBundle.getObject("disconnectFromServer") + " --->", MessageStyle.SERVER);
 
         chatview_textarea_chatinput.setDisable(true);
         chatview_button_send.setDisable(true);
@@ -234,13 +248,13 @@ public class ChatViewController extends Controller implements Initializable {
         if (receivers.length < store.getState().clients.size() - 1) {
             // whisper message
             messageStyle = MessageStyle.WHISPER;
-            chatMessage = senderName + " whispers to you";
+            chatMessage = senderName + " " + resourceBundle.getObject("whisperToYou");
             for (int i = 0; i < receivers.length; i++) {
-                if (receivers[i].equals(state.client.getId())) {
+                if (receivers[i].equals(store.getState().client.getId())) {
                     continue;
                 }
 
-                chatMessage += ", @" + state.clients.get(receivers[i]).getName();
+                chatMessage += ", @" + store.getState().clients.get(receivers[i]).getName();
             }
             chatMessage += ": " + message;
         } else {
@@ -260,7 +274,8 @@ public class ChatViewController extends Controller implements Initializable {
      * @param gameId the game ID of the client which left the server.
      */
     public void onClientLeft(int clientId, String name, int gameId) {
-        print("<--- " + name + " left the server. --->", MessageStyle.SERVER);
+        print("<--- " + " " + name + resourceBundle.getObject("leftTheServer") +". --->",
+                MessageStyle.SERVER);
     }
 
     /**
@@ -270,14 +285,15 @@ public class ChatViewController extends Controller implements Initializable {
      * @param gameId the game ID of the client which left the server.
      */
     public void onClientJoined(int clientId, String name, int gameId) {
-        print("<--- " + name + " joined the server. --->", MessageStyle.SERVER);
+        print("<--- " + name + " " + resourceBundle.getObject("joinedTheServer") + ". --->",
+                MessageStyle.SERVER);
     }
 
     /**
      * Updates the UI when this client was kicked from the server.
      */
     public void onYouHaveBeenKicked() {
-        print("<--- You have been kicked from the server --->", MessageStyle.WARNING);
+        print("<--- " + resourceBundle.getObject("kickedFromServer") + " --->", MessageStyle.WARNING);
     }
 
     /**
@@ -295,7 +311,7 @@ public class ChatViewController extends Controller implements Initializable {
             // don't send message to ourselves
             receiverIds.remove((Integer) store.getState().client.getId());
 
-            message = "You: " + message;
+            message = resourceBundle.getObject("you") + ": " + message;
 
             if(tab_global.isSelected()) {
                 print(message, MessageStyle.GLOBAL_CHAT);
@@ -319,7 +335,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientDAO -> clientDAO.getId() != state.client.getId());
+                    .filtered(clientDAO -> clientDAO.getId() != store.getState().client.getId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -327,9 +343,9 @@ public class ChatViewController extends Controller implements Initializable {
             }
 
             // creates message for the chat textarea
-            chatMessage = "You whispered ";
+            chatMessage = resourceBundle.getObject("youWhisper") + " ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).getId() == state.client.getId()) {
+                if (receivers.get(i).getId() == store.getState().client.getId()) {
                     continue;
                 }
                 receiverIds.add(receivers.get(i).getId());

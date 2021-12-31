@@ -19,11 +19,6 @@ import java.util.ResourceBundle;
  */
 public class MenuViewController extends Controller implements Initializable {
     /**
-     * Represents the state for internal use.
-     */
-    private KBState state;
-
-    /**
      * Represents the BorderPane of the View.
      */
     @FXML
@@ -60,6 +55,11 @@ public class MenuViewController extends Controller implements Initializable {
     private Button menuview_connect_button;
 
     /**
+     * Represents the Gui State, if the client is connected.
+     */
+    private boolean isConnected;
+
+    /**
      * Sets the store.
      * @param store The store to set.
      */
@@ -75,18 +75,22 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store.subscribe(newState -> {
-            if(state == null) {
-                state = newState;
-                return;
-            }
-            // Client connection
-            if (newState.isConnected && !state.isConnected) {
+        if(store.getState().isConnected) {
+            isConnected = true;
+            onConnect();
+        } else {
+            isConnected = false;
+            onDisconnect();
+        }
+
+        store.subscribe(state -> {
+            if (state.isConnected && !isConnected) {
                 onConnect();
-            } else if (!newState.isConnected && state.isConnected){
+                isConnected = true;
+            } else if (!state.isConnected && isConnected){
                 onDisconnect();
+                isConnected = false;
             }
-            state = newState;
         });
     }
 
@@ -127,7 +131,7 @@ public class MenuViewController extends Controller implements Initializable {
         // send a "bye" message to a server and handle this method within an event.
         // delete Client so we can reconnect -> Client state move to store
         // and update Client list on disconnect
-        if (state.isConnected) {
+        if (store.getState().isConnected) {
             // Disconnect from server
             store.dispatch(new DisconnectAction());
         } else {
