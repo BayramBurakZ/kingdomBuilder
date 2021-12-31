@@ -1,5 +1,6 @@
 package kingdomBuilder.network;
 
+import kingdomBuilder.annotations.Protocol;
 import kingdomBuilder.network.generated.ProtocolDeserializer;
 
 import kingdomBuilder.network.protocol.*;
@@ -749,5 +750,57 @@ public class TestProtocolDeserializer {
         );
 
         assertEquals(expectedSettlementData, typedPacket.settlementsDataList());
+    }
+
+    @Test
+    void testDeserializingBoardReply() {
+        final String packet = "[REPLY_MESSAGE] (?board) <[1;4;2;0]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        BoardReply typedPacket = assertInstanceOf(BoardReply.class, testConsumer.getObject());
+
+        assertEquals(1, typedPacket.quadrantId1());
+        assertEquals(4, typedPacket.quadrantId2());
+        assertEquals(2, typedPacket.quadrantId3());
+        assertEquals(0, typedPacket.quadrantId4());
+    }
+
+    @Test
+    void testDeserializingWinConditionReply() {
+        final String packet = "[REPLY_MESSAGE] (?winconditions) <[MINDER;FISHER;KNIGHT]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        WinConditionReply typedPacket = assertInstanceOf(WinConditionReply.class, testConsumer.getObject());
+
+        assertEquals("MINDER", typedPacket.winCondition1());
+        assertEquals("FISHER", typedPacket.winCondition2());
+        assertEquals("KNIGHT", typedPacket.winCondition3());
+    }
+
+    @Disabled
+    @Test
+    void testDeserializingMyGameReply() {
+        final String packet = "[REPLY_MESSAGE] (?mygame) <[42;kingdom_builder:KB;0;gameName;gameDescription;2;1;-1;-1;" +
+                "[0;1;2;3]]>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        MyGameReply typedPacket = assertInstanceOf(MyGameReply.class, testConsumer.getObject());
+
+        assertEquals(42, typedPacket.clientId());
+        assertEquals("kingdom_builder:KB", typedPacket.gameType());
+        assertEquals(0, typedPacket.gameId());
+        assertEquals("gameName", typedPacket.gameName());
+        assertEquals("gameDescription", typedPacket.gameDescription());
+        assertEquals(2, typedPacket.playerLimit());
+        assertEquals(1, typedPacket.playersJoined());
+        assertEquals(-1, typedPacket.timeLimit());
+        assertEquals(-1, typedPacket.turnLimit());
+        assertEquals(0, typedPacket.quadrantId1());
+        assertEquals(1, typedPacket.quadrantId2());
+        assertEquals(2, typedPacket.quadrantId3());
+        assertEquals(3, typedPacket.quadrantId4());
     }
 }

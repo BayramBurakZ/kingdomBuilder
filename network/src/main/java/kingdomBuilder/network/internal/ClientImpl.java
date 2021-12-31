@@ -337,4 +337,19 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(SettlementsLeftReply message) {
 
     }
+
+    @Override
+    public void accept(BoardReply message) {
+
+    }
+
+    @Override
+    public void accept(WinConditionReply message) {
+
+    }
+
+    @Override
+    public void accept(MyGameReply message) {
+
+    }
 }

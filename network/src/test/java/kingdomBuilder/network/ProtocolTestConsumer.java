@@ -257,6 +257,21 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
         object = message;
     }
 
+    @Override
+    public void accept(BoardReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(WinConditionReply message) {
+        object = message;
+    }
+
+    @Override
+    public void accept(MyGameReply message) {
+        object = message;
+    }
+
     public Object getObject() {
         return object;
     }
