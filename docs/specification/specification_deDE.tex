@@ -6,6 +6,7 @@
 \usepackage{ae}
 \usepackage[bookmarks,bookmarksnumbered]{hyperref}
 \usepackage{tabularx}
+\usepackage{graphicx}
 
 
 \newenvironment{requirement}[5] {
@@ -289,6 +290,8 @@ Hierbei muss eine GUI-Maske entworfen und implementiert werden, die folgende But
 	\item[Exit] beendet das Programm.
 \end{description}
 
+\includegraphics[width=0.8\textwidth]{view2.png}
+
 \end{requirement}
 
 
@@ -341,6 +344,9 @@ Der erste Button sorgt dafür, dass ein User ein Spiel erstellt und die View zu 
 Mit dem Button daneben betritt der User das in der Tabelle ausgewählte Spiel. Die aktuelle View wird zur View geändert, die das Spiel anzeigt.
 Der letzte Button sorgt dafür, dass der User dem in der Tabelle ausgewählten Spiel als Zuschauer beitritt. Hierbei wird die View auch zur View geändert, die das Spiel anzeigt.
 
+\includegraphics[width=0.8\textwidth]{view3.png}
+
+
 \end{requirement}
 
 
@@ -362,6 +368,8 @@ Hierbei soll eine GUI-Maske entworfen und implementiert werden, die einem Spiele
 Des Weiteren müssen Buttons angeboten werden, die einem ermöglichen das Spiel zu \glqq hosten\grqq{} und die Spieleinstellungen zu verlassen.
 Wird der Button \glqq
 Hosten\grqq{} geklickt, so wird das Spiel erstellt und der Ersteller tritt automatisch bei. Anschließend wird der Spieler in die Spielinformations-Maske (\glqq GameInfoView\grqq{}) geführt. Wird der Button \glqq Zurück\grqq{} gedrückt, so wird der Spieler zurück in das Hauptmenü (\glqq MainView\grqq{}) geführt.
+
+\includegraphics[width=0.8\textwidth]{view4.png}
 
 \end{requirement}
 
@@ -399,6 +407,8 @@ Hierbei muss eine GUI-Komponente dargestellt werden, welche alle Hexagone gemä�
 so dass die Karte bewegt und vergrößert sowie verkleinert werden kann. Es gilt zu beachten, dass Spieler die Karte nicht über den Rand hinaus bewegen dürfen sowie das Grenzen für das Verkleinern und Vergrößern der Karte gesetzt werden.
 
 Die Karte muss über die Pfeiltasten bewegbar sein und über das Mausrad vergrößert oder verkleinert werden können.
+
+\includegraphics[width=0.8\textwidth]{view5.png}
 
 \end{requirement}
 
@@ -578,6 +588,9 @@ Dies wird wie im Lastenheft als Portable Document Format (pdf) in der Papiergrö
 
 
 \chapter{Anhang}
+\section{Menüführung}
+\includegraphics[width=0.8\textwidth]{menufuehrung.png}
+
 \section{Architektur: Redux}
 Die Redux Architektur besitzt verschiedene Bereiche. Es existiert der Store, mehrere Reducers, die Views und Actions.
 
@@ -658,19 +671,19 @@ Wenn der Reducer erfolgreich den State verändert hat, werden anhand der Änderu
     \item[Siedlung verschieben] Eine Spielfigur von einem Feld entfernen und auf ein anderes Feld platzieren.
     \item[Siedlungsfelder] Felder auf dem Spielbrett, welche mit einer Siedlung bebaut sind.
 	\item[Sieges-Karten / Siegesbedingungen] Drei von zehn ausgewählten Siegesbedingungen. Diese beschreiben, unter welchen Bedingungen ein Spieler Punkte bekommt.
-    \item[Snake-Case] Notation von Variablen mit Unterstrichen.
-    \item[Spiel beitreten] Ein Benutzer tritt einem Spiel bei, um in diesem zu spielen oder diesem zuzuschauen.
-    \item[Spielbrett] Das Spielfeld, das aus den 4 Quadranten beziehungsweise deren einzelnen Feldern besteht.
-    \item[Spielfunktion] Die Funktionen, die benötigt werden, ein Spiel als Datenstruktur zu verwalten.
-    \item[Spielerfarbe] Die eindeutige Farbe, die einem Spieler am Anfang des Spiel zugeordnet wird.
-    \item[Spielstatus] Der Status eines Spiels. Ein Spiel kann auf Spieler warten, gestartet sein und laufen oder beendet sein.
-    \item[Spielzug] Ein Zug eines Spielers in einem Spiel. Dieser besteht aus Pflichtaktionen wie dem Basiszug und optionalen Aktionen wie dem Spielen von Tokens.
-    \item[State] Teil der Redux Architektur. Die State speichert die Daten des Programms.
-    \item[Store] Teil der Redux Architektur. Der Store bildet die Schnittstelle zur State.
-    \item[SubScene] Eine abstrahierte Teilmenge der gesamten Szene, um nur bestimmte Daten zu lesen.
-    \item[subscribe] Sich als Teilprogramm einschreiben, um benachrichtigt zu werden, wenn ein Kriterium erfüllt ist.
-    \item[Subscriber] Ein Teilprogramm, welches benachrichtigt wird, wenn ein Kriterium erfüllt ist.
-    \item[Substate] Teil der Redux Architektur. Einzelne Unterkategorien der State, welchen separat subscribed werden kann.
+	    \item[Snake-Case] Notation von Variablen mit Unterstrichen.
+	    \item[Spiel beitreten] Ein Benutzer tritt einem Spiel bei, um in diesem zu spielen oder diesem zuzuschauen.
+	    \item[Spielbrett] Das Spielfeld, das aus den 4 Quadranten beziehungsweise deren einzelnen Feldern besteht.
+	    \item[Spielfunktion] Die Funktionen, die benötigt werden, ein Spiel als Datenstruktur zu verwalten.
+	    \item[Spielerfarbe] Die eindeutige Farbe, die einem Spieler am Anfang des Spiel zugeordnet wird.
+	    \item[Spielstatus] Der Status eines Spiels. Ein Spiel kann auf Spieler warten, gestartet sein und laufen oder beendet sein.
+	    \item[Spielzug] Ein Zug eines Spielers in einem Spiel. Dieser besteht aus Pflichtaktionen wie dem Basiszug und optionalen Aktionen wie dem Spielen von Tokens.
+	    \item[State] Teil der Redux Architektur. Die State speichert die Daten des Programms.
+	    \item[Store] Teil der Redux Architektur. Der Store bildet die Schnittstelle zur State.
+	    \item[SubScene] Eine abstrahierte Teilmenge der gesamten Szene, um nur bestimmte Daten zu lesen.
+	    \item[subscribe] Sich als Teilprogramm einschreiben, um benachrichtigt zu werden, wenn ein Kriterium erfüllt ist.
+	    \item[Subscriber] Ein Teilprogramm, welches benachrichtigt wird, wenn ein Kriterium erfüllt ist.
+	    \item[Substate] Teil der Redux Architektur. Einzelne Unterkategorien der State, welchen separat subscribed werden kann.
 	\item[Socket] Die lokale Anbindung der direkten Verbindung zum Server.
 	\item[SpinBox] Element der Oberfläche, mit welchem eine Zahl spezifiziert werden kann.
 	\item[Szene] Die Benutzeroberfläche, welche im Fenster angezeigt wird.
