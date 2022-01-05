@@ -16,7 +16,6 @@ public class GameBoard {
      */
     private final Store<KBState> store;
 
-
     /**
      * Represents the board that contains the hexagons.
      */
@@ -44,8 +43,6 @@ public class GameBoard {
     public void setupGameBoard(Pane pane, TileType[][] gameBoardData, ResourceBundle resource) {
         resourceBundle = resource;
 
-        //TODO: reads the array of Tiles in the store and creates the board accordingly.
-        // instead of using the data from the parameter
         for (int y = 0; y < 20; y++) {
             for (int x = 0; x < 20; x++) {
                 int xPos;
@@ -65,9 +62,24 @@ public class GameBoard {
     }
 
     /**
-     * Highlights Hexagons on the map.
+     * Highlights Hexagons on the map which matches the given type.
      */
-    public void highlightTerrain( ) {
-        // TODO: checks which hexagons are able to build on.
+    public void highlightTerrain() {
+        // TODO: remove randomizer
+        int random = (int) (Math.random() * 5) + 1;
+        for (int y = 0; y < gameBoard.length; y++) {
+            for (int x = 0; x < gameBoard.length; x++) {
+                // remove hightlight
+                if (gameBoard[x][y].isHighlighted()) {
+                    gameBoard[x][y].removeHighlight();
+                }
+
+                // set new highlight
+                //TODO: Change to Gamelogic
+                if (gameBoard[x][y].getTileType() == TileType.valueOf(random)) {
+                    gameBoard[x][y].setHighlight();
+                }
+            }
+        }
     }
 }

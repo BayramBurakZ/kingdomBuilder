@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.SubScene;
 import javafx.scene.control.Button;
@@ -20,6 +21,10 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
+    /**
+     * Represents the texture loader which all hexagons share.
+     */
+    private static final TextureLoader textureLoader = new TextureLoader();
 
     /**
      * Represents the initial VBox.
@@ -142,17 +147,23 @@ public class GameViewController extends Controller implements Initializable {
      * Represents the Button to end the turn.
      */
     @FXML
-    private Button game_button_endturn;
+    private Button game_button_end;
 
-    /**
-     * Represents the texture loader which all hexagons share.
-     */
-    private static final TextureLoader textureLoader = new TextureLoader();
 
     /**
      * Represents the resourceBundle that used for language support.
      */
     private ResourceBundle resourceBundle;
+
+    /**
+     * Represents if the view is in spectating mode.
+     */
+    private boolean isSpectating;
+
+    /**
+     * Represents if the view is in online mode.
+     */
+    private boolean isOnline;
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
@@ -164,6 +175,19 @@ public class GameViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         resourceBundle = resources;
         setupLayout();
+    }
+
+    /**
+     * Changes some functionalities when spectating or playing.
+     */
+    private void playingOrSpectating() {
+        if (isSpectating) {
+            game_button_end.setText(resourceBundle.getString("endSpectate"));
+            game_button_end.setOnAction(this::onSpectateEndButtonPressed);
+        } else {
+            game_button_end.setText(resourceBundle.getString("endTurn"));
+            game_button_end.setOnAction(this::onTurnEndButtonPressed);
+        }
     }
 
     /**
@@ -195,7 +219,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the Card to the current card of the turn
      * @param tileType
      */
-    private void updateTerrainCard(TileType tileType) {
+    private void cardDescription(TileType tileType) {
         // TODO read TileType from Datalogic/Store instead of parameter
 
         //Update Image
@@ -203,15 +227,15 @@ public class GameViewController extends Controller implements Initializable {
         game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
 
         //Update Text
-        String cardDescribtion = "";
+        String cardDescription = "";
         switch(tileType) {
-            case GRAS -> cardDescribtion = resourceBundle.getObject("gras").toString();
-            case FLOWER -> cardDescribtion = resourceBundle.getObject("flower").toString();
-            case DESERT -> cardDescribtion = resourceBundle.getObject("desert").toString();
-            case CANYON -> cardDescribtion = resourceBundle.getObject("canyon").toString();
-            case FORREST -> cardDescribtion = resourceBundle.getObject("forrest").toString();
+            case GRAS -> cardDescription = resourceBundle.getString("gras");
+            case FLOWER -> cardDescription = resourceBundle.getString("flower");
+            case DESERT -> cardDescription = resourceBundle.getString("desert");
+            case CANYON -> cardDescription = resourceBundle.getString("canyon");
+            case FORREST -> cardDescription = resourceBundle.getString("forrest");
         }
-        game_label_carddescribtion.setText(cardDescribtion);
+        game_label_carddescribtion.setText(cardDescription);
     }
 
     /**
@@ -220,5 +244,43 @@ public class GameViewController extends Controller implements Initializable {
      */
     public SubScene getGame_subscene() {
         return this.game_subscene;
+    }
+
+    /**
+     * Sets the functions for the "End"-Button. Here for ending the turn.
+     * @param actionEvent the triggered event.
+     */
+    public void onTurnEndButtonPressed(ActionEvent actionEvent) {
+    }
+
+    /**
+     * Sets the functions for the "End"-Button. Here for ending spectating
+     * @param actionEvent the triggered event.
+     */
+    public void onSpectateEndButtonPressed(ActionEvent actionEvent) {
+        // TODO: Network Message "unspectate"
+        if (isOnline) {
+            sceneLoader.showGameSettingsView(true);
+        } else {
+            // TODO: Network End internal server
+            sceneLoader.showMenuView();
+        }
+    }
+
+    /**
+     * Set the spectating value, if the game view is for a spectating game.
+     * @param spectating If the game is observed by a spectator.
+     */
+    public void setSpectating(boolean spectating) {
+        this.isSpectating = spectating;
+    }
+
+    /**
+     * Sets the online value, if the game is on an online server.
+     * @param isOnline If the game is an online game.
+     */
+    public void setIsOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+        playingOrSpectating();
     }
 }

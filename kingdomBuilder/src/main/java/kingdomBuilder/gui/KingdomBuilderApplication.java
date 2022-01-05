@@ -1,17 +1,11 @@
 package kingdomBuilder.gui;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
-
-import java.lang.reflect.Constructor;
-import java.net.URL;
 
 /**
  * Represents the specified JavaFX application for the KingdomBuilder.

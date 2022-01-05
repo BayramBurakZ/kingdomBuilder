@@ -1,5 +1,7 @@
 package kingdomBuilder;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
@@ -56,9 +58,15 @@ public class KBState {
     public boolean failedToConnect = false;
 
     /**
+     * Represents a List with all the available quadrants on the server;
+     */
+    public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
+
+    /**
      * Represents the default constructor.
      */
-    public KBState() { }
+    public KBState() {
+    }
 
     /**
      * Creates the same KBState object as the given KBState object.
@@ -73,5 +81,6 @@ public class KBState {
         clientPreferredName = other.clientPreferredName;
         isConnected = other.isConnected;
         failedToConnect = other.failedToConnect;
+        quadrantIDs = other.quadrantIDs;
     }
 }

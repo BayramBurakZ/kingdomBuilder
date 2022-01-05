@@ -29,9 +29,9 @@ public class SceneLoader {
      */
     private Node menuView;
     /**
-     * Stores the current gameLobbyView.
+     * Stores the current gameSettingsView.
      */
-    private Node gameLobbyView;
+    private Node gameSettingsView;
     /**
      * Stores the current gameView.
      */
@@ -52,15 +52,19 @@ public class SceneLoader {
      * Stores the current settingsView.
      */
     private Node settingsView;
+    /**
+     * Stores the current serverConnectView.
+     */
+    private Node serverConnectView;
 
     /**
      * Stores the menuViewController.
      */
     private MenuViewController menuViewController;
     /**
-     * Stores the gameLobbyController.
+     * Stores the gameSettingsController.
      */
-    private GameLobbyViewController gameLobbyViewController;
+    private GameSettingsViewController gameSettingsViewController;
     /**
      * Stores the gameViewController.
      */
@@ -81,6 +85,11 @@ public class SceneLoader {
      * Stores the settingsViewController
      */
     private SettingsController settingsViewController;
+    /**
+     * Stores the serverConnectViewController.
+     */
+    private ServerConnectViewController serverConnectViewController;
+
 
     /**
      * Represents the store of the application.
@@ -91,11 +100,15 @@ public class SceneLoader {
      * Represents the main scene of the application.
      */
     private Scene scene;
-
     /**
      * Represents the main layout of the application.
      */
     private BorderPane borderPane;
+
+    /**
+     * Represents the locale for language settings.
+     */
+    private Locale locale;
 
     /**
      * Constructor that initially loads every view.
@@ -118,13 +131,15 @@ public class SceneLoader {
      * @param locale the language in which the views are loaded.
      */
     public void loadViews(Locale locale) {
+        this.locale = locale;
         loadMenuView(locale);
-        loadGameLobbyView(locale);
+        loadGameSettingsView(locale);
         loadGameView(locale);
         loadIAmView(locale);
         loadChatView(locale);
         loadGameSelectionView(locale);
         loadSettingsView(locale);
+        loadServerConnectView(locale);
     }
 
     /**
@@ -148,22 +163,28 @@ public class SceneLoader {
     }
 
     /**
-     * Loads the GameLobbyView into the center of the main borderPane.
+     * Loads the GameSettingsView into the center of the main borderPane.
+     * @param isOnlineGame If the game is online.
      */
-    public void showGameLobbyView() {
-        borderPane.setCenter(gameLobbyView);
+    public void showGameSettingsView(boolean isOnlineGame) {
+        borderPane.setCenter(gameSettingsView);
+        gameSettingsViewController.setIsOnlineGame(isOnlineGame);
     }
 
     /**
-     * Loads the GameLobbyView into the center of the main borderPane.
+     * Loads the gameView into the center of the main borderPane.
+     * @param isSpectating Whether the user wants to spectate.
+     * @param isOnline Whether the game is online.
      */
-    public void showGameView() {
+    public void showGameView(boolean isSpectating, boolean isOnline) {
         //TODO: currently it reloads the gameview to generate a random board
         // fix with an update function and REDUX
         //resets the GameView and generates the board new
-        loadGameView(Locale.ENGLISH);
+        loadGameView(locale);
 
         borderPane.setCenter(gameView);
+        gameViewController.setSpectating(isSpectating);
+        gameViewController.setIsOnline(isOnline);
 
         //TODO: Focus-management
         gameViewController.getGame_subscene().getRoot().requestFocus();
@@ -188,6 +209,13 @@ public class SceneLoader {
      */
     public void showSettingsView() {
         borderPane.setCenter(settingsView);
+    }
+
+    /**
+     * Loads the ServerConnectView into the center of the main borderPane.
+     */
+    public void showServerConnectView() {
+        borderPane.setCenter(serverConnectView);
     }
 
     // load-methods
@@ -218,6 +246,33 @@ public class SceneLoader {
     }
 
     /**
+     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
+     * construction.
+     * @param location The location to load the FXML file from.
+     * @return The newly created loader.
+     */
+    private FXMLLoader makeLoader(URL location) {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setControllerFactory(controllerType -> {
+            try {
+                for (Constructor<?> ctor: controllerType.getConstructors()) {
+                    if(ctor.getParameterCount() == 1
+                            && ctor.getParameterTypes()[0] == Store.class)
+                        return ctor.newInstance(store);
+                }
+
+                return controllerType.getConstructor().newInstance();
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        });
+
+        loader.setLocation(location);
+
+        return loader;
+    }
+
+    /**
      * Calls the loadView() method with the path of the MenuView.fxml and
      * sets the menuView and menuViewController fields.
      * Used for reloading this View.
@@ -230,15 +285,15 @@ public class SceneLoader {
     }
 
     /**
-     * Calls the loadView() method with the path of the GameLobbyView.fxml and
-     * sets the gameLobbyView and gameLobbyViewController fields
+     * Calls the loadView() method with the path of the GameSettingsView.fxml and
+     * sets the gameSettingsView and gameSettingsViewController fields
      * Used for reloading this View.
      * @param locale The locale for language support.
      */
-    public void loadGameLobbyView(Locale locale) {
-        Pair<Node, Controller> pair = loadView("controller/GameLobbyView.fxml", locale);
-        gameLobbyView = pair.getKey();
-        gameLobbyViewController = (GameLobbyViewController) pair.getValue();
+    public void loadGameSettingsView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameSettingsView.fxml", locale);
+        gameSettingsView = pair.getKey();
+        gameSettingsViewController = (GameSettingsViewController) pair.getValue();
     }
 
     /**
@@ -301,125 +356,25 @@ public class SceneLoader {
         settingsViewController = (SettingsController) pair.getValue();
     }
 
+    /**
+     * Calls the loadView() method with the path of the ServerConnect.fxml and
+     * sets the serverConnectView and serverConnectViewController fields
+     * Used for reloading this View.
+     * @param locale The locale for language support.
+     */
+    public void loadServerConnectView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/ServerConnect.fxml", locale);
+        serverConnectView = pair.getKey();
+        serverConnectViewController = (ServerConnectViewController) pair.getValue();
+    }
+
+    // TODO: Remove
     // getter
-
-    /**
-     * Returns the current parent node of the MenuView.
-     * @return The current parent node of the MenuView.
-     */
-    public Node getMenuView() {
-        return menuView;
-    }
-    /**
-     * Returns the current parent node of the GameLobbyView.
-     * @return The current parent node of the GameLobbyView.
-     */
-    public Node getGameLobbyView() {
-        return gameLobbyView;
-    }
-    /**
-     * Returns the current parent node of the GameView.
-     * @return The current parent node of the GameView.
-     */
-    public Node getGameView() {
-        return gameView;
-    }
-    /**
-     * Returns the current parent node of the IAmView.
-     * @return The current parent node of the IAmView.
-     */
-    public Node getIAmView() {
-        return iAmView;
-    }
-    /**
-     * Returns the current parent node of the ChatView.
-     * @return The current parent node of the ChatView.
-     */
-    public Node getChatView() {
-        return chatView;
-    }
-    /**
-     * Returns the current parent node of the GameSelectionView.
-     * @return The current parent node of the GameSelectionView.
-     */
-    public Node getGameSelectionView() {
-        return gameSelectionView;
-    }
-    /**
-     * Returns the current parent node of the SettingsView.
-     * @return The current parent node of the SettingsView.
-     */
-    public Node getSettingsView() {
-        return settingsView;
-    }
-
-    /**
-     * Returns the MenuViewController.
-     * @return The MenuViewController with all functionalities for the MenuView.
-     */
-    public MenuViewController getMenuViewController() {
-        return (MenuViewController) menuViewController;
-    }
-    /**
-     * Returns the GameLobbyViewController.
-     * @return The GameLobbyViewController with all functionalities for the GameLobbyView.
-     */
-    public GameLobbyViewController getGameLobbyViewController() {
-        return (GameLobbyViewController) gameLobbyViewController;
-    }
-    /**
-     * Returns the GameViewController.
-     * @return The GameViewController with all functionalities for the GameView.
-     */
-    public GameViewController getGameViewController() {
-        return (GameViewController) gameViewController;
-    }
-    /**
-     * Returns the IAmViewController.
-     * @return The IAmViewController with all functionalities for the IAmView.
-     */
-    public IAmViewController getIAmViewController() {
-        return (IAmViewController) iAmViewController;
-    }
     /**
      * Returns the ChatViewController.
      * @return The ChatViewController with all functionalities for the ChatView.
      */
     public ChatViewController getChatViewController() {
-        return (ChatViewController) chatViewController;
-    }
-    /**
-     * Returns the GameSelectionViewController.
-     * @return The GameSelectionViewController with all functionalities for the GameSelectionView.
-     */
-    public GameSelectionViewController getGameSelectionViewController() {
-        return (GameSelectionViewController) gameSelectionViewController;
-    }
-
-    /**
-     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
-     * construction.
-     * @param location The location to load the FXML file from.
-     * @return The newly created loader.
-     */
-    private FXMLLoader makeLoader(URL location) {
-        FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(controllerType -> {
-            try {
-                for (Constructor<?> ctor: controllerType.getConstructors()) {
-                    if(ctor.getParameterCount() == 1
-                            && ctor.getParameterTypes()[0] == Store.class)
-                        return ctor.newInstance(store);
-                }
-
-                return controllerType.getConstructor().newInstance();
-            } catch(Exception exc) {
-                throw new RuntimeException(exc);
-            }
-        });
-
-        loader.setLocation(location);
-
-        return loader;
+        return chatViewController;
     }
 }

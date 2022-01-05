@@ -163,7 +163,6 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    // TODO: remove controller
     private KBState reduce(KBState oldState, SetSceneLoaderAction a) {
         KBState state = new KBState(oldState);
         state.sceneLoader = a.sceneLoader;

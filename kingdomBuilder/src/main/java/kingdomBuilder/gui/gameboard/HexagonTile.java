@@ -1,8 +1,7 @@
 package kingdomBuilder.gui.gameboard;
 
-import javafx.event.EventHandler;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Polygon;
@@ -47,6 +46,16 @@ public class HexagonTile extends Polygon {
     private static ArrayList<Point> corners;
 
     /**
+     * Represents, if the tile is highlighted.
+     */
+    private boolean highlight = false;
+
+    /**
+     * Represents the tileType of th hexagon.
+     */
+    private TileType tileType;
+
+    /**
      * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos The x-coordinate of the upper-left corner position.
      * @param yPos The y-coordinate of the upper-left corner position.
@@ -60,7 +69,7 @@ public class HexagonTile extends Polygon {
             corners = calculateCorners(40);
         }
 
-        if (resourceBundle == null) {
+        if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
 
@@ -70,66 +79,16 @@ public class HexagonTile extends Polygon {
             getPoints().add(yPos + corners.get(i).getY());
         }
 
+        this.tileType = tileType;
+
+        // TODO: execute only for Tokens
+        setTokenTooltip(tileType);
+
         setTexture(textureLoader.getTexture(tileType));
         setHexagonStroke(tileType);
         setMouseHandler(tileType);
     }
 
-    /**
-     * Class that represents a point.
-     */
-    private class Point {
-
-        /**
-         * Represents the x-coordinate of the point.
-         */
-        private int x;
-        /**
-         * Represents the y-coordinate of the point.
-         */
-        private int y;
-        /**
-         * Constructs a new point with the given parameters.
-         * @param x The x-coordinate of the point.
-         * @param y The y-coordinate of the point.
-         */
-        public Point(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        /**
-         * Gets the x-coordinate of the point.
-         * @return The x-coordinate.
-         */
-        public int getX() {
-            return x;
-        }
-
-        /**
-         * Gets the y-coordinate of the point.
-         * @return The y-coordinate.
-         */
-        public int getY() {
-            return y;
-        }
-
-        /**
-         * Translates the x-coordinate of a point with the given distance.
-         * @param x The value that the point is moved on the x-axis.
-         */
-        public void translateX(int x) {
-            this.x += x;
-        }
-
-        /**
-         * Translates the y-coordinate of a point with the given distance.
-         * @param y The value that the point is moved on the y-axis.
-         */
-        public void translateY(int y) {
-            this.y += y;
-        }
-    }
     /**
      * Calculates the corners of a hexagon with the given radius.
      * @param radius The radius from the center of a hexagon to one of its corners.
@@ -156,8 +115,8 @@ public class HexagonTile extends Polygon {
         // search the distance from the center to the far left side
         int minX = Integer.MAX_VALUE;
         for (Point e : corners) {
-            if (e.x < minX) {
-                minX = e.x;
+            if (e.getX() < minX) {
+                minX = e.getX();
             }
         }
 
@@ -166,7 +125,6 @@ public class HexagonTile extends Polygon {
             corners.get(i).translateX(-minX);
             corners.get(i).translateY(radius);
         }
-
         return corners;
     }
 
@@ -187,14 +145,58 @@ public class HexagonTile extends Polygon {
         // sets the stroke
         if (tileType.getValue() < 9) {
             // normal Tile
+            setStroke(Paint.valueOf("CYAN"));
             setStrokeWidth(0.0);
         } else {
             // special Place
             setStroke(Paint.valueOf("GOLD"));
             setStrokeWidth(1.0);
         }
-
         setStrokeType(StrokeType.INSIDE);
+    }
+
+    /**
+     * Set the rule for every generated special place to their rule.
+     * @param tileType type for recognizing the special place.
+     */
+    private void setTokenTooltip(TileType tileType) {
+        // TODO: Adjust to gameLogic enums
+        Tooltip tokenTooltip = new Tooltip();
+        switch (tileType) {
+            case BARN -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenBarnRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case FARM -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenFarmRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case OASIS -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenOasisRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case TOWER -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenTowerRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case HARBOR -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenHarborRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case ORACLE -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenOracleRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case TAVERN -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenTavernRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+            case PADDOCK -> {
+                tokenTooltip.setText(resourceBundle.getString("tokenPaddockRule"));
+                Tooltip.install(this, tokenTooltip);
+            }
+        }
+
     }
 
     /**
@@ -202,42 +204,74 @@ public class HexagonTile extends Polygon {
      * @param tileType The type of the hexagon.
      */
     private void setMouseHandler(TileType tileType) {
-        setOnMouseEntered(new EventHandler<MouseEvent>() {
-            /**
-             * A MouseEvent handler to highlight the hexagon.
-             * @param event A MouseEvent
-             */
-            @Override
-            public void handle(MouseEvent event) {
+        setOnMouseEntered( event -> {
+            if (highlight) {
+                setStroke(Paint.valueOf("DARKORCHID"));
+            } else {
                 setStroke(Paint.valueOf("RED"));
-                setStrokeWidth(2.0);
             }
+            setStrokeWidth(2.0);
+        });
+
+        setOnMouseMoved(event -> {
+            if (highlight) {
+                setStroke(Paint.valueOf("DARKORCHID"));
+            } else {
+                setStroke(Paint.valueOf("RED"));
+            }
+            setStrokeWidth(2.0);
         });
 
         // TODO: Adjust to gameLogic enums (only Tiles have no Border and Gold Border for Tokens)
         if (tileType.getValue() < 9) {
-            setOnMouseExited(new EventHandler<MouseEvent>() {
-                /**
-                 * A MouseEvent handler to end the highlight of the hexagon.
-                 * @param event A MouseEvent
-                 */
-                @Override
-                public void handle(MouseEvent event) {
+            // placeable Tile
+            setOnMouseExited(event -> {
+                setStroke(Paint.valueOf("CYAN"));
+                if (highlight) {
+                    setStrokeWidth(2.0);
+                } else {
                     setStrokeWidth(0.0);
                 }
             });
         } else {
-            setOnMouseExited(new EventHandler<MouseEvent>() {
-                /**
-                 * A MouseEvent handler to end the highlight of the hexagon.
-                 * @param event A MouseEvent
-                 */
-                @Override
-                public void handle(MouseEvent event) {
-                    setStroke(Paint.valueOf("GOLD"));
-                    setStrokeWidth(1.0);
-                }
+            // special Tile
+            setOnMouseExited(event -> {
+                setStroke(Paint.valueOf("GOLD"));
+                setStrokeWidth(2.0);
             });
         }
+    }
+
+    /**
+     * Activates the highlight of a Tile.
+     */
+    public void setHighlight() {
+        highlight = true;
+        setStroke(Paint.valueOf("CYAN"));
+        setStrokeWidth(2.0);
+    }
+
+    /**
+     * Removes the highlight from the tile.
+     */
+    public void removeHighlight() {
+        highlight = false;
+        setStrokeWidth(0.0);
+    }
+
+    /**
+     * Gets the boolean value, if the tile is currently highlighted.
+     * @return If the tile is highlighted.
+     */
+    public boolean isHighlighted() {
+        return highlight;
+    }
+
+    /**
+     * Gets the type of the hexagon.
+     * @return The Type of the hexagon.
+     */
+    public TileType getTileType() {
+        return tileType;
     }
 }

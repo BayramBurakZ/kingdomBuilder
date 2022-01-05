@@ -19,8 +19,7 @@ import java.util.ResourceBundle;
 public class GameBoardViewController extends Controller implements Initializable {
 
     //TODO:
-    // - replace by the GameBoard.java object
-    // - temporary solution to store the board instead using the data from dataLogic
+    // temporary solution to store the board instead using the data from dataLogic
     private TileType[][] gameBoardData;
 
     /**
@@ -47,7 +46,8 @@ public class GameBoardViewController extends Controller implements Initializable
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //gameboard_pane.setBackground(new Background(new BackgroundFill(Color.AQUAMARINE, null, null)));
+        //make board transparent
+        //gameBoard_pane.setOpacity(0.0);
 
         resourceBundle = resources;
 
@@ -111,20 +111,14 @@ public class GameBoardViewController extends Controller implements Initializable
              */
             @Override
             public void handle(KeyEvent event) {
-                switch(event.getCode()){
+                switch (event.getCode()) {
                     // TODO: Verschiebungsgrad anpassen
-                    case UP:
-                        gameBoard_pane.setTranslateY(gameBoard_pane.getTranslateY() + 20.0);
-                        break;
-                    case DOWN:
-                        gameBoard_pane.setTranslateY(gameBoard_pane.getTranslateY() - 20.0);
-                        break;
-                    case LEFT:
-                        gameBoard_pane.setTranslateX(gameBoard_pane.getTranslateX() + 20.0);
-                        break;
-                    case RIGHT:
-                        gameBoard_pane.setTranslateX(gameBoard_pane.getTranslateX() - 20.0);
-                        break;
+                    case UP -> gameBoard_pane.setTranslateY(gameBoard_pane.getTranslateY() + 20.0);
+                    case DOWN -> gameBoard_pane.setTranslateY(gameBoard_pane.getTranslateY() - 20.0);
+                    case LEFT -> gameBoard_pane.setTranslateX(gameBoard_pane.getTranslateX() + 20.0);
+                    case RIGHT -> gameBoard_pane.setTranslateX(gameBoard_pane.getTranslateX() - 20.0);
+                    //ToDO: remove - just for testing the highlight
+                    case R ->  gameBoard.highlightTerrain();
                 }
             }
         });
