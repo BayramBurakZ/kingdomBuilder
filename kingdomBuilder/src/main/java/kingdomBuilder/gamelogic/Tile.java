@@ -64,11 +64,30 @@ public class Tile {
         return tileType;
     }
 
+    public boolean isOccupiedByPlayer(Player player) {
+
+        if (occupiedBy == player)
+            return true;
+
+        return false;
+    }
+
+    public boolean isOccupied() {
+
+        if (occupiedBy != null)
+            return true;
+
+        return false;
+    }
+
+
     /**
      * Gets the tile type of the tile.
+     *
      * @return The tile type of the tile.
      */
     public TileType getTileType() {
         return tileType;
     }
+
 }

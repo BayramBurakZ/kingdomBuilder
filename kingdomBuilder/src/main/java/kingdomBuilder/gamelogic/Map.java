@@ -128,30 +128,62 @@ public class Map {
     }
 
     /**
-     * Get the position of a 2D array in a 1D array.
+     * Get the position of a 1D array from a 2D index.
      *
-     * @param x     The position of the 2D array.
-     * @param y     The position of th 2D array.
-     * @param width The width of the 2D array.
-     * @return The position in a 1D array.
+     * @param x     The x position of the 2D array.
+     * @param y     The y position of the 2D array.
+     * @param width The height/width of the 2D array.
+     * @return The position in the 1D array.
      */
     private int to1DIndex(int x, int y, int width) {
         return y * width + x;
     }
 
     //TODO: eliminate width from return
+    /**
+     * Get the position of the 1D game map from a 2D index for the top left quadrant.
+     *
+     * @param x     The x position of the 2D array.
+     * @param y     The y position of the 2D array.
+     * @param width The height/width of the 2D quadrant.
+     * @return The position in the 1D array.
+     */
     private int to1DIndexTopLeft(int x, int y, int width) {
         return y * 2 * width + x;
     }
 
+    /**
+     * Get the position of the 1D game map from a 2D index for the top right quadrant.
+     *
+     * @param x     The x position of the 2D array.
+     * @param y     The y position of the 2D array.
+     * @param width The height/width of the 2D quadrant.
+     * @return The position in the 1D array.
+     */
     private int to1DIndexTopRight(int x, int y, int width) {
         return y * 2 * width + x + width;
     }
 
+    /**
+     * Get the position of the 1D game map from a 2D index for the bottom left quadrant.
+     *
+     * @param x     The x position of the 2D array.
+     * @param y     The y position of the 2D array.
+     * @param width The height/width of the 2D quadrant.
+     * @return The position in the 1D array.
+     */
     private int to1DIndexBottomLeft(int x, int y, int width) {
         return width * 2 * width + y * 2 * width + x;
     }
 
+    /**
+     * Get the position of the 1D game map from a 2D index for the bottom right quadrant.
+     *
+     * @param x     The x position of the 2D array.
+     * @param y     The y position of the 2D array.
+     * @param width The height/width of the 2D quadrant.
+     * @return The position in the 1D array.
+     */
     private int to1DIndexBottomRight(int x, int y, int width) {
         return width * 2 * width + y * 2 * width + x + width;
     }
@@ -207,12 +239,17 @@ public class Map {
      */
     public boolean isTilePlaceable(int x, int y) {
 
-        if (placeableTileTypes.contains(getTileType(x, y)))
-            return true;
+        Tile target = getTile(x, y);
 
-        return false;
+        if (tokenType.contains(target.getTileType()))
+            return false;
+        else if (target.isOccupied())
+            return false;
+        else if (nonPlaceableTileTypes.contains(target.getTileType()))
+            return false;
+
+        return true;
     }
-
 
     /**
      * Checks if two tiles are neighbours in the hexagon map.
@@ -256,5 +293,35 @@ public class Map {
         }
 
         return false;
+    }
+
+    // TODO: JavaDoc
+    /**
+     * Checks if two tiles have the same type.
+     *
+     * @param firstX
+     * @param firstY
+     * @param secondX
+     * @param secondY
+     * @return
+     */
+    public boolean tilesAreSameType(int firstX, int firstY, int secondX, int secondY) {
+        if (getTile(firstX, firstY).getTileType() == getTile(secondX, secondY).getTileType())
+            return true;
+
+        return false;
+    }
+
+    // TODO: JavaDoc
+    public boolean tileIsOccupiedByPlayer(int x, int y, Player player){
+        if(getTile(x, y).isOccupiedByPlayer(player))
+            return true;
+
+        return false;
+    }
+
+    // TODO: JavaDoc
+    public int getMapWidth(){
+        return mapWidth;
     }
 }
