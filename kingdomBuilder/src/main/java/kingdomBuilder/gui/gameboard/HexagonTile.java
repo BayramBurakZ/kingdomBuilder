@@ -1,20 +1,23 @@
 package kingdomBuilder.gui.gameboard;
 
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
+import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.Image;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.StrokeType;
+import javafx.scene.shape.MeshView;
+import javafx.scene.shape.TriangleMesh;
+import javafx.util.Duration;
+import kingdomBuilder.gui.util.PLYLoader;
 import kingdomBuilder.model.TileType;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
  * Class that is used to display the hexagon tiles in the UI.
  */
-public class HexagonTile extends Polygon {
+public class HexagonTile extends MeshView {
     /**
      * Represents the angle in degree to turn the corners around the center;
      */
@@ -43,7 +46,7 @@ public class HexagonTile extends Polygon {
     /**
      * Represents the six corners of a hexagon.
      */
-    private static ArrayList<Point> corners;
+    private static ArrayList<Point> vertices;
 
     /**
      * Represents, if the tile is highlighted.
@@ -51,9 +54,100 @@ public class HexagonTile extends Polygon {
     private boolean highlight = false;
 
     /**
-     * Represents the tileType of th hexagon.
+     * Represents the tileType of the hexagon.
      */
     private TileType tileType;
+
+    /**
+     * Represents the TriangleMesh for the hexanoal prism.
+     */
+    private static final TriangleMesh hexagonMesh;
+
+    // TODO: check if javadoc is necessary
+    static {
+        TriangleMesh loadedMesh = null;
+        try {
+            loadedMesh = PLYLoader.readFromPlyFile(
+                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/hexagon.ply").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        hexagonMesh = loadedMesh;
+    }
+
+    /**
+     * Represents the TriangleMesh for the Settlement.
+     */
+    private static final TriangleMesh settlementMesh;
+
+    // TODO: check if javadoc is necessary
+    static {
+        TriangleMesh loadedMesh = null;
+        try {
+            loadedMesh = PLYLoader.readFromPlyFile(
+                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/settlement.ply").toURI());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        settlementMesh = loadedMesh;
+    }
+
+    //private static final PhongMaterial hexagonMaterial = new PhongMaterial();
+
+    /**
+     * Represents the MeshView for the settlement.
+     */
+    private final MeshView settlement = new MeshView(settlementMesh);
+
+    /**
+     * Represents the Group that contains the hexagonal prism and the settlement.
+     */
+    public Group root = new Group(this, settlement);
+
+    /**
+     * Represents the height for the hexagonal prism.
+     */
+    private static final double HEXAGON_HEIGHT = 40;
+
+    /**
+     * Represents the width for the hexagonal prism.
+     */
+    private static final double HEXAGON_WIDTH = 40;
+
+    /**
+     * Represents the depth for the hexagonal prism.
+     */
+    private static final double HEXAGON_DEPTH = 20;
+
+    /**
+     * Represents the height for a settlement.
+     */
+    private static final double SETTLEMENT_HEIGHT = 15;
+
+    /**
+     * Represents the width for a settlement.
+     */
+    private static final double SETTLEMENT_WIDTH = 15;
+
+    /**
+     * Represents the depth for a settlement.
+     */
+    private static final double SETTLEMENT_DEPTH = 15;
+
+    /**
+     * Represents the distance that the group moves for highlighting.
+     */
+    private static final double HIGHLIGHT_DISTANCE = HEXAGON_DEPTH;
+
+    /**
+     * Represents the time for the animation to highlighting.
+     */
+    private static final Duration HIGHLIGHT_DURATION = Duration.millis(200);
+
+    /**
+     * Represents the animation for the highlight.
+     */
+    private final TranslateTransition highlightAnimation = new TranslateTransition(HIGHLIGHT_DURATION);
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
@@ -63,29 +157,32 @@ public class HexagonTile extends Polygon {
      * @param resource The ResourceBundle to translate text.
      */
     public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
-        // only calculate the corners once and not for every hexagon
-        if (corners == null) {
-            //ToDo: extract the hard coded radius
-            corners = calculateCorners(40);
-        }
+        super(hexagonMesh);
+        setScaleX(HEXAGON_WIDTH);
+        setScaleY(HEXAGON_HEIGHT);
+        setScaleZ(HEXAGON_DEPTH);
+
+        settlement.setScaleX(SETTLEMENT_WIDTH);
+        settlement.setScaleY(SETTLEMENT_HEIGHT);
+        settlement.setScaleZ(SETTLEMENT_DEPTH);
+        settlement.setTranslateZ(-HEXAGON_DEPTH-SETTLEMENT_DEPTH);
+
+        root.setTranslateX(xPos);
+        root.setTranslateY(yPos);
 
         if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
 
-        // calculate all corners of a hexagon
-        for (int i = 0; i < NUMBER_OF_CORNERS; i++) {
-            getPoints().add(xPos + corners.get(i).getX());
-            getPoints().add(yPos + corners.get(i).getY());
-        }
-
         this.tileType = tileType;
+
+        highlightAnimation.setFromZ(0);
+        highlightAnimation.setToZ(-HIGHLIGHT_DISTANCE);
+        highlightAnimation.setInterpolator(Interpolator.EASE_BOTH);
+        highlightAnimation.setNode(root);
 
         // TODO: execute only for Tokens
         setTokenTooltip(tileType);
-
-        setTexture(textureLoader.getTexture(tileType));
-        setHexagonStroke(tileType);
         setMouseHandler(tileType);
     }
 
@@ -94,7 +191,7 @@ public class HexagonTile extends Polygon {
      * @param radius The radius from the center of a hexagon to one of its corners.
      * @return A list with six points of a hexagon.
      */
-    private ArrayList<Point> calculateCorners(int radius) {
+    private static ArrayList<Point> calculateCorners(int radius) {
         ArrayList<Point> corners = new ArrayList<>();
 
         int x = 0, my = 0;
@@ -126,33 +223,6 @@ public class HexagonTile extends Polygon {
             corners.get(i).translateY(radius);
         }
         return corners;
-    }
-
-    /**
-     * Sets the texture with the given Image.
-     * @param texture The Image for the texture.
-     */
-    private void setTexture(Image texture) {
-        setFill(new ImagePattern(texture, 0.0f, 0.0f, 1.0f, 1.0f, true));
-    }
-
-    /**
-     * Sets the Stroke of a hexagon based on its type.
-     * @param tileType The type of the hexagon.
-     */
-    private void setHexagonStroke(TileType tileType) {
-        // TODO: Adjust to gameLogic enums
-        // sets the stroke
-        if (tileType.getValue() < 9) {
-            // normal Tile
-            setStroke(Paint.valueOf("CYAN"));
-            setStrokeWidth(0.0);
-        } else {
-            // special Place
-            setStroke(Paint.valueOf("GOLD"));
-            setStrokeWidth(1.0);
-        }
-        setStrokeType(StrokeType.INSIDE);
     }
 
     /**
@@ -206,57 +276,50 @@ public class HexagonTile extends Polygon {
     private void setMouseHandler(TileType tileType) {
         setOnMouseEntered( event -> {
             if (highlight) {
-                setStroke(Paint.valueOf("DARKORCHID"));
+
             } else {
-                setStroke(Paint.valueOf("RED"));
+
             }
-            setStrokeWidth(2.0);
         });
 
         setOnMouseMoved(event -> {
             if (highlight) {
-                setStroke(Paint.valueOf("DARKORCHID"));
+
             } else {
-                setStroke(Paint.valueOf("RED"));
+
             }
-            setStrokeWidth(2.0);
         });
 
-        // TODO: Adjust to gameLogic enums (only Tiles have no Border and Gold Border for Tokens)
-        if (tileType.getValue() < 9) {
-            // placeable Tile
-            setOnMouseExited(event -> {
-                setStroke(Paint.valueOf("CYAN"));
-                if (highlight) {
-                    setStrokeWidth(2.0);
-                } else {
-                    setStrokeWidth(0.0);
-                }
-            });
-        } else {
-            // special Tile
-            setOnMouseExited(event -> {
-                setStroke(Paint.valueOf("GOLD"));
-                setStrokeWidth(2.0);
-            });
-        }
+        setOnMouseExited(event -> {
+            if (highlight) {
+
+            } else {
+
+            }
+        });
+
     }
 
     /**
      * Activates the highlight of a Tile.
      */
     public void setHighlight() {
-        highlight = true;
-        setStroke(Paint.valueOf("CYAN"));
-        setStrokeWidth(2.0);
+        if (!highlight) {
+            highlightAnimation.setRate(1);
+            highlightAnimation.play();
+            highlight = true;
+        }
     }
 
     /**
      * Removes the highlight from the tile.
      */
     public void removeHighlight() {
-        highlight = false;
-        setStrokeWidth(0.0);
+        if (highlight) {
+            highlightAnimation.setRate(-1);
+            highlightAnimation.play();
+            highlight = false;
+        }
     }
 
     /**

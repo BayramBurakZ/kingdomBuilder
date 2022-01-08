@@ -101,9 +101,13 @@
 
     <!-- HBox that contains the Subscene with the gameboard-->
     <HBox fx:id="game_hbox_subscene" alignment="CENTER" VBox.vgrow="ALWAYS">
-        <SubScene fx:id="game_subscene" managed="false" BorderPane.alignment="CENTER">
+        <SubScene fx:id="game_subscene" managed="false" BorderPane.alignment="CENTER" pickOnBounds="true"
+                  depthBuffer="true">
+            <antiAliasing>
+                <SceneAntialiasing fx:constant="BALANCED"/>
+            </antiAliasing>
             <root>
-                <fx:include source="GameBoardView.fxml"/>
+                <Group fx:id="gameBoard_group"/>
             </root>
         </SubScene>
     </HBox>
@@ -113,7 +117,8 @@
 
 
         <!-- VBox that displays the information of the current card-->
-        <VBox fx:id="game_vbox_terraincard" alignment="CENTER" style="-fx-border-color: white;             -fx-background-color: ANTIQUEWHITE;">
+        <VBox fx:id="game_vbox_terraincard" alignment="CENTER"
+              style="-fx-border-color: white; -fx-background-color: ANTIQUEWHITE;">
             <Rectangle fx:id="game_rectangle_card" stroke="BLACK" strokeType="INSIDE" />
             <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Flower" />
             <padding>

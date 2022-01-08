@@ -1,6 +1,6 @@
 package kingdomBuilder.gui.gameboard;
 
-import javafx.scene.layout.Pane;
+import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.model.TileType;
 import kingdomBuilder.redux.Store;
@@ -19,7 +19,9 @@ public class GameBoard {
     /**
      * Represents the board that contains the hexagons.
      */
-    private HexagonTile[][] gameBoard = new HexagonTile[20][20];
+    // TODO: use value from Datalogig
+    // TODO: make private again
+    public HexagonTile[][] gameBoard = new HexagonTile[20][20];
 
     /**
      * Constructor to instantiate the GameBoard.
@@ -36,11 +38,11 @@ public class GameBoard {
 
     /**
      * Setup the GameBoard with textured hexagons.
-     * @param pane The pane on which the hexagons are drawn.
+     * @param group The pane on which the hexagons are drawn.
      * @param gameBoardData The data with all information.
      * @param resource The ResourceBundle for translating text.
      */
-    public void setupGameBoard(Pane pane, TileType[][] gameBoardData, ResourceBundle resource) {
+    public void setupGameBoard(Group group, TileType[][] gameBoardData, ResourceBundle resource) {
         resourceBundle = resource;
 
         for (int y = 0; y < 20; y++) {
@@ -55,8 +57,9 @@ public class GameBoard {
                 int yPos = y * 60;
 
                 HexagonTile hexagon = new HexagonTile(xPos, yPos, gameBoardData[x][y], resource);
-                pane.getChildren().add(hexagon);
                 gameBoard[x][y] = hexagon;
+
+                group.getChildren().add(hexagon.root);
             }
         }
     }
@@ -69,17 +72,16 @@ public class GameBoard {
         int random = (int) (Math.random() * 5) + 1;
         for (int y = 0; y < gameBoard.length; y++) {
             for (int x = 0; x < gameBoard.length; x++) {
-                // remove hightlight
-                if (gameBoard[x][y].isHighlighted()) {
-                    gameBoard[x][y].removeHighlight();
-                }
-
-                // set new highlight
-                //TODO: Change to Gamelogic
+                // //TODO: Change to Gamelogic
                 if (gameBoard[x][y].getTileType() == TileType.valueOf(random)) {
-                    gameBoard[x][y].setHighlight();
+                    if (!gameBoard[x][y].isHighlighted())
+                        gameBoard[x][y].setHighlight();
+                } else {
+                    if (gameBoard[x][y].isHighlighted())
+                        gameBoard[x][y].removeHighlight();
                 }
             }
         }
     }
+
 }

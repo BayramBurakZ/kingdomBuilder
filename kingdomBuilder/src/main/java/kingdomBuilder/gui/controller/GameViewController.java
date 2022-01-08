@@ -2,16 +2,24 @@ package kingdomBuilder.gui.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.SubScene;
+import javafx.geometry.Point3D;
+import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
+import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.TextureLoader;
+import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
 
 import java.net.URL;
@@ -26,6 +34,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     private static final TextureLoader textureLoader = new TextureLoader();
 
+    //region FXML-Imports
     /**
      * Represents the initial VBox.
      */
@@ -149,6 +158,21 @@ public class GameViewController extends Controller implements Initializable {
     @FXML
     private Button game_button_end;
 
+    /**
+     * Represents the pane for all hexagons
+     */
+    @FXML
+    private Group gameBoard_group;
+
+    //endregion FXML
+    //TODO:
+    // temporary solution to store the board instead using the data from dataLogic
+    private TileType[][] gameBoardData;
+
+    /**
+     * Represents the gameBoard with data for the gui like hexagons and textures.
+     */
+    private GameBoard gameBoard = new GameBoard(store);
 
     /**
      * Represents the resourceBundle that used for language support.
@@ -174,7 +198,112 @@ public class GameViewController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         resourceBundle = resources;
+
+        // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+
+        double viewAngle = 30.0;
+        double fov = 50.0;
+
+        camera.setFarClip(4096.0);
+        camera.setRotationAxis(new Point3D(1.0, 0, 0));
+        camera.setRotate(viewAngle);
+        camera.setFieldOfView(fov);
+        game_subscene.setCamera(camera);
+
+        // TODO: Remove
+        Model model = new Model();
+        gameBoardData = model.getGameBoardData();
+
+        setupGameBoard();
+
+        // TODO: set initial camera position properly
+        camera.setTranslateX(
+                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
+        camera.setTranslateY(
+                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
+        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
+
+        // create a testBox
+        Box box = new Box(100, 100, 100);
+        TextureLoader textureLoader = new TextureLoader();
+        box.setMaterial(new PhongMaterial(
+                Color.WHITE, textureLoader.getTexture(TileType.FARM), null, null, null)
+        );
+        box.translateXProperty().set(1500);
+        box.translateYProperty().set(1500);
+        box.setOnMouseEntered(e -> {
+            ((PhongMaterial)box.getMaterial()).setDiffuseColor(Color.CHOCOLATE);
+        });
+        box.setOnMouseExited(e -> {
+            ((PhongMaterial)box.getMaterial()).setDiffuseColor(Color.WHITE);
+        });
+        gameBoard_group.getChildren().add(box);
+
+        // TODO: for some reason moving the camera causes bugs, so switch to moving the world instead I guess?
+        setupCameraHandlers(camera, false);
         setupLayout();
+    }
+
+    /**
+     * Setup all connected EventHandler.
+     */
+    private void setupCameraHandlers(Node node, boolean moveWorld) {
+        setupCameraZoomHandler(node, moveWorld);
+        setupCameraScrollHandler(node, moveWorld);
+    }
+
+    /**
+     * Zooms the camera when the user scrolls the mousewheel.
+     */
+    private void setupCameraZoomHandler(Node node, boolean moveWorld) {
+        game_subscene.setOnScroll((ScrollEvent event) -> {
+            double deltaY = event.getDeltaY();
+
+            double zoomSpeed = 1.5;
+            zoomSpeed *= moveWorld ? -1.0 : 1.0;
+
+            double translation = deltaY * zoomSpeed;
+
+            if (moveWorld) {
+                node.setTranslateZ(node.getTranslateZ() + translation);
+            } else {
+                Point3D pos = node.localToScene(0, 0, translation);
+                node.setTranslateX(pos.getX());
+                node.setTranslateY(pos.getY());
+                node.setTranslateZ(pos.getZ());
+            }
+
+            event.consume();
+        });
+    }
+
+    /**
+     * Translates the camera when the user presses the arrow keys or drags the mouse with a rightclick.
+     */
+    private void setupCameraScrollHandler(Node node, boolean moveWorld) {
+        // TODO: smoother scrolling
+        game_subscene.setOnKeyPressed((KeyEvent event) -> {
+            double scrollSpeed = 20.0;
+            scrollSpeed *= moveWorld ? -1.0 : 1.0;
+            switch (event.getCode()) {
+                case UP -> node.setTranslateY(node.getTranslateY() - scrollSpeed);
+                case DOWN -> node.setTranslateY(node.getTranslateY() + scrollSpeed);
+                case LEFT -> node.setTranslateX(node.getTranslateX() - scrollSpeed);
+                case RIGHT -> node.setTranslateX(node.getTranslateX() + scrollSpeed);
+                //ToDO: remove - just for testing the highlight
+                case R ->  gameBoard.highlightTerrain();
+            }
+            event.consume();
+        });
+    }
+
+    /**
+     * Generates the 20 x 20 field of the hexagons.
+     */
+    private void setupGameBoard() {
+        // TODO: access data via state
+        gameBoard.setupGameBoard(gameBoard_group, gameBoardData, resourceBundle);
     }
 
     /**
