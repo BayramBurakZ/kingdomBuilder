@@ -24,6 +24,9 @@ import java.util.ResourceBundle;
  * With the get_View() you get the specific view.
  */
 public class SceneLoader {
+
+    //region Nodes for every View
+
     /**
      * Stores the current menuView.
      */
@@ -56,6 +59,10 @@ public class SceneLoader {
      * Stores the current serverConnectView.
      */
     private Node serverConnectView;
+
+    //endregion Nodes
+
+    //region Controller for every View
 
     /**
      * Stores the menuViewController.
@@ -90,6 +97,7 @@ public class SceneLoader {
      */
     private ServerConnectViewController serverConnectViewController;
 
+    //endregion Controller for every View
 
     /**
      * Represents the store of the application.

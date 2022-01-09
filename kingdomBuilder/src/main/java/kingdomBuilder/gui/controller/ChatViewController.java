@@ -29,6 +29,9 @@ import java.util.ResourceBundle;
  * containing data.
  */
 public class ChatViewController extends Controller implements Initializable {
+
+    //region FXML-Imports
+
     /**
      * Represents the button to clear the selection.
      */
@@ -95,6 +98,8 @@ public class ChatViewController extends Controller implements Initializable {
     @FXML
     private WebView webview_globalchat;
 
+    //endregion FXML-Imports
+
     /**
      * The body of the html file used for displaying the global chat.
      */
@@ -154,11 +159,24 @@ public class ChatViewController extends Controller implements Initializable {
             }
         });
 
+        setupClientList();
+        setupWebView();
+    }
+
+    /**
+     * Setup for the table that shows all connected clients.
+     */
+    private void setupClientList() {
         tableview_chat.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
         column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
         column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameId"));
+    }
 
+    /**
+     * Setup for the WebView that displays the Chat-Log.
+     */
+    private void setupWebView() {
         webview_globalchat.setContextMenuEnabled(false);
 
         WebEngine webEngine = webview_globalchat.getEngine();
@@ -408,7 +426,7 @@ public class ChatViewController extends Controller implements Initializable {
                 messageElement.appendChild(textElement);
                 globalChatAppendElement(messageElement);
             } else {
-                // text output for game chat
+                // TODO: text output for game chat
             }
 
             store.dispatch(new ChatSendAction(receiverIds, message));

@@ -28,7 +28,6 @@ public class KingdomBuilderApplication extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        // TODO: resources instead of path for .fxml-files
         // TODO: WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @1933c126'
 
         sceneLoader = new SceneLoader(store);

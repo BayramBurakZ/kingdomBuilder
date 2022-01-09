@@ -85,43 +85,26 @@ public class TextureLoader {
      * @return The Image for the requested Tile.
      */
     public Image getTexture(TileType type) {
-        switch (type) {
-            case CANYON:
-                return CANYON;
-            case DESERT:
-                return DESERT;
-            case FLOWER:
-                return FLOWER;
-            case FORREST:
-                return FORREST;
-            case GRAS:
-                return GRAS;
-            case MOUNTAIN:
-                return MOUNTAIN;
-            case WATER:
-                return WATER;
-            case CASTLE:
-                return CASTLE;
-            case BARN:
-                return BARN;
-            case FARM:
-                return FARM;
-            case HARBOR:
-                return HARBOR;
-            case OASIS:
-                return OASIS;
-            case ORACLE:
-                return ORACLE;
-            case PADDOCK:
-                return PADDOCK;
-            case TAVERN:
-                return TAVERN;
-            case TOWER:
-                return TOWER;
+        return switch (type) {
+            case CANYON -> CANYON;
+            case DESERT -> DESERT;
+            case FLOWER -> FLOWER;
+            case FORREST -> FORREST;
+            case GRAS -> GRAS;
+            case MOUNTAIN -> MOUNTAIN;
+            case WATER -> WATER;
+            case CASTLE -> CASTLE;
+            case BARN -> BARN;
+            case FARM -> FARM;
+            case HARBOR -> HARBOR;
+            case OASIS -> OASIS;
+            case ORACLE -> ORACLE;
+            case PADDOCK -> PADDOCK;
+            case TAVERN -> TAVERN;
+            case TOWER -> TOWER;
 
             // TODO: generates an exception:
-            default:
-                return null;
-        }
+            default -> null;
+        };
     }
 }

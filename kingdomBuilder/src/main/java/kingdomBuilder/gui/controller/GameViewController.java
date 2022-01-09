@@ -6,8 +6,6 @@ import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
@@ -36,6 +34,16 @@ public class GameViewController extends Controller implements Initializable {
      * Represents the texture loader which all hexagons share.
      */
     private static final TextureLoader textureLoader = new TextureLoader();
+
+    /**
+     * Represents the setting for the field of view (fov).
+     */
+    private static final double fov = 50.0;
+
+    /**
+     * Represents the angle for the camera.
+     */
+    private static final double viewAngle = 30.0;
 
     //region FXML-Imports
 
@@ -214,10 +222,8 @@ public class GameViewController extends Controller implements Initializable {
         gameBoardData = model.getGameBoardData();
 
         setupGameBoard();
-
         setupCamera();
         setupLight();
-
         setupLayout();
 
         // create a testBox
@@ -237,6 +243,9 @@ public class GameViewController extends Controller implements Initializable {
         gameBoard_group.getChildren().add(box);
     }
 
+    /**
+     * Sets the initial light for the board.
+     */
     private void setupLight() {
         AmbientLight al = new AmbientLight(Color.gray(0.4));
         gameBoard_group.getChildren().add(al);
@@ -254,10 +263,6 @@ public class GameViewController extends Controller implements Initializable {
      * Initializes the Camera for the subScene.
      */
     private void setupCamera() {
-        // TODO constants?
-        double viewAngle = 30.0;
-        double fov = 50.0;
-
         // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
         PerspectiveCamera camera = new PerspectiveCamera(true);
 
@@ -275,37 +280,34 @@ public class GameViewController extends Controller implements Initializable {
         camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
 
         // TODO: for some reason moving the camera causes bugs, so switch to moving the world instead I guess?
-        setupCameraHandlers(camera, false);
+        setupCameraHandlers(camera);
     }
 
     /**
      * Setup all connected EventHandler.
+     * @param node
      */
-    private void setupCameraHandlers(Node node, boolean moveWorld) {
-        setupCameraZoomHandler(node, moveWorld);
-        setupCameraScrollHandler(node, moveWorld);
+    private void setupCameraHandlers(Node node) {
+        setupCameraZoomHandler(node);
+        setupCameraScrollHandler(node);
     }
 
     /**
      * Zooms the camera when the user scrolls the mousewheel.
+     * @param node
      */
-    private void setupCameraZoomHandler(Node node, boolean moveWorld) {
+    private void setupCameraZoomHandler(Node node) {
         game_subscene.setOnScroll((ScrollEvent event) -> {
             double deltaY = event.getDeltaY();
 
             double zoomSpeed = 1.5;
-            zoomSpeed *= moveWorld ? -1.0 : 1.0;
 
             double translation = deltaY * zoomSpeed;
 
-            if (moveWorld) {
-                node.setTranslateZ(node.getTranslateZ() + translation);
-            } else {
-                Point3D pos = node.localToScene(0, 0, translation);
-                node.setTranslateX(pos.getX());
-                node.setTranslateY(pos.getY());
-                node.setTranslateZ(pos.getZ());
-            }
+            Point3D pos = node.localToScene(0, 0, translation);
+            node.setTranslateX(pos.getX());
+            node.setTranslateY(pos.getY());
+            node.setTranslateZ(pos.getZ());
 
             event.consume();
         });
@@ -313,12 +315,12 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Translates the camera when the user presses the arrow keys or drags the mouse with a rightclick.
+     * @param node
      */
-    private void setupCameraScrollHandler(Node node, boolean moveWorld) {
+    private void setupCameraScrollHandler(Node node) {
         // TODO: smoother scrolling
         game_subscene.setOnKeyPressed((KeyEvent event) -> {
             double scrollSpeed = 20.0;
-            scrollSpeed *= moveWorld ? -1.0 : 1.0;
             switch (event.getCode()) {
                 case UP -> node.setTranslateY(node.getTranslateY() - scrollSpeed);
                 case DOWN -> node.setTranslateY(node.getTranslateY() + scrollSpeed);
@@ -368,7 +370,6 @@ public class GameViewController extends Controller implements Initializable {
         game_hbox_statistic.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.1));
         game_hbox_subscene.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.7));
         game_hbox_playerinformation.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.15));
-
 
         //resize VBox that contains the information for the current terrain type (picture, text)
         game_vbox_terraincard.prefWidthProperty().bind(game_vbox.widthProperty().multiply(0.15));

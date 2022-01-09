@@ -1,7 +1,5 @@
 package kingdomBuilder.gui.gameboard;
 
-import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
@@ -19,7 +17,6 @@ public class Hexagon extends MeshView {
      */
     private static final TriangleMesh hexagonMesh;
 
-    // TODO: check if javadoc is necessary
     static {
         TriangleMesh loadedMesh = null;
         try {

@@ -4,7 +4,6 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
@@ -18,20 +17,39 @@ import java.util.ResourceBundle;
  */
 public class MenuViewController extends Controller implements Initializable {
 
+    //region FXML-Imports
+
+    /**
+     * Represents the VBox that contains all buttons.
+     */
     @FXML
     private VBox menuview_vbox;
 
+    /**
+     * Represents the button to start a local game.
+     */
     @FXML
     private Button menuview_button_localgame;
 
+    /**
+     * Represents the button to play an online game.
+     */
     @FXML
     private Button menuview_button_onlinegame;
 
+    /**
+     * Represents the button to get to the settings.
+     */
     @FXML
     private Button menuview_button_settings;
 
+    /**
+     * Represents the button to exit the program.
+     */
     @FXML
     private Button menuview_button_exit;
+
+    //endregion FXML-Imports
 
     /**
      * Sets the store.
@@ -69,6 +87,7 @@ public class MenuViewController extends Controller implements Initializable {
     @FXML
     private void onLocalGameButtonPressed(Event event) {
         sceneLoader.showGameView(false, false);
+        // TODO change again to the correct scene
         //sceneLoader.showGameSettingsView(false);
     }
 

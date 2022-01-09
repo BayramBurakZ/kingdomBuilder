@@ -30,7 +30,6 @@ public class PLYLoader {
 
 
         try {
-            // TODO FIX
             BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(uri)));
 
             String line = bufferedReader.readLine();

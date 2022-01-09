@@ -30,7 +30,6 @@ public class Settlement extends MeshView {
      */
     public static final double SETTLEMENT_DEPTH = 15;
 
-    // TODO: check if javadoc is necessary
     static {
         TriangleMesh loadedMesh = null;
         try {
@@ -42,6 +41,9 @@ public class Settlement extends MeshView {
         settlementMesh = loadedMesh;
     }
 
+    /**
+     * Creates a new 3D settlement.
+     */
     public Settlement() {
         super(settlementMesh);
         setScaleX(SETTLEMENT_WIDTH);

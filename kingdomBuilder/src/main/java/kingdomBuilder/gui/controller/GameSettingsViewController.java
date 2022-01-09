@@ -39,6 +39,8 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private static final int MIN_TURN_LIMIT = 1;
 
+    //region FXML-Imports
+
     /**
      * Represents the Button to go back into the previous screen.
      */
@@ -74,8 +76,6 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     @FXML
     private GridPane gamesettings_gridpane_ids;
-
-
 
     /**
      * Represents the spinner, where the user sets, how many (humen-)players can join.
@@ -137,11 +137,19 @@ public class GameSettingsViewController extends Controller implements Initializa
     @FXML
     private Button gamesettings_button_host_spectate;
 
+    /**
+     * Represents the textfield, to set the name of the game.
+     */
     @FXML
     private TextField gamesettings_textfield_name;
 
+    /**
+     * Represents the textfield, to set the describtion of the game.
+     */
     @FXML
     private TextField gamesettings_textfield_desc;
+
+    //endregion FXML-Imports
 
     /**
      * Represents if the menu is for a local (0) or online (1) game.
@@ -288,22 +296,22 @@ public class GameSettingsViewController extends Controller implements Initializa
                 activateHostGameButton();
             }
 
-            //update Buttons
+            // update Buttons
             updateButtons();
-            //update values in bot spinner
+            // update values in bot spinner
             updateBotSpinner();
-            //update values in player spinner
+            // update values in player spinner
             updatePlayerSpinner();
         });
 
         gamesettings_spinner_bots.valueProperty().addListener((observable, oldValue, newValue) -> {
             botCount = newValue;
 
-            //update Buttons
+            // update Buttons
             updateButtons();
-            //update values in hotseat spinner
+            // update values in hotseat spinner
             updateHotseatSpinner();
-            //update values in player spinner
+            // update values in player spinner
             updatePlayerSpinner();
         });
     }
