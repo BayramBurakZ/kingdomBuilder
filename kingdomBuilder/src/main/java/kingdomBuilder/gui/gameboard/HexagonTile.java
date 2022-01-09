@@ -24,9 +24,14 @@ public class HexagonTile extends Group {
     private static ResourceBundle resourceBundle;
 
     /**
-     * Represents, if the tile is highlighted.
+     * Represents if the tile's color has been changed for highlighting.
      */
-    private boolean highlight = false;
+    private boolean isColorHighlighted = false;
+
+    /**
+     * Represents if the tile is translated in the z direction for highlighting.
+     */
+    private boolean isElevated = false;
 
     /**
      * Represents the tileType of the hexagon.
@@ -172,63 +177,65 @@ public class HexagonTile extends Group {
             settlement.setMaterial(mat);
         });
 
-        setOnMouseEntered( event -> {
-            if (highlight) {
-                // TODO do it properly
-                ((PhongMaterial) hexagon.getMaterial()).setDiffuseColor(Color.RED);
+        setOnMouseEntered(event -> setColorHighlighted());
 
-            } else {
-
-            }
-        });
-
-        setOnMouseMoved(event -> {
-            if (highlight) {
-
-            } else {
-
-            }
-        });
-
-        setOnMouseExited(event -> {
-            if (highlight) {
-                // TODO do it properly
-                ((PhongMaterial) hexagon.getMaterial()).setDiffuseColor(Color.WHITE);
-            } else {
-
-            }
-        });
-
+        setOnMouseExited(event -> removeColorHighlighted());
     }
 
     /**
-     * Activates the highlight of a Tile.
+     * Activates the color highlighting of a tile.
      */
-    public void setHighlight() {
-        if (!highlight) {
+    private void setColorHighlighted() {
+        if (!isColorHighlighted && isElevated) {
+            isColorHighlighted = true;
+            hexagon.setMaterial(MaterialLoader.RED);
+        }
+    }
+
+    /**
+     * Removes the color highlighting of the tile.
+     */
+    private void removeColorHighlighted() {
+        if (isColorHighlighted) {
+            isColorHighlighted = false;
+            resetMaterial();
+        }
+    }
+
+    /**
+     * Activates the elevation highlighting of the tile.
+     */
+    public void setElevated() {
+        if (!isElevated) {
+            isElevated = true;
+            if (isHover()) {
+                setColorHighlighted();
+            }
             highlightAnimation.setRate(1);
             highlightAnimation.play();
-            highlight = true;
         }
     }
 
     /**
-     * Removes the highlight from the tile.
+     * Removes the elevation highlighting of the tile.
      */
-    public void removeHighlight() {
-        if (highlight) {
+    public void removeElevated() {
+        if (isElevated) {
+            isElevated = false;
+            if (isColorHighlighted) {
+                removeColorHighlighted();
+            }
             highlightAnimation.setRate(-1);
             highlightAnimation.play();
-            highlight = false;
         }
     }
 
     /**
-     * Gets the boolean value, if the tile is currently highlighted.
-     * @return If the tile is highlighted.
+     * Gets the boolean value if the tile is currently elevated for highlighting.
+     * @return If the tile is elevated for highlighting.
      */
-    public boolean isHighlighted() {
-        return highlight;
+    public boolean isElevated() {
+        return isElevated;
     }
 
     /**
@@ -237,5 +244,13 @@ public class HexagonTile extends Group {
      */
     public TileType getTileType() {
         return tileType;
+    }
+
+    /**
+     * Sets the material to the tile type's material.
+     */
+    public void resetMaterial() {
+        PhongMaterial mat = MaterialLoader.getMaterial(tileType);
+        hexagon.setMaterial(mat);
     }
 }

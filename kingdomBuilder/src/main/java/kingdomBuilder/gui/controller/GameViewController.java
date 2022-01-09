@@ -6,6 +6,8 @@ import javafx.geometry.Point3D;
 import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
@@ -18,6 +20,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.gui.gameboard.GameBoard;
+import kingdomBuilder.gui.gameboard.Hexagon;
 import kingdomBuilder.gui.gameboard.TextureLoader;
 import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
@@ -35,6 +38,7 @@ public class GameViewController extends Controller implements Initializable {
     private static final TextureLoader textureLoader = new TextureLoader();
 
     //region FXML-Imports
+
     /**
      * Represents the initial VBox.
      */
@@ -164,9 +168,6 @@ public class GameViewController extends Controller implements Initializable {
     @FXML
     private Group gameBoard_group;
 
-    @FXML
-    private PointLight gameBoard_pointlight;
-
     //endregion FXML
 
     //TODO:
@@ -177,6 +178,11 @@ public class GameViewController extends Controller implements Initializable {
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
     private GameBoard gameBoard = new GameBoard(store);
+
+    /**
+     * Represents the center of the gameboard as a Point3D.
+     */
+    private Point3D boardCenter;
 
     /**
      * Represents the resourceBundle that used for language support.
@@ -232,22 +238,16 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     private void setupLight() {
-        // TODO: fix light
-        double viewAngle = 30.0;
-        double fov = 50.0;
-        AmbientLight al = new AmbientLight();
+        AmbientLight al = new AmbientLight(Color.gray(0.4));
         gameBoard_group.getChildren().add(al);
 
-        gameBoard_pointlight.setRotationAxis(new Point3D(1.0, 0, 0));
-        gameBoard_pointlight.setRotate(viewAngle);
+        // for some reason JavaFX doesn't support vector light/sunlight
+        SpotLight sl = new SpotLight(Color.gray(0.6));
+        gameBoard_group.getChildren().add(sl);
 
-        gameBoard_pointlight.setTranslateX(
-                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
-        gameBoard_pointlight.setTranslateY(
-                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) *
-                        (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
-        gameBoard_pointlight.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
-        System.out.println(gameBoard_pointlight.getTranslateX());
+        sl.setTranslateX(boardCenter.getX());
+        sl.setTranslateY(boardCenter.getY());
+        sl.setTranslateZ(-7000);
     }
 
     /**
@@ -267,12 +267,11 @@ public class GameViewController extends Controller implements Initializable {
         camera.setFieldOfView(fov);
         game_subscene.setCamera(camera);
 
+
         // TODO: set initial camera position properly
-        camera.setTranslateX(
-                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
+        camera.setTranslateX(boardCenter.getX());
         camera.setTranslateY(
-                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) *
-                        (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
+                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * boardCenter.getY());
         camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
 
         // TODO: for some reason moving the camera causes bugs, so switch to moving the world instead I guess?
@@ -338,6 +337,12 @@ public class GameViewController extends Controller implements Initializable {
     private void setupGameBoard() {
         // TODO: access data via state
         gameBoard.setupGameBoard(gameBoard_group, gameBoardData, resourceBundle);
+
+        boardCenter = new Point3D(
+                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f,
+                (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f,
+                Hexagon.HEXAGON_DEPTH
+        );
     }
 
     /**

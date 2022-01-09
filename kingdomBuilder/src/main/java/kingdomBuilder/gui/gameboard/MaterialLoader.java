@@ -5,7 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import kingdomBuilder.model.TileType;
 
-public class MaterialLoader extends TextureLoader {
+public final class MaterialLoader {
 
     private static final PhongMaterial CANYON = new PhongMaterial
             (Color.WHITE, new Image("kingdomBuilder/gui/textures/uvMaps/CANYON.png"), null, null, null);
@@ -53,14 +53,15 @@ public class MaterialLoader extends TextureLoader {
             (Color.WHITE, new Image("kingdomBuilder/gui/textures/uvMaps/TAVERN.png"), null, null, null);
 
     private static final PhongMaterial TOWER = new PhongMaterial
-            (Color.WHITE, new Image("kingdomBuilder/gui/textures/uvMaps/TOWER.png"), null, null, null);;
+            (Color.WHITE, new Image("kingdomBuilder/gui/textures/uvMaps/TOWER.png"), null, null, null);
 
+    public static final PhongMaterial RED = new PhongMaterial(Color.RED);
 
-    public MaterialLoader() {
+    private MaterialLoader() {
 
     }
 
-    public PhongMaterial getMaterial(TileType type) {
+    public static PhongMaterial getMaterial(TileType type) {
         return switch (type) {
             case CANYON -> CANYON;
             case DESERT -> DESERT;

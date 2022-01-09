@@ -15,11 +15,6 @@ import java.net.URISyntaxException;
  */
 public class Hexagon extends MeshView {
     /**
-     * Represents the material loader which all hexagons share.
-     */
-    private static final MaterialLoader materialLoader = new MaterialLoader();
-
-    /**
      * Represents the TriangleMesh for the hexanoal prism.
      */
     private static final TriangleMesh hexagonMesh;
@@ -62,9 +57,8 @@ public class Hexagon extends MeshView {
         setScaleY(HEXAGON_HEIGHT);
         setScaleZ(HEXAGON_DEPTH);
 
-
         // set Texture with given type
-        PhongMaterial mat = materialLoader.getMaterial(tileType);
+        PhongMaterial mat = MaterialLoader.getMaterial(tileType);
         setMaterial(mat);
     }
 }

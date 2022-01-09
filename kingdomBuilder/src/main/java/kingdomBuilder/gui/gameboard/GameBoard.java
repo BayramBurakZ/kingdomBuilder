@@ -74,11 +74,11 @@ public class GameBoard {
             for (int x = 0; x < gameBoard.length; x++) {
                 // //TODO: Change to Gamelogic
                 if (gameBoard[x][y].getTileType() == TileType.valueOf(random)) {
-                    if (!gameBoard[x][y].isHighlighted())
-                        gameBoard[x][y].setHighlight();
+                    if (!gameBoard[x][y].isElevated())
+                        gameBoard[x][y].setElevated();
                 } else {
-                    if (gameBoard[x][y].isHighlighted())
-                        gameBoard[x][y].removeHighlight();
+                    if (gameBoard[x][y].isElevated())
+                        gameBoard[x][y].removeElevated();
                 }
             }
         }
