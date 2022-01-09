@@ -195,11 +195,24 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         setupLayout();
         initializeChoiceBox();
+        initializeSpinner();
+        initializeListeners();
+    }
 
+    /**
+     * Initialize all Listeners.
+     */
+    private void initializeListeners() {
+        setupSpinnerListener();
         setupCheckboxListener();
 
-        initializeSpinner();
-        setupSpinnerListener();
+        gamesettings_textfield_name.textProperty().addListener(observable -> updateButtons());
+        gamesettings_textfield_desc.textProperty().addListener(observable -> updateButtons());
+
+        gamesettings_choicebox_upperleft.valueProperty().addListener(observable -> updateButtons());
+        gamesettings_choicebox_upperright.valueProperty().addListener(observable -> updateButtons());
+        gamesettings_choicebox_bottomleft.valueProperty().addListener(observable -> updateButtons());
+        gamesettings_choicebox_bottomright.valueProperty().addListener(observable -> updateButtons());
     }
 
     /**
@@ -272,13 +285,6 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamesettings_spinner_online_players.valueProperty().addListener((observable, oldValue, newValue) -> {
             playerCount = newValue;
 
-            // Impossible to create game without players but with hotseat player
-            if (playerCount == 0) {
-                deactivateHostAndJoinGameButton();
-            } else {
-                activateHostAndJoinGameButton();
-            }
-
             // update Buttons
             updateButtons();
             // update values in bot spinner
@@ -289,12 +295,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         gamesettings_spinner_hotseat.valueProperty().addListener((observable, oldValue, newValue) -> {
             hotseatCount = newValue;
-            // need to join game with min 1 hotseat-player
-            if (hotseatCount > 0) {
-                deactivateHostGameButton();
-            } else {
-                activateHostGameButton();
-            }
 
             // update Buttons
             updateButtons();
@@ -325,7 +325,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         if (currentValue > max_bots) {
             currentValue = max_bots;
-            botCount = currentValue;
         }
 
         gamesettings_spinner_bots.setValueFactory(
@@ -341,7 +340,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         if (currentValue > max_hotseat) {
             currentValue = max_hotseat;
-            hotseatCount = currentValue;
         }
 
         gamesettings_spinner_hotseat.setValueFactory(
@@ -357,7 +355,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         if (currentValue > max_players) {
             currentValue = max_players;
-            playerCount = currentValue;
         }
 
         // no hotseat allowed without own player
@@ -374,6 +371,10 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Updates the Buttons according to the state of the spinners.
      */
     private void updateButtons() {
+        // not all informations to host a game are filled in
+        if (hasAllHostInformations()) {
+            return;
+        }
         // no players selected or only hotseat
         if (playerCount + hotseatCount + botCount == 0 || (hotseatCount > 0 && playerCount == 0)) {
             deactivateHostGameButton();
@@ -403,6 +404,39 @@ public class GameSettingsViewController extends Controller implements Initializa
             deactivateHostAndJoinGameButton();
             activateHostAndSpectateGameButton();
         }
+    }
+
+    /**
+     * Checks if all information are given to host a game.
+     * @return True, if something is missing.
+     */
+    private boolean hasAllHostInformations() {
+        if (gamesettings_textfield_name.getText().trim().isEmpty()) {
+            return true;
+        }
+
+        if (gamesettings_textfield_desc.getText().trim().isEmpty()) {
+            return true;
+        }
+
+        if (gamesettings_choicebox_bottomright.getValue() == null) {
+            return true;
+        }
+
+        if (gamesettings_choicebox_bottomleft.getValue() == null) {
+            return true;
+        }
+
+        if (gamesettings_choicebox_upperleft.getValue() == null) {
+            return true;
+        }
+
+        if (gamesettings_choicebox_upperright.getValue() == null) {
+            return true;
+        }
+
+        System.out.println("All Informations are set");
+        return false;
     }
 
     /**
@@ -441,12 +475,11 @@ public class GameSettingsViewController extends Controller implements Initializa
      * @return true if something is missing to host a game.
      */
     private boolean hostGame() {
-        String gameName = gamesettings_textfield_name.getText().trim();
-        String gameDesc = gamesettings_textfield_desc.getText().trim();
-
-        if(gameName.isEmpty() || gameDesc.isEmpty()) {
+        if (hasAllHostInformations()) {
             return true;
         }
+        String gameName = gamesettings_textfield_name.getText().trim();
+        String gameDesc = gamesettings_textfield_desc.getText().trim();
 
         // gets the time limit from GUI
         int timeLimit;
@@ -470,22 +503,15 @@ public class GameSettingsViewController extends Controller implements Initializa
             return true;
         }
 
-        // if no quadrant is selected
-        if (gamesettings_choicebox_upperleft.getValue() == null)
-            return true;
-        if (gamesettings_choicebox_upperright.getValue() == null)
-            return true;
-        if (gamesettings_choicebox_bottomleft.getValue() == null)
-            return true;
-        if (gamesettings_choicebox_bottomright.getValue() == null)
-            return true;
-
         int quadrantUpperLeft = gamesettings_choicebox_upperleft.getValue();
         int quadrantUpperRight = gamesettings_choicebox_upperright.getValue();
         int quadrantBottomLeft = gamesettings_choicebox_bottomleft.getValue();
         int quadrantBottomRight = gamesettings_choicebox_bottomright.getValue();
 
         System.out.println(
+                "Joinable Players: " + playerCount + "\n" +
+                "Bots: " + botCount + "\n" +
+                "Hotseat Players: " + hotseatCount + "\n" +
                 "Name: " + gameName + "\n" +
                 "Desc: " + gameDesc + "\n" +
                 "Time: " + timeLimit + "\n" +

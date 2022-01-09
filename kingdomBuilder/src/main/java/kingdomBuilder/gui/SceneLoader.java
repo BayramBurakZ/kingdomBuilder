@@ -139,6 +139,7 @@ public class SceneLoader {
      * @param locale the language in which the views are loaded.
      */
     public void loadViews(Locale locale) {
+        // TODO: check which is still necessary
         this.locale = locale;
         loadMenuView(locale);
         loadGameSettingsView(locale);
@@ -167,7 +168,9 @@ public class SceneLoader {
     public void showMenuView() {
         borderPane.setCenter(menuView);
 
-        borderPane.setLeft(chatView);
+        // set Chat only once
+        if (borderPane.getLeft() == null)
+            borderPane.setLeft(chatView);
     }
 
     /**
@@ -175,6 +178,9 @@ public class SceneLoader {
      * @param isOnlineGame If the game is online.
      */
     public void showGameSettingsView(boolean isOnlineGame) {
+        //reloads the view so its completely empty
+        loadGameSettingsView(locale);
+
         borderPane.setCenter(gameSettingsView);
         gameSettingsViewController.setIsOnlineGame(isOnlineGame);
     }
@@ -185,9 +191,7 @@ public class SceneLoader {
      * @param isOnline Whether the game is online.
      */
     public void showGameView(boolean isSpectating, boolean isOnline) {
-        //TODO: currently it reloads the gameview to generate a random board
-        // fix with an update function and REDUX
-        //resets the GameView and generates the board new
+        // reloads the view so its completely empty
         loadGameView(locale);
 
         borderPane.setCenter(gameView);
@@ -209,6 +213,9 @@ public class SceneLoader {
      * Loads the gameSelectionView into the center of the main borderPane.
      */
     public void showGameSelectionView() {
+        //reloads the view so its completely empty
+        loadGameSelectionView(locale);
+
         borderPane.setCenter(gameSelectionView);
     }
 
@@ -216,6 +223,9 @@ public class SceneLoader {
      * Loads the SettingsView into the center of the main borderPane.
      */
     public void showSettingsView() {
+        //reloads the view so its completely empty
+        loadSettingsView(locale);
+
         borderPane.setCenter(settingsView);
     }
 
@@ -223,6 +233,9 @@ public class SceneLoader {
      * Loads the ServerConnectView into the center of the main borderPane.
      */
     public void showServerConnectView() {
+        //reloads the view so its completely empty
+        loadServerConnectView(locale);
+
         borderPane.setCenter(serverConnectView);
     }
 
