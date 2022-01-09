@@ -64,6 +64,7 @@ public class Tile {
         return tileType;
     }
 
+    // TODO: JavaDoc, maybe scrap and just do getOccupyingPlayer() == player separately
     public boolean isOccupiedByPlayer(Player player) {
 
         if (occupiedBy == player)
@@ -72,6 +73,7 @@ public class Tile {
         return false;
     }
 
+    // TODO: JavaDoc
     public boolean isOccupied() {
 
         if (occupiedBy != null)
@@ -80,6 +82,11 @@ public class Tile {
         return false;
     }
 
+    // TODO: JavaDoc
+    public Player occupiedBy() {
+
+        return occupiedBy;
+    }
 
     /**
      * Gets the tile type of the tile.
@@ -87,7 +94,7 @@ public class Tile {
      * @return The tile type of the tile.
      */
     public TileType getTileType() {
+
         return tileType;
     }
-
 }

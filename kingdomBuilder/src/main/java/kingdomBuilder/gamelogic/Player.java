@@ -64,4 +64,8 @@ public class Player {
             throw new RuntimeException("Tried to use a token but the player had none remaining!");
         token.remaining--;
     }
+
+    public boolean hasRemainingSettlements() {
+        return remainingSettlements > 0;
+    }
 }

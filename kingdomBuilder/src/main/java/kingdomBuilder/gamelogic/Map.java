@@ -231,7 +231,7 @@ public class Map {
     }
 
     /**
-     * Checks whether the tile at given index is placeable excluding water which is only placeable with a token.
+     * Checks whether the tile type at given index is placeable excluding water which is only placeable with a token.
      *
      * @param x The x coordinate of the tile.
      * @param y The y coordinate of the tile.
@@ -313,11 +313,13 @@ public class Map {
     }
 
     // TODO: JavaDoc
-    public boolean tileIsOccupiedByPlayer(int x, int y, Player player){
-        if(getTile(x, y).isOccupiedByPlayer(player))
-            return true;
+    public Player occupiedBy(int x, int y) {
+        return getTile(x, y).occupiedBy();
+    }
 
-        return false;
+    // TODO: JavaDoc
+    public boolean isOccupied(int x, int y) {
+        return getTile(x, y).isOccupied();
     }
 
     // TODO: JavaDoc
