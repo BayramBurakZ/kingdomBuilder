@@ -19,7 +19,7 @@ public class GameBoard {
     /**
      * Represents the board that contains the hexagons.
      */
-    // TODO: use value from Datalogig
+    // TODO: use value from Datalogic
     // TODO: make private again
     public HexagonTile[][] gameBoard = new HexagonTile[20][20];
 
@@ -56,10 +56,10 @@ public class GameBoard {
 
                 int yPos = y * 60;
 
-                HexagonTile hexagon = new HexagonTile(xPos, yPos, gameBoardData[x][y], resource);
-                gameBoard[x][y] = hexagon;
+                HexagonTile hexagonTile = new HexagonTile(xPos, yPos, gameBoardData[x][y], resource);
+                gameBoard[x][y] = hexagonTile;
 
-                group.getChildren().add(hexagon.root);
+                group.getChildren().add(hexagonTile);
             }
         }
     }

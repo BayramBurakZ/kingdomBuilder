@@ -164,7 +164,11 @@ public class GameViewController extends Controller implements Initializable {
     @FXML
     private Group gameBoard_group;
 
+    @FXML
+    private PointLight gameBoard_pointlight;
+
     //endregion FXML
+
     //TODO:
     // temporary solution to store the board instead using the data from dataLogic
     private TileType[][] gameBoardData;
@@ -199,30 +203,16 @@ public class GameViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         resourceBundle = resources;
 
-        // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-
-        double viewAngle = 30.0;
-        double fov = 50.0;
-
-        camera.setFarClip(4096.0);
-        camera.setRotationAxis(new Point3D(1.0, 0, 0));
-        camera.setRotate(viewAngle);
-        camera.setFieldOfView(fov);
-        game_subscene.setCamera(camera);
-
         // TODO: Remove
         Model model = new Model();
         gameBoardData = model.getGameBoardData();
 
         setupGameBoard();
 
-        // TODO: set initial camera position properly
-        camera.setTranslateX(
-                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
-        camera.setTranslateY(
-                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
-        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
+        setupCamera();
+        setupLight();
+
+        setupLayout();
 
         // create a testBox
         Box box = new Box(100, 100, 100);
@@ -239,10 +229,54 @@ public class GameViewController extends Controller implements Initializable {
             ((PhongMaterial)box.getMaterial()).setDiffuseColor(Color.WHITE);
         });
         gameBoard_group.getChildren().add(box);
+    }
+
+    private void setupLight() {
+        // TODO: fix light
+        double viewAngle = 30.0;
+        double fov = 50.0;
+        AmbientLight al = new AmbientLight();
+        gameBoard_group.getChildren().add(al);
+
+        gameBoard_pointlight.setRotationAxis(new Point3D(1.0, 0, 0));
+        gameBoard_pointlight.setRotate(viewAngle);
+
+        gameBoard_pointlight.setTranslateX(
+                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
+        gameBoard_pointlight.setTranslateY(
+                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) *
+                        (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
+        gameBoard_pointlight.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
+        System.out.println(gameBoard_pointlight.getTranslateX());
+    }
+
+    /**
+     * Initializes the Camera for the subScene.
+     */
+    private void setupCamera() {
+        // TODO constants?
+        double viewAngle = 30.0;
+        double fov = 50.0;
+
+        // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
+        PerspectiveCamera camera = new PerspectiveCamera(true);
+
+        camera.setFarClip(4096.0);
+        camera.setRotationAxis(new Point3D(1.0, 0, 0));
+        camera.setRotate(viewAngle);
+        camera.setFieldOfView(fov);
+        game_subscene.setCamera(camera);
+
+        // TODO: set initial camera position properly
+        camera.setTranslateX(
+                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f);
+        camera.setTranslateY(
+                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) *
+                        (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f);
+        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
 
         // TODO: for some reason moving the camera causes bugs, so switch to moving the world instead I guess?
         setupCameraHandlers(camera, false);
-        setupLayout();
     }
 
     /**

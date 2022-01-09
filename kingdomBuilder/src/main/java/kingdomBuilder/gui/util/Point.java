@@ -1,9 +1,9 @@
-package kingdomBuilder.gui.gameboard;
+package kingdomBuilder.gui.util;
 
 /**
  * Class that represents a point.
  */
-class Point {
+public class Point {
 
     /**
      * Represents the x-coordinate of the point.

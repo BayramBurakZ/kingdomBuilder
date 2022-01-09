@@ -4,49 +4,24 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
-import javafx.scene.shape.MeshView;
-import javafx.scene.shape.TriangleMesh;
+import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
-import kingdomBuilder.gui.util.PLYLoader;
 import kingdomBuilder.model.TileType;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
  * Class that is used to display the hexagon tiles in the UI.
  */
-public class HexagonTile extends MeshView {
-    /**
-     * Represents the angle in degree to turn the corners around the center;
-     */
-    private static final int TURN_ANGLE_DEGREE = 60;
-
-    /**
-     * Represents the angle in radian to turn the corners around the center;
-     */
-    private static final double TURN_ANGLE_RADIAN = Math.toRadians(TURN_ANGLE_DEGREE);
-
-    /**
-     * Represents the number of corners of a hexagon.
-     */
-    private static final int NUMBER_OF_CORNERS = 6;
-
-    /**
-     * Represents the texture loader which all hexagons share.
-     */
-    private static final TextureLoader textureLoader = new TextureLoader();
-
+public class HexagonTile extends Group {
     /**
      * Represents the resourceBundle that used for language support.
      */
     private static ResourceBundle resourceBundle;
-
-    /**
-     * Represents the six corners of a hexagon.
-     */
-    private static ArrayList<Point> vertices;
 
     /**
      * Represents, if the tile is highlighted.
@@ -59,85 +34,9 @@ public class HexagonTile extends MeshView {
     private TileType tileType;
 
     /**
-     * Represents the TriangleMesh for the hexanoal prism.
-     */
-    private static final TriangleMesh hexagonMesh;
-
-    // TODO: check if javadoc is necessary
-    static {
-        TriangleMesh loadedMesh = null;
-        try {
-            loadedMesh = PLYLoader.readFromPlyFile(
-                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/hexagon.ply").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        hexagonMesh = loadedMesh;
-    }
-
-    /**
-     * Represents the TriangleMesh for the Settlement.
-     */
-    private static final TriangleMesh settlementMesh;
-
-    // TODO: check if javadoc is necessary
-    static {
-        TriangleMesh loadedMesh = null;
-        try {
-            loadedMesh = PLYLoader.readFromPlyFile(
-                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/settlement.ply").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        settlementMesh = loadedMesh;
-    }
-
-    //private static final PhongMaterial hexagonMaterial = new PhongMaterial();
-
-    /**
-     * Represents the MeshView for the settlement.
-     */
-    private final MeshView settlement = new MeshView(settlementMesh);
-
-    /**
-     * Represents the Group that contains the hexagonal prism and the settlement.
-     */
-    public Group root = new Group(this, settlement);
-
-    /**
-     * Represents the height for the hexagonal prism.
-     */
-    private static final double HEXAGON_HEIGHT = 40;
-
-    /**
-     * Represents the width for the hexagonal prism.
-     */
-    private static final double HEXAGON_WIDTH = 40;
-
-    /**
-     * Represents the depth for the hexagonal prism.
-     */
-    private static final double HEXAGON_DEPTH = 20;
-
-    /**
-     * Represents the height for a settlement.
-     */
-    private static final double SETTLEMENT_HEIGHT = 15;
-
-    /**
-     * Represents the width for a settlement.
-     */
-    private static final double SETTLEMENT_WIDTH = 15;
-
-    /**
-     * Represents the depth for a settlement.
-     */
-    private static final double SETTLEMENT_DEPTH = 15;
-
-    /**
      * Represents the distance that the group moves for highlighting.
      */
-    private static final double HIGHLIGHT_DISTANCE = HEXAGON_DEPTH;
+    private static final double HIGHLIGHT_DISTANCE = Hexagon.HEXAGON_DEPTH;
 
     /**
      * Represents the time for the animation to highlighting.
@@ -150,6 +49,16 @@ public class HexagonTile extends MeshView {
     private final TranslateTransition highlightAnimation = new TranslateTransition(HIGHLIGHT_DURATION);
 
     /**
+     * Represents the settlement on the hexagon.
+     */
+    private Settlement settlement = new Settlement();
+
+    /**
+     * Represents the hexagon prism.
+     */
+    private Hexagon hexagon;
+
+    /**
      * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos The x-coordinate of the upper-left corner position.
      * @param yPos The y-coordinate of the upper-left corner position.
@@ -157,72 +66,38 @@ public class HexagonTile extends MeshView {
      * @param resource The ResourceBundle to translate text.
      */
     public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
-        super(hexagonMesh);
-        setScaleX(HEXAGON_WIDTH);
-        setScaleY(HEXAGON_HEIGHT);
-        setScaleZ(HEXAGON_DEPTH);
-
-        settlement.setScaleX(SETTLEMENT_WIDTH);
-        settlement.setScaleY(SETTLEMENT_HEIGHT);
-        settlement.setScaleZ(SETTLEMENT_DEPTH);
-        settlement.setTranslateZ(-HEXAGON_DEPTH-SETTLEMENT_DEPTH);
-
-        root.setTranslateX(xPos);
-        root.setTranslateY(yPos);
-
         if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
+        // create hexagon
+        this.hexagon = new Hexagon(tileType);
 
+        // add hexagon prism and settlement to this group
+        getChildren().addAll(hexagon, settlement);
+
+        // move this group to new position
+        setTranslateX(xPos);
+        setTranslateY(yPos);
+
+        // set tileType
+        // TODO use Datalogic enum
         this.tileType = tileType;
 
-        highlightAnimation.setFromZ(0);
-        highlightAnimation.setToZ(-HIGHLIGHT_DISTANCE);
-        highlightAnimation.setInterpolator(Interpolator.EASE_BOTH);
-        highlightAnimation.setNode(root);
+        setupAnimation();
 
         // TODO: execute only for Tokens
         setTokenTooltip(tileType);
-        setMouseHandler(tileType);
+        setMouseHandler();
     }
 
     /**
-     * Calculates the corners of a hexagon with the given radius.
-     * @param radius The radius from the center of a hexagon to one of its corners.
-     * @return A list with six points of a hexagon.
+     * Sets th animation used for this HexagonTile.
      */
-    private static ArrayList<Point> calculateCorners(int radius) {
-        ArrayList<Point> corners = new ArrayList<>();
-
-        int x = 0, my = 0;
-        int y = my + radius;
-
-        corners.add(new Point(x, y));
-
-        // Rotation matrix to rotate the corners 60 degree around the center
-        for (int i = 0; i < NUMBER_OF_CORNERS - 1; i++) {
-            int movedX = (int) Math.round( (x * Math.cos(TURN_ANGLE_RADIAN)) - (y * Math.sin(TURN_ANGLE_RADIAN)) );
-            int movedY = (int) Math.round( (x * Math.sin(TURN_ANGLE_RADIAN)) + (y * Math.cos(TURN_ANGLE_RADIAN)) );
-
-            corners.add(new Point(movedX, movedY));
-            x = movedX;
-            y = movedY;
-        }
-
-        // search the distance from the center to the far left side
-        int minX = Integer.MAX_VALUE;
-        for (Point e : corners) {
-            if (e.getX() < minX) {
-                minX = e.getX();
-            }
-        }
-
-        //translate the hexagon corners to positive values
-        for (int i = 0; i < corners.size(); i++) {
-            corners.get(i).translateX(-minX);
-            corners.get(i).translateY(radius);
-        }
-        return corners;
+    private void setupAnimation() {
+        highlightAnimation.setFromZ(0);
+        highlightAnimation.setToZ(-HIGHLIGHT_DISTANCE);
+        highlightAnimation.setInterpolator(Interpolator.EASE_BOTH);
+        highlightAnimation.setNode(this);
     }
 
     /**
@@ -266,16 +141,41 @@ public class HexagonTile extends MeshView {
                 Tooltip.install(this, tokenTooltip);
             }
         }
+    }
 
+    /**
+     * Creates an image with only one color.
+     * @param red The red value.
+     * @param green The green value.
+     * @param blue The blue value.
+     * @return Image with the given color.
+     */
+    public Image generateImage(double red, double green, double blue) {
+        WritableImage img = new WritableImage(1, 1);
+        PixelWriter pixelWriter = img.getPixelWriter();
+
+        Color color = Color.color(red, green, blue);
+        pixelWriter.setColor(0, 0, color);
+        return img ;
     }
 
     /**
      * Sets the MouseHandler of a hexagon based on its type.
-     * @param tileType The type of the hexagon.
      */
-    private void setMouseHandler(TileType tileType) {
+    private void setMouseHandler() {
+        setOnMouseClicked(event -> {
+            // TODO integrate player color
+            settlement.setOpacity(1.0);
+            Image img = generateImage(Math.random(),Math.random(),Math.random());
+            PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
+
+            settlement.setMaterial(mat);
+        });
+
         setOnMouseEntered( event -> {
             if (highlight) {
+                // TODO do it properly
+                ((PhongMaterial) hexagon.getMaterial()).setDiffuseColor(Color.RED);
 
             } else {
 
@@ -292,7 +192,8 @@ public class HexagonTile extends MeshView {
 
         setOnMouseExited(event -> {
             if (highlight) {
-
+                // TODO do it properly
+                ((PhongMaterial) hexagon.getMaterial()).setDiffuseColor(Color.WHITE);
             } else {
 
             }

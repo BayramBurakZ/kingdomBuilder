@@ -107,7 +107,9 @@
                 <SceneAntialiasing fx:constant="BALANCED"/>
             </antiAliasing>
             <root>
-                <Group fx:id="gameBoard_group"/>
+                <Group fx:id="gameBoard_group">
+                    <PointLight fx:id="gameBoard_pointlight"/>
+                </Group>
             </root>
         </SubScene>
     </HBox>
