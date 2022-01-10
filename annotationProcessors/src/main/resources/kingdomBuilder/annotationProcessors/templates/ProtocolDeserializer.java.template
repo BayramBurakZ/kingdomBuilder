@@ -58,11 +58,11 @@ public class ProtocolDeserializer {
          * and lists containing tuples.
          */
 
-        if(payload.startsWith("<["))
-            payload = payload.substring(2);
+        if(payload.startsWith("<") && payload.endsWith(">"))
+            payload = payload.substring(1, payload.length() - 1);
 
-        if(payload.endsWith("]>"))
-            payload = payload.substring(0, payload.length() - 2);
+        if(payload.startsWith("[") && payload.endsWith("]"))
+            payload = payload.substring(1,payload.length() - 1);
 
         return List.of(payload.split(";", count));
     }
@@ -81,5 +81,7 @@ public class ProtocolDeserializer {
             .boxed()
             .collect(Collectors.toList());
     }
+
+<%= deserializerMethods %>
 
 }

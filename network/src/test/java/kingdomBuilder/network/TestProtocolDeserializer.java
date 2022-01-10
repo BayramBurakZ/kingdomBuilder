@@ -132,7 +132,6 @@ public class TestProtocolDeserializer {
         assertInstanceOf(YouAreRoot.class, testConsumer.getObject());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingNamespaceLoaded() {
         final String packet = "[SERVER_MESSAGE] [NAMESPACE_LOADED] <kingdom_builder>";
@@ -144,7 +143,6 @@ public class TestProtocolDeserializer {
         assertEquals("kingdom_builder", typedPacket.namespace());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingNamespaceUnloaded() {
         final String packet = "[SERVER_MESSAGE] [NAMESPACE_UNLOADED] <kingdom_builder>";
@@ -156,7 +154,6 @@ public class TestProtocolDeserializer {
         assertEquals("kingdom_builder", typedPacket.namespace());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingYouSpectateGame() {
         final String packet = "[SERVER_MESSAGE] [YOU_SPECTATE_GAME] <4711>";
@@ -168,7 +165,6 @@ public class TestProtocolDeserializer {
         assertEquals(4711, typedPacket.gameId());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingStoppedSpectating() {
         final String packet = "[SERVER_MESSAGE] [STOPPED_SPECTATING] <4711>";
@@ -180,7 +176,6 @@ public class TestProtocolDeserializer {
         assertEquals(4711, typedPacket.gameId());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingYouLeftGame() {
         final String packet = "[SERVER_MESSAGE] [YOU_LEFT_GAME] <4711>";
@@ -192,7 +187,6 @@ public class TestProtocolDeserializer {
         assertEquals(4711, typedPacket.gameId());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingWelcomeToGame() {
         final String packet = "[SERVER_MESSAGE] [WELCOME_TO_GAME] <4711>";
@@ -237,7 +231,6 @@ public class TestProtocolDeserializer {
         assertInstanceOf(TurnEndedByServer.class, testConsumer.getObject());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingVersionReply() {
         final String packet = "[REPLY_MESSAGE] (?version) <ws2021_v1.2.6>";
@@ -339,7 +332,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedModules, typedPacket.modules());
     }
 
-    @Disabled("Disabled until the ProtocolDeserializer.split() and the storage of single input parameter is fixed.")
     @Test
     void testDeserializingDetailsOfGameReply() {
         final String packet = "[REPLY_MESSAGE] (?detailsofgame) <???>";
@@ -382,7 +374,6 @@ public class TestProtocolDeserializer {
         assertInstanceOf(GameStart.class, testConsumer.getObject());
     }
 
-    @Disabled("Disabled until parsing is fixed")
     @Test
     void testDeserializingYourTerrainCard(){
         final String packet = "[GAME_MESSAGE] [YOUR_TERRAIN_CARD] <GRAS>";
@@ -394,10 +385,9 @@ public class TestProtocolDeserializer {
         assertEquals("GRAS", typedPacket.terrainType());
     }
 
-    @Disabled("Disabled until parsing is fixed")
     @Test
     void testDeserializingTurnStart() {
-        final String packet = " [GAME_MESSAGE] [TURN_START] <42>";
+        final String packet = "[GAME_MESSAGE] [TURN_START] <42>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError());
@@ -406,7 +396,6 @@ public class TestProtocolDeserializer {
         assertEquals(42, typedPacket.clientId());
     }
 
-    @Disabled("Disabled until parsing is fixed")
     @Test
     void testDeserializingTerrainTypeOfTurn(){
         final String packet = "[GAME_MESSAGE] [TERRAIN_TYPE_OF_TURN] <GRAS>";
@@ -472,7 +461,6 @@ public class TestProtocolDeserializer {
         assertEquals(9, typedPacket.column());
     }
 
-    @Disabled("Disabled until parsing fixed")
     @Test
     void testDeserializingPlayerUsedLastSettlement(){
         final String packet = "[GAME_MESSAGE] [PLAYER_USED_LAST_SETTLEMENT] <42>";
@@ -658,7 +646,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedQuadrantsIds, typedPacket.quadrantIds());
     }
 
-    @Disabled
     @Test
     void testDeserializingTimeLimitReply() {
         final String packet = "[REPLY_MESSAGE] (?timelimit) <42000>";
@@ -670,7 +657,6 @@ public class TestProtocolDeserializer {
         assertEquals(42000, typedPacket.timeLimit());
     }
 
-    @Disabled
     @Test
     void testDeserializingPlayerLimitReply() {
         final String packet = "[REPLY_MESSAGE] (?playerlimit) <4>";
@@ -699,7 +685,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedPlayersData, typedPacket.playerDataList());
     }
 
-    @Disabled
     @Test
     void testDeserializingTurnsReply() {
         final String packet = "[REPLY_MESSAGE] (?turns) <21>";
@@ -711,7 +696,6 @@ public class TestProtocolDeserializer {
         assertEquals(21, typedPacket.turns());
     }
 
-    @Disabled
     @Test
     void testDeserializingTurnLimitReply() {
         final String packet = "[REPLY_MESSAGE] (?turnlimit) <100>";
@@ -723,7 +707,6 @@ public class TestProtocolDeserializer {
         assertEquals(100, typedPacket.turnLimit());
     }
 
-    @Disabled
     @Test
     void testDeserializingWhoseTurnReply() {
         final String packet = "[REPLY_MESSAGE] (?whoseturn) <42>";

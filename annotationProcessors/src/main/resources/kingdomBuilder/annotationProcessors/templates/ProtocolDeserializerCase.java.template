@@ -1,10 +1,5 @@
             case <%= case %>: {
-                List<String> tokens = null;
-                if(sections.length >= 3)
-                    tokens = split(sections[2], <%= componentCount %>);
-
-                <%= constructionVariables %>
-                <%= body %>
-                <%= packetType %> packet = new <%= packetType %>(<%= constructionArgs %>);
-                consumer.accept(packet);
+                <%= packetType %> packet = deserialize<%= packetType %>(<%= deserializeParam %>);
+                if(packet != null) consumer.accept(packet);
+                else consumer.onFailure(rawPacket);
             } break;

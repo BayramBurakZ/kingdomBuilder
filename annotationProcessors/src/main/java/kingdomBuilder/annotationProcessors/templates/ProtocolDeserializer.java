@@ -39,9 +39,20 @@ public class ProtocolDeserializer {
         return String.join("\n", cases);
     }
 
+    public String getDeserializerMethods() throws IOException {
+        List<String> methods = new ArrayList<>();
+        for(TypeElement element: elements) {
+            ProtocolDeserializerMethod pdm = new ProtocolDeserializerMethod(element, types);
+            methods.add(TemplateRenderer.render(pdm));
+        }
+
+        return String.join("\n", methods);
+    }
+
     private String makeCase(TypeElement element) throws IOException {
         ProtocolDeserializerCase psc = new ProtocolDeserializerCase(element, types);
         return TemplateRenderer.render(psc);
     }
+
 
 }
