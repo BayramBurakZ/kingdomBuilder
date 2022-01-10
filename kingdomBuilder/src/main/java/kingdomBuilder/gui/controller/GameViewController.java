@@ -1,6 +1,7 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
@@ -8,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
@@ -20,10 +22,12 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.Hexagon;
 import kingdomBuilder.gui.gameboard.TextureLoader;
+import kingdomBuilder.gui.gameboard.Token;
 import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 /**
@@ -178,7 +182,7 @@ public class GameViewController extends Controller implements Initializable {
 
     //endregion FXML
 
-    //TODO:
+    //TODO: remove with adding subscribers
     // temporary solution to store the board instead using the data from dataLogic
     private TileType[][] gameBoardData;
 
@@ -208,6 +212,16 @@ public class GameViewController extends Controller implements Initializable {
     private boolean isOnline;
 
     /**
+     * Represents if the Tokens are currently disabled.
+     */
+    private boolean areTokensDisabled = false;
+
+    /**
+     * Represents all Tokens on the GUI of a player.
+     */
+    private ArrayList<Token> tokens = new ArrayList<Token>();
+
+    /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
@@ -215,9 +229,19 @@ public class GameViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        //TODO: Subscribers:
+        // - PlayerData (name, score)
+        // - Win Conditions
+        // -
+        // - Tokens from the current Player -> updateTokens()
+        // - Token used -> updateTokens()
+        // - In Basic turn -> disableTokens(false/true)
+        // - current Terrain -> updateCardDescription()
+        // - if PlayersTurn -> disableTokens(false / true)
+
         resourceBundle = resources;
 
-        // TODO: Remove
+        // TODO: Remove with adding subscribers
         Model model = new Model();
         gameBoardData = model.getGameBoardData();
 
@@ -279,24 +303,23 @@ public class GameViewController extends Controller implements Initializable {
                 (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * boardCenter.getY());
         camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
 
-        // TODO: for some reason moving the camera causes bugs, so switch to moving the world instead I guess?
         setupCameraHandlers(camera);
     }
 
     /**
      * Setup all connected EventHandler.
-     * @param node
+     * @param camera The camera for the handlers.
      */
-    private void setupCameraHandlers(Node node) {
-        setupCameraZoomHandler(node);
-        setupCameraScrollHandler(node);
+    private void setupCameraHandlers(Camera camera) {
+        setupCameraZoomHandler(camera);
+        setupCameraScrollHandler(camera);
     }
 
     /**
      * Zooms the camera when the user scrolls the mousewheel.
-     * @param node
+     * @param camera The camera for zooming.
      */
-    private void setupCameraZoomHandler(Node node) {
+    private void setupCameraZoomHandler(Camera camera) {
         game_subscene.setOnScroll((ScrollEvent event) -> {
             double deltaY = event.getDeltaY();
 
@@ -304,30 +327,35 @@ public class GameViewController extends Controller implements Initializable {
 
             double translation = deltaY * zoomSpeed;
 
-            Point3D pos = node.localToScene(0, 0, translation);
-            node.setTranslateX(pos.getX());
-            node.setTranslateY(pos.getY());
-            node.setTranslateZ(pos.getZ());
+            Point3D pos = camera.localToScene(0, 0, translation);
+            camera.setTranslateX(pos.getX());
+            camera.setTranslateY(pos.getY());
+            camera.setTranslateZ(pos.getZ());
 
             event.consume();
         });
     }
 
     /**
-     * Translates the camera when the user presses the arrow keys or drags the mouse with a rightclick.
-     * @param node
+     * Translates the camera when the user presses the arrow keys.
+     * @param camera The camera to move.
      */
-    private void setupCameraScrollHandler(Node node) {
+    private void setupCameraScrollHandler(Camera camera) {
         // TODO: smoother scrolling
         game_subscene.setOnKeyPressed((KeyEvent event) -> {
             double scrollSpeed = 20.0;
             switch (event.getCode()) {
-                case UP -> node.setTranslateY(node.getTranslateY() - scrollSpeed);
-                case DOWN -> node.setTranslateY(node.getTranslateY() + scrollSpeed);
-                case LEFT -> node.setTranslateX(node.getTranslateX() - scrollSpeed);
-                case RIGHT -> node.setTranslateX(node.getTranslateX() + scrollSpeed);
+                case UP -> camera.setTranslateY(camera.getTranslateY() - scrollSpeed);
+                case DOWN -> camera.setTranslateY(camera.getTranslateY() + scrollSpeed);
+                case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
+                case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
                 //ToDO: remove - just for testing the highlight
-                case R ->  gameBoard.highlightTerrain();
+                case R ->  {
+                    gameBoard.highlightTerrain();
+                    int random = (int) (Math.random() * 5) + 1;
+                    updateCardDescription(TileType.valueOf(random));
+                    updateTokens();
+                }
             }
             event.consume();
         });
@@ -386,9 +414,9 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Updates the Card to the current card of the turn
-     * @param tileType
+     * @param tileType The type to show.
      */
-    private void cardDescription(TileType tileType) {
+    private void updateCardDescription(TileType tileType) {
         // TODO read TileType from Datalogic/Store instead of parameter
 
         //Update Image
@@ -405,6 +433,55 @@ public class GameViewController extends Controller implements Initializable {
             case FORREST -> cardDescription = resourceBundle.getString("forrest");
         }
         game_label_carddescribtion.setText(cardDescription);
+    }
+
+    /**
+     * Disables all tokens except the selected.
+     * @param disable If the tokens should be disabled then use true.
+     */
+    public void disableTokens(boolean disable) {
+        if (tokens.size() == 0) {
+            return;
+        }
+
+        areTokensDisabled = disable;
+
+        // iterate through all Tokens
+        for (Token token : tokens) {
+            // Skip activated Token
+            if (token.isTokenActivated()) {
+                continue;
+            }
+
+            if (disable) {
+                token.disableToken();
+            } else {
+                token.enableToken();
+            }
+        }
+    }
+
+    /**
+     * Updates the token bar at the bottom of the screen.
+     */
+    private void updateTokens() {
+        //tokens.clear();
+        //gameview_hbox_tokens.getChildren().clear();
+
+        // TODO: read information from Datalogic which Tokens are necessary
+        //  instead of using a randomizer and the for loop
+        //  and clear tokens and hbox first (2 lines above)
+
+        int random = (int) (Math.random() * 8) + 9;
+        int count = 2;
+
+        TileType tileType = TileType.valueOf(random);
+
+        //gameview_hbox_tokens
+        Token token = new Token(tileType, count, this, areTokensDisabled);
+        tokens.add(token);
+
+        gameview_hbox_tokens.getChildren().add(token);
     }
 
     /**

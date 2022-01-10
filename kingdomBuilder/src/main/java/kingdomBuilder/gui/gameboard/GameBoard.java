@@ -20,7 +20,7 @@ public class GameBoard {
      * Represents the board that contains the hexagons.
      */
     // TODO: use value from Datalogic
-    // TODO: make private again
+    //  & make private again
     public HexagonTile[][] gameBoard = new HexagonTile[20][20];
 
     /**
@@ -28,6 +28,10 @@ public class GameBoard {
      * @param store The Store to access the state.
      */
     public GameBoard(Store<KBState> store) {
+        // TODO: Subscribers:
+        //  - Token Enable/Disable -> highlightTerrain()
+        //  - Settlements from others -> updateBoard()
+
         this.store = store;
     }
 
@@ -82,5 +86,12 @@ public class GameBoard {
                 }
             }
         }
+    }
+
+    /**
+     * Updates the Board according to the state.
+     */
+    private void updateBoard() {
+        //TODO: implement
     }
 }
