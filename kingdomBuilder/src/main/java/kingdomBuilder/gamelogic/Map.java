@@ -1,6 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 import java.security.InvalidParameterException;
+import java.util.Iterator;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
@@ -215,6 +216,10 @@ public class Map {
         return getTile(x, y).getTileType();
     }
 
+    public boolean isWithinBounds(int x, int y) {
+        return (x >= 0 || y >= 0 || x < mapWidth || y < mapWidth);
+    }
+
     /**
      * Check whether the tile at given index is at the border of the map.
      *
@@ -224,7 +229,7 @@ public class Map {
      */
     public boolean isTileAtBorder(int x, int y) {
 
-        if (x == 0 || y == 0 || x == mapWidth || y == mapWidth)
+        if (x == 0 || y == 0 || x == mapWidth - 1 || y == mapWidth - 1)
             return true;
 
         return false;
@@ -235,7 +240,7 @@ public class Map {
      *
      * @param x The x coordinate of the tile.
      * @param y The y coordinate of the tile.
-     * @return whether the tile is placeable.
+     * @return Whether the tile is placeable.
      */
     public boolean isTilePlaceable(int x, int y) {
 
@@ -249,6 +254,58 @@ public class Map {
             return false;
 
         return true;
+    }
+
+    /**
+     * Calculates the x position for the tile that lies top left from the tile with the given coordinates.
+     * @param x The x coordinate of the original tile.
+     * @param y The y coordinate of the original tile.
+     * @return The x coordinate of the tile that lies top left from the original tile.
+     */
+    public int topLeftX(int x, int y) {
+        if (y % 2 == 0) {
+            // even row
+            return x - 1;
+        } else {
+            // odd row
+            return x;
+        }
+    }
+
+    /**
+     * Calculates the x position for the tile that lies top right from the tile with the given coordinates.
+     * @param x The x coordinate of the original tile.
+     * @param y The y coordinate of the original tile.
+     * @return The x coordinate of the tile that lies top right from the original tile.
+     */
+    public int topRightX(int x, int y) {
+        if (y % 2 == 0) {
+            // even row
+            return x;
+        } else {
+            // odd row
+            return x + 1;
+        }
+    }
+
+    /**
+     * Calculates the x position for the tile that lies bottom left from the tile with the given coordinates.
+     * @param x The x coordinate of the original tile.
+     * @param y The y coordinate of the original tile.
+     * @return The x coordinate of the tile that lies bottom left from the original tile.
+     */
+    public int bottomLeftX(int x, int y) {
+        return topLeftX(x, y);
+    }
+
+    /**
+     * Calculates the x position for the tile that lies bottom right from the tile with the given coordinates.
+     * @param x The x coordinate of the original tile.
+     * @param y The y coordinate of the original tile.
+     * @return The x coordinate of the tile that lies bottom right from the original tile.
+     */
+    public int bottomRightX(int x, int y) {
+        return topRightX(x, y);
     }
 
     /**
@@ -280,14 +337,16 @@ public class Map {
             return false;
 
         if (firstY % 2 == 0) {
-            // even
+            // even row
 
+            // top/bottom left or top/bottom right
             if (firstX == secondX - 1 || firstX == secondX)
                 return true;
 
         } else {
-            // odd
+            // odd row
 
+            // top/bottom right or top/bottom left
             if (firstX == secondX + 1 || firstX == secondX)
                 return true;
         }
@@ -325,5 +384,73 @@ public class Map {
     // TODO: JavaDoc
     public int getMapWidth(){
         return mapWidth;
+    }
+
+    private Iterator<Position> surroundingTiles(int x, int y) {
+        return new Iterator<Position>() {
+            int state = -1;
+            @Override
+            public boolean hasNext() {
+                switch (state) {
+                    case -1:
+                        // check given coordinates
+                        if (!isWithinBounds(x, y)) {
+                            return false;
+                        }
+                    case 0:
+                        // top left
+                        state = 0;
+                        if (topLeftX(x, y) >= 0 && y > 0) {
+                            return true;
+                        }
+                    case 1:
+                        // top right
+                        state = 1;
+                        if (topRightX(x,y) < mapWidth && y > 0) {
+                            return true;
+                        }
+                    case 2:
+                        // left
+                        state = 2;
+                        if ( x - 1 >= 0) {
+                            return true;
+                        }
+                    case 3:
+                        // right
+                        state = 3;
+                        if ( x + 1 >= mapWidth) {
+                            return true;
+                        }
+                    case 4:
+                        // bottom left
+                        state = 4;
+                        if (bottomLeftX(x, y) >= 0 && y <= mapWidth) {
+                            return true;
+                        }
+                    case 5:
+                        // bottom right
+                        state = 5;
+                        if (bottomRightX(x, y) < mapWidth && y <= mapWidth) {
+                            return true;
+                        }
+                    default:
+                        // all tiles checked
+                        return false;
+                }
+            }
+
+            @Override
+            public Position next() {
+                return switch (state) {
+                    case 0 -> new Position(topLeftX(x, y), y - 1);
+                    case 1 -> new Position(topRightX(x, y), y - 1);
+                    case 2 -> new Position(x - 1, y);
+                    case 3 -> new Position(x + 1, y);
+                    case 4 -> new Position(bottomLeftX(x, y),y + 1);
+                    case 5 -> new Position(bottomRightX(x, y), y + 1);
+                    default -> null;
+                };
+            }
+        };
     }
 }
