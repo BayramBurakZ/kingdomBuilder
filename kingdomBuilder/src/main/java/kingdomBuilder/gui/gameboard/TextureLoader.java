@@ -6,7 +6,10 @@ import kingdomBuilder.model.TileType;
 /**
  * Class to load all relevant textures.
  */
-public class TextureLoader {
+public final class TextureLoader {
+
+    //region BASIC TILES
+
     /**
      * Represents the Image for the Tile "Canyon".
      */
@@ -39,6 +42,10 @@ public class TextureLoader {
      * Represents the Image for the Tile "Water".
      */
     private static final Image WATER = new Image("kingdomBuilder/gui/textures/tiles/WATER.png");
+
+    //endregion BASIC TILES
+
+    //region TOKEN
 
     /**
      * Represents the Image for the Token "Barn".
@@ -73,10 +80,65 @@ public class TextureLoader {
      */
     private static final Image TOWER = new Image("kingdomBuilder/gui/textures/tokens/TOWER.png");
 
+    //endregion TOKEN
+
+    //region WIN_ICONS
+
     /**
-     * Constructs a new TextureLoader.
+     * Represents the Icon for the WinCondition "ANCHORITE".
      */
-    public TextureLoader() {
+    private static final Image ANCHORITE = new Image("kingdomBuilder/gui/textures/icons/winconditions/ANCHORITE.png");
+
+    /**
+     * Represents the Icon for the WinCondition "CITIZEN".
+     */
+    private static final Image CITIZEN = new Image("kingdomBuilder/gui/textures/icons/winconditions/CITIZEN.png");
+
+    /**
+     * Represents the Icon for the WinCondition "EXPLORER".
+     */
+    private static final Image EXPLORER = new Image("kingdomBuilder/gui/textures/icons/winconditions/EXPLORER.png");
+
+    /**
+     * Represents the Icon for the WinCondition "FARMER".
+     */
+    private static final Image FARMER = new Image("kingdomBuilder/gui/textures/icons/winconditions/FARMER.png");
+
+    /**
+     * Represents the Icon for the WinCondition "FISHER".
+     */
+    private static final Image FISHER = new Image("kingdomBuilder/gui/textures/icons/winconditions/FISHER.png");
+
+    /**
+     * Represents the Icon for the WinCondition "KNIGHT".
+     */
+    private static final Image KNIGHT = new Image("kingdomBuilder/gui/textures/icons/winconditions/KNIGHT.png");
+
+    /**
+     * Represents the Icon for the WinCondition "LORDS".
+     */
+    private static final Image LORD = new Image("kingdomBuilder/gui/textures/icons/winconditions/LORD.png");
+
+    /**
+     * Represents the Icon for the WinCondition "MERCHANT".
+     */
+    private static final Image MERCHANT = new Image("kingdomBuilder/gui/textures/icons/winconditions/MERCHANT.png");
+
+    /**
+     * Represents the Icon for the WinCondition "MINER".
+     */
+    private static final Image MINER = new Image("kingdomBuilder/gui/textures/icons/winconditions/MINER.png");
+
+    /**
+     * Represents the Icon for the WinCondition "WORKER".
+     */
+    private static final Image WORKER = new Image("kingdomBuilder/gui/textures/icons/winconditions/WORKER.png");
+    //endregion WIN_ICONS
+
+    /**
+     * Constructor so this class never get instanced.
+     */
+    private TextureLoader() {
     }
 
     /**
@@ -84,7 +146,7 @@ public class TextureLoader {
      * @param type The Tile for requesting the Image.
      * @return The Image for the requested Tile.
      */
-    public Image getTexture(TileType type) {
+    public static Image getTileTexture(TileType type) {
         return switch (type) {
             case CANYON -> CANYON;
             case DESERT -> DESERT;
@@ -102,6 +164,29 @@ public class TextureLoader {
             case PADDOCK -> PADDOCK;
             case TAVERN -> TAVERN;
             case TOWER -> TOWER;
+
+            // TODO: generates an exception:
+            default -> null;
+        };
+    }
+
+    /**
+     * Gets the Image for the given WinCondition.
+     * @param wincondition  The WinCondition for requesting the Image.
+     * @return The Image for the requested WinCondition.
+     */
+    public static Image getWinConditionTexture(Wincondition.WinCondition wincondition) {
+        return switch (wincondition) {
+            case ANCHORITE -> ANCHORITE;
+            case CITIZEN -> CITIZEN;
+            case EXPLORER -> EXPLORER;
+            case FARMER -> FARMER;
+            case FISHER -> FISHER;
+            case KNIGHT -> KNIGHT;
+            case LORDS -> LORD;
+            case MERCHANT -> MERCHANT;
+            case MINER -> MINER;
+            case WORKER -> WORKER;
 
             // TODO: generates an exception:
             default -> null;

@@ -1,7 +1,6 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Point3D;
 import javafx.scene.*;
@@ -9,7 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
@@ -19,10 +17,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
-import kingdomBuilder.gui.gameboard.GameBoard;
-import kingdomBuilder.gui.gameboard.Hexagon;
-import kingdomBuilder.gui.gameboard.TextureLoader;
-import kingdomBuilder.gui.gameboard.Token;
+import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
 
@@ -34,11 +29,6 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
-    /**
-     * Represents the texture loader which all hexagons share.
-     */
-    private static final TextureLoader textureLoader = new TextureLoader();
-
     /**
      * Represents the setting for the field of view (fov).
      */
@@ -133,6 +123,11 @@ public class GameViewController extends Controller implements Initializable {
      */
     @FXML
     private Label game_label_time;
+    /**
+     * Represents the HBox where the winconditions are displayed.
+     */
+    @FXML
+    private HBox game_hBox_windconditions;
     /**
      * Represents the HBox that contains the subscene
      */
@@ -231,8 +226,9 @@ public class GameViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
         // - PlayerData (name, score)
-        // - Win Conditions
+        // - when player joins
         // -
+        // - Win Conditions -> updateWinConditions()
         // - Tokens from the current Player -> updateTokens()
         // - Token used -> updateTokens()
         // - In Basic turn -> disableTokens(false/true)
@@ -252,9 +248,8 @@ public class GameViewController extends Controller implements Initializable {
 
         // create a testBox
         Box box = new Box(100, 100, 100);
-        TextureLoader textureLoader = new TextureLoader();
         box.setMaterial(new PhongMaterial(
-                Color.WHITE, textureLoader.getTexture(TileType.FARM), null, null, null)
+                Color.WHITE, TextureLoader.getTileTexture(TileType.FARM), null, null, null)
         );
         box.translateXProperty().set(1500);
         box.translateYProperty().set(1500);
@@ -350,12 +345,14 @@ public class GameViewController extends Controller implements Initializable {
                 case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
                 case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
                 //ToDO: remove - just for testing the highlight
-                case R ->  {
-                    gameBoard.highlightTerrain();
+                case R -> gameBoard.highlightTerrain();
+                case T -> {
                     int random = (int) (Math.random() * 5) + 1;
                     updateCardDescription(TileType.valueOf(random));
                     updateTokens();
                 }
+                case Z -> updateWinConditions();
+
             }
             event.consume();
         });
@@ -396,6 +393,7 @@ public class GameViewController extends Controller implements Initializable {
 
         // resize the HBox for statistic at top and player information on the bottom
         game_hbox_statistic.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.1));
+        game_hBox_windconditions.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.1));
         game_hbox_subscene.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.7));
         game_hbox_playerinformation.prefHeightProperty().bind(game_vbox.heightProperty().multiply(0.15));
 
@@ -420,7 +418,7 @@ public class GameViewController extends Controller implements Initializable {
         // TODO read TileType from Datalogic/Store instead of parameter
 
         //Update Image
-        Image img = textureLoader.getTexture(tileType);
+        Image img = TextureLoader.getTileTexture(tileType);
         game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
 
         //Update Text
@@ -482,6 +480,39 @@ public class GameViewController extends Controller implements Initializable {
         tokens.add(token);
 
         gameview_hbox_tokens.getChildren().add(token);
+    }
+
+    /**
+     * Updates the win conditions.
+     */
+    private void updateWinConditions() {
+        // should be empty but safe is safe
+        game_hBox_windconditions.getChildren().clear();
+
+        // TODO: read winconditions from Data
+        Wincondition.WinCondition[] wc = {
+                Wincondition.WinCondition.FISHER,
+                Wincondition.WinCondition.LORDS,
+                Wincondition.WinCondition.MINER,
+                Wincondition.WinCondition.ANCHORITE,
+                Wincondition.WinCondition.FARMER,
+                Wincondition.WinCondition.MERCHANT,
+                Wincondition.WinCondition.KNIGHT,
+                Wincondition.WinCondition.EXPLORER
+        };
+
+        for (int i = 0; i < 3; i++) {
+            int random = (int) (Math.random() * 8);
+            game_hBox_windconditions.getChildren().add(new Wincondition(wc[random], resourceBundle));
+        }
+
+        /*
+        Wincondition one = new Wincondition(winConditionOne, resourceBundle);
+        Wincondition two = new Wincondition(winConditionTwo, resourceBundle);
+        Wincondition three = new Wincondition(winConditionThree, resourceBundle);
+
+        game_hBox_windconditions.getChildren().addAll(one, two, three);
+        */
     }
 
     /**

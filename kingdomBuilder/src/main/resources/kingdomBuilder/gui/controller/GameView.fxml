@@ -97,28 +97,33 @@
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
         </Label>
+        <!-- Hbox for win conditions-->
+        <HBox fx:id="game_hBox_windconditions" VBox.vgrow="ALWAYS"/>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
     </HBox>
 
     <!-- HBox that contains the Subscene with the gameboard-->
     <HBox fx:id="game_hbox_subscene" alignment="CENTER" VBox.vgrow="ALWAYS">
-        <SubScene fx:id="game_subscene" managed="false" BorderPane.alignment="CENTER" pickOnBounds="true"
-                  depthBuffer="true">
+        <SubScene fx:id="game_subscene" depthBuffer="true" managed="false" pickOnBounds="true"
+                  BorderPane.alignment="CENTER">
             <antiAliasing>
-                <SceneAntialiasing fx:constant="BALANCED"/>
+                <SceneAntialiasing fx:constant="BALANCED" />
             </antiAliasing>
             <root>
-                <Group fx:id="gameBoard_group"/>
+                <Group fx:id="gameBoard_group" />
             </root>
         </SubScene>
     </HBox>
 
     <!--HBox that displays the player specific information like the tokens.-->
-    <HBox fx:id="game_hbox_playerinformation">
+    <HBox fx:id="game_hbox_playerinformation" alignment="CENTER">
 
 
         <!-- VBox that displays the information of the current card-->
-        <VBox fx:id="game_vbox_terraincard" alignment="CENTER"
-              style="-fx-border-color: white; -fx-background-color: ANTIQUEWHITE;">
+        <VBox fx:id="game_vbox_terraincard" alignment="CENTER" style="-fx-border-color: white;
+        -fx-background-color: ANTIQUEWHITE;">
             <Rectangle fx:id="game_rectangle_card" stroke="BLACK" strokeType="INSIDE" />
             <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Flower" />
             <padding>

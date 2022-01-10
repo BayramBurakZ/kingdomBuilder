@@ -12,10 +12,14 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import kingdomBuilder.gui.controller.GameViewController;
+import kingdomBuilder.gui.util.HexagonCalculator;
 import kingdomBuilder.model.TileType;
 
 import java.util.ArrayList;
 
+/**
+ * Class that is used to display Tokens.
+ */
 public class Token extends StackPane {
 
     /**
@@ -33,6 +37,7 @@ public class Token extends StackPane {
      * @param tileType The type of the Token.
      * @param count The count, how many Tokens the user own.
      * @param gameViewController The gameViewController (to deactivate other Tokens).
+     * @param disable If the Token is at the beginning disabled.
      */
     public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable) {
         super();
@@ -94,34 +99,14 @@ public class Token extends StackPane {
      */
     private class Hexagon2D extends Polygon {
         /**
-         * Represents the six corners of a hexagon.
-         */
-        private static ArrayList<Point2D> vertices;
-
-        /**
-         * Represents the angle in degree to turn the corners around the center;
-         */
-        private static final int TURN_ANGLE_DEGREE = 60;
-
-        /**
-         * Represents the angle in radian to turn the corners around the center;
-         */
-        private static final double TURN_ANGLE_RADIAN = Math.toRadians(TURN_ANGLE_DEGREE);
-
-        /**
          * Represents the radius of one hexagon.
          */
         private static final int RADIUS= 40;
 
         /**
-         * Represents the number of corners of a hexagon.
+         * Represents the six corners of a hexagon.
          */
-        private static final int NUMBER_OF_CORNERS = 6;
-
-        /**
-         * Represents the texture loader which all hexagons share.
-         */
-        private static final TextureLoader textureLoader = new TextureLoader();
+        private static ArrayList<Point2D> vertices = HexagonCalculator.calculateCorners(RADIUS);;
 
         /**
          * Indicates if the token is ready to use (true).
@@ -129,69 +114,42 @@ public class Token extends StackPane {
         private boolean isActivated = false;
 
         /**
+         * Indicates if the hexagon is disabled. If so no action will be triggered.
+         */
+        private boolean isDisabled = false;
+
+        /**
          * Represents the GameViewController.
          */
         private GameViewController gameViewController;
 
+
         /**
-         * Calculates the corners of a hexagon with the given radius.
-         *
-         * @param radius The radius from the center of a hexagon to one of its corners.
-         * @return A list with six points of a hexagon.
+         * Constructs a new 2D hexagon with the given type.
+         * @param tileType The type for the texture.
+         * @param gameViewController The gameViewController.
          */
-        private static ArrayList<Point2D> calculateCorners(int radius) {
-            ArrayList<Point2D> corners = new ArrayList<>();
-
-            int x = 0, my = 0;
-            int y = my + radius;
-
-            corners.add(new Point2D(x, y));
-
-            // Rotation matrix to rotate the corners 60 degree around the center
-            for (int i = 0; i < NUMBER_OF_CORNERS - 1; i++) {
-                int movedX = (int) Math.round((x * Math.cos(TURN_ANGLE_RADIAN)) - (y * Math.sin(TURN_ANGLE_RADIAN)));
-                int movedY = (int) Math.round((x * Math.sin(TURN_ANGLE_RADIAN)) + (y * Math.cos(TURN_ANGLE_RADIAN)));
-
-                corners.add(new Point2D(movedX, movedY));
-                x = movedX;
-                y = movedY;
-            }
-
-            // search the distance from the center to the far left side
-            int minX = Integer.MAX_VALUE;
-            for (Point2D e : corners) {
-                if (e.getX() < minX) {
-                    minX = (int) e.getX();
-                }
-            }
-
-
-            //translate the hexagon corners to positive values
-            for (int i = 0; i < corners.size(); i++) {
-                corners.set(i, corners.get(i).add(-minX, radius));
-            }
-            return corners;
-        }
-
-        //TODO javadoc
         public Hexagon2D(TileType tileType, GameViewController gameViewController) {
             this.gameViewController = gameViewController;
-            vertices = calculateCorners(RADIUS);
 
             setStrokeWidth(2.0);
             setStrokeType(StrokeType.INSIDE);
 
-            // calculate all corners of a hexagon
-            for (int i = 0; i < NUMBER_OF_CORNERS; i++) {
+            // add all corners of to the hexagon shape
+            for (int i = 0; i < HexagonCalculator.NUMBER_OF_CORNERS; i++) {
                 getPoints().add(vertices.get(i).getX());
                 getPoints().add(vertices.get(i).getY());
             }
 
             addListener(tileType);
-            Image texture = textureLoader.getTexture(tileType);
+            Image texture = TextureLoader.getTileTexture(tileType);
             setFill(new ImagePattern(texture, 0.0f, 0.0f, 1.0f, 1.0f, true));
         }
 
+        /**
+         * Adds the Mouse listener for the hexagon.
+         * @param tileType The type defines which action is triggered.
+         */
         private void addListener(TileType tileType) {
             setOnMouseClicked(event -> {
                 // if the tile is disabled: do nothing
@@ -248,19 +206,24 @@ public class Token extends StackPane {
             });
         }
 
-
+        // TODO: remove
         private void placeholder(TileType tileType) {
             if (isActivated) {
                 System.out.println("You activated your " + tileType + " -Token!");
             }
         }
 
-        private boolean isDisabled = false;
-
+        /**
+         * Sets the hexagon disable value.
+         * @param value Set to true if no Action should be triggered.
+         */
         private void setHexagonDisabled(boolean value) {
             isDisabled = value;
         }
 
+        /**
+         * Activates the Token and highlights it.
+         */
         private void activateToken() {
             isActivated = !isActivated;
 
