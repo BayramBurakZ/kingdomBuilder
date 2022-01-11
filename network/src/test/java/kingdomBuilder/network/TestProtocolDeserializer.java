@@ -1,11 +1,9 @@
 package kingdomBuilder.network;
 
-import kingdomBuilder.annotations.Protocol;
 import kingdomBuilder.network.generated.ProtocolDeserializer;
 
 import kingdomBuilder.network.protocol.*;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,7 +19,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingClientLeft() {
+    void testDeserializingClientLeft() {
         final String packet = "[SERVER_MESSAGE] [CLIENT_LEFT] <[4;Ich;-1]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
@@ -34,7 +32,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingClientJoined() {
+    void testDeserializingClientJoined() {
         final String packet = "[SERVER_MESSAGE] [CLIENT_JOINED] <[4;Ich;-1]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
@@ -47,7 +45,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingClientJoinedWithSpacesName() {
+    void testDeserializingClientJoinedWithSpacesName() {
         final String packet = "[SERVER_MESSAGE] [CLIENT_JOINED] <[4; H a h;-1]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
@@ -60,7 +58,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingMessage() {
+    void testDeserializingMessage() {
         final String packet = "[SERVER_MESSAGE] [MESSAGE] <[1;{2,3,42};Hallo Du!]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
@@ -73,7 +71,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingWelcomeToServer() {
+    void testDeserializingWelcomeToServer() {
         final String packet = "[SERVER_MESSAGE] [WELCOME_TO_SERVER] <[4;Test;-1]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
@@ -88,7 +86,7 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testParsingRequestClientsResponse() {
+    void testDeserializingRequestClientsResponse() {
         final String packet = "[REPLY_MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
