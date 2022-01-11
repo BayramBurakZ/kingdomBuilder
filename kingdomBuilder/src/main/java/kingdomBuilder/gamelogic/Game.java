@@ -2,6 +2,9 @@ package kingdomBuilder.gamelogic;
 
 import java.security.InvalidParameterException;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Contains all the information of a game hosted on the server.
@@ -43,17 +46,18 @@ public class Game {
 
     /**
      * Constructs a new game object which is ready for the first move.
-     * @param gameName The name of the game.
-     * @param gameDescription The description of the game.
-     * @param playerLimit The maximum amount of players that can play in the game.
-     * @param timeLimit The maximum amount of time a player can spend on each turn.
-     * @param turnLimit The maximum amount of turns the game can run for.
-     * @param quadrantIDs The quadrants the game board is assembled from.
-     * @param hostID The ID of the client who created the game.
-     * @param startingPlayerID The ID of the player who takes the first turn.
-     * @param winConditions An array of the win conditions of the game.
-     * @param players An array of the players playing in the game.
-     * @param startingTokenCount The amount of tokens each special place should contain at the start of the game.
+     *
+     * @param gameName            The name of the game.
+     * @param gameDescription     The description of the game.
+     * @param playerLimit         The maximum amount of players that can play in the game.
+     * @param timeLimit           The maximum amount of time a player can spend on each turn.
+     * @param turnLimit           The maximum amount of turns the game can run for.
+     * @param quadrantIDs         The quadrants the game board is assembled from.
+     * @param hostID              The ID of the client who created the game.
+     * @param startingPlayerID    The ID of the player who takes the first turn.
+     * @param winConditions       An array of the win conditions of the game.
+     * @param players             An array of the players playing in the game.
+     * @param startingTokenCount  The amount of tokens each special place should contain at the start of the game.
      * @param startingSettlements The total amount of settlements a player has to place to end the game.
      */
     public Game(String gameName,
@@ -92,6 +96,7 @@ public class Game {
     }
 
     // TODO: maybe not a class for this idk
+
     /**
      * Server takes quadrant IDs in this listed order.
      */
@@ -189,8 +194,8 @@ public class Game {
         int counter = 0;
 
         for (int y = 0; y < map.getMapWidth(); y++) {
-            for (int x = 0; x < map.getMapWidth(); x++){
-                if(map.occupiedBy(x, y) == player){
+            for (int x = 0; x < map.getMapWidth(); x++) {
+                if (map.occupiedBy(x, y) == player) {
                     //tilesWithSettlementsOfPlayer[counter] =
                 }
             }
@@ -213,12 +218,14 @@ public class Game {
 
     /**
      * Checks if a settlement can be placed.
-     * @param x The horizontal position of the settlement on the map.
-     * @param y The vertical position of the settlement on the map.
+     *
+     * @param x      The horizontal position of the settlement on the map.
+     * @param y      The vertical position of the settlement on the map.
      * @param player The player whose turn it is and who owns the settlement.
      * @return
      */
-    public boolean canPlaceSettlement(int x, int y, Player player) {
+    public boolean canPlaceSettlement(Player player, int x, int y) {
+        //TODO: implement settlement placement WITHOUT a terrain
         return isPlayersTurn(player)
                 && player.hasRemainingSettlements()
                 && !map.isOccupied(x, y);
@@ -226,28 +233,37 @@ public class Game {
 
     /**
      * Places a settlement as a basic turn and throws if the move isn't valid.
-     * @param x The horizontal position of the settlement on the map.
-     * @param y The vertical position of the settlement on the map.
+     *
+     * @param x      The horizontal position of the settlement on the map.
+     * @param y      The vertical position of the settlement on the map.
      * @param player The player whose turn it is and who owns the settlement.
      * @return
      */
-    public void placeSettlement(int x, int y, Player player) {
+    public void placeSettlement(Player player, int x, int y) {
         checkIsPlayersTurn(player);
         checkHasRemainingSettlements(player);
 
         map.placeSettlement(x, y, player);
         player.remainingSettlements--;
-        // TODO: check if new position neighbours special place, if so give token to player
+
+        TileType token = map.specialPlaceInSurrounding(x, y);
+
+        // Player gets a token if settlement is next to special place
+        if (token != null) {
+            player.addToken(token);
+            map.takeToken(x, y);
+        }
     }
 
     /**
      * Checks if a settlement can be moved to a new position.
      * Does not allow placing on water.
      * Token functions which allow placement on water handle their placement separately.
-     * @param fromX The old horizontal position of the settlement on the map.
-     * @param fromY The old vertical position of the settlement on the map.
-     * @param toX The new horizontal position of the settlement on the map.
-     * @param toY The new vertical position of the settlement on the map.
+     *
+     * @param fromX  The old horizontal position of the settlement on the map.
+     * @param fromY  The old vertical position of the settlement on the map.
+     * @param toX    The new horizontal position of the settlement on the map.
+     * @param toY    The new vertical position of the settlement on the map.
      * @param player The player whose turn it is and who owns the settlement.
      */
     public boolean canMoveSettlement(int fromX, int fromY, int toX, int toY, Player player) {
@@ -261,10 +277,11 @@ public class Game {
      * Moves a settlement to a new position and throws if the move isn't valid.
      * Does not allow placing on water.
      * Token functions which allow placement on water handle their placement separately.
-     * @param fromX The old horizontal position of the settlement on the map.
-     * @param fromY The old vertical position of the settlement on the map.
-     * @param toX The new horizontal position of the settlement on the map.
-     * @param toY The new vertical position of the settlement on the map.
+     *
+     * @param fromX  The old horizontal position of the settlement on the map.
+     * @param fromY  The old vertical position of the settlement on the map.
+     * @param toX    The new horizontal position of the settlement on the map.
+     * @param toY    The new vertical position of the settlement on the map.
      * @param player The player whose turn it is and who owns the settlement.
      */
     public void moveSettlement(int fromX, int fromY, int toX, int toY, Player player) {
@@ -272,33 +289,236 @@ public class Game {
 
         map.moveSettlement(fromX, fromY, toX, toY);
         // TODO: check if previous position neighboured special place, if so remove token from player
-        // TODO: check if new position neighbours special place, if so give token to player
+
+        TileType token = map.specialPlaceInSurrounding(toX, toY);
+
+        // Player gets a token if settlement is next to special place
+        if (token != null) {
+            player.addToken(token);
+            map.takeToken(toX, toY);
+        }
     }
 
-    // TODO: implement, see Player function by the same name
-    //addToken(TileType tokenType, Player player, ...)
+
+    /**
+     * Gives player a token and removes it from the special place.
+     *
+     * @param player The player the token is given to.
+     * @param x      The x coordinate of the tile.
+     * @param y      The y coordinate of the tile.
+     */
+    public void addToken(Player player, int x, int y) {
+        //TODO: don't add token from the same place twice
+
+        if (map.tileHasTokenLeft(x, y)) {
+            player.addToken(map.getTileType(x, y));
+            map.takeToken(x, y);
+        }
+    }
+
+    /**
+     * use a token that places a settlement.
+     *
+     * @param tokenType that is used.
+     * @param player    player that uses it.
+     */
+    public void useToken(TileType tokenType, Player player, int x, int y) {
+        // TODO: only keep this if token function are getting changed to private
+        if (!player.playerHasTokenLeft(tokenType))
+            return;
+
+        switch (tokenType) {
+            case ORACLE:
+                useTokenOracle(player, x, y);
+                break;
+            case FARM:
+                useTokenFarm(player, x, y);
+                break;
+            case TAVERN:
+                useTokenTavern(player, x, y);
+                break;
+            case TOWER:
+                useTokenTower(player, x, y);
+                break;
+            case OASIS:
+                useTokenOasis(player, x, y);
+                break;
+            default:
+                return;
+        }
+
+    }
+
+    /**
+     * use a token that moves a settlement.
+     *
+     * @param tokenType
+     * @param player
+     * @param fromX
+     * @param fromY
+     * @param toX
+     * @param toY
+     */
+    public void useToken(TileType tokenType, Player player, int fromX, int fromY, int toX, int toY) {
+        // TODO: only keep this if token function are getting changed to private
+        if (!player.playerHasTokenLeft(tokenType))
+            return;
+
+        switch (tokenType) {
+            case HARBOR:
+                useTokenHarbor(player, fromX, fromY, toX, toY);
+                break;
+            case PADDOCK:
+                useTokenPaddock(player, fromX, fromY, toX, toY);
+                break;
+            case BARN:
+                useTokenBarn(player, fromX, fromY, toX, toY);
+                break;
+            default:
+                return;
+        }
+
+    }
+
+
+    /**
+     * Use the oracle token. The player is allowed to place an extra settlement on a tile that has the same type as
+     * the players' terrain card.
+     *
+     * @param player That is using the token.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
+     */
+    private void useTokenOracle(Player player, int x, int y) {
+        if (canPlaceSettlementInTerrain(player, player.terrainCard, x, y)) {
+            placeSettlement(player, x, y);
+            player.removeToken(TileType.ORACLE);
+        }
+    }
+
+    /**
+     * Use the farm token. The player can place an extra settlement on gras.
+     *
+     * @param player That is using the token.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
+     */
+    private void useTokenFarm(Player player, int x, int y) {
+        if (canPlaceSettlementInTerrain(player, TileType.GRAS, x, y)) {
+            placeSettlement(player, x, y);
+            player.removeToken(TileType.FARM);
+        }
+    }
 
     // TODO: implement, parameters should match the protocol message format
-    //useTokenOracle(Player player, int x, int y)
+    private void useTokenTavern(Player player, int x, int y) {
+    }
+
+    /**
+     * Use tower token. The player can place a token at the border of the map.
+     *
+     * @param player That is using the token.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
+     */
+    private void useTokenTower(Player player, int x, int y) {
+        if (!map.isTileAtBorder(x, y))
+            return;
+
+        if (canPlaceSettlement(player, x, y)) {
+            placeSettlement(player, x, y);
+            player.removeToken(TileType.TOWER);
+        }
+    }
+
+    /**
+     * Use Oasis token. The player can place an extra settlement on Desert.
+     *
+     * @param player That is using the token.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
+     */
+    private void useTokenOasis(Player player, int x, int y) {
+        if (canPlaceSettlementInTerrain(player, TileType.DESERT, x, y)) {
+            placeSettlement(player, x, y);
+            player.removeToken(TileType.OASIS);
+        }
+    }
 
     // TODO: implement, parameters should match the protocol message format
-    //useTokenFarm(Player player, int x, int y)
+    private void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
+    }
 
     // TODO: implement, parameters should match the protocol message format
-    //useTokenTavern(Player player, int x, int y)
+    private void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
+    }
 
     // TODO: implement, parameters should match the protocol message format
-    //useTokenTower(Player player, int x, int y)
+    private void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
+    }
 
-    // TODO: implement, parameters should match the protocol message format
-    //useTokenOasis(Player player, int x, int y)
 
-    // TODO: implement, parameters should match the protocol message format
-    //useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY)
+    /**
+     * check if a settlement is placeable.
+     *
+     * @param player
+     * @param terrain
+     * @param x
+     * @param y
+     * @return
+     */
+    public boolean canPlaceSettlementInTerrain(Player player, TileType terrain, int x, int y) {
 
-    // TODO: implement, parameters should match the protocol message format
-    //useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY)
+        if (!isPlayersTurn(player) || !player.hasRemainingSettlements())
+            return false;
 
-    // TODO: implement, parameters should match the protocol message format
-    //useTokenBarn(Player player, int fromX, int fromY, int toX, int toY)
+        if (!placeableTileTypes.contains(terrain))
+            throw new InvalidParameterException("parameter is not a terrain!");
+
+        // terrain must match the terrain of the tile player wants to place a settlement
+        if (!map.isTilePlaceable(x, y) && terrain != map.getTileType(x, y))
+            return false;
+
+        // player has to place settlement next to another settlement
+        if (map.settlementOfPlayerOnSurroundingTiles(player, x, y))
+            return true;
+
+        // player can place anywhere on tile
+        if (playerCanPlaceAnywhereOnTerrain(player, terrain, x, y))
+            return true;
+
+        return false;
+    }
+
+
+    public boolean playerCanPlaceAnywhereOnTerrain(Player player, TileType terrain, int x, int y) {
+        if (!placeableTileTypes.contains(terrain))
+            throw new InvalidParameterException("not a landscape!");
+
+        Set<Position> allPlaceableTiles = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
+
+        if (allPlaceableTiles.isEmpty())
+            return true;
+
+        return false;
+    }
+
+    public Set<Position> allPossibleSettlementPlacementsNextToOtherSettlement(Player player, TileType terrain) {
+        if (!placeableTileTypes.contains(terrain))
+            throw new InvalidParameterException("not a landscape!");
+
+        Set<Position> allowedTiles = new HashSet<>();
+        Set<Position> freeTiles = map.freeTilesOnTerrain(terrain);
+        Iterator<Position> freeTilesIterator = freeTiles.iterator();
+        Position current;
+
+        while (freeTilesIterator.hasNext()) {
+            current = freeTilesIterator.next();
+
+            if (map.settlementOfPlayerOnSurroundingTiles(player, current.x, current.y)) {
+                allowedTiles.add(current);
+            }
+        }
+        return allowedTiles;
+    }
 }

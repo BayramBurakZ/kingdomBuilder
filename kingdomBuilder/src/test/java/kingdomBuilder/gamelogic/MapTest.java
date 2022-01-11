@@ -3,10 +3,12 @@ package kingdomBuilder.gamelogic;
 import static kingdomBuilder.gamelogic.Game.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import javafx.geometry.Pos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class MapTest {
 
@@ -100,4 +102,5 @@ public class MapTest {
             }
         }
     }
+
 }

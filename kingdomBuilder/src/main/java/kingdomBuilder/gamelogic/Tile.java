@@ -73,18 +73,24 @@ public class Tile {
         return false;
     }
 
-    // TODO: JavaDoc
+    /**
+     * Checks whether the tile is occupied by any player.
+     *
+     * @return True if it is occupied. False otherwise.
+     */
     public boolean isOccupied() {
-
         if (occupiedBy != null)
             return true;
 
         return false;
     }
 
-    // TODO: JavaDoc
+    /**
+     * Gets the player that is occupying the tile.
+     *
+     * @return the player that is occupying the tile.
+     */
     public Player occupiedBy() {
-
         return occupiedBy;
     }
 
@@ -96,5 +102,16 @@ public class Tile {
     public TileType getTileType() {
 
         return tileType;
+    }
+
+    /**
+     * Check if tile has any token left.
+     *
+     * @return True if there are token left. False otherwise.
+     */
+    public boolean hasTokenLeft() {
+        if (remainingTokens > 0)
+            return true;
+        return false;
     }
 }
