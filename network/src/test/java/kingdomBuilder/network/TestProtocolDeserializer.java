@@ -87,10 +87,9 @@ public class TestProtocolDeserializer {
         assertEquals(-1, typedPacket.gameId());
     }
 
-    @Disabled
     @Test
     void testParsingRequestClientsResponse() {
-        final String packet = "[REPLY MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
+        final String packet = "[REPLY_MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
@@ -268,7 +267,6 @@ public class TestProtocolDeserializer {
         assertEquals(-1, typedPacket.gameId());
     }
 
-    @Disabled("Disabled until parsing lists is fixed")
     @Test
     void testDeserializingGamesReply() {
         final String packet = "[REPLY_MESSAGE] (?games) <{[3;kingdom_builder:KB;0;a game;some game;2;0]}>";
@@ -298,7 +296,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedClientIds, typedPacket.clientIds());
     }
 
-    @Disabled("Disabled until parsing lists is fixed")
     @Test
     void testDeserializingModulesReply() {
         final String packet = "[REPLY_MESSAGE] (?modules) <{[Server;std],[Kingdom Builder;kingdom_builder]}>";
@@ -315,7 +312,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedModules, typedPacket.modules());
     }
 
-    @Disabled("Disabled until parsing lists is fixed")
     @Test
     void testDeserializingMyNamespacesReply() {
         final String packet = "[REPLY_MESSAGE] (?mymodules) <{[Server;std],[Kingdom Builder;kingdom_builder]}>";
@@ -472,7 +468,6 @@ public class TestProtocolDeserializer {
         assertEquals(42, typedPacket.clientId());
     }
 
-    @Disabled("Disabled until parsing fixed")
     @Test
     void testDeserializingGameOver(){
         final String packet = "[GAME_MESSAGE] [GAME_OVER] <{1,24,78,156,8}>";
@@ -486,7 +481,6 @@ public class TestProtocolDeserializer {
         assertEquals(expectedClientIds, typedPacket.clientIds());
     }
 
-    @Disabled("Disabled until Parsing is fixed")
     @Test
     void testDeserializingScores() {
         final String packet = "[GAME_MESSAGE] [SCORES] <{[4;54],[2;34]}>";
@@ -632,7 +626,6 @@ public class TestProtocolDeserializer {
         assertEquals("WATER", typedPacket.fieldType100());
     }
 
-    @Disabled("Disabled until parsing fixed")
     @Test
     void testDeserializingQuadrantsReply(){
         final String packet = "[REPLY_MESSAGE] (?quadrants) <{0;1;4;7}>";
@@ -668,7 +661,6 @@ public class TestProtocolDeserializer {
         assertEquals(4, typedPacket.playerLimit());
     }
 
-    @Disabled
     @Test
     void testDeserializingPlayersReply() {
         final String packet = "[REPLY_MESSAGE] (?players) <{[21;RED],[42;BLUE]}>";
@@ -718,7 +710,6 @@ public class TestProtocolDeserializer {
         assertEquals(42, typedPacket.clientId());
     }
 
-    @Disabled
     @Test
     void testDeserializingSettlementsLeftReply(){
         final String packet = "[REPLY_MESSAGE] (?settlementsleft) <{[1;16],[2;14]}>";
@@ -743,10 +734,10 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError());
         BoardReply typedPacket = assertInstanceOf(BoardReply.class, testConsumer.getObject());
 
-        assertEquals(1, typedPacket.quadrantId1());
-        assertEquals(4, typedPacket.quadrantId2());
-        assertEquals(2, typedPacket.quadrantId3());
-        assertEquals(0, typedPacket.quadrantId4());
+        assertEquals(1, typedPacket.boardData().quadrantId1());
+        assertEquals(4, typedPacket.boardData().quadrantId2());
+        assertEquals(2, typedPacket.boardData().quadrantId3());
+        assertEquals(0, typedPacket.boardData().quadrantId4());
     }
 
     @Test
@@ -762,7 +753,6 @@ public class TestProtocolDeserializer {
         assertEquals("KNIGHT", typedPacket.winCondition3());
     }
 
-    @Disabled
     @Test
     void testDeserializingMyGameReply() {
         final String packet = "[REPLY_MESSAGE] (?mygame) <[42;kingdom_builder:KB;0;gameName;gameDescription;2;1;-1;-1;" +
@@ -781,9 +771,9 @@ public class TestProtocolDeserializer {
         assertEquals(1, typedPacket.playersJoined());
         assertEquals(-1, typedPacket.timeLimit());
         assertEquals(-1, typedPacket.turnLimit());
-        assertEquals(0, typedPacket.quadrantId1());
-        assertEquals(1, typedPacket.quadrantId2());
-        assertEquals(2, typedPacket.quadrantId3());
-        assertEquals(3, typedPacket.quadrantId4());
+        assertEquals(0, typedPacket.boardData().quadrantId1());
+        assertEquals(1, typedPacket.boardData().quadrantId2());
+        assertEquals(2, typedPacket.boardData().quadrantId3());
+        assertEquals(3, typedPacket.boardData().quadrantId4());
     }
 }

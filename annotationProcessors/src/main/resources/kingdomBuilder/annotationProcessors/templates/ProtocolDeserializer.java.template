@@ -53,18 +53,26 @@ public class ProtocolDeserializer {
      * @return The list of chunks.
      */
     private static List<String> split(String payload, int count) {
-        /*
-         * The responses can be differentiated in tuples containing primitives
-         * and lists containing tuples.
-         */
-
         if(payload.startsWith("<") && payload.endsWith(">"))
             payload = payload.substring(1, payload.length() - 1);
 
         if(payload.startsWith("[") && payload.endsWith("]"))
-            payload = payload.substring(1,payload.length() - 1);
+            payload = payload.substring(1, payload.length() - 1) ;
 
         return List.of(payload.split(";", count));
+    }
+
+    /**
+     * Splits the payload, containing a list of tuples, into substrings, where
+     * each substring represents a single element of the list.
+     * @param payload The payload to split.
+     * @return A list of substrings, where each string represents an element of the list.
+     */
+    private static List<String> splitList(String payload) {
+        if(payload.startsWith("{") && payload.endsWith("}"))
+            payload = payload.substring(1, payload.length() - 1);
+
+        return List.of(payload.split(","));
     }
 
     /**
@@ -76,7 +84,7 @@ public class ProtocolDeserializer {
         if(payload.startsWith("{") && payload.endsWith("}"))
             payload = payload.substring(1, payload.length() - 1);
 
-        return Arrays.stream(payload.split(","))
+        return Arrays.stream(payload.split(",|;"))
             .mapToInt(Integer::parseInt)
             .boxed()
             .collect(Collectors.toList());

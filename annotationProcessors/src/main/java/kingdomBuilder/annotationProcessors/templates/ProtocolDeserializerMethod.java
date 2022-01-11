@@ -13,14 +13,17 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Template
 public class ProtocolDeserializerMethod {
+    private final Set<TypeElement> elements;
     private final TypeElement element;
     private final Types types;
 
-    public ProtocolDeserializerMethod(TypeElement element, Types types) {
+    public ProtocolDeserializerMethod(Set<TypeElement> elements, TypeElement element, Types types) {
+        this.elements = elements;
         this.element = element;
         this.types = types;
     }
@@ -79,6 +82,9 @@ public class ProtocolDeserializerMethod {
 
                     if(cls == String.class) return String.format("tokens.get(%d)", idx);
                     else if(cls == List.class) return makeListValue(component, cls, idx);
+                    else if(elements.contains(typeElement)) {
+                        return String.format("deserialize%s(tokens.get(%d))", typeElement.getSimpleName(), idx);
+                    }
                 }
 
                 return "null";
@@ -91,9 +97,28 @@ public class ProtocolDeserializerMethod {
 
     private String makeListValue(RecordComponentElement component, Class<?> cls, int idx) {
         final var args = getGenericParameterTypes(component.asType());
-        final var elementType = getClassForQualifiedName(args.get(0).toString());
+        final var arg = args.get(0);
+        final var elementType = getClassForQualifiedName(arg.toString());
 
         if(elementType == Integer.class) return String.format("parseIntegerList(tokens.get(%d));", idx);
+
+        // Check whether the argument is a component (Protocol.is_component = true).
+        final TypeElement arg_element = elements
+                .stream()
+                .filter(elem -> elem.asType().equals(arg))
+                .findFirst()
+                .orElse(null);
+
+        if(arg_element != null) {
+            String name = arg_element.getSimpleName().toString();
+            name = name.substring(0, 1).toUpperCase() + name.substring(1);
+
+            return String.format("""
+splitList(tokens.get(%d))
+            .stream()
+            .map(ProtocolDeserializer::deserialize%s)
+            .toList()""", idx, name);
+        }
 
         return "new ArrayList<>();";
     }

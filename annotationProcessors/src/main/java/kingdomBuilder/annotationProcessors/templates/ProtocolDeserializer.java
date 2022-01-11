@@ -42,7 +42,7 @@ public class ProtocolDeserializer {
     public String getDeserializerMethods() throws IOException {
         List<String> methods = new ArrayList<>();
         for(TypeElement element: elements) {
-            ProtocolDeserializerMethod pdm = new ProtocolDeserializerMethod(element, types);
+            ProtocolDeserializerMethod pdm = new ProtocolDeserializerMethod(elements, element, types);
             methods.add(TemplateRenderer.render(pdm));
         }
 
