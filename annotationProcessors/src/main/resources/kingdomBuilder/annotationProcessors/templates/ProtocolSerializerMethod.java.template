@@ -1,3 +1,4 @@
-    public static String serialize(<%= name %> packet) {
+    public static String serialize(<%= packetType %> packet) {
+        <%= components %>
         return <%= body %>
     }

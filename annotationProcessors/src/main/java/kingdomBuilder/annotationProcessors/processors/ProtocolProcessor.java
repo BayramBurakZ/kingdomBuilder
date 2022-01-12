@@ -76,7 +76,7 @@ public class ProtocolProcessor extends AbstractProcessor {
             );
 
             generateFromTemplate(
-                    new ProtocolSerializer("kingdomBuilder.network.generated", requests),
+                    new ProtocolSerializer("kingdomBuilder.network.generated", requests, processingEnv.getTypeUtils()),
                     responses.toArray(new TypeElement[0])
             );
 
