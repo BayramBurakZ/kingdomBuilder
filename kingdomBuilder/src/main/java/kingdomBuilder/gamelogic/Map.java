@@ -1,5 +1,7 @@
 package kingdomBuilder.gamelogic;
 
+import javafx.geometry.Pos;
+
 import javax.swing.plaf.IconUIResource;
 import java.security.InvalidParameterException;
 import java.util.HashSet;
@@ -102,7 +104,7 @@ public class Map {
      * @param y      The y coordinate of the tile.
      * @param player The player that places a settlement.
      */
-    public void placeSettlement(int x, int y, Player player) {
+    public void placeSettlement(Player player, int x, int y) {
         getTile(x, y).placeSettlement(player);
     }
 
@@ -116,7 +118,7 @@ public class Map {
      */
     public void moveSettlement(int fromX, int fromY, int toX, int toY) {
         Player player = getTile(fromX, fromY).removeSettlement();
-        placeSettlement(toX, toY, player);
+        placeSettlement(player, toX, toY);
     }
 
     /**
@@ -430,7 +432,9 @@ public class Map {
      * @param y The y coordinate of the Tile.
      * @return All surrounding Tiles.
      */
-    public Iterator<Position> surroundingTiles(int x, int y) {
+    public Iterator<Position> surroundingTilesIterator(int x, int y) {
+        //TODO: FAILED IN TEST.
+
         return new Iterator<Position>() {
             int state = -1;
 
@@ -501,6 +505,48 @@ public class Map {
 
 
     /**
+     * Get all surrounding tiles of a given target tile.
+     *
+     * @param x The x coordinate of the target tile.
+     * @param y The y coordinate of the target tile.
+     * @return All tiles that surrounding target tile.
+     */
+    public Set<Position> surroundingTiles(int x, int y) {
+        if (!isWithinBounds(x, y)) {
+            return null;
+        }
+
+        Set<Position> surroundingTiles = new HashSet<>();
+
+        // top left
+        if (topLeftX(x, y) >= 0 && y > 0)
+            surroundingTiles.add(new Position(topLeftX(x, y), y - 1));
+
+        // top right
+        if (topRightX(x, y) < mapWidth && y > 0)
+            surroundingTiles.add(new Position(topRightX(x, y), y - 1));
+
+        // left
+        if (x - 1 >= 0)
+            surroundingTiles.add(new Position(x - 1, y));
+
+        // right
+        if (x + 1 >= mapWidth)
+            surroundingTiles.add(new Position(x + 1, y));
+
+        // bottom left
+        if (bottomLeftX(x, y) >= 0 && y <= mapWidth)
+            surroundingTiles.add(new Position(bottomLeftX(x, y), y + 1));
+
+        // bottom right
+        if (bottomRightX(x, y) < mapWidth && y <= mapWidth)
+            surroundingTiles.add(new Position(bottomRightX(x, y), y + 1));
+
+        return surroundingTiles;
+    }
+
+
+    /**
      * Check if next to the tile is a token and return it.
      *
      * @param x The x coordinate of the tile.
@@ -508,7 +554,7 @@ public class Map {
      * @return The Token that is next to the settlement or null if there is no token;
      */
     public TileType specialPlaceInSurrounding(int x, int y) {
-        Iterator<Position> surroundingTiles = surroundingTiles(x, y);
+        Iterator<Position> surroundingTiles = surroundingTiles(x, y).iterator();
 
         while (surroundingTiles.hasNext()) {
             Position position = surroundingTiles.next();
@@ -548,7 +594,7 @@ public class Map {
      * @return True if the player has another settlement on surrounding tile. False otherwise.
      */
     public boolean settlementOfPlayerOnSurroundingTiles(Player player, int x, int y) {
-        Iterator<Position> surrounding = surroundingTiles(x, y);
+        Iterator<Position> surrounding = surroundingTiles(x, y).iterator();
         Position current;
 
         while (surrounding.hasNext()) {
@@ -571,7 +617,7 @@ public class Map {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a terrain!");
 
-        Iterator<Position> terrainIterator = getEntireTerrain(terrain);
+        Iterator<Position> terrainIterator = getEntireTerrain(terrain).iterator();
         Position current;
 
         while (terrainIterator.hasNext()) {
@@ -585,45 +631,25 @@ public class Map {
     }
 
     /**
-     * Get an iterator that contains all tiles of a given terrain.
+     * Gets the entire terrain of a type.
      *
      * @param terrain The terrain to filter.
-     * @return All tiles that have type of terrain.
+     * @return All tiles of a type.
      */
-    public Iterator<Position> getEntireTerrain(TileType terrain) {
+    public Set<Position> getEntireTerrain(TileType terrain) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        return new Iterator<Position>() {
-            int x, y;
+        Set<Position> entireTerrain = new HashSet<>();
 
-            @Override
-            public boolean hasNext() {
-
-                for (; y < mapWidth; y++) {
-                    for (; x < mapWidth; x++) {
-                        if (getTile(x, y).getTileType() != terrain)
-                            continue;
-
-                        return true;
-                    }
+        for (int y = 0; y < mapWidth; y++) {
+            for (int x = 0; x < mapWidth; x++) {
+                if (getTile(x, y).getTileType() == terrain) {
+                    entireTerrain.add(new Position(x, y));
                 }
-                return false;
             }
-
-            @Override
-            public Position next() {
-                for (; y < mapWidth; y++) {
-                    for (; x < mapWidth; x++) {
-                        if (getTile(x, y).getTileType() != terrain)
-                            continue;
-
-                        return new Position(x, y);
-                    }
-                }
-                return null;
-            }
-        };
+        }
+        return entireTerrain;
     }
 
 
@@ -638,7 +664,7 @@ public class Map {
             throw new InvalidParameterException("not a landscape!");
 
         Set<Position> freeTiles = new HashSet<>();
-        Iterator<Position> terrainIterator = getEntireTerrain(terrain);
+        Iterator<Position> terrainIterator = getEntireTerrain(terrain).iterator();
         Position current;
 
         while (terrainIterator.hasNext()) {
@@ -656,12 +682,12 @@ public class Map {
      * Checks if there is only one settlement of a player next to a special place.
      *
      * @param player The player to check-
-     * @param x The x position of the settlement to place.
-     * @param y The y position of the settlement to place.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
      * @return
      */
     public boolean playerHasOnlyOneSettlementNextToSpecialPlace(Player player, int x, int y) {
-        Iterator<Position> tilesIterator = surroundingTiles(x, y);
+        Iterator<Position> tilesIterator = surroundingTiles(x, y).iterator();
         Position token;
         int counter = 0;
 

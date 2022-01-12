@@ -243,7 +243,7 @@ public class Game {
         checkIsPlayersTurn(player);
         checkHasRemainingSettlements(player);
 
-        map.placeSettlement(x, y, player);
+        map.placeSettlement(player, x, y);
         player.remainingSettlements--;
 
         TileType token = map.specialPlaceInSurrounding(x, y);
@@ -284,11 +284,51 @@ public class Game {
      * @param toY    The new vertical position of the settlement on the map.
      * @param player The player whose turn it is and who owns the settlement.
      */
-    public void moveSettlement(int fromX, int fromY, int toX, int toY, Player player) {
+    public void moveSettlement(Player player, int fromX, int fromY, int toX, int toY) {
+
         checkIsPlayersTurn(player);
 
         map.moveSettlement(fromX, fromY, toX, toY);
-        // TODO: check if previous position neighboured special place, if so remove token from player
+
+        TileType token = map.specialPlaceInSurrounding(toX, toY);
+
+        // Player gets a token if settlement is next to special place
+        if (token != null) {
+            player.addToken(token);
+            map.takeToken(toX, toY);
+        }
+    }
+
+    /**
+     * Moves a settlement to a new position and throws if the move isn't valid.
+     * Does not allow placing on water.
+     * Token functions which allow placement on water handle their placement separately.
+     *
+     * @param player  The player whose turn it is and who owns the settlement.
+     * @param terrain The terrain it is getting placed.
+     * @param fromX   The old horizontal position of the settlement on the map.
+     * @param fromY   The old vertical position of the settlement on the map.
+     * @param toX     The new horizontal position of the settlement on the map.
+     * @param toY     The new vertical position of the settlement on the map.
+     */
+    public void moveSettlement(Player player, TileType terrain, int fromX, int fromY, int toX, int toY) {
+
+        checkIsPlayersTurn(player);
+
+        if (map.occupiedBy(fromX, fromY) != player || !canPlaceSettlementInTerrain(player, terrain, toX, toY))
+            return;
+
+        // Take token from player if settlement was last one on special place
+        if (map.playerHasOnlyOneSettlementNextToSpecialPlace(player, fromX, fromY)) {
+
+            TileType token = map.specialPlaceInSurrounding(fromX, fromY);
+
+            if (player.playerHasTokenLeft(token))
+                player.removeToken(token);
+        }
+
+        map.moveSettlement(fromX, fromY, toX, toY);
+
 
         TileType token = map.specialPlaceInSurrounding(toX, toY);
 
@@ -389,7 +429,7 @@ public class Game {
      * @param x      The x position of the settlement to place.
      * @param y      The y position of the settlement to place.
      */
-    private void useTokenOracle(Player player, int x, int y) {
+    public void useTokenOracle(Player player, int x, int y) {
         if (canPlaceSettlementInTerrain(player, player.terrainCard, x, y)) {
             placeSettlement(player, x, y);
             player.removeToken(TileType.ORACLE);
@@ -403,7 +443,7 @@ public class Game {
      * @param x      The x position of the settlement to place.
      * @param y      The y position of the settlement to place.
      */
-    private void useTokenFarm(Player player, int x, int y) {
+    public void useTokenFarm(Player player, int x, int y) {
         if (canPlaceSettlementInTerrain(player, TileType.GRAS, x, y)) {
             placeSettlement(player, x, y);
             player.removeToken(TileType.FARM);
@@ -411,7 +451,7 @@ public class Game {
     }
 
     // TODO: implement, parameters should match the protocol message format
-    private void useTokenTavern(Player player, int x, int y) {
+    public void useTokenTavern(Player player, int x, int y) {
     }
 
     /**
@@ -421,7 +461,7 @@ public class Game {
      * @param x      The x position of the settlement to place.
      * @param y      The y position of the settlement to place.
      */
-    private void useTokenTower(Player player, int x, int y) {
+    public void useTokenTower(Player player, int x, int y) {
         if (!map.isTileAtBorder(x, y))
             return;
 
@@ -438,7 +478,7 @@ public class Game {
      * @param x      The x position of the settlement to place.
      * @param y      The y position of the settlement to place.
      */
-    private void useTokenOasis(Player player, int x, int y) {
+    public void useTokenOasis(Player player, int x, int y) {
         if (canPlaceSettlementInTerrain(player, TileType.DESERT, x, y)) {
             placeSettlement(player, x, y);
             player.removeToken(TileType.OASIS);
@@ -446,15 +486,17 @@ public class Game {
     }
 
     // TODO: implement, parameters should match the protocol message format
-    private void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
+    public void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
     }
 
     // TODO: implement, parameters should match the protocol message format
-    private void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
+    public void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
     }
 
     // TODO: implement, parameters should match the protocol message format
-    private void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
+    public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
+        player.removeToken(TileType.BARN);
+        moveSettlement(player, player.terrainCard, fromX, fromY, toX, toY);
     }
 
 
@@ -491,6 +533,15 @@ public class Game {
     }
 
 
+    /**
+     * Checks if player can place anywhere on a terrain.
+     *
+     * @param player
+     * @param terrain
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean playerCanPlaceAnywhereOnTerrain(Player player, TileType terrain, int x, int y) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
@@ -503,6 +554,13 @@ public class Game {
         return false;
     }
 
+    /**
+     * Gets all possible positions to place a settlement for a player on a given terrain.
+     *
+     * @param player
+     * @param terrain
+     * @return
+     */
     public Set<Position> allPossibleSettlementPlacementsNextToOtherSettlement(Player player, TileType terrain) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
@@ -521,4 +579,8 @@ public class Game {
         }
         return allowedTiles;
     }
+
+
+    // TODO: implement basic functions of MAP again in Game but with rules (e.g. Check if player is next to token)
+
 }

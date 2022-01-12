@@ -5,10 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import javafx.geometry.Pos;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MapTest {
 
@@ -62,23 +67,26 @@ public class MapTest {
     TileType quadrant3[];
     TileType quadrant4[];
 
+    Map map;
+
     private final int QUADRANT_WIDTH = 10;
 
     @BeforeEach
-    public void initialize() {
+    public void testInitializeMap() {
         quadrant1 = Arrays.stream(first.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant2 = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
-    }
 
+        map = new Map(2);
+        map.createMap(quadrant1, quadrant2, quadrant3, quadrant4);
+
+    }
 
     @Test
     public void testMapCreationFromQuadrants() {
         // Test if each tile is in the correct position.
 
-        Map map = new Map(2);
-        map.createMap(quadrant1, quadrant2, quadrant3, quadrant4);
 
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
@@ -103,4 +111,109 @@ public class MapTest {
         }
     }
 
+
+    @Test
+    public void testGetEntireTerrainPlaceableTiles() {
+
+        Position gras = new Position(1, 5);
+        Position flower = new Position(2, 1);
+        Position desert = new Position(5, 0);
+        Position forest = new Position(1, 0);
+
+        Iterator<Position> allGrasTiles = map.getEntireTerrain(TileType.GRAS).iterator();
+        Iterator<Position> allDesertTiles = map.getEntireTerrain(TileType.DESERT).iterator();
+        Iterator<Position> allFlowerTiles = map.getEntireTerrain(TileType.FLOWER).iterator();
+        Iterator<Position> allForestTiles = map.getEntireTerrain(TileType.FORREST).iterator();
+
+        Position current;
+        boolean foundTile = false;
+
+        // check if types correct
+        assertEquals(TileType.GRAS, map.getTileType(gras.x, gras.y), "Type is not gras");
+        assertEquals(TileType.FLOWER, map.getTileType(flower.x, flower.y), "Type is not flower");
+        assertEquals(TileType.DESERT, map.getTileType(desert.x, desert.y), "Type is not desert");
+        assertEquals(TileType.FORREST, map.getTileType(forest.x, forest.y), "Type is not forest");
+
+        // Gras
+        while( allGrasTiles.hasNext()){
+            current = allGrasTiles.next();
+
+            if( current.x == gras.x && current.y == gras.y)
+                foundTile = true;
+        }
+
+        if(!foundTile)
+            fail("gras tile failed");
+
+        foundTile = false;
+
+        // Flower
+        while (allFlowerTiles.hasNext()) {
+            current = allFlowerTiles.next();
+
+            if (current.x == flower.x && current.y == flower.y)
+                foundTile = true;
+        }
+
+        if (!foundTile)
+            fail("flower tile failed");
+
+        foundTile = false;
+
+
+        // desert
+        while (allDesertTiles.hasNext()) {
+            current = allDesertTiles.next();
+
+            if (current.x == desert.x && current.y == desert.y)
+                foundTile = true;
+        }
+
+        if (!foundTile)
+            fail("desert tile failed");
+
+        foundTile = false;
+
+        // forest
+        while (allForestTiles.hasNext()) {
+            current = allForestTiles.next();
+
+            if (current.x == forest.x && current.y == forest.y) {
+                foundTile = true;
+                break;
+            }
+        }
+
+        if (!foundTile)
+            fail("forest tile failed");
+
+        foundTile = false;
+
+    }
+
+    @Test
+    public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
+
+        Position tower = new Position(3, 5);
+        assertEquals(TileType.TOWER, map.getTileType(3, 5), "not a tower.");
+
+        // Testing with tile that is on top right of tower
+        TileType tokenToTest =  map.specialPlaceInSurrounding(4, 4);
+
+        assertEquals(TileType.TOWER, tokenToTest, "failed to find Token in surrounding.");
+    }
+
+    @Test
+    @Disabled
+    public void testUseTokenOraclePlayerUsingToken(){
+        // need instance of a game to test this.
+
+        Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20 );
+        player.terrainCard = TileType.FORREST;
+        player.addToken(TileType.ORACLE);
+
+        //check if player has received that token
+        assertTrue(player.playerHasTokenLeft(TileType.ORACLE), "failed to add Oracle token");
+        assertEquals(1, player.remainingToken(TileType.ORACLE), "Player doesn't have one Oracle token");
+    }
 }
