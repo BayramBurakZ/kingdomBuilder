@@ -166,11 +166,12 @@ public class SceneLoader {
      * and loads the chat into the left side of the main borderPane.
      */
     public void showMenuView() {
-        borderPane.setCenter(menuView);
+        // remove Chat
+        if (borderPane.getLeft() != null)
+            borderPane.setLeft(null);
 
-        // set Chat only once
-        if (borderPane.getLeft() == null)
-            borderPane.setLeft(chatView);
+        // set main menu
+        borderPane.setCenter(menuView);
     }
 
     /**
@@ -191,9 +192,15 @@ public class SceneLoader {
      * @param isOnline Whether the game is online.
      */
     public void showGameView(boolean isSpectating, boolean isOnline) {
+        // set Chat
+        if (borderPane.getLeft() == null)
+            borderPane.setLeft(chatView);
+
+
         // reloads the view so its completely empty
         loadGameView(locale);
 
+        // loads the gameView
         borderPane.setCenter(gameView);
         gameViewController.setSpectating(isSpectating);
         gameViewController.setIsOnline(isOnline);
@@ -213,6 +220,10 @@ public class SceneLoader {
      * Loads the gameSelectionView into the center of the main borderPane.
      */
     public void showGameSelectionView() {
+        // set Chat
+        if (borderPane.getLeft() == null)
+            borderPane.setLeft(chatView);
+
         //reloads the view so its completely empty
         loadGameSelectionView(locale);
 

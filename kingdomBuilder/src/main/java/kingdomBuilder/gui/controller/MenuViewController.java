@@ -86,9 +86,7 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     private void onLocalGameButtonPressed(Event event) {
-        sceneLoader.showGameView(false, false);
-        // TODO change again to the correct scene (GameSettings is correct)
-        //sceneLoader.showGameSettingsView(false);
+        sceneLoader.showGameSettingsView(false);
     }
 
     /**
