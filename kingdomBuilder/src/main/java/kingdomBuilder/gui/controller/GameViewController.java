@@ -17,6 +17,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
+import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
@@ -184,7 +185,7 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
-    private GameBoard gameBoard = new GameBoard(store);
+    public GameBoard gameBoard = new GameBoard(store);
 
     /**
      * Represents the center of the gameboard as a Point3D.
@@ -296,7 +297,7 @@ public class GameViewController extends Controller implements Initializable {
         camera.setTranslateX(boardCenter.getX());
         camera.setTranslateY(
                 (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * boardCenter.getY());
-        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.gameBoard[19][0].getTranslateX());
+        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.getGameBoard()[19][0].getTranslateX());
 
         setupCameraHandlers(camera);
     }
@@ -365,9 +366,10 @@ public class GameViewController extends Controller implements Initializable {
         // TODO: access data via state
         gameBoard.setupGameBoard(gameBoard_group, gameBoardData, resourceBundle);
 
+        HexagonTile[][] board = gameBoard.getGameBoard();
         boardCenter = new Point3D(
-                (gameBoard.gameBoard[9][0].getTranslateX() + gameBoard.gameBoard[10][0].getTranslateX()) / 2f,
-                (gameBoard.gameBoard[0][9].getTranslateY() + gameBoard.gameBoard[0][10].getTranslateY()) / 2f,
+                (board[9][0].getTranslateX() + board[10][0].getTranslateX()) / 2f,
+                (board[0][9].getTranslateY() + board[0][10].getTranslateY()) / 2f,
                 Hexagon.HEXAGON_DEPTH
         );
     }

@@ -54,8 +54,14 @@ public class Hexagon extends MeshView {
         setScaleY(HEXAGON_HEIGHT);
         setScaleZ(HEXAGON_DEPTH);
 
-        // set Texture with given type
-        PhongMaterial mat = MaterialLoader.getMaterial(tileType);
+        PhongMaterial mat;
+        if (tileType != null) {
+            // set Texture with given type
+            mat = MaterialLoader.getMaterial(tileType);
+        } else {
+            // set white Texture
+            mat = MaterialLoader.WHITE;
+        }
         setMaterial(mat);
     }
 }

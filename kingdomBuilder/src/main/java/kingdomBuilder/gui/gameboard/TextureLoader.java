@@ -1,6 +1,9 @@
 package kingdomBuilder.gui.gameboard;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
 import kingdomBuilder.model.TileType;
 
 /**
@@ -191,5 +194,21 @@ public final class TextureLoader {
             // TODO: generates an exception:
             default -> null;
         };
+    }
+
+    /**
+     * Creates an image with only one color.
+     * @param red The red value.
+     * @param green The green value.
+     * @param blue The blue value.
+     * @return Image with the given color.
+     */
+    public static Image generateImage(double red, double green, double blue) {
+        WritableImage img = new WritableImage(1, 1);
+        PixelWriter pixelWriter = img.getPixelWriter();
+
+        Color color = Color.color(red, green, blue);
+        pixelWriter.setColor(0, 0, color);
+        return img ;
     }
 }

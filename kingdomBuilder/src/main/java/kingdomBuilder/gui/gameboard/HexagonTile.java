@@ -2,14 +2,12 @@ package kingdomBuilder.gui.gameboard;
 
 import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
-import javafx.scene.Group;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
+import kingdomBuilder.gui.base.Tile;
 import kingdomBuilder.model.TileType;
 
 import java.util.ResourceBundle;
@@ -17,12 +15,7 @@ import java.util.ResourceBundle;
 /**
  * Class that is used to display the hexagon tiles in the UI.
  */
-public class HexagonTile extends Group {
-    /**
-     * Represents the resourceBundle that used for language support.
-     */
-    private static ResourceBundle resourceBundle;
-
+public class HexagonTile extends Tile {
     /**
      * Represents if the tile's color has been changed for highlighting.
      */
@@ -32,11 +25,6 @@ public class HexagonTile extends Group {
      * Represents if the tile is translated in the z direction for highlighting.
      */
     private boolean isElevated = false;
-
-    /**
-     * Represents the tileType of the hexagon.
-     */
-    private TileType tileType;
 
     /**
      * Represents the distance that the group moves for highlighting.
@@ -59,11 +47,6 @@ public class HexagonTile extends Group {
     private Settlement settlement = new Settlement();
 
     /**
-     * Represents the hexagon prism.
-     */
-    private Hexagon hexagon;
-
-    /**
      * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos The x-coordinate of the upper-left corner position.
      * @param yPos The y-coordinate of the upper-left corner position.
@@ -71,23 +54,12 @@ public class HexagonTile extends Group {
      * @param resource The ResourceBundle to translate text.
      */
     public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
-        if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
-            resourceBundle = resource;
-        }
-        // create hexagon
-        this.hexagon = new Hexagon(tileType);
+        super(xPos, yPos, tileType, resource);
 
-        // add hexagon prism and settlement to this group
-        getChildren().addAll(hexagon, settlement);
+        // add settlement to this group
+        getChildren().add(settlement);
 
-        // move this group to new position
-        setTranslateX(xPos);
-        setTranslateY(yPos);
-
-        // set tileType
-        // TODO use Datalogic enum
-        this.tileType = tileType;
-
+        // set up animation for elevating
         setupAnimation();
 
         // TODO: execute only for Tokens
@@ -149,29 +121,14 @@ public class HexagonTile extends Group {
     }
 
     /**
-     * Creates an image with only one color.
-     * @param red The red value.
-     * @param green The green value.
-     * @param blue The blue value.
-     * @return Image with the given color.
-     */
-    public Image generateImage(double red, double green, double blue) {
-        WritableImage img = new WritableImage(1, 1);
-        PixelWriter pixelWriter = img.getPixelWriter();
-
-        Color color = Color.color(red, green, blue);
-        pixelWriter.setColor(0, 0, color);
-        return img ;
-    }
-
-    /**
      * Sets the MouseHandler of a hexagon based on its type.
      */
-    private void setMouseHandler() {
+    @Override
+    protected void setMouseHandler() {
         setOnMouseClicked(event -> {
             // TODO integrate player color
             settlement.setOpacity(1.0);
-            Image img = generateImage(Math.random(),Math.random(),Math.random());
+            Image img = TextureLoader.generateImage(Math.random(),Math.random(),Math.random());
             PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
             settlement.setMaterial(mat);

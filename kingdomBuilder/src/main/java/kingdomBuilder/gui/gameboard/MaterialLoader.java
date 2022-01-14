@@ -112,6 +112,11 @@ public final class MaterialLoader {
     public static final PhongMaterial RED = new PhongMaterial(Color.RED);
 
     /**
+     * The material for the white highlight.
+     */
+    public static final PhongMaterial WHITE = new PhongMaterial(Color.WHITE);
+
+    /**
      * Constructor so this class never get instanced.
      */
     private MaterialLoader() {
