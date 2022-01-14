@@ -60,7 +60,19 @@ public class TestProtocolSerializer {
     }
 
     @Test
-    void testSerializingKick() {
+    void testSerializingUnspectate() {
+        final String message = ProtocolSerializer.serialize(new Unspectate());
+        assertEquals("unspectate", message);
+    }
+
+    @Test
+    void testSerializingShutdownServer() {
+        final String message = ProtocolSerializer.serialize(new ShutdownServer());
+        assertEquals("shutdown server", message);
+    }
+
+    @Test
+    void testSerializingKickClient() {
         final String message = ProtocolSerializer.serialize(new KickClient(42));
         assertEquals("kick client 42", message);
     }
@@ -125,4 +137,163 @@ public class TestProtocolSerializer {
         assertEquals("?detailsofgame 4711", message);
     }
 
+    @Test
+    void testSerializingQuadrantRequest() {
+        final String message = ProtocolSerializer.serialize(new QuadrantRequest(5));
+        assertEquals("?quadrant 5", message);
+    }
+
+    @Test
+    void testSerializingQuadrantsRequest() {
+        final String message = ProtocolSerializer.serialize(new QuadrantsRequest());
+        assertEquals("?quadrants", message);
+    }
+
+    @Test
+    void testSerializingUploadQuadrant() {
+        final String message = ProtocolSerializer.serialize(new UploadQuadrant("WATER", "WATER", "WATER", "FORREST",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER",
+                "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER", "WATER"));
+        assertEquals("upload quadrant [WATER;WATER;WATER;FORREST;WATER;WATER;WATER;WATER;WATER;" +
+        "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;WATER;" +
+                "WATER;WATER;WATER;WATER;WATER;WATER]", message);
+    }
+
+    @Test
+    void testSerializingHostGame() {
+        final String message = ProtocolSerializer.serialize(new HostGame("my game", "some game",
+                3, -1, -1, 0, 1, 2, 3));
+        assertEquals("host game [my game;some game;3;-1;-1;[0;1;2;3]]", message);
+    }
+
+    @Test
+    void testSerializingTimeLimitRequest() {
+        final String message = ProtocolSerializer.serialize(new TimeLimitRequest());
+        assertEquals("?timelimit", message);
+    }
+
+    @Test
+    void testSerializingPlayerLimitRequest() {
+        final String message = ProtocolSerializer.serialize(new PlayerLimitRequest());
+        assertEquals("?playerlimit", message);
+    }
+
+    @Test
+    void testSerializingPlayersRequest() {
+        final String message = ProtocolSerializer.serialize(new PlayersRequest());
+        assertEquals("?players", message);
+    }
+
+    @Test
+    void testSerializingTurnsRequest() {
+        final String message = ProtocolSerializer.serialize(new TurnsRequest());
+        assertEquals("?turns", message);
+    }
+
+    @Test
+    void testSerializingTurnLimitRequest() {
+        final String message = ProtocolSerializer.serialize(new TurnLimitRequest());
+        assertEquals("?turnlimit", message);
+    }
+
+    @Test
+    void testSerializingWhoseTurnRequest() {
+        final String message = ProtocolSerializer.serialize(new WhoseTurnRequest());
+        assertEquals("?whoseturn", message);
+    }
+
+    @Test
+    void testSerializingSettlementsLeftRequest() {
+        final String message = ProtocolSerializer.serialize(new SettlementsLeftRequest());
+        assertEquals("?settlementsleft", message);
+    }
+
+    @Test
+    void testSerializingBoardRequest() {
+        final String message = ProtocolSerializer.serialize(new BoardRequest());
+        assertEquals("?board", message);
+    }
+
+    @Test
+    void testSerializingWinConditionsRequest() {
+        final String message = ProtocolSerializer.serialize(new WinConditionsRequest());
+        assertEquals("?winconditions", message);
+    }
+
+    @Test
+    void testSerializingMyGameRequest() {
+        final String message = ProtocolSerializer.serialize(new MyGameRequest());
+        assertEquals("?mygame", message);
+    }
+
+    @Test
+    void testSerializingEndTurn() {
+        final String message = ProtocolSerializer.serialize(new EndTurn());
+        assertEquals("end turn", message);
+    }
+
+    @Test
+    void testSerializingPlace() {
+        final String message = ProtocolSerializer.serialize(new Place(3, 4));
+        assertEquals("place [3;4]", message);
+    }
+
+    @Test
+    void testSerializingOracle() {
+        final String message = ProtocolSerializer.serialize(new Oracle(3, 4));
+        assertEquals("oracle [3;4]", message);
+    }
+
+    @Test
+    void testSerializingFarm() {
+        final String message = ProtocolSerializer.serialize(new Farm(3, 4));
+        assertEquals("farm [3;4]", message);
+    }
+
+    @Test
+    void testSerializingTavern() {
+        final String message = ProtocolSerializer.serialize(new Tavern(3, 4));
+        assertEquals("tavern [3;4]", message);
+    }
+
+    @Test
+    void testSerializingTower() {
+        final String message = ProtocolSerializer.serialize(new Tower(3, 4));
+        assertEquals("tower [3;4]", message);
+    }
+
+    @Test
+    void testSerializingOasis() {
+        final String message = ProtocolSerializer.serialize(new Oasis(3, 4));
+        assertEquals("oasis [3;4]", message);
+    }
+
+    @Test
+    void testSerializingHarbor() {
+        final String message = ProtocolSerializer.serialize(new Harbor(3, 4, 2, 1));
+        assertEquals("harbor [3;4;2;1]", message);
+    }
+
+    @Test
+    void testSerializingPaddock() {
+        final String message = ProtocolSerializer.serialize(new Paddock(3, 4, 2, 1));
+        assertEquals("paddock [3;4;2;1]", message);
+    }
+
+    @Test
+    void testSerializingBarn() {
+        final String message = ProtocolSerializer.serialize(new Barn(3, 4, 2, 1));
+        assertEquals("barn [3;4;2;1]", message);
+    }
 }

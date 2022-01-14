@@ -13,10 +13,22 @@ import java.util.List;
  * Clients must be created through {@link ClientSelector#connect(InetSocketAddress)}.
  */
 public abstract class Client {
+    /**
+     * Represents a constant.
+     */
     public static final int NO_ID = -1;
 
+    /**
+     * Represents the name of the client.
+     */
     protected String name;
+    /**
+     * Represents the client´s id.
+     */
     protected int clientId;
+    /**
+     * Represents the game-ID of the game in which the client plays.
+     */
     protected int gameId;
 
     /**
@@ -49,6 +61,9 @@ public abstract class Client {
      */
     public final Event<Message> onMessageReceived;
 
+    /**
+     * Constructs a new client object.
+     */
     public Client() {
         name = null;
         clientId = NO_ID;

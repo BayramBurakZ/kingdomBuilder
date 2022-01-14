@@ -2,6 +2,10 @@ package kingdomBuilder.network.protocol;
 
 import kingdomBuilder.annotations.Protocol;
 
+/**
+ * Represents message that contains details of one quadrant -
+ * reply message ?quadrant {@link kingdomBuilder.network.protocol.QuadrantRequest}.
+ */
 @Protocol(format = "[REPLY_MESSAGE] (?quadrant) <[#{quadrantId};#{fieldType1};#{fieldType2};#{fieldType3};#{fieldType4};" +
         "#{fieldType5};#{fieldType6};#{fieldType7};#{fieldType8};#{fieldType9};#{fieldType10};#{fieldType11};" +
         "#{fieldType12};#{fieldType13};#{fieldType14};#{fieldType15};#{fieldType16};#{fieldType17};#{fieldType18};" +

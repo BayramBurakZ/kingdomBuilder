@@ -2,6 +2,9 @@ package kingdomBuilder.network.protocol;
 
 import kingdomBuilder.annotations.Protocol;
 
+/**
+ * Represents message to upload the quadrant.
+ */
 @Protocol(format = "upload quadrant [#{fieldType1};#{fieldType2};#{fieldType3};#{fieldType4};#{fieldType5};#{fieldType6};" +
         "#{fieldType7};#{fieldType8};#{fieldType9};#{fieldType10};#{fieldType11};#{fieldType12};#{fieldType13};" +
         "#{fieldType14};#{fieldType15};#{fieldType16};#{fieldType17};#{fieldType18};#{fieldType19};#{fieldType20};" +
