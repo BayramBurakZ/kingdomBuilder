@@ -1,9 +1,7 @@
 package kingdomBuilder.annotationProcessors.util;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.*;
-import java.lang.annotation.ElementType;
 import java.util.ArrayList;
 import java.util.List;
 

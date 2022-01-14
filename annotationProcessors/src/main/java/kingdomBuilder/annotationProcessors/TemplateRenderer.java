@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -29,12 +28,9 @@ public class TemplateRenderer {
                          && (m.getName().equals(name) || m.getName().equals(getterName)))
             .findFirst();
 
-        Method method;
-        if(optMethod.isPresent())
-            method = optMethod.get();
-        else {
-            throw new RuntimeException("Failed to find source for " + name + " or " + getterName);
-        }
+        Method method = optMethod.orElseThrow(
+            () -> new RuntimeException("Failed to find source for " + name + " or " + getterName)
+        );
 
         try { return (String) method.invoke(template); }
         catch(Exception e) { throw new RuntimeException(e); }
