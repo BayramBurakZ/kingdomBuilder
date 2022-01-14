@@ -11,11 +11,18 @@ import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 
+/**
+ * {@inheritDoc}
+ */
 public class ClientSelectorImpl implements ClientSelector {
     private final Selector selector;
     private final AtomicBoolean running;
     private final AtomicBoolean stopped;
 
+    /**
+     * Creates a new selector, used to multiplex sockets.
+     * @throws IOException Thrown when selector creation fails.
+     */
     public ClientSelectorImpl() throws IOException {
         this.selector = Selector.open();
         this.running = new AtomicBoolean(false);
@@ -23,11 +30,7 @@ public class ClientSelectorImpl implements ClientSelector {
     }
 
     /**
-     * Creates a new client, which connects to given address.
-     *
-     * @param address The address to connect to.
-     * @return A client representing the newly created connection.
-     * @throws IOException
+     * {@inheritDoc}
      */
     @Override
     public Client connect(InetSocketAddress address) throws IOException {
@@ -42,7 +45,7 @@ public class ClientSelectorImpl implements ClientSelector {
     }
 
     /**
-     * {@return Returns whether the listening loop is running.}
+     * {@inheritDoc}
      */
     @Override
     public boolean isRunning() {
@@ -50,13 +53,16 @@ public class ClientSelectorImpl implements ClientSelector {
     }
 
     /**
-     * Stops the selection/listening looping and interrupts the current thread.
+     * {@inheritDoc}
      */
     @Override
     public void stop() {
         stopped.set(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void run() {
         running.set(true);

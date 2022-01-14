@@ -10,52 +10,87 @@ import kingdomBuilder.network.protocol.*;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Implements the {@link Client} using an IOHandler.
+ */
 public class ClientImpl extends Client implements ProtocolConsumer {
     private final IOHandler ioHandler;
 
+    /**
+     * Initializes the client.
+     *
+     * @param ioHandler A handler, which deals with asynchronous IO using javas selector mechanism.
+     */
     public ClientImpl(IOHandler ioHandler) {
         this.ioHandler = ioHandler;
         this.ioHandler.setConsumer(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void login(String preferredName) {
         final String command = ProtocolSerializer.serialize(new IAm(preferredName));
         trySendCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void logout() {
         final String command = ProtocolSerializer.serialize(new Bye());
         trySendCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void chat(List<Integer> recipients, String message) {
         final String command = ProtocolSerializer.serialize(new Chat(recipients, message));
         trySendCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isConnected() {
         return ioHandler.isConnected();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void disconnect() {
         ioHandler.disconnect();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasPendingCommands() {
         return ioHandler.hasPendingCommands();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     private void trySendCommand(String command) {
-        try { ioHandler.sendCommand(command); }
-        catch (IOException exc) { this.onConnectionLost.dispatch(this); }
+        try {
+            ioHandler.sendCommand(command);
+        } catch (IOException exc) {
+            this.onConnectionLost.dispatch(this);
+        }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onFailure(String packet) {
         System.out.println("Failed to decode the following packet:");
@@ -65,6 +100,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Notifies listeners, that a client left the server.
+     *
      * @param message The client data of the client, that left the server.
      */
     @Override
@@ -74,6 +110,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Notifies listeners, that a new message was received.
+     *
      * @param message The message and its recipients.
      */
     @Override
@@ -83,6 +120,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Updates the internal client data and notifies listeners of this state change.
+     *
      * @param message The client data assigned by the server.
      */
     @Override
@@ -95,6 +133,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Notifies listeners that a client joined the server.
+     *
      * @param message The client data of the newly joined client.
      */
     @Override
@@ -104,6 +143,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Disconnects the client and notifies listeners that client was kicked.
+     *
      * @param message Not used.
      */
     @Override
@@ -115,6 +155,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     /**
      * Responds with a 'PONG' to the server.
+     *
      * @param message Not used.
      */
     @Override

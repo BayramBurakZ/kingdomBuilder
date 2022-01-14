@@ -3,6 +3,9 @@ package kingdomBuilder.annotationProcessors.protocol;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a placeholder within protocol formats.
+ */
 public record Placeholder(
     String name,
     int offset
@@ -12,6 +15,11 @@ public record Placeholder(
         return offset + name.length() + 1;
     }
 
+    /**
+     * Parses a format string and returns a list of placeholders.
+     * @param format The format to parse.
+     * @return A list of the placeholders found within the string.
+     */
     public static List<Placeholder> fromFormatString(String format) {
         List<Placeholder> placeholders = new ArrayList<>();
 

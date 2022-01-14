@@ -11,11 +11,22 @@ import java.util.Optional;
  */
 public class TemplateRenderer {
 
+    /**
+     * Capitalizes the first letter of given string.
+     * @param name The string to capitalize the first letter of.
+     * @return The string with its first letter capitalized.
+     */
     private static String capitalizeFirstLetter(String name) {
         return name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
-    private static <T> String getOrEvaluate(String name, T template) {
+    /**
+     * Evaluates a method to retrieve the value of a placeholder.
+     * @param name The name of the method to evaluate.
+     * @param template The template object to which the method belongs to.
+     * @return The evaluation result as a string.
+     */
+    private static <T> String evaluateFromContext(String name, T template) {
         String getterName;
         if(name.startsWith("get")) getterName = name;
         else getterName = "get" + capitalizeFirstLetter(name);
@@ -36,17 +47,31 @@ public class TemplateRenderer {
         catch(Exception e) { throw new RuntimeException(e); }
     }
 
-    private static <T> void eval(StringBuilder builder, String contents, int begin, int end, T template) {
+    /**
+     * Evaluates a placeholder and returns the value.
+     * @param contents The template which this method operates on.
+     * @param begin The beginning of the placeholder.
+     * @param end The end of the placeholder.
+     * @param template The context to the placeholder values from.
+     */
+    private static <T> String eval(String contents, int begin, int end, T template) {
         if(contents.startsWith("<%=", begin)) {
             final String name = contents
                     .substring(begin + 3, end - 1)
                     .stripLeading()
                     .stripTrailing();
-            final String value = getOrEvaluate(name, template);
-            builder.append(value);
+            return evaluateFromContext(name, template);
         }
+
+        return "";
     }
 
+    /**
+     * Renders a template, by substituting placeholders with results of the public methods provided by the object.
+     * @param template The template object to render.
+     * @return The rendered template as String.
+     * @throws IOException when the template file could not be loaded.
+     */
     public static <T> String render(T template) throws IOException {
         Class<?> cls = template.getClass();
         if(!cls.isAnnotationPresent(Template.class))
@@ -70,7 +95,7 @@ public class TemplateRenderer {
                 if(end == -1 || it + 2 == end)
                     throw new RuntimeException("Encountered EOF while scanning file.");
 
-                eval(sb, contents, it, end, template);
+                sb.append(eval(contents, it, end, template));
                 it = end + 1;
                 continue;
             }

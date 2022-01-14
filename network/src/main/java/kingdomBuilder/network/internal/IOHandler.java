@@ -22,21 +22,28 @@ public class IOHandler {
     private final Selector selector;
     private final SocketChannel channel;
     private final Queue<ByteBuffer> writeQueue;
+    private final AtomicBoolean connected;
     private ByteBuffer buffer;
     private ProtocolConsumer consumer;
 
-    private AtomicBoolean connected;
-
-
+    /**
+     * Initializes the handler to default state.
+     * @param selector The selector to which the channel is registered to.
+     * @param channel The channel to operate upon.
+     */
     public IOHandler(Selector selector, SocketChannel channel) {
         this.selector = selector;
         this.channel = channel;
         this.writeQueue = new ConcurrentLinkedQueue<>();
+        this.connected = new AtomicBoolean(false);
         this.buffer = null;
         this.consumer = null;
-        this.connected = new AtomicBoolean(false);
     }
 
+    /**
+     * Sets the consumer, which is notified about incoming packets.
+     * @param consumer The consumer to notify.
+     */
     public void setConsumer(ProtocolConsumer consumer) {
         this.consumer = consumer;
     }
@@ -127,14 +134,23 @@ public class IOHandler {
         }
     }
 
+    /**
+     * {@return Returns whether any commands are still pending to be written.}
+     */
     public boolean hasPendingCommands() {
         return !writeQueue.isEmpty();
     }
 
+    /**
+     * {@return Returns whether the channel/socket is connected.}
+     */
     public boolean isConnected() {
         return connected.get();
     }
 
+    /**
+     * Disconnects the channel (i.e. closes the socket) and removes it from the selector.
+     */
     public void disconnect() {
         try {
             SelectionKey key = channel.keyFor(selector);

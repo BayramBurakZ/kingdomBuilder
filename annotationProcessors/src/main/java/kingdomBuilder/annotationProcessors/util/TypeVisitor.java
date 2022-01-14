@@ -5,6 +5,10 @@ import javax.lang.model.type.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implements the TypeVisitor interface, used to retrieve the generic parameters
+ * of a type.
+ */
 public class TypeVisitor implements javax.lang.model.type.TypeVisitor<Void, Void> {
     private final List<Element> parameters = new ArrayList<>();
     private List<? extends TypeMirror> types;
