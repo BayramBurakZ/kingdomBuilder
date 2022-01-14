@@ -77,11 +77,12 @@ public class Player {
 
     /**
      * Check if player owns a specific type of token
+     *
      * @param tokenType The token type to check
      * @return true if he ownes at least one of that token
      */
-    public boolean playerHasTokenLeft(TileType tokenType){
-        if(remainingToken(tokenType) > 0)
+    public boolean playerHasTokenLeft(TileType tokenType) {
+        if (remainingToken(tokenType) > 0)
             return true;
 
         return false;

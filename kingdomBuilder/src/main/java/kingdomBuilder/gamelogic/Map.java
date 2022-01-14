@@ -677,13 +677,38 @@ public class Map {
         return freeTiles;
     }
 
+    /**
+     * Get all free tiles at the border of the map.
+     *
+     * @param player
+     * @return
+     */
+    public Set<Position> freeTilesOnMapBorder(Player player) {
+        Set<Position> freeTiles = new HashSet<>();
+
+        for (int i = 0; i < mapWidth; i++) {
+
+            if (isTilePlaceable(i, 0))
+                freeTiles.add(new Position(i, 0));
+
+            if (isTilePlaceable(0, i))
+                freeTiles.add(new Position(0, i));
+
+            if (isTilePlaceable(i, mapWidth - 1))
+                freeTiles.add(new Position(i, mapWidth - 1));
+
+            if (isTilePlaceable(mapWidth - 1, i))
+                freeTiles.add(new Position(mapWidth - 1, i));
+        }
+        return freeTiles;
+    }
 
     /**
      * Checks if there is only one settlement of a player next to a special place.
      *
      * @param player The player to check-
-     * @param x      The x position of the settlement to place.
-     * @param y      The y position of the settlement to place.
+     * @param x      The x position of the special place.
+     * @param y      The y position of the special place.
      * @return
      */
     public boolean playerHasOnlyOneSettlementNextToSpecialPlace(Player player, int x, int y) {
@@ -697,7 +722,24 @@ public class Map {
                 counter++;
         }
 
-        return (counter == 1) ? true : false;
+        return counter == 1;
+    }
+
+    /**
+     * Get all positions where the player has a settlement.
+     *
+     * @param player
+     * @return
+     */
+    public Set<Position> allSettlementsOfPlayerOnMap(Player player) {
+        Set<Position> allSettlements = new HashSet<>();
+
+        for (int y = 0; y < mapWidth; y++)
+            for (int x = 0; x < mapWidth; x++) {
+                if (occupiedBy(x, y) == player)
+                    allSettlements.add(new Position(x, y));
+            }
+        return allSettlements;
     }
 }
 
