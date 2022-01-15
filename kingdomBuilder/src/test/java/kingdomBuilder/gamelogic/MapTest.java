@@ -3,17 +3,12 @@ package kingdomBuilder.gamelogic;
 import static kingdomBuilder.gamelogic.Game.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import javafx.geometry.Pos;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MapTest {
 
@@ -78,9 +73,7 @@ public class MapTest {
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
 
-        map = new Map(2);
-        map.createMap(quadrant1, quadrant2, quadrant3, quadrant4);
-
+        map = new Map(2, quadrant1, quadrant2, quadrant3, quadrant4);
     }
 
     @Test
@@ -90,49 +83,50 @@ public class MapTest {
 
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.getTileType(x, y), quadrant1[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x, y).tileType, quadrant1[y * QUADRANT_WIDTH + x]);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.getTileType(x + QUADRANT_WIDTH, y), quadrant2[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[y * QUADRANT_WIDTH + x]);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.getTileType(x, y + QUADRANT_WIDTH), quadrant3[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[y * QUADRANT_WIDTH + x]);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.getTileType(x + QUADRANT_WIDTH,
-                        y + QUADRANT_WIDTH), quadrant4[y * QUADRANT_WIDTH + x]);
+                assertEquals(
+                        map.at(x + QUADRANT_WIDTH, y + QUADRANT_WIDTH).tileType,
+                        quadrant4[y * QUADRANT_WIDTH + x]
+                );
             }
         }
     }
 
-
     @Test
     public void testGetEntireTerrainPlaceableTiles() {
 
-        Position gras = new Position(1, 5);
-        Position flower = new Position(2, 1);
-        Position desert = new Position(5, 0);
-        Position forest = new Position(1, 0);
+        Tile gras = map.at(1, 5);
+        Tile flower = map.at(2, 1);
+        Tile desert = map.at(5, 0);
+        Tile forest = map.at(1, 0);
 
-        Iterator<Position> allGrasTiles = map.getEntireTerrain(TileType.GRAS).iterator();
-        Iterator<Position> allDesertTiles = map.getEntireTerrain(TileType.DESERT).iterator();
-        Iterator<Position> allFlowerTiles = map.getEntireTerrain(TileType.FLOWER).iterator();
-        Iterator<Position> allForestTiles = map.getEntireTerrain(TileType.FORREST).iterator();
+        Iterator<Tile> allGrasTiles = map.getEntireTerrain(TileType.GRAS).iterator();
+        Iterator<Tile> allDesertTiles = map.getEntireTerrain(TileType.DESERT).iterator();
+        Iterator<Tile> allFlowerTiles = map.getEntireTerrain(TileType.FLOWER).iterator();
+        Iterator<Tile> allForestTiles = map.getEntireTerrain(TileType.FORREST).iterator();
 
-        Position current;
+        Tile current;
         boolean foundTile = false;
 
         // check if types correct
-        assertEquals(TileType.GRAS, map.getTileType(gras.x, gras.y), "Type is not gras");
-        assertEquals(TileType.FLOWER, map.getTileType(flower.x, flower.y), "Type is not flower");
-        assertEquals(TileType.DESERT, map.getTileType(desert.x, desert.y), "Type is not desert");
-        assertEquals(TileType.FORREST, map.getTileType(forest.x, forest.y), "Type is not forest");
+        assertEquals(TileType.GRAS, map.at(gras.x, gras.y).tileType, "Type is not gras");
+        assertEquals(TileType.FLOWER, map.at(flower.x, flower.y).tileType, "Type is not flower");
+        assertEquals(TileType.DESERT, map.at(desert.x, desert.y).tileType, "Type is not desert");
+        assertEquals(TileType.FORREST, map.at(forest.x, forest.y).tileType, "Type is not forest");
 
         // Gras
         while( allGrasTiles.hasNext()){
@@ -194,8 +188,8 @@ public class MapTest {
     @Test
     public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
 
-        Position tower = new Position(3, 5);
-        assertEquals(TileType.TOWER, map.getTileType(3, 5), "not a tower.");
+        Tile tower = map.at(3, 5);
+        assertEquals(TileType.TOWER, map.at(3, 5).tileType, "not a tower.");
 
         // Testing with tile that is on top right of tower
         TileType tokenToTest =  map.specialPlaceInSurrounding(4, 4);

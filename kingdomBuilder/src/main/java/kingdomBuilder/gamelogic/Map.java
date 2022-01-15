@@ -1,52 +1,43 @@
 package kingdomBuilder.gamelogic;
 
-import javafx.geometry.Pos;
-
-import javax.swing.plaf.IconUIResource;
 import java.security.InvalidParameterException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
+
 /**
  * Contains the data of a map.
  */
-public class Map {
+class MapReadOnly {
 
     /**
      * Represents the tiles of the map in a 1D array.
      */
-    private Tile tiles[];
+    protected final Tile[] tiles;
 
     /**
      * Represents the width of a quadrant.
      */
-    private int quadrantWidth;
+    public final int quadrantWidth;
 
     /**
      * Represents the width of the map.
      */
-    private int mapWidth;
+    public final int mapWidth;
 
     /**
-     * Represents the amount of tokens that a special place contains at game start.
+     * The amount of tokens each special place should contain at the start of the game.
      */
-    private int startingTokenCount;
+    public final int startingTokenCount;
 
     /**
-     * Constructs the map.
+     * Creates the map from the given quadrants.
      *
      * @param startingTokenCount The amount of tokens that a special place contains at game start.
-     */
-    public Map(int startingTokenCount) {
-        this.startingTokenCount = startingTokenCount;
-    }
-
-    /**
-     * Creates the map from the given quadrants and sets it internally.
-     *
      * @param topLeft     The first quadrant in the top left.
      * @param topRight    The second quadrant in the top right.
      * @param bottomLeft  The third quadrant in the bottom left.
@@ -54,9 +45,16 @@ public class Map {
      * @throws InvalidParameterException Throws an InvalidParameterException when the sizes between
      *                                   quadrants are not the same or if quadrant is not a square.
      */
-    public void createMap(TileType topLeft[], TileType topRight[], TileType bottomLeft[], TileType bottomRight[])
+    protected MapReadOnly(int startingTokenCount,
+               TileType topLeft[],
+               TileType topRight[],
+               TileType bottomLeft[],
+               TileType bottomRight[])
             throws InvalidParameterException {
 
+        this.startingTokenCount = startingTokenCount;
+
+        // create map
         if (topLeft.length != topRight.length || topLeft.length != bottomLeft.length
                 || topLeft.length != bottomRight.length)
             throw new InvalidParameterException();
@@ -76,11 +74,11 @@ public class Map {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopLeft(x, y, quadrantWidth)] =
-                        new Tile(topLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y, topLeft[y * quadrantWidth + x], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
-                        new Tile(topRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y, topRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
 
@@ -88,49 +86,13 @@ public class Map {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
-                        new Tile(bottomLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y, bottomLeft[y * quadrantWidth + x], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
-                        new Tile(bottomRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y, bottomRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
-    }
-
-    /**
-     * Places a settlement on a tile.
-     *
-     * @param x      The x coordinate of the tile.
-     * @param y      The y coordinate of the tile.
-     * @param player The player that places a settlement.
-     */
-    public void placeSettlement(Player player, int x, int y) {
-        getTile(x, y).placeSettlement(player);
-    }
-
-    /**
-     * Moves a settlement from one tile to another.
-     *
-     * @param fromX The x coordinate from the settlement that gets removed.
-     * @param fromY The y coordinate from the settlement that gets removed.
-     * @param toX   The x coordinate of the new settlement.
-     * @param toY   The y coordinate of the new settlement.
-     */
-    public void moveSettlement(int fromX, int fromY, int toX, int toY) {
-        Player player = getTile(fromX, fromY).removeSettlement();
-        placeSettlement(player, toX, toY);
-    }
-
-    /**
-     * Take a token from a special place.
-     *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
-     * @return The token.
-     * @throws UnsupportedOperationException when tile is not a special place.
-     */
-    public TileType takeToken(int x, int y) throws HasNoTokenException {
-        return getTile(x, y).takeTokenFromSpecialPlace();
     }
 
     /**
@@ -141,11 +103,9 @@ public class Map {
      * @param width The height/width of the 2D array.
      * @return The position in the 1D array.
      */
-    private int to1DIndex(int x, int y, int width) {
+    protected static int to1DIndex(int x, int y, int width) {
         return y * width + x;
     }
-
-    //TODO: eliminate width from return
 
     /**
      * Get the position of the 1D game map from a 2D index for the top left quadrant.
@@ -155,7 +115,7 @@ public class Map {
      * @param width The height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
-    private int to1DIndexTopLeft(int x, int y, int width) {
+    protected static int to1DIndexTopLeft(int x, int y, int width) {
         return y * 2 * width + x;
     }
 
@@ -167,7 +127,7 @@ public class Map {
      * @param width The height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
-    private int to1DIndexTopRight(int x, int y, int width) {
+    protected static int to1DIndexTopRight(int x, int y, int width) {
         return y * 2 * width + x + width;
     }
 
@@ -179,7 +139,7 @@ public class Map {
      * @param width The height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
-    private int to1DIndexBottomLeft(int x, int y, int width) {
+    protected static int to1DIndexBottomLeft(int x, int y, int width) {
         return width * 2 * width + y * 2 * width + x;
     }
 
@@ -191,87 +151,8 @@ public class Map {
      * @param width The height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
-    private int to1DIndexBottomRight(int x, int y, int width) {
+    protected static int to1DIndexBottomRight(int x, int y, int width) {
         return width * 2 * width + y * 2 * width + x + width;
-    }
-
-    /**
-     * The tile at the given index.
-     *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
-     * @return The tile at the index.
-     */
-    private Tile getTile(int x, int y) {
-        //TODO: make package default accessible.
-        if (x < 0 || y < 0 || x >= mapWidth || y >= mapWidth)
-            throw new IndexOutOfBoundsException();
-
-        return tiles[to1DIndex(x, y, mapWidth)];
-    }
-
-    /**
-     * Get the tile type at the given index.
-     *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
-     * @return The tile type of the tile.
-     */
-    public TileType getTileType(int x, int y) {
-        //TODO: make package default accessible.
-        return getTile(x, y).getTileType();
-    }
-
-    public boolean isWithinBounds(int x, int y) {
-        return (x >= 0 || y >= 0 || x < mapWidth || y < mapWidth);
-    }
-
-    /**
-     * Check whether the tile at given index is at the border of the map.
-     *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
-     * @return Whether the tile is at the border.
-     */
-    public boolean isTileAtBorder(int x, int y) {
-
-        if (x == 0 || y == 0 || x == mapWidth - 1 || y == mapWidth - 1)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Checks whether the tile type at given index is placeable excluding water which is only placeable with a token.
-     *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
-     * @return Whether the tile is placeable.
-     */
-    public boolean isTilePlaceable(int x, int y) {
-
-        Tile target = getTile(x, y);
-
-        if (tokenType.contains(target.getTileType()))
-            return false;
-        else if (target.isOccupied())
-            return false;
-        else if (nonPlaceableTileTypes.contains(target.getTileType()))
-            return false;
-
-        return true;
-    }
-
-    public boolean isTilePlaceable(int x) {
-
-        if (tokenType.contains(tiles[x].getTileType()))
-            return false;
-        else if (tiles[x].isOccupied())
-            return false;
-        else if (nonPlaceableTileTypes.contains(tiles[x].getTileType()))
-            return false;
-
-        return true;
     }
 
     /**
@@ -281,7 +162,7 @@ public class Map {
      * @param y The y coordinate of the original tile.
      * @return The x coordinate of the tile that lies top left from the original tile.
      */
-    public int topLeftX(int x, int y) {
+    protected static int topLeftX(int x, int y) {
         if (y % 2 == 0) {
             // even row
             return x - 1;
@@ -298,7 +179,7 @@ public class Map {
      * @param y The y coordinate of the original tile.
      * @return The x coordinate of the tile that lies top right from the original tile.
      */
-    public int topRightX(int x, int y) {
+    protected static int topRightX(int x, int y) {
         if (y % 2 == 0) {
             // even row
             return x;
@@ -315,7 +196,7 @@ public class Map {
      * @param y The y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom left from the original tile.
      */
-    public int bottomLeftX(int x, int y) {
+    protected int bottomLeftX(int x, int y) {
         return topLeftX(x, y);
     }
 
@@ -326,8 +207,65 @@ public class Map {
      * @param y The y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom right from the original tile.
      */
-    public int bottomRightX(int x, int y) {
+    protected int bottomRightX(int x, int y) {
         return topRightX(x, y);
+    }
+
+    /**
+     * Gets the tile at the given index.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return The tile at the given index.
+     */
+    public TileReadOnly at(int x, int y) {
+        //TODO: make package default accessible.
+        if (!isTileWithinBounds(x, y))
+            throw new IndexOutOfBoundsException();
+
+        return tiles[to1DIndex(x, y, mapWidth)];
+    }
+
+    /**
+     * Checks if the given tile coordinates are within the boundaries of the map.
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return Whether the coordinates are within the boundaries of the map.
+     */
+    public boolean isTileWithinBounds(int x, int y) {
+        return (x >= 0 || y >= 0 || x < mapWidth || y < mapWidth);
+    }
+
+    /**
+     * Check whether the tile at given index is at the border of the map.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return Whether the tile is at the border.
+     */
+    public boolean isTileAtBorder(int x, int y) {
+        return (x == 0 || y == 0 || x == mapWidth - 1 || y == mapWidth - 1);
+    }
+
+    /**
+     * Checks whether the tile type at given index is placeable excluding water which is only placeable with a token.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return Whether the tile is placeable.
+     */
+    public boolean isTilePlaceable(int x, int y) {
+
+        TileReadOnly target = at(x, y);
+
+        if (tokenType.contains(target.tileType))
+            return false;
+        else if (target.isOccupied())
+            return false;
+        else if (nonPlaceableTileTypes.contains(target.tileType))
+            return false;
+
+        return true;
     }
 
     /**
@@ -376,44 +314,95 @@ public class Map {
         return false;
     }
 
-    // TODO: JavaDoc
-
     /**
      * Checks if two tiles have the same type.
      *
-     * @param firstX
-     * @param firstY
-     * @param secondX
-     * @param secondY
+     * @param firstX   The horizontal position of the first tile.
+     * @param firstY   The vertical position of the first tile.
+     * @param secondX  The horizontal position of the second tile.
+     * @param secondY  The vertical position of the second tile.
      * @return
      */
     public boolean tilesAreSameType(int firstX, int firstY, int secondX, int secondY) {
-        if (getTile(firstX, firstY).getTileType() == getTile(secondX, secondY).getTileType())
-            return true;
+        return (at(firstX, firstY).tileType == at(secondX, secondY).tileType);
+    }
+}
 
-        return false;
+/**
+ * Contains the data of a map.
+ */
+public class Map extends MapReadOnly {
+
+    /**
+     * Creates the map from the given quadrants.
+     *
+     * @param startingTokenCount The amount of tokens that a special place contains at game start.
+     * @param topLeft            The first quadrant in the top left.
+     * @param topRight           The second quadrant in the top right.
+     * @param bottomLeft         The third quadrant in the bottom left.
+     * @param bottomRight        The fourth quadrant in the bottom right.
+     * @throws InvalidParameterException Throws an InvalidParameterException when the sizes between
+     *                                   quadrants are not the same or if quadrant is not a square.
+     */
+    public Map(int startingTokenCount,
+                  TileType[] topLeft,
+                  TileType[] topRight,
+                  TileType[] bottomLeft,
+                  TileType[] bottomRight)
+            throws InvalidParameterException {
+        super(startingTokenCount, topLeft, topRight, bottomLeft, bottomRight);
     }
 
     /**
-     * Gets the player that is occupying the tile at a given position.
+     * Gets the tile at the given index.
      *
      * @param x The x coordinate of the tile.
      * @param y The y coordinate of the tile.
-     * @return The player that is occupying the tile.
+     * @return The tile at the given index.
      */
-    public Player occupiedBy(int x, int y) {
-        return getTile(x, y).occupiedBy();
+    @Override
+    public Tile at(int x, int y) {
+        //TODO: make package default accessible.
+        if (!isTileWithinBounds(x, y))
+            throw new IndexOutOfBoundsException();
+
+        return tiles[to1DIndex(x, y, mapWidth)];
     }
 
     /**
-     * Checks if the tile is occupied by any player.
+     * Places a settlement on a tile.
      *
-     * @param x The x coordinate of the Tile.
-     * @param y The y coordinate of the Tile.
-     * @return True if any player is occupying it. False otherwise.
+     * @param x      The x coordinate of the tile.
+     * @param y      The y coordinate of the tile.
+     * @param player The player that places a settlement.
      */
-    public boolean isOccupied(int x, int y) {
-        return getTile(x, y).isOccupied();
+    public void placeSettlement(Player player, int x, int y) {
+        at(x, y).placeSettlement(player);
+    }
+
+    /**
+     * Moves a settlement from one tile to another.
+     *
+     * @param fromX The x coordinate from the settlement that gets removed.
+     * @param fromY The y coordinate from the settlement that gets removed.
+     * @param toX   The x coordinate of the new settlement.
+     * @param toY   The y coordinate of the new settlement.
+     */
+    public void moveSettlement(int fromX, int fromY, int toX, int toY) {
+        Player player = at(fromX, fromY).removeSettlement();
+        placeSettlement(player, toX, toY);
+    }
+
+    /**
+     * Take a token from a special place.
+     *
+     * @param x The x coordinate of the tile.
+     * @param y The y coordinate of the tile.
+     * @return The token.
+     * @throws UnsupportedOperationException when tile is not a special place.
+     */
+    public TileType takeToken(int x, int y) throws HasNoTokenException {
+        return at(x, y).takeTokenFromSpecialPlace();
     }
 
     /**
@@ -432,10 +421,9 @@ public class Map {
      * @param y The y coordinate of the Tile.
      * @return All surrounding Tiles.
      */
-    public Iterator<Position> surroundingTilesIterator(int x, int y) {
-        //TODO: FAILED IN TEST.
+    public Iterator<Tile> surroundingTilesIterator(int x, int y) {
 
-        return new Iterator<Position>() {
+        return new Iterator<Tile>() {
             int state = -1;
 
             @Override
@@ -443,43 +431,43 @@ public class Map {
                 switch (state) {
                     case -1:
                         // check given coordinates
-                        if (!isWithinBounds(x, y)) {
+                        if (!isTileWithinBounds(x, y)) {
                             return false;
                         }
                     case 0:
                         // top left
-                        state = 0;
                         if (topLeftX(x, y) >= 0 && y > 0) {
+                            state = 0;
                             return true;
                         }
                     case 1:
                         // top right
-                        state = 1;
                         if (topRightX(x, y) < mapWidth && y > 0) {
+                            state = 1;
                             return true;
                         }
                     case 2:
                         // left
-                        state = 2;
                         if (x - 1 >= 0) {
+                            state = 2;
                             return true;
                         }
                     case 3:
                         // right
-                        state = 3;
                         if (x + 1 >= mapWidth) {
+                            state = 3;
                             return true;
                         }
                     case 4:
                         // bottom left
-                        state = 4;
                         if (bottomLeftX(x, y) >= 0 && y <= mapWidth) {
+                            state = 4;
                             return true;
                         }
                     case 5:
                         // bottom right
-                        state = 5;
                         if (bottomRightX(x, y) < mapWidth && y <= mapWidth) {
+                            state = 5;
                             return true;
                         }
                     default:
@@ -489,20 +477,19 @@ public class Map {
             }
 
             @Override
-            public Position next() {
-                return switch (state) {
-                    case 0 -> new Position(topLeftX(x, y), y - 1);
-                    case 1 -> new Position(topRightX(x, y), y - 1);
-                    case 2 -> new Position(x - 1, y);
-                    case 3 -> new Position(x + 1, y);
-                    case 4 -> new Position(bottomLeftX(x, y), y + 1);
-                    case 5 -> new Position(bottomRightX(x, y), y + 1);
-                    default -> null;
-                };
+            public Tile next() {
+                switch (state) {
+                    case 0: state++; return at(topLeftX(x, y), y - 1);
+                    case 1: state++; return at(topRightX(x, y), y - 1);
+                    case 2: state++; return at(x - 1, y);
+                    case 3: state++; return at(x + 1, y);
+                    case 4: state++; return at(bottomLeftX(x, y), y + 1);
+                    case 5: state++; return at(bottomRightX(x, y), y + 1);
+                    default: return null;
+                }
             }
         };
     }
-
 
     /**
      * Get all surrounding tiles of a given target tile.
@@ -511,40 +498,39 @@ public class Map {
      * @param y The y coordinate of the target tile.
      * @return All tiles that surrounding target tile.
      */
-    public Set<Position> surroundingTiles(int x, int y) {
-        if (!isWithinBounds(x, y)) {
+    public Set<Tile> surroundingTiles(int x, int y) {
+        if (!isTileWithinBounds(x, y)) {
             return null;
         }
 
-        Set<Position> surroundingTiles = new HashSet<>();
+        Set<Tile> surroundingTiles = new HashSet<>();
 
         // top left
         if (topLeftX(x, y) >= 0 && y > 0)
-            surroundingTiles.add(new Position(topLeftX(x, y), y - 1));
+            surroundingTiles.add(at(topLeftX(x, y), y - 1));
 
         // top right
         if (topRightX(x, y) < mapWidth && y > 0)
-            surroundingTiles.add(new Position(topRightX(x, y), y - 1));
+            surroundingTiles.add(at(topRightX(x, y), y - 1));
 
         // left
         if (x - 1 >= 0)
-            surroundingTiles.add(new Position(x - 1, y));
+            surroundingTiles.add(at(x - 1, y));
 
         // right
         if (x + 1 >= mapWidth)
-            surroundingTiles.add(new Position(x + 1, y));
+            surroundingTiles.add(at(x + 1, y));
 
         // bottom left
         if (bottomLeftX(x, y) >= 0 && y <= mapWidth)
-            surroundingTiles.add(new Position(bottomLeftX(x, y), y + 1));
+            surroundingTiles.add(at(bottomLeftX(x, y), y + 1));
 
         // bottom right
         if (bottomRightX(x, y) < mapWidth && y <= mapWidth)
-            surroundingTiles.add(new Position(bottomRightX(x, y), y + 1));
+            surroundingTiles.add(at(bottomRightX(x, y), y + 1));
 
         return surroundingTiles;
     }
-
 
     /**
      * Check if next to the tile is a token and return it.
@@ -554,13 +540,13 @@ public class Map {
      * @return The Token that is next to the settlement or null if there is no token;
      */
     public TileType specialPlaceInSurrounding(int x, int y) {
-        Iterator<Position> surroundingTiles = surroundingTiles(x, y).iterator();
+        Iterator<Tile> surroundingTiles = surroundingTiles(x, y).iterator();
 
         while (surroundingTiles.hasNext()) {
-            Position position = surroundingTiles.next();
+            Tile position = surroundingTiles.next();
 
-            if (tokenType.contains(getTileType(position.x, position.y))) {
-                return getTileType(position.x, position.y);
+            if (tokenType.contains(at(position.x, position.y).tileType)) {
+                return at(position.x, position.y).tileType;
             }
         }
         return null;
@@ -574,12 +560,12 @@ public class Map {
      * @return True if tile has tokens left. False otherwise.
      */
     public boolean tileHasTokenLeft(int x, int y) {
-        Tile tile = getTile(x, y);
+        Tile tile = at(x, y);
 
-        if (!tokenType.contains(tile.getTileType()))
+        if (!tokenType.contains(tile.tileType))
             throw new InvalidParameterException("not a token");
 
-        if (tile.hasTokenLeft())
+        if (tile.hasTokens())
             return true;
 
         return false;
@@ -594,17 +580,16 @@ public class Map {
      * @return True if the player has another settlement on surrounding tile. False otherwise.
      */
     public boolean settlementOfPlayerOnSurroundingTiles(Player player, int x, int y) {
-        Iterator<Position> surrounding = surroundingTiles(x, y).iterator();
-        Position current;
+        Iterator<Tile> surrounding = surroundingTiles(x, y).iterator();
+        Tile current;
 
         while (surrounding.hasNext()) {
             current = surrounding.next();
-            if (getTile(current.x, current.y).isOccupiedByPlayer(player))
+            if (at(current.x, current.y).isOccupiedByPlayer(player))
                 return true;
         }
         return false;
     }
-
 
     /**
      * Check if there is at least one settlement of a Player on a terrain.
@@ -617,13 +602,13 @@ public class Map {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a terrain!");
 
-        Iterator<Position> terrainIterator = getEntireTerrain(terrain).iterator();
-        Position current;
+        Iterator<Tile> terrainIterator = getEntireTerrain(terrain).iterator();
+        Tile current;
 
         while (terrainIterator.hasNext()) {
             current = terrainIterator.next();
 
-            if (occupiedBy(current.x, current.y) == player)
+            if (at(current.x, current.y).occupiedBy == player)
                 return true;
         }
 
@@ -636,22 +621,21 @@ public class Map {
      * @param terrain The terrain to filter.
      * @return All tiles of a type.
      */
-    public Set<Position> getEntireTerrain(TileType terrain) {
+    public Set<Tile> getEntireTerrain(TileType terrain) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        Set<Position> entireTerrain = new HashSet<>();
+        Set<Tile> entireTerrain = new HashSet<>();
 
         for (int y = 0; y < mapWidth; y++) {
             for (int x = 0; x < mapWidth; x++) {
-                if (getTile(x, y).getTileType() == terrain) {
-                    entireTerrain.add(new Position(x, y));
+                if (at(x, y).tileType == terrain) {
+                    entireTerrain.add(at(x, y));
                 }
             }
         }
         return entireTerrain;
     }
-
 
     /**
      * Get only the free tiles of a terrain.
@@ -659,13 +643,13 @@ public class Map {
      * @param terrain
      * @return
      */
-    public Set<Position> freeTilesOnTerrain(TileType terrain) {
+    public Set<Tile> freeTilesOnTerrain(TileType terrain) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        Set<Position> freeTiles = new HashSet<>();
-        Iterator<Position> terrainIterator = getEntireTerrain(terrain).iterator();
-        Position current;
+        Set<Tile> freeTiles = new HashSet<>();
+        Iterator<Tile> terrainIterator = getEntireTerrain(terrain).iterator();
+        Tile current;
 
         while (terrainIterator.hasNext()) {
             current = terrainIterator.next();
@@ -683,22 +667,22 @@ public class Map {
      * @param player
      * @return
      */
-    public Set<Position> freeTilesOnMapBorder(Player player) {
-        Set<Position> freeTiles = new HashSet<>();
+    public Set<Tile> freeTilesOnMapBorder(Player player) {
+        Set<Tile> freeTiles = new HashSet<>();
 
         for (int i = 0; i < mapWidth; i++) {
 
             if (isTilePlaceable(i, 0))
-                freeTiles.add(new Position(i, 0));
+                freeTiles.add(at(i, 0));
 
             if (isTilePlaceable(0, i))
-                freeTiles.add(new Position(0, i));
+                freeTiles.add(at(0, i));
 
             if (isTilePlaceable(i, mapWidth - 1))
-                freeTiles.add(new Position(i, mapWidth - 1));
+                freeTiles.add(at(i, mapWidth - 1));
 
             if (isTilePlaceable(mapWidth - 1, i))
-                freeTiles.add(new Position(mapWidth - 1, i));
+                freeTiles.add(at(mapWidth - 1, i));
         }
         return freeTiles;
     }
@@ -712,13 +696,13 @@ public class Map {
      * @return
      */
     public boolean playerHasOnlyOneSettlementNextToSpecialPlace(Player player, int x, int y) {
-        Iterator<Position> tilesIterator = surroundingTiles(x, y).iterator();
-        Position token;
+        Iterator<Tile> tilesIterator = surroundingTiles(x, y).iterator();
+        Tile token;
         int counter = 0;
 
         while (tilesIterator.hasNext()) {
             token = tilesIterator.next();
-            if (getTile(token.x, token.y).occupiedBy() == player)
+            if (at(token.x, token.y).occupiedBy() == player)
                 counter++;
         }
 
@@ -731,13 +715,13 @@ public class Map {
      * @param player
      * @return
      */
-    public Set<Position> allSettlementsOfPlayerOnMap(Player player) {
-        Set<Position> allSettlements = new HashSet<>();
+    public Set<Tile> allSettlementsOfPlayerOnMap(Player player) {
+        Set<Tile> allSettlements = new HashSet<>();
 
         for (int y = 0; y < mapWidth; y++)
             for (int x = 0; x < mapWidth; x++) {
-                if (occupiedBy(x, y) == player)
-                    allSettlements.add(new Position(x, y));
+                if (at(x, y).occupiedBy == player)
+                    allSettlements.add(at(x, y));
             }
         return allSettlements;
     }

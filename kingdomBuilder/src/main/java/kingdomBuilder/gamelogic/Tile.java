@@ -5,17 +5,78 @@ import kingdomBuilder.gamelogic.Game.*;
 /**
  * Contains the data of a tile.
  */
-public class Tile {
+class TileReadOnly {
 
-    private TileType tileType;
-    private Player occupiedBy;
-    private int remainingTokens;
+    /**
+     * The x and y coordinate of the tile.
+     */
+    public final int x, y;
 
-    public Tile(TileType tileType, int remainingTokens) {
+    /**
+     * The tile type of the tile.
+     */
+    public final TileType tileType;
 
+    /**
+     * The player whose settlement is occupying the tile.
+     */
+    protected Player occupiedBy;
+
+    /**
+     * The amount of tokens that players can still receive from this tile.
+     */
+    protected int remainingTokens;
+
+    public TileReadOnly(int x, int y, TileType tileType, int remainingTokens) {
+
+        this.x = x;
+        this.y = y;
         this.tileType = tileType;
+
         this.occupiedBy = null;
         this.remainingTokens = remainingTokens;
+    }
+
+    // TODO: JavaDoc, maybe scrap and just do getOccupyingPlayer() == player separately
+    public boolean isOccupiedByPlayer(Player player) {
+        return (occupiedBy == player);
+    }
+
+    /**
+     * Checks whether the tile is occupied by any player.
+     *
+     * @return True if it is occupied. False otherwise.
+     */
+    public boolean isOccupied() {
+        return (occupiedBy != null);
+    }
+
+    /**
+     * Gets the player that is occupying the tile.
+     *
+     * @return The player that is occupying the tile.
+     */
+    public Player occupiedBy() {
+        return occupiedBy;
+    }
+
+    /**
+     * Check if tile has any tokens left.
+     *
+     * @return True if there are tokens left. False otherwise.
+     */
+    public boolean hasTokens() {
+        return (remainingTokens > 0);
+    }
+}
+
+/**
+ * Contains the data of a tile.
+ */
+public class Tile extends TileReadOnly {
+
+    public Tile(int x, int y, TileType tileType, int remainingTokens) {
+        super(x, y, tileType, remainingTokens);
     }
 
     /**
@@ -62,56 +123,5 @@ public class Tile {
 
         remainingTokens--;
         return tileType;
-    }
-
-    // TODO: JavaDoc, maybe scrap and just do getOccupyingPlayer() == player separately
-    public boolean isOccupiedByPlayer(Player player) {
-
-        if (occupiedBy == player)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Checks whether the tile is occupied by any player.
-     *
-     * @return True if it is occupied. False otherwise.
-     */
-    public boolean isOccupied() {
-        if (occupiedBy != null)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Gets the player that is occupying the tile.
-     *
-     * @return the player that is occupying the tile.
-     */
-    public Player occupiedBy() {
-        return occupiedBy;
-    }
-
-    /**
-     * Gets the tile type of the tile.
-     *
-     * @return The tile type of the tile.
-     */
-    public TileType getTileType() {
-
-        return tileType;
-    }
-
-    /**
-     * Check if tile has any token left.
-     *
-     * @return True if there are token left. False otherwise.
-     */
-    public boolean hasTokenLeft() {
-        if (remainingTokens > 0)
-            return true;
-        return false;
     }
 }

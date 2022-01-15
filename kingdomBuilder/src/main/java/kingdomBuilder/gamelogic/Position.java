@@ -1,5 +1,5 @@
 package kingdomBuilder.gamelogic;
-
+/*
 public class Position {
     int x, y;
 
@@ -13,3 +13,4 @@ public class Position {
         this.y = pos.y;
     }
 }
+*/

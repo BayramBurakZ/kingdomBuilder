@@ -25,17 +25,50 @@ public class Game {
      */
     private final String gameDescription;
 
-    // TODO: copy paste descriptions from the constructor :)
+    /**
+     * The maximum amount of players that can play in the game.
+     */
     private final int playerLimit;
+
+    /**
+     * The maximum amount of time a player can spend on each turn.
+     */
     private final int timeLimit;
+
+    /**
+     * The maximum amount of turns the game can run for.
+     */
     private final int turnLimit;
+
+    /**
+     * The quadrants the game board is assembled from.
+     */
     private final QuadrantIDs quadrantIDs;
 
     // Additional data for a game.
+    /**
+     * The ID of the client who created the game.
+     */
     private final int hostID;
+
+    /**
+     * The ID of the player whose turn it currently is.
+     */
     private int currentPlayerID;
+
+    /**
+     * An array of the win conditions of the game.
+     */
     private final WinCondition[] winConditions;
+
+    /**
+     * An array of the players playing in the game.
+     */
     private final Player[] players;
+
+    /**
+     * The total amount of settlements a player has to place to end the game.
+     */
     private final int startingSettlements;
 
     // constants
@@ -45,7 +78,7 @@ public class Game {
 
     // Internal data of the map
     private final Map map;
-    public Set<Position> previewMap;
+    public Set<Tile> previewMap;
 
     /**
      * Constructs a new game object which is ready for the first move.
@@ -95,11 +128,15 @@ public class Game {
         //       the constructor should only receive the player information that was relevant before game start
         this.players = players;
         this.startingSettlements = startingSettlements;
-        this.map = new Map(startingTokenCount);
+        // TODO: get the TileType[] from the quadrant ID
+        this.map = new Map(startingTokenCount,
+                new TileType[100],
+                new TileType[100],
+                new TileType[100],
+                new TileType[100]);
     }
 
     // TODO: maybe not a class for this idk
-
     /**
      * Server takes quadrant IDs in this listed order.
      */
@@ -114,15 +151,54 @@ public class Game {
      * Win conditions for the game.
      */
     public enum WinCondition {
+        /**
+         * Score for every settlement next to water.
+         */
         FISHER,
+
+        /**
+         * Score for settlement next to a single mountain.
+         */
         LORDS,
+
+        /**
+         * Score for every connection between two special places.
+         */
         MINER,
+
+        /**
+         * Score for every settlement next to a special place.
+         */
         ANCHORITE,
+
+        /**
+         * Score for every horizontal line with min. one settlement.
+         */
         FARMER,
+
+        /**
+         * Score for every settlement on the horizontal line with the most settlements of your own.
+         */
         MERCHANT,
+
+        /**
+         * Score for every separate group of settlements.
+         */
         KNIGHT,
+
+        /**
+         * Score per quadrant for the player with the most settlements (second gets +6 score).
+         */
         EXPLORER,
+
+        /**
+         * Score per settlement in the biggest group of settlements.
+         */
         CITIZEN,
+
+        /**
+         * Score per quadrant for the player with the least settlements (second gets +6 score).
+         */
         WORKER
     }
 
@@ -183,35 +259,28 @@ public class Game {
         WHITE
     }
 
+    /**
+     * Checks if it's the given player's turn.
+     * @param player The player to check if it's their turn.
+     * @return Whether it's the given player's turn.
+     */
     public boolean isPlayersTurn(Player player) {
         return currentPlayerID == player.ID;
     }
 
-    // TODO: maybe return an iterator instead
-    public int[] placeableTilesWithLandscape(TileType landscape, Player player) {
-        if (!regularTileTypes.contains(landscape))
-            throw new InvalidParameterException("Type of tile is not a landscape");
-
-
-        //Tile[] tilesWithSettlementsOfPlayer = new Tile[startingSettlements - player.remainingSettlements];
-        int counter = 0;
-
-        for (int y = 0; y < map.getMapWidth(); y++) {
-            for (int x = 0; x < map.getMapWidth(); x++) {
-                if (map.occupiedBy(x, y) == player) {
-                    //tilesWithSettlementsOfPlayer[counter] =
-                }
-            }
-        }
-
-        return null;
-    }
-
+    /**
+     * Throws if it's not the given player's turn.
+     * @param player The player to check if it's their turn.
+     */
     private void checkIsPlayersTurn(Player player) {
         if (!isPlayersTurn(player))
             throw new RuntimeException("It's not the player's turn!");
     }
 
+    /**
+     * Checks if the given player can still place settlements this turn.
+     * @param player The player to check if they can still place settlements this turn.
+     */
     private void checkHasRemainingSettlements(Player player) {
         if (!player.hasRemainingSettlements())
             throw new RuntimeException("Player has no settlements left!");
@@ -229,9 +298,39 @@ public class Game {
      */
     public boolean canPlaceSettlement(Player player, int x, int y) {
         //TODO: implement settlement placement WITHOUT a terrain
+
+        boolean hasSurroundingSettlement = false;
+        for (var it = map.surroundingTilesIterator(x, y); it.hasNext();) {
+            Tile pos = it.next();
+            if (map.at(pos.x, pos.y).occupiedBy == player) {
+                hasSurroundingSettlement = true;
+                break;
+            }
+        }
+        boolean existsUnoccupiedNeighbouringTile = false;
+        if (!hasSurroundingSettlement) {
+            outer:
+            for (int y2 = 0; y2 < map.getMapWidth(); y2++) {
+                for (int x2 = 0; x2 < map.getMapWidth(); x2++) {
+                    if (map.at(x2, y2).occupiedBy == player) {
+                        for (var it = map.surroundingTilesIterator(x2, y2); it.hasNext(); ) {
+                            Tile pos = it.next();
+                            if (map.at(pos.x, pos.y).occupiedBy == player) {
+                                existsUnoccupiedNeighbouringTile = true;
+                                break outer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return isPlayersTurn(player)
                 && player.hasRemainingSettlements()
-                && !map.isOccupied(x, y);
+                && !map.at(x, y).isOccupied()
+                //&& map.isTilePlaceable(x, y)
+                && map.at(x, y).tileType == player.terrainCard
+                && (hasSurroundingSettlement || !existsUnoccupiedNeighbouringTile);
     }
 
     /**
@@ -271,11 +370,10 @@ public class Game {
      */
     public boolean canMoveSettlement(Player player, int fromX, int fromY, int toX, int toY) {
         return isPlayersTurn(player)
-                && (map.occupiedBy(fromX, fromY) == player)
-                && !map.isOccupied(toX, toY)
+                && (map.at(fromX, fromY).occupiedBy == player)
+                && !map.at(toX, toY).isOccupied()
                 && map.isTilePlaceable(toX, toY);
     }
-
 
     /**
      * Moves a settlement to a new position and throws if the move isn't valid.
@@ -293,7 +391,7 @@ public class Game {
 
         checkIsPlayersTurn(player);
 
-        if (map.occupiedBy(fromX, fromY) != player || !canPlaceSettlementInTerrain(player, terrain, toX, toY))
+        if (map.at(fromX, fromY).occupiedBy != player || !canPlaceSettlementInTerrain(player, terrain, toX, toY))
             return;
 
         // Take token from player if settlement was last one on special place
@@ -330,7 +428,7 @@ public class Game {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        Set<Position> allPlaceableTiles = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
+        Set<Tile> allPlaceableTiles = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
 
         if (allPlaceableTiles.isEmpty())
             return true;
@@ -356,7 +454,7 @@ public class Game {
             throw new InvalidParameterException("parameter is not a terrain!");
 
         // terrain must match the terrain of the tile player wants to place a settlement
-        if (!map.isTilePlaceable(x, y) && terrain != map.getTileType(x, y))
+        if (!map.isTilePlaceable(x, y) && terrain != map.at(x, y).tileType)
             return false;
 
         // player has to place settlement next to another settlement
@@ -370,7 +468,6 @@ public class Game {
         return false;
     }
 
-
     /**
      * Gets all possible positions to place a settlement for a player on a given terrain.
      *
@@ -378,14 +475,14 @@ public class Game {
      * @param terrain
      * @return
      */
-    public Set<Position> allPossibleSettlementPlacementsNextToOtherSettlement(Player player, TileType terrain) {
+    public Set<Tile> allPossibleSettlementPlacementsNextToOtherSettlement(Player player, TileType terrain) {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        Set<Position> allowedTiles = new HashSet<>();
-        Set<Position> freeTiles = map.freeTilesOnTerrain(terrain);
-        Iterator<Position> freeTilesIterator = freeTiles.iterator();
-        Position current;
+        Set<Tile> allowedTiles = new HashSet<>();
+        Set<Tile> freeTiles = map.freeTilesOnTerrain(terrain);
+        Iterator<Tile> freeTilesIterator = freeTiles.iterator();
+        Tile current;
 
         while (freeTilesIterator.hasNext()) {
             current = freeTilesIterator.next();
@@ -404,8 +501,8 @@ public class Game {
      * @param terrain The terrain the player has.
      * @return A set of all positions a player can place a settlement.
      */
-    public Set<Position> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
-        Set<Position> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
+    public Set<Tile> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
+        Set<Tile> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
         return (allPossiblePlacements.isEmpty()) ? map.freeTilesOnTerrain(terrain) : allPossiblePlacements;
     }
 
@@ -415,10 +512,10 @@ public class Game {
      * @param player
      * @return
      */
-    public Set<Position> allPossibleSettlementsOnBorder(Player player) {
-        Iterator<Position> freeTilesAtBorder = map.freeTilesOnMapBorder(player).iterator();
-        Set<Position> placeableTilesAtBorder = new HashSet<>();
-        Position position;
+    public Set<Tile> allPossibleSettlementsOnBorder(Player player) {
+        Iterator<Tile> freeTilesAtBorder = map.freeTilesOnMapBorder(player).iterator();
+        Set<Tile> placeableTilesAtBorder = new HashSet<>();
+        Tile position;
 
         while (freeTilesAtBorder.hasNext()) {
             position = freeTilesAtBorder.next();
@@ -436,11 +533,10 @@ public class Game {
      * @param terrain
      */
     public void updatePreviewWithTerrain(Player player, TileType terrain) {
-        Set<Position> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
+        Set<Tile> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
 
         previewMap = (allPossiblePlacements.isEmpty()) ? map.freeTilesOnTerrain(terrain) : allPossiblePlacements;
     }
-
 
     /**
      * Preview all Settlements of a player on the map.
@@ -462,7 +558,7 @@ public class Game {
         //TODO: don't add token from the same place twice
 
         if (map.tileHasTokenLeft(x, y)) {
-            player.addToken(map.getTileType(x, y));
+            player.addToken(map.at(x, y).tileType);
             map.takeToken(x, y);
         }
     }
@@ -530,7 +626,6 @@ public class Game {
         }
 
     }
-
 
     /**
      * Use the oracle token. The player is allowed to place an extra settlement on a tile that has the same type as
@@ -638,6 +733,4 @@ public class Game {
         player.removeToken(TileType.BARN);
         moveSettlement(player, player.terrainCard, fromX, fromY, toX, toY);
     }
-
-
 }
