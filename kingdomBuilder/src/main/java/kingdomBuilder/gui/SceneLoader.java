@@ -8,6 +8,7 @@ import javafx.util.Pair;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.SetSceneLoaderAction;
 import kingdomBuilder.gui.controller.*;
+import kingdomBuilder.gui.levelEditor.LevelEditorController;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
@@ -59,6 +60,10 @@ public class SceneLoader {
      * Stores the current serverConnectView.
      */
     private Node serverConnectView;
+    /**
+     * Stores the current levelEditorView.
+     */
+    private Node levelEditorView;
 
     //endregion Nodes
 
@@ -96,6 +101,10 @@ public class SceneLoader {
      * Stores the serverConnectViewController.
      */
     private ServerConnectViewController serverConnectViewController;
+    /**
+     * Stores the levelEditorController.
+     */
+    private LevelEditorController levelEditorController;
 
     //endregion Controller for every View
 
@@ -250,6 +259,16 @@ public class SceneLoader {
         borderPane.setCenter(serverConnectView);
     }
 
+    /**
+     * Loads the LevelEditorView into the center of the main borderPane.
+     */
+    public void showLevelEditorView() {
+        //reloads the view so its completely empty
+        loadLevelEditorView(locale);
+
+        borderPane.setCenter(levelEditorView);
+    }
+
     // load-methods
 
     /**
@@ -398,6 +417,18 @@ public class SceneLoader {
         Pair<Node, Controller> pair = loadView("controller/ServerConnect.fxml", locale);
         serverConnectView = pair.getKey();
         serverConnectViewController = (ServerConnectViewController) pair.getValue();
+    }
+
+    /**
+     * Calls the loadView() method with the path of the LevelEditor.fxml and
+     * sets the LevelEditorView and LevelEditorViewController fields
+     * Used for reloading this View.
+     * @param locale The locale for language support.
+     */
+    public void loadLevelEditorView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/LevelEditor.fxml", locale);
+        levelEditorView = pair.getKey();
+        levelEditorController = (LevelEditorController) pair.getValue();
     }
 
     // TODO: Remove

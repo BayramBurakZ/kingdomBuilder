@@ -64,7 +64,6 @@ public class HexagonTile extends Tile {
 
         // TODO: execute only for Tokens
         setTokenTooltip(tileType);
-        setMouseHandler();
     }
 
     /**

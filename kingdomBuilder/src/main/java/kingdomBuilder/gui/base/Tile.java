@@ -48,10 +48,21 @@ public abstract class Tile extends Group {
         // move this group to new position
         setTranslateX(xPos);
         setTranslateY(yPos);
+
+
+        setMouseHandler();
     }
 
     /**
      * Sets the MouseHandler of a tile.
      */
     protected abstract void setMouseHandler();
+
+    /**
+     * Gets the type of this Tile.
+     * @return The type.
+     */
+    public TileType getTileType() {
+        return tileType;
+    }
 }

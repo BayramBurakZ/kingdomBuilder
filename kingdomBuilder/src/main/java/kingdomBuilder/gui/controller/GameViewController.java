@@ -33,12 +33,12 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Represents the setting for the field of view (fov).
      */
-    private static final double fov = 50.0;
+    private static final double FOV = 50.0;
 
     /**
      * Represents the angle for the camera.
      */
-    private static final double viewAngle = 30.0;
+    private static final double VIEW_ANGLE = 30.0;
 
     //region FXML-Imports
 
@@ -288,16 +288,16 @@ public class GameViewController extends Controller implements Initializable {
 
         camera.setFarClip(4096.0);
         camera.setRotationAxis(new Point3D(1.0, 0, 0));
-        camera.setRotate(viewAngle);
-        camera.setFieldOfView(fov);
+        camera.setRotate(VIEW_ANGLE);
+        camera.setFieldOfView(FOV);
         game_subscene.setCamera(camera);
 
 
         // TODO: set initial camera position properly
         camera.setTranslateX(boardCenter.getX());
         camera.setTranslateY(
-                (1 + Math.sin(Math.toRadians(viewAngle)) + Math.sin(Math.toRadians(fov))) * boardCenter.getY());
-        camera.setTranslateZ(-Math.cos(Math.toRadians(viewAngle)) * gameBoard.getGameBoard()[19][0].getTranslateX());
+                (1 + Math.sin(Math.toRadians(VIEW_ANGLE)) + Math.sin(Math.toRadians(FOV))) * boardCenter.getY());
+        camera.setTranslateZ(-Math.cos(Math.toRadians(VIEW_ANGLE)) * gameBoard.getBoard()[19][0].getTranslateX());
 
         setupCameraHandlers(camera);
     }
@@ -364,9 +364,9 @@ public class GameViewController extends Controller implements Initializable {
      */
     private void setupGameBoard() {
         // TODO: access data via state
-        gameBoard.setupGameBoard(gameBoard_group, gameBoardData, resourceBundle);
+        gameBoard.setupBoard(gameBoard_group, gameBoardData, resourceBundle);
 
-        HexagonTile[][] board = gameBoard.getGameBoard();
+        HexagonTile[][] board = gameBoard.getBoard();
         boardCenter = new Point3D(
                 (board[9][0].getTranslateX() + board[10][0].getTranslateX()) / 2f,
                 (board[0][9].getTranslateY() + board[0][10].getTranslateY()) / 2f,

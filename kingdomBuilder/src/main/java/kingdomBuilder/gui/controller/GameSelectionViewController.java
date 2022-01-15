@@ -63,6 +63,11 @@ public class GameSelectionViewController extends Controller implements Initializ
         sceneLoader.showGameSettingsView(true);
     }
 
+    @FXML
+    private void onLevelEditorButtonPressed() {
+        sceneLoader.showLevelEditorView();
+    }
+
     /**
      * Sets the functionality for the ReturnToMenu Button.
      * @param event Contains the data from the event source.
