@@ -46,7 +46,7 @@ public class Wincondition extends Polygon {
      * @param resourceBundle The language support.
      */
     public Wincondition(WinCondition winCondition, ResourceBundle resourceBundle) {
-        // add all corners of to the hexagon shape
+        // add all corners for a hexagon shape
         for (int i = 0; i < HexagonCalculator.NUMBER_OF_CORNERS; i++) {
             getPoints().add(vertices.get(i).getX());
             getPoints().add(vertices.get(i).getY());
@@ -61,7 +61,6 @@ public class Wincondition extends Polygon {
 
         // set Tooltip
         switch (winCondition) {
-            // TODO: write win condition
             case ANCHORITE -> winConditionTooltip.setText(resourceBundle.getString("winCondAnchorite"));
             case CITIZEN -> winConditionTooltip.setText(resourceBundle.getString("winCondCitizen"));
             case EXPLORER -> winConditionTooltip.setText(resourceBundle.getString("winCondExplorer"));

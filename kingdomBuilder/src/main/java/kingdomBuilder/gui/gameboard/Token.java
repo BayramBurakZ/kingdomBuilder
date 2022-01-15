@@ -5,6 +5,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -16,6 +17,7 @@ import kingdomBuilder.gui.util.HexagonCalculator;
 import kingdomBuilder.model.TileType;
 
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 /**
  * Class that is used to display Tokens.
@@ -33,19 +35,26 @@ public class Token extends StackPane {
     private Hexagon2D hexagon;
 
     /**
+     * Represents the resourceBundle that used for language support.
+     */
+    protected static ResourceBundle resource;
+
+    /**
      * Constructs a new Token, with given type, count.
      * @param tileType The type of the Token.
      * @param count The count, how many Tokens the user own.
      * @param gameViewController The gameViewController (to deactivate other Tokens).
      * @param disable If the Token is at the beginning disabled.
      */
-    public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable) {
+    public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable, ResourceBundle resource) {
         super();
 
         // TODO: Subscribers:
         //  - Token used -> tokenUsed
         hexagon = new Hexagon2D(tileType, gameViewController);
 
+        // set resource
+        this.resource = resource;
 
         ObservableList<Node> contents = this.getChildren();
         contents.add(countDisplay);
@@ -64,6 +73,8 @@ public class Token extends StackPane {
         if (disable) {
             this.disableToken();
         }
+
+        setTokenTooltip(tileType);
     }
 
     /**
@@ -92,6 +103,31 @@ public class Token extends StackPane {
      */
     public boolean isTokenActivated() {
         return hexagon.isActivated;
+    }
+
+    /**
+     * Set the rule for every generated special place to their rule.
+     * @param tileType type for recognizing the special place.
+     */
+    private void setTokenTooltip(TileType tileType) {
+        // TODO: Adjust to gameLogic enums
+
+        if (tileType.getValue() < 8) {
+            return;
+        }
+
+        Tooltip tokenTooltip = new Tooltip();
+        switch (tileType) {
+            case BARN -> tokenTooltip.setText(resource.getString("tokenBarnRule"));
+            case FARM -> tokenTooltip.setText(resource.getString("tokenFarmRule"));
+            case OASIS -> tokenTooltip.setText(resource.getString("tokenOasisRule"));
+            case TOWER -> tokenTooltip.setText(resource.getString("tokenTowerRule"));
+            case HARBOR -> tokenTooltip.setText(resource.getString("tokenHarborRule"));
+            case ORACLE -> tokenTooltip.setText(resource.getString("tokenOracleRule"));
+            case TAVERN -> tokenTooltip.setText(resource.getString("tokenTavernRule"));
+            case PADDOCK -> tokenTooltip.setText(resource.getString("tokenPaddockRule"));
+        }
+        Tooltip.install(this, tokenTooltip);
     }
 
     /**

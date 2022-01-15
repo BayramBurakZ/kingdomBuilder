@@ -83,41 +83,23 @@ public class HexagonTile extends Tile {
      */
     private void setTokenTooltip(TileType tileType) {
         // TODO: Adjust to gameLogic enums
+
+        if (tileType.getValue() < 8) {
+            return;
+        }
+
         Tooltip tokenTooltip = new Tooltip();
         switch (tileType) {
-            case BARN -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenBarnRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case FARM -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenFarmRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case OASIS -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenOasisRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case TOWER -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenTowerRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case HARBOR -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenHarborRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case ORACLE -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenOracleRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case TAVERN -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenTavernRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
-            case PADDOCK -> {
-                tokenTooltip.setText(resourceBundle.getString("tokenPaddockRule"));
-                Tooltip.install(this, tokenTooltip);
-            }
+            case BARN -> tokenTooltip.setText(resourceBundle.getString("tokenBarnRule"));
+            case FARM -> tokenTooltip.setText(resourceBundle.getString("tokenFarmRule"));
+            case OASIS -> tokenTooltip.setText(resourceBundle.getString("tokenOasisRule"));
+            case TOWER -> tokenTooltip.setText(resourceBundle.getString("tokenTowerRule"));
+            case HARBOR -> tokenTooltip.setText(resourceBundle.getString("tokenHarborRule"));
+            case ORACLE -> tokenTooltip.setText(resourceBundle.getString("tokenOracleRule"));
+            case TAVERN -> tokenTooltip.setText(resourceBundle.getString("tokenTavernRule"));
+            case PADDOCK -> tokenTooltip.setText(resourceBundle.getString("tokenPaddockRule"));
         }
+        Tooltip.install(this, tokenTooltip);
     }
 
     /**

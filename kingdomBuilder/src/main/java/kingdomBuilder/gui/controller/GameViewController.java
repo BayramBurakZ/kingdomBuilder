@@ -478,7 +478,7 @@ public class GameViewController extends Controller implements Initializable {
         TileType tileType = TileType.valueOf(random);
 
         //gameview_hbox_tokens
-        Token token = new Token(tileType, count, this, areTokensDisabled);
+        Token token = new Token(tileType, count, this, areTokensDisabled, resourceBundle);
         tokens.add(token);
 
         gameview_hbox_tokens.getChildren().add(token);

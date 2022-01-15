@@ -98,7 +98,7 @@
             </padding>
         </Label>
         <!-- Hbox for win conditions-->
-        <HBox fx:id="game_hBox_windconditions" VBox.vgrow="ALWAYS"/>
+        <HBox fx:id="game_hBox_windconditions" VBox.vgrow="ALWAYS" alignment="CENTER"/>
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
