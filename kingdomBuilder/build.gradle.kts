@@ -13,6 +13,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("org.jetbrains:annotations:16.0.2")
     implementation(project(":network"))
+    implementation(project(":annotations"))
+    annotationProcessor(project(":annotationProcessors"))
 }
 
 javafx {

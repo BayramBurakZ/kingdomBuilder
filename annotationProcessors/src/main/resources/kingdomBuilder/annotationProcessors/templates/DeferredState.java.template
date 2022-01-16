@@ -1,0 +1,35 @@
+package <%= packageName %>;
+
+<%= imports %>
+
+import kingdomBuilder.redux.Store;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/**
+ * Implements setters for the state class {@link <%= qualifiedClassName %>}, which internally populate a set of changes,
+ * which are then
+ */
+public class DeferredState {
+    private final Set<String> changedAttributes = new HashSet<>();
+
+    <%= constructionVariableDeclarations %>
+
+    public DeferredState(<%= stateType %> oldState) {
+        <%= constructionVariableInitialization %>
+    }
+
+<%= deferredSetters %>
+    public Set<String> getChangedAttributes() {
+        return changedAttributes;
+    }
+
+    /**
+     * Creates a new state object with the changed attributes.
+     */
+    public <%= stateType %> withChanges() {
+        return new <%= stateType %>(<%= constructionVariables %>);
+    }
+
+};

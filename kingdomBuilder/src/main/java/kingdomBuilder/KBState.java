@@ -6,6 +6,7 @@ import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
+import kingdomBuilder.annotations.State;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * Represents the state of the Kingdom Builder application.
  */
+@State
 public class KBState {
     // public for testing
     // TODO? :probably just make these ObservableLists directly
@@ -67,6 +69,19 @@ public class KBState {
      * Shows whether the connection to the server failed.
      */
     public boolean failedToConnect;
+
+    public KBState(MainViewController controller, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect) {
+        this.controller = controller;
+        this.clients = clients;
+        this.games = games;
+        this.selector = selector;
+        this.selectorThread = selectorThread;
+        this.client = client;
+        this.clientPreferredName = clientPreferredName;
+        this.isConnecting = isConnecting;
+        this.isConnected = isConnected;
+        this.failedToConnect = failedToConnect;
+    }
 
     /**
      * Initializes the state with initial value.
