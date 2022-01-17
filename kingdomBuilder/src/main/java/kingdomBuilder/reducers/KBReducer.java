@@ -9,12 +9,14 @@ import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
 
+import kingdomBuilder.generated.DeferredState;
+
 import java.io.IOException;
 
 public class KBReducer implements Reducer<KBState> {
 
     @Override
-    public KBState reduce(Store<KBState> store, KBState oldState, Action action) {
+    public DeferredState reduce(Store<KBState> store, KBState oldState, Action action) {
         System.out.println("Reducer Log: " + action.getClass().getSimpleName());
 
         /*
@@ -43,12 +45,14 @@ public class KBReducer implements Reducer<KBState> {
         else if(action instanceof ApplicationExitAction a)
             return reduce(oldState, a);
 
-        return oldState;
+        return new DeferredState(oldState);
     }
 
-    private KBState reduce(KBState oldState, ClientAddAction a) {
-        KBState state = new KBState(oldState);
-        state.clients.put(a.id, new ClientDAO(a.id, a.name, a.gameId));
+    private DeferredState reduce(KBState oldState, ClientAddAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var clients = oldState.clients;
+        clients.put(a.id, new ClientDAO(a.id, a.name, a.gameId));
+        state.setClients(clients);
 
         var sceneLoader = oldState.controller.getSceneLoader();
         sceneLoader.getChatViewController().onClientJoined(a.id, a.name, a.gameId);
@@ -56,9 +60,11 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private KBState reduce(KBState oldState, ClientRemoveAction a) {
-        KBState state = new KBState(oldState);
-        state.clients.remove(a.id);
+    private DeferredState reduce(KBState oldState, ClientRemoveAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var clients = oldState.clients;
+        clients.remove(a.id);
+        state.setClients(clients);
 
         var sceneLoader = oldState.controller.getSceneLoader();
         sceneLoader.getChatViewController().onClientLeft(a.id, a.name, a.gameId);
@@ -66,42 +72,42 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private KBState reduce(KBState oldState, SetPreferredNameAction a) {
-        KBState state = new KBState(oldState);
-        state.clientPreferredName = a.clientName;
+    private DeferredState reduce(KBState oldState, SetPreferredNameAction a) {
+        DeferredState state = new DeferredState(oldState);
+        state.setClientPreferredName(a.clientName);
         return state;
     }
 
-    private KBState reduce(KBState state, ChatSendAction a) {
-        state.client.chat(a.receiverIds, a.message);
-        return state;
+    private DeferredState reduce(KBState oldState, ChatSendAction a) {
+        oldState.client.chat(a.receiverIds, a.message);
+        return new DeferredState(oldState);
     }
 
-    private KBState reduce(KBState oldState, ChatReceiveAction a) {
+    private DeferredState reduce(KBState oldState, ChatReceiveAction a) {
         var sceneLoader = oldState.controller.getSceneLoader();
         var chatViewController = sceneLoader.getChatViewController();
         // chatViewController.onMessage(a.chatMessage);
-        return oldState;
+        return new DeferredState(oldState);
     }
 
-    private KBState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
+    private DeferredState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
+        DeferredState state = new DeferredState(oldState);
+
         Client client;
         try { client = oldState.selector.connect(a.address); }
         catch(IOException exc) {
-            System.out.println("Failed to connect to server.");
-
-            final KBState state = new KBState(oldState);
-            state.failedToConnect = true;
+            state.setFailedToConnect(true);
             return state;
         }
 
         Thread selectorThread = oldState.selectorThread;
         if(selectorThread == null || !selectorThread.isAlive()) {
             assert !oldState.selector.isRunning();
+
             selectorThread = new Thread(oldState.selector);
             selectorThread.start();
 
-            System.out.println("Started selector thread!");
+            state.setSelectorThread(selectorThread);
         }
 
         client.onLoggedIn.subscribe(c -> store.dispatch(new LoggedInAction(c)));
@@ -111,56 +117,53 @@ public class KBReducer implements Reducer<KBState> {
 
         client.login(oldState.clientPreferredName);
 
-        KBState state = new KBState(oldState);
-        state.client = client;
-        state.isConnecting = true;
-        state.selectorThread = selectorThread;
-        System.out.println("Set thread");
+        state.setClient(client);
+        state.setIsConnecting(true);
 
         return state;
     }
 
-    private KBState reduce(KBState oldState, ApplicationExitAction a) {
-        System.out.println("Stopping selector.");
-        ClientSelector selector = oldState.selector;
-        if(selector != null && selector.isRunning())
-            selector.stop();
+    private DeferredState reduce(KBState state, ApplicationExitAction a) {
+        ClientSelector selector = state.selector;
+        if(selector != null && selector.isRunning()) selector.stop();
 
-        Thread selectorThread = oldState.selectorThread;
-        if(selectorThread != null && selectorThread.isAlive()) {
-            System.out.println("Did interrupt.");
-            selectorThread.interrupt();
-        }
+        Thread selectorThread = state.selectorThread;
+        if(selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
 
         // Return old state, so that no other subscribers are called.
-        return oldState;
+        return new DeferredState(state);
     }
 
-    private KBState reduce(KBState oldState, LoggedInAction a) {
-        System.out.println("Logged in!");
-        KBState state = new KBState(oldState);
-        state.isConnecting = false;
+    private DeferredState reduce(KBState oldState, LoggedInAction a) {
+        DeferredState state = new DeferredState(oldState);
+        state.setIsConnecting(false);
         return state;
     }
 
-    private KBState reduce(KBState oldState, DisconnectAction a) {
-        KBState state = new KBState(oldState);
-        // TODO: kicked action ?
-        if (a.wasKicked) {
+    private DeferredState reduce(KBState oldState, DisconnectAction a) {
+        DeferredState state = new DeferredState(oldState);
+
+        if(a.wasKicked) {
             var sceneLoader = oldState.controller.getSceneLoader();
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
-        state.client.disconnect();
-        state.clients.clear();
-        state.games.clear();
-        state.client = null;
-        state.isConnected = false;
+
+        oldState.client.disconnect();
+        state.setClient(null);
+        state.setIsConnected(false);
+
+        oldState.clients.clear();
+        state.setClients(oldState.clients);
+
+        oldState.games.clear();
+        state.setGames(oldState.games);
+
         return state;
     }
 
-    private KBState reduce(KBState oldState, SetMainControllerAction a) {
-        KBState state = new KBState(oldState);
-        state.controller = a.controller;
+    private DeferredState reduce(KBState oldState, SetMainControllerAction a) {
+        DeferredState state = new DeferredState(oldState);
+        state.setController(a.controller);
         return state;
     }
 }

@@ -11,7 +11,7 @@ import java.util.Set;
  * Implements setters for the state class {@link <%= qualifiedClassName %>}, which internally populate a set of changes,
  * which are then
  */
-public class DeferredState {
+public class DeferredState implements kingdomBuilder.redux.DeferredState<<%= stateType %>> {
     private final Set<String> changedAttributes = new HashSet<>();
 
     <%= constructionVariableDeclarations %>
