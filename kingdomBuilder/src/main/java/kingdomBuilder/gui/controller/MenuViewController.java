@@ -83,22 +83,15 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store.subscribe(newState -> {
-            if(state == null) {
-                state = newState;
-                return;
-            }
+        store.subscribe(s -> {
+            state = s;
+            if(s.isConnected) onConnect();
+            else              onDisconnect();
+        }, "isConnected");
 
-            menuview_connect_button.setDisable(newState.isConnecting);
-
-            // Client connection
-            if (newState.isConnected && !state.isConnected) {
-                onConnect();
-            } else if (!newState.isConnected && state.isConnected){
-                onDisconnect();
-            }
-            state = newState;
-        });
+        store.subscribe(s -> {
+            menuview_connect_button.setDisable(s.isConnecting);
+        }, "isConnecting");
     }
 
     /**

@@ -105,6 +105,7 @@ public class KBReducer implements Reducer<KBState> {
             assert !oldState.selector.isRunning();
 
             selectorThread = new Thread(oldState.selector);
+            selectorThread.setName("SelectorThread");
             selectorThread.start();
 
             state.setSelectorThread(selectorThread);
@@ -137,6 +138,8 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, LoggedInAction a) {
         DeferredState state = new DeferredState(oldState);
         state.setIsConnecting(false);
+        state.setIsConnected(true);
+        System.out.println("Is connected.");
         return state;
     }
 

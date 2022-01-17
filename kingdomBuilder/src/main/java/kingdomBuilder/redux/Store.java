@@ -1,5 +1,7 @@
 package kingdomBuilder.redux;
 
+import javafx.application.Platform;
+
 import java.util.*;
 
 /**
@@ -48,16 +50,18 @@ public class Store<State> {
      * @param action changes the state.
      */
     public synchronized void dispatch(Action action) {
-        final DeferredState<State> state = reducer.reduce(this, this.state, action);
-        if(state.getChangedAttributes().isEmpty()) return;
+        Platform.runLater(() -> {
+            final DeferredState<State> state = reducer.reduce(this, this.state, action);
+            if(state.getChangedAttributes().isEmpty()) return;
 
-        Set<Subscriber<State>> subscribers = new HashSet<>();
-        subscribers.addAll(getSubscriberSet(ATTRIBUTE_WILDCARD));
-        for(String attribute: state.getChangedAttributes())
-            subscribers.addAll(getSubscriberSet(attribute));
+            Set<Subscriber<State>> subscribers = new HashSet<>();
+            subscribers.addAll(getSubscriberSet(ATTRIBUTE_WILDCARD));
+            for(String attribute: state.getChangedAttributes())
+                subscribers.addAll(getSubscriberSet(attribute));
 
-        this.state = state.withChanges();
-        subscribers.forEach(s -> s.onChange(this.state));
+            this.state = state.withChanges();
+            subscribers.forEach(s -> s.onChange(this.state));
+        });
     }
 
     /**
@@ -78,6 +82,8 @@ public class Store<State> {
             var subs = getSubscriberSet(attribute);
             subs.add(subscriber);
         }
+
+        subscriber.onChange(this.state);
     }
 
     /**
