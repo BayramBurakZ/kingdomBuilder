@@ -1,7 +1,5 @@
 package kingdomBuilder.gamelogic;
 
-import javafx.geometry.Pos;
-
 import java.security.InvalidParameterException;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -310,8 +308,8 @@ public class Game {
         boolean existsUnoccupiedNeighbouringTile = false;
         if (!hasSurroundingSettlement) {
             outer:
-            for (int y2 = 0; y2 < map.getMapWidth(); y2++) {
-                for (int x2 = 0; x2 < map.getMapWidth(); x2++) {
+            for (int y2 = 0; y2 < map.mapWidth; y2++) {
+                for (int x2 = 0; x2 < map.mapWidth; x2++) {
                     if (map.at(x2, y2).occupiedBy == player) {
                         for (var it = map.surroundingTilesIterator(x2, y2); it.hasNext(); ) {
                             Tile pos = it.next();
@@ -328,7 +326,7 @@ public class Game {
         return isPlayersTurn(player)
                 && player.hasRemainingSettlements()
                 && !map.at(x, y).isOccupied()
-                //&& map.isTilePlaceable(x, y)
+                //&& map.at(x, y).isTilePlaceable()
                 && map.at(x, y).tileType == player.terrainCard
                 && (hasSurroundingSettlement || !existsUnoccupiedNeighbouringTile);
     }
@@ -345,7 +343,7 @@ public class Game {
         checkIsPlayersTurn(player);
         checkHasRemainingSettlements(player);
 
-        map.placeSettlement(player, x, y);
+        map.at(x, y).placeSettlement(player);
         player.remainingSettlements--;
 
         TileType token = map.specialPlaceInSurrounding(x, y);
@@ -353,7 +351,7 @@ public class Game {
         // Player gets a token if settlement is next to special place
         if (token != null) {
             player.addToken(token);
-            map.takeToken(x, y);
+            map.at(x, y).takeTokenFromSpecialPlace();
         }
     }
 
@@ -372,7 +370,7 @@ public class Game {
         return isPlayersTurn(player)
                 && (map.at(fromX, fromY).occupiedBy == player)
                 && !map.at(toX, toY).isOccupied()
-                && map.isTilePlaceable(toX, toY);
+                && map.at(toX, toY).isTilePlaceable();
     }
 
     /**
@@ -403,7 +401,7 @@ public class Game {
                 player.removeToken(token);
         }
 
-        map.moveSettlement(fromX, fromY, toX, toY);
+        map.at(fromX, fromY).moveSettlement(map.at(toX, toY));
 
 
         TileType token = map.specialPlaceInSurrounding(toX, toY);
@@ -411,7 +409,7 @@ public class Game {
         // Player gets a token if settlement is next to special place
         if (token != null) {
             player.addToken(token);
-            map.takeToken(toX, toY);
+            map.at(toX, toY).takeTokenFromSpecialPlace();
         }
     }
 
@@ -454,7 +452,7 @@ public class Game {
             throw new InvalidParameterException("parameter is not a terrain!");
 
         // terrain must match the terrain of the tile player wants to place a settlement
-        if (!map.isTilePlaceable(x, y) && terrain != map.at(x, y).tileType)
+        if (!map.at(x, y).isTilePlaceable() && terrain != map.at(x, y).tileType)
             return false;
 
         // player has to place settlement next to another settlement
@@ -557,9 +555,9 @@ public class Game {
     public void addToken(Player player, int x, int y) {
         //TODO: don't add token from the same place twice
 
-        if (map.tileHasTokenLeft(x, y)) {
+        if (map.at(x, y).hasTokens()) {
             player.addToken(map.at(x, y).tileType);
-            map.takeToken(x, y);
+            map.at(x, y).takeTokenFromSpecialPlace();
         }
     }
 
@@ -686,7 +684,7 @@ public class Game {
      * @param y      The y position of the settlement to place.
      */
     public void useTokenTower(Player player, int x, int y) {
-        if (!map.isTileAtBorder(x, y))
+        if (!map.at(x, y).isAtBorder(map))
             return;
 
         if (canPlaceSettlement(player, x, y)) {
