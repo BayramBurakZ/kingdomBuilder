@@ -526,9 +526,12 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      * @param tile   The origin tile.
      * @return True if tile is a part of a chain. False otherwise.
      */
-    public boolean tileIsInFrontOrBackOfAChain(Player player, T tile) {
+    public boolean freeTileIsInFrontOrBackOfAChain(Player player, T tile) {
         int x = tile.x;
         int y = tile.y;
+
+        if(!tile.isOccupied())
+            return false;
 
         // Check if chain is on right side
         if (isWithinBounds(x + 3, y)
@@ -569,7 +572,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
                 if (!at(x, y).isTilePlaceable() && !playerHasASettlementInSurrounding(player, at(x, y)))
                     continue;
 
-                else if (tileIsInFrontOrBackOfAChain(player, at(x, y))) {
+                else if (freeTileIsInFrontOrBackOfAChain(player, at(x, y))) {
                     freeTiles.add(at(x, y));
 
                 }
@@ -577,6 +580,46 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
         }
         return freeTiles;
     }
+
+
+    /**
+     * Get all free tiles at the border of the map.
+     *
+     * @return All free tiles at the border of the map.
+     */
+    public Set<T> allFreeTilesOnBorderOfMap() {
+        Set<T> freeTiles = new HashSet<>();
+
+        for (int x = 0; x < mapWidth; x++) {
+
+            if (at(x, 0).isTilePlaceable()) {
+                // top border
+                freeTiles.add(at(x, 0));
+            }
+
+            if (at(x, mapWidth - 1).isTilePlaceable()) {
+                // bottom border
+                freeTiles.add(at(x, mapWidth - 1));
+            }
+        }
+
+        for (int y = 0; y < mapWidth; y++) {
+
+            if (at(0, y).isTilePlaceable()) {
+                // left border
+                freeTiles.add(at(0, y));
+            }
+
+            if (at(mapWidth, y).isTilePlaceable()) {
+                // right border
+                freeTiles.add(at(mapWidth, y));
+            }
+        }
+
+        return freeTiles;
+    }
+
+
 }
 
 /**

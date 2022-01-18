@@ -685,7 +685,7 @@ public class Game {
      * @param y      The y position of the settlement to place.
      */
     public void useTokenTavern(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, x, y) || !map.tileIsInFrontOrBackOfAChain(player, map.at(x, y)))
+        if (!canPlaceSettlement(player, x, y) || !map.freeTileIsInFrontOrBackOfAChain(player, map.at(x, y)))
             return;
 
         placeSettlement(player, x, y);
@@ -717,9 +717,20 @@ public class Game {
 
     }
 
-    //TODO: hier
+    /**
+     * Use tower token. The player can place a token at the border of the map.
+     *
+     * @param player The player to update for.
+     */
     public void previewWithTower(Player player) {
+        Set<Tile> allPlaceableTiles = new HashSet<>();
 
+        for (Tile tile : map.allFreeTilesOnBorderOfMap()) {
+            if(tile.isTilePlaceable())
+                allPlaceableTiles.add(tile);
+        }
+
+        previewMap = allPlaceableTiles;
     }
 
     /**
@@ -763,7 +774,15 @@ public class Game {
 
     }
 
-    // TODO: implement, parameters should match the protocol message format
+    /**
+     * Use Barn token. The player can move a settlement on a tile with current terrain  card.
+     *
+     * @param player That is using the token.
+     * @param fromX The x coordinate of settlement to move.
+     * @param fromY The y coordinate of settlement to move.
+     * @param toX The x coordinate of target tile to put settlement.
+     * @param toY The y coordinate of target tile to put settlement.
+     */
     public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
         player.removeToken(TileType.BARN);
         moveSettlement(player, player.terrainCard, fromX, fromY, toX, toY);
