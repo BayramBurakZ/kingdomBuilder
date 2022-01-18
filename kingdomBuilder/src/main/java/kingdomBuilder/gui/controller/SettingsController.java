@@ -5,11 +5,13 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.BetterColorModeAction;
 import kingdomBuilder.actions.SetPreferredNameAction;
 import kingdomBuilder.redux.Store;
 
@@ -35,6 +37,12 @@ public class SettingsController extends Controller implements Initializable {
     private TextField textField_name;
 
     /**
+     * Represents the CheckBox to change the color mode.
+     */
+    @FXML
+    private CheckBox settings_checkBox_colors;
+
+    /**
      * Constructs the Settings View with the given store.
      * @param store The Store for access to the state.
      */
@@ -45,6 +53,7 @@ public class SettingsController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupCheckBox(resources);
+        settings_checkBox_colors.setSelected(store.getState().betterColorsActiv);
     }
 
     /**
@@ -123,8 +132,13 @@ public class SettingsController extends Controller implements Initializable {
         } else {
             // TODO: Error Message if Name is not valid!
         }
-        sceneLoader.showMenuView();
 
+        // color mode
+        if (store.getState().betterColorsActiv != settings_checkBox_colors.isSelected()) {
+            store.dispatch(new BetterColorModeAction(settings_checkBox_colors.isSelected()));
+        }
+
+        sceneLoader.showMenuView();
     }
 
     /**

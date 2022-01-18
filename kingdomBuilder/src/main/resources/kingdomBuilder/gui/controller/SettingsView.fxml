@@ -26,9 +26,13 @@
         <TextField fx:id="textField_name" maxWidth="200.0" promptText="%enterHere"/>
     </HBox>
 
+    <CheckBox fx:id="settings_checkBox_colors" text="%betterColors" />
+
     <Button onAction="#onButtonApply" text="%apply"/>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
+
+
 
 </VBox>

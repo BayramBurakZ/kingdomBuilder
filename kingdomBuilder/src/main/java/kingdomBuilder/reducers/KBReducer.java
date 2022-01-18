@@ -40,6 +40,8 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         } else if (action instanceof SetSceneLoaderAction a) {
             return reduce(oldState, a);
+        } else if (action instanceof BetterColorModeAction a) {
+            return reduce(oldState, a);
         }
 
         return oldState;
@@ -166,6 +168,12 @@ public class KBReducer implements Reducer<KBState> {
     private KBState reduce(KBState oldState, SetSceneLoaderAction a) {
         KBState state = new KBState(oldState);
         state.sceneLoader = a.sceneLoader;
+        return state;
+    }
+
+    private KBState reduce(KBState oldState, BetterColorModeAction a) {
+        KBState state = new KBState(oldState);
+        state.betterColorsActiv = a.active;
         return state;
     }
 }

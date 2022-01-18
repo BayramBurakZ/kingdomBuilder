@@ -11,16 +11,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
+import kingdomBuilder.KBState;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.model.Model;
 import kingdomBuilder.model.TileType;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -53,66 +57,12 @@ public class GameViewController extends Controller implements Initializable {
      */
     @FXML
     private HBox game_hbox_statistic;
+
     /**
-     * Represents the Label for the name of player 1.
+     * Represents the HBox that contains the players.
      */
     @FXML
-    private Label game_label_player1_name;
-    /**
-     * Represents the Label for the settlements of player 1.
-     */
-    @FXML
-    private Label game_label_player1_settlements;
-    /**
-     * Represents the Label for the score of player 1.
-     */
-    @FXML
-    private Label game_label_player1_score;
-    /**
-     * Represents the Label for the name of player 2.
-     */
-    @FXML
-    private Label game_label_player2_name;
-    /**
-     * Represents the Label for the settlements of player 2.
-     */
-    @FXML
-    private Label game_label_player2_settlements;
-    /**
-     * Represents the Label for the score of player 2.
-     */
-    @FXML
-    private Label game_label_player2_score;
-    /**
-     * Represents the Label for the name of player 3.
-     */
-    @FXML
-    private Label game_label_player3_name;
-    /**
-     * Represents the Label for the settlements of player 3.
-     */
-    @FXML
-    private Label game_label_player3_settlements;
-    /**
-     * Represents the Label for the score of player 3.
-     */
-    @FXML
-    private Label game_label_player3_score;
-    /**
-     * Represents the Label for the name of player 4.
-     */
-    @FXML
-    private Label game_label_player4_name;
-    /**
-     * Represents the Label for the settlements of player 4.
-     */
-    @FXML
-    private Label game_label_player4_settlements;
-    /**
-     * Represents the Label for the score of player 4.
-     */
-    @FXML
-    private Label game_label_player4_score;
+    private HBox game_hbox_players;
 
     /**
      * Represents the Label for the turn counter.
@@ -218,6 +168,19 @@ public class GameViewController extends Controller implements Initializable {
     private ArrayList<Token> tokens = new ArrayList<Token>();
 
     /**
+     * Represents the list of players on the top of the view.
+     */
+    private ArrayList<PlayerInformation> players = new ArrayList<>();
+
+    /**
+     * Constructs the GameView with the given store.
+     * @param store The Store for access to the state.
+     */
+    public GameViewController(Store<KBState> store) {
+        this.store = store;
+    }
+
+    /**
      * Called to initialize this controller after its root element has been completely processed.
      * @param location The location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
@@ -226,9 +189,9 @@ public class GameViewController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
-        // - PlayerData (name, score)
-        // - when player joins
-        // -
+        // - PlayerData settlements -> updateSettlementsForPlayer()
+        // - PlayerData score -> updateScoreForPlayer()
+        // - when player joins -> addPlayer()
         // - Win Conditions -> updateWinConditions()
         // - Tokens from the current Player -> updateTokens()
         // - Token used -> updateTokens()
@@ -353,6 +316,7 @@ public class GameViewController extends Controller implements Initializable {
                     updateTokens();
                 }
                 case Z -> updateWinConditions();
+                case P -> addPlayer("Tom44");
 
             }
             event.consume();
@@ -410,6 +374,8 @@ public class GameViewController extends Controller implements Initializable {
         // resize the subScene
         game_subscene.widthProperty().bind(game_hbox_subscene.widthProperty());
         game_subscene.heightProperty().bind(game_hbox_subscene.heightProperty());
+
+        game_hbox_players.maxWidthProperty().bind(game_vbox.widthProperty().subtract(75));
     }
 
     /**
@@ -482,6 +448,53 @@ public class GameViewController extends Controller implements Initializable {
         tokens.add(token);
 
         gameview_hbox_tokens.getChildren().add(token);
+    }
+
+    /**
+     * Adds a player to the view.
+     * @param name The name of the player.
+     */
+    private void addPlayer(String name) {
+        // TODO: adjust to gamelogic or read from state
+        PlayerInformation.PlayerColor color = PlayerInformation.PlayerColor.RED;
+
+        int size = players.size();
+        if (size == 0)  color = PlayerInformation.PlayerColor.RED;
+        if (size == 1)  color = PlayerInformation.PlayerColor.BLUE;
+        if (size == 2)  color = PlayerInformation.PlayerColor.BLACK;
+        if (size == 3)  color = PlayerInformation.PlayerColor.WHITE;
+        if (size > 3)   return;
+
+        boolean colorMode = store.getState().betterColorsActiv;
+        PlayerInformation player = new PlayerInformation(name, color, colorMode);
+        game_hbox_players.getChildren().add(player);
+
+        // add spacing
+        Region region = new Region();
+        game_hbox_players.getChildren().add(region);
+        HBox.setHgrow(region, Priority.ALWAYS);
+        
+        players.add(player);
+    }
+
+    /**
+     * Updates the score of a player.
+     *
+     * @param player The selected player (0-3).
+     * @param score The new score.
+     */
+    private void updateScoreForPlayer(int player, int score) {
+        players.get(player).setScore(score);
+    }
+
+    /**
+     * Updates the settlements of a player.
+     *
+     * @param player The selected player (0-3).
+     * @param count The new settlement count.
+     */
+    private void updateSettlementsForPlayer(int player, int count) {
+        players.get(player).setSettlementCount(count);
     }
 
     /**

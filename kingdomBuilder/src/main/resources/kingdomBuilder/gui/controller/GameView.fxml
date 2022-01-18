@@ -11,76 +11,8 @@
 
     <HBox fx:id="game_hbox_statistic" alignment="CENTER" VBox.vgrow="ALWAYS">
 
-        <!-- Player information for player 1-->
-        <Label fx:id="game_label_player1_name" text="PLAYER 1" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player1_settlements" text="40" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player1_score" text="00" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
+        <HBox fx:id="game_hbox_players" alignment="CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
 
-        <Region HBox.hgrow="ALWAYS" />
-        <!-- Player information for player 2-->
-        <Label fx:id="game_label_player2_name" text="PLAYER 2" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player2_settlements" text="40" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player2_score" text="00" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-
-        <Region HBox.hgrow="ALWAYS" />
-        <!-- Player information for player 3-->
-        <Label fx:id="game_label_player3_name" text="PLAYER 3" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player3_settlements" text="40" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player3_score" text="00" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-
-        <Region HBox.hgrow="ALWAYS" />
-        <!-- Player information for player 4-->
-        <Label fx:id="game_label_player4_name" text="PLAYER 4" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player4_settlements" text="40" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
-        <Label fx:id="game_label_player4_score" text="00" textFill="WHITE">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Label>
 
         <Region HBox.hgrow="ALWAYS" />
         <!-- Turn information of the game-->
@@ -90,7 +22,6 @@
             </padding>
         </Label>
 
-        <Region HBox.hgrow="ALWAYS" />
         <!-- Time information of the game-->
         <Label fx:id="game_label_time" text="00" textFill="WHITE">
             <padding>

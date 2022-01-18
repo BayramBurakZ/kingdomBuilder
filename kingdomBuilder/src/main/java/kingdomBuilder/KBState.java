@@ -58,6 +58,11 @@ public class KBState {
     public boolean failedToConnect = false;
 
     /**
+     * Represents if the better color mode is active.
+     */
+    public boolean betterColorsActiv = false;
+
+    /**
      * Represents a List with all the available quadrants on the server;
      */
     public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
@@ -82,5 +87,6 @@ public class KBState {
         isConnected = other.isConnected;
         failedToConnect = other.failedToConnect;
         quadrantIDs = other.quadrantIDs;
+        betterColorsActiv = other.betterColorsActiv;
     }
 }
