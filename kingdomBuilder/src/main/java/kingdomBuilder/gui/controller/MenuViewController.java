@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,6 +31,9 @@ public class MenuViewController extends Controller implements Initializable {
      * Represents the state for internal use.
      */
     private KBState state;
+
+    @FXML
+    private BooleanProperty isConnected;
 
     /**
      * Represents the BorderPane of the View.
