@@ -135,6 +135,7 @@ public class Game {
     }
 
     // TODO: maybe not a class for this idk
+
     /**
      * Server takes quadrant IDs in this listed order.
      */
@@ -259,6 +260,7 @@ public class Game {
 
     /**
      * Checks if it's the given player's turn.
+     *
      * @param player The player to check if it's their turn.
      * @return Whether it's the given player's turn.
      */
@@ -268,6 +270,7 @@ public class Game {
 
     /**
      * Throws if it's not the given player's turn.
+     *
      * @param player The player to check if it's their turn.
      */
     private void checkIsPlayersTurn(Player player) {
@@ -277,6 +280,7 @@ public class Game {
 
     /**
      * Checks if the given player can still place settlements this turn.
+     *
      * @param player The player to check if they can still place settlements this turn.
      */
     private void checkHasRemainingSettlements(Player player) {
@@ -298,7 +302,7 @@ public class Game {
         //TODO: implement settlement placement WITHOUT a terrain
 
         boolean hasSurroundingSettlement = false;
-        for (var it = map.surroundingTilesIterator(x, y); it.hasNext();) {
+        for (var it = map.surroundingTilesIterator(x, y); it.hasNext(); ) {
             Tile pos = it.next();
             if (map.at(pos.x, pos.y).occupiedBy == player) {
                 hasSurroundingSettlement = true;
@@ -672,8 +676,29 @@ public class Game {
         updatePreviewWithTerrain(player, TileType.GRAS);
     }
 
-    // TODO: implement, parameters should match the protocol message format
+    /**
+     * Use the Tavern token. The player can place an extra settlement at the front or back of a
+     * chain of settlements that is owned by the player.
+     *
+     * @param player That is using the token.
+     * @param x      The x position of the settlement to place.
+     * @param y      The y position of the settlement to place.
+     */
     public void useTokenTavern(Player player, int x, int y) {
+        if (!canPlaceSettlement(player, x, y) || !map.tileIsInFrontOrBackOfAChain(player, map.at(x, y)))
+            return;
+
+        placeSettlement(player, x, y);
+        player.removeToken(TileType.TAVERN);
+    }
+
+    /**
+     * Updates the preview for tavern token.
+     *
+     * @param player The player to update for.
+     */
+    public void previewTokenTavern(Player player) {
+        previewMap = map.allFreeTilesInFrontOrBackOfAChain(player);
     }
 
     /**
@@ -684,16 +709,18 @@ public class Game {
      * @param y      The y position of the settlement to place.
      */
     public void useTokenTower(Player player, int x, int y) {
-        if (!map.at(x, y).isAtBorder(map))
+        if (canPlaceSettlement(player, x, y) || !map.at(x, y).isAtBorder(map))
             return;
 
-        if (canPlaceSettlement(player, x, y)) {
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.TOWER);
-        }
+        placeSettlement(player, x, y);
+        player.removeToken(TileType.TOWER);
+
     }
 
-    //TODO: updatePreviewWithTower(Player player)
+    //TODO: hier
+    public void previewWithTower(Player player) {
+
+    }
 
     /**
      * Use Oasis token. The player can place an extra settlement on Desert.
@@ -722,13 +749,27 @@ public class Game {
     public void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
     }
 
+    //TODO: implement
+    public void previewTokenHarbor() {
+
+    }
+
     // TODO: implement, parameters should match the protocol message format
     public void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
+    }
+
+    //TODO: implement
+    public void previewTokenPaddock() {
+
     }
 
     // TODO: implement, parameters should match the protocol message format
     public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
         player.removeToken(TileType.BARN);
         moveSettlement(player, player.terrainCard, fromX, fromY, toX, toY);
+    }
+
+    public void previewTokenBarn() {
+
     }
 }

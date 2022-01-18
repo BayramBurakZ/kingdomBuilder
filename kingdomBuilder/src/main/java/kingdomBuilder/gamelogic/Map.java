@@ -44,18 +44,18 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      * Creates the map from the given quadrants.
      *
      * @param startingTokenCount The amount of tokens that a special place contains at game start.
-     * @param topLeft     The first quadrant in the top left.
-     * @param topRight    The second quadrant in the top right.
-     * @param bottomLeft  The third quadrant in the bottom left.
-     * @param bottomRight The fourth quadrant in the bottom right.
+     * @param topLeft            The first quadrant in the top left.
+     * @param topRight           The second quadrant in the top right.
+     * @param bottomLeft         The third quadrant in the bottom left.
+     * @param bottomRight        The fourth quadrant in the bottom right.
      * @throws InvalidParameterException Throws an InvalidParameterException when the sizes between
      *                                   quadrants are not the same or if quadrant is not a square.
      */
     protected MapReadOnly(int startingTokenCount,
-               TileType[] topLeft,
-               TileType[] topRight,
-               TileType[] bottomLeft,
-               TileType[] bottomRight)
+                          TileType[] topLeft,
+                          TileType[] topRight,
+                          TileType[] bottomLeft,
+                          TileType[] bottomRight)
             throws InvalidParameterException {
 
         this.startingTokenCount = startingTokenCount;
@@ -233,6 +233,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
 
     /**
      * Checks if the given tile coordinates are within the boundaries of the map.
+     *
      * @param x The x coordinate of the tile.
      * @param y The y coordinate of the tile.
      * @return Whether the coordinates are within the boundaries of the map.
@@ -306,13 +307,26 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
             @Override
             public T next() {
                 switch (state) {
-                    case 0: state++; return at(topLeftX(x, y), y - 1);
-                    case 1: state++; return at(topRightX(x, y), y - 1);
-                    case 2: state++; return at(x - 1, y);
-                    case 3: state++; return at(x + 1, y);
-                    case 4: state++; return at(bottomLeftX(x, y), y + 1);
-                    case 5: state++; return at(bottomRightX(x, y), y + 1);
-                    default: return null;
+                    case 0:
+                        state++;
+                        return at(topLeftX(x, y), y - 1);
+                    case 1:
+                        state++;
+                        return at(topRightX(x, y), y - 1);
+                    case 2:
+                        state++;
+                        return at(x - 1, y);
+                    case 3:
+                        state++;
+                        return at(x + 1, y);
+                    case 4:
+                        state++;
+                        return at(bottomLeftX(x, y), y + 1);
+                    case 5:
+                        state++;
+                        return at(bottomRightX(x, y), y + 1);
+                    default:
+                        return null;
                 }
             }
         };
@@ -341,8 +355,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
         @Override
         public BiConsumer<Set<T>, T> accumulator() {
             return (set, tile) -> {
-                for (var it = surroundingTilesIterator(tile.x, tile.y); it.hasNext();)
-                {
+                for (var it = surroundingTilesIterator(tile.x, tile.y); it.hasNext(); ) {
                     var surroundingTile = it.next();
                     if (!originalTiles.contains(surroundingTile)) set.add(surroundingTile);
                 }
@@ -371,6 +384,199 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     public SurroundingTilesCollector toSurroundingTilesSet(Set<T> tiles) {
         return new SurroundingTilesCollector(tiles);
     }
+
+    /**
+     * Check if settlement of a player has at least one neighbour.
+     *
+     * @param player The player to check-
+     * @param tile   Tile to look for.
+     * @return True if player has a neighbouring settlement. False otherwise.
+     */
+    private boolean playerHasASettlementInSurrounding(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        // right tile
+        if (isWithinBounds(x + 1, y) && at(x + 1, y).isOccupiedByPlayer(player))
+            return true;
+
+        // left tile
+        if (isWithinBounds(x - 1, y) && at(x - 1, y).isOccupiedByPlayer(player))
+            return true;
+
+        // top right
+        if (isWithinBounds(topRightX(x, y), y + 1) && at(topRightX(x, y), y + 1).isOccupiedByPlayer(player))
+            return true;
+
+        // top left
+        if (isWithinBounds(topLeftX(x, y), y + 1) && at(topLeftX(x, y), y + 1).isOccupiedByPlayer(player))
+            return true;
+
+        // bottom right
+        if (isWithinBounds(bottomRightX(x, y), y - 1) && at(bottomRightX(x, y), y - 1).isOccupiedByPlayer(player))
+            return true;
+
+        // bottom left
+        if (isWithinBounds(bottomLeftX(x, y), y - 1) && at(bottomLeftX(x, y), y - 1).isOccupiedByPlayer(player))
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Check if player has a chain of settlements on top right diagonal of a tile.
+     *
+     * @param player The player to check for.
+     * @param tile   The origin tile.
+     * @return True if the next three tiles on top right diagonal are occupied by player. False otherwise.
+     */
+    private boolean topRightDiagonalIsAChain(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        for (int i = 0; i < 3; i++) {
+            if (!isWithinBounds(x, y))
+                return false;
+
+            x = topRightX(x, y);
+            y++;
+
+            if (!at(x, y).isOccupiedByPlayer(player))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if player has a chain of settlements on top left diagonal of a tile.
+     *
+     * @param player The player to check for.
+     * @param tile   The origin tile.
+     * @return True if the next three tiles on top left diagonal are occupied by player. False otherwise.
+     */
+    private boolean topLeftDiagonalIsAChain(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        for (int i = 0; i < 3; i++) {
+            if (!isWithinBounds(x, y))
+                return false;
+
+            x = topLeftX(x, y);
+            y++;
+
+            if (!at(x, y).isOccupiedByPlayer(player))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if player has a chain of settlements on bottom right diagonal of a tile.
+     *
+     * @param player The player to check for.
+     * @param tile   The origin tile.
+     * @return True if the next three tiles on bottom right diagonal are occupied by player. False otherwise.
+     */
+    private boolean bottomRightDiagonalIsAChain(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        for (int i = 0; i < 3; i++) {
+            if (!isWithinBounds(x, y))
+                return false;
+
+            x = bottomRightX(x, y);
+            y--;
+
+            if (!at(x, y).isOccupiedByPlayer(player))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if player has a chain of settlements on bottom left diagonal of a tile.
+     *
+     * @param player The player to check for.
+     * @param tile   The origin tile.
+     * @return True if the next three tiles on bottom left diagonal are occupied by player. False otherwise.
+     */
+    private boolean bottomLeftDiagonalIsAChain(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        for (int i = 0; i < 3; i++) {
+            if (!isWithinBounds(x, y))
+                return false;
+
+            x = bottomLeftX(x, y);
+            y--;
+
+            if (!at(x, y).isOccupiedByPlayer(player))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Check if a tile is the front or back part of a chain that is occupied by a player.
+     *
+     * @param player The player to check for.
+     * @param tile   The origin tile.
+     * @return True if tile is a part of a chain. False otherwise.
+     */
+    public boolean tileIsInFrontOrBackOfAChain(Player player, T tile) {
+        int x = tile.x;
+        int y = tile.y;
+
+        // Check if chain is on right side
+        if (isWithinBounds(x + 3, y)
+                && at(x + 1, y).isOccupiedByPlayer(player)
+                && at(x + 2, y).isOccupiedByPlayer(player)
+                && at(x + 3, y).isOccupiedByPlayer(player))
+            return true;
+
+        // Check if chain is on left side
+        if (isWithinBounds(x - 3, y)
+                && at(x - 1, y).isOccupiedByPlayer(player)
+                && at(x - 2, y).isOccupiedByPlayer(player)
+                && at(x - 3, y).isOccupiedByPlayer(player))
+            return true;
+
+        // Check if chain is on diagonals
+        if (topRightDiagonalIsAChain(player, tile)
+                || topLeftDiagonalIsAChain(player, tile)
+                || bottomRightDiagonalIsAChain(player, tile)
+                || bottomLeftDiagonalIsAChain(player, tile))
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Gets all free tiles that are in front or back of a chain of settlements that is occupied by the player.
+     *
+     * @param player The player to check for.
+     * @return All free tiles that are in front or back of a chain of settlements.
+     */
+    public Set<T> allFreeTilesInFrontOrBackOfAChain(Player player) {
+        Set<T> freeTiles = new HashSet<>();
+
+        for (int y = 0; y < mapWidth; y++) {
+            for (int x = 0; y < mapWidth; x++) {
+
+                if (!at(x, y).isTilePlaceable() && !playerHasASettlementInSurrounding(player, at(x, y)))
+                    continue;
+
+                else if (tileIsInFrontOrBackOfAChain(player, at(x, y))) {
+                    freeTiles.add(at(x, y));
+
+                }
+            }
+        }
+        return freeTiles;
+    }
 }
 
 /**
@@ -390,10 +596,10 @@ public class Map extends MapReadOnly<Tile> {
      *                                   quadrants are not the same or if quadrant is not a square.
      */
     public Map(int startingTokenCount,
-                  TileType[] topLeft,
-                  TileType[] topRight,
-                  TileType[] bottomLeft,
-                  TileType[] bottomRight)
+               TileType[] topLeft,
+               TileType[] topRight,
+               TileType[] bottomLeft,
+               TileType[] bottomRight)
             throws InvalidParameterException {
         super(startingTokenCount, topLeft, topRight, bottomLeft, bottomRight);
     }
