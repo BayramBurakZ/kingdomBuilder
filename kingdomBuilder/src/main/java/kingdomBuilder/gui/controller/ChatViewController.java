@@ -33,12 +33,6 @@ public class ChatViewController extends Controller implements Initializable {
     //region FXML-Imports
 
     /**
-     * Represents the button to clear the selection.
-     */
-    @FXML
-    private Button chatview_button_clear;
-
-    /**
      * Represents the table for the clients on the server.
      */
     @FXML
@@ -150,6 +144,7 @@ public class ChatViewController extends Controller implements Initializable {
             // TODO: failedToConnect mechanism, multiple output in chatarea
             // Failed to connect
             if (state.failedToConnect) {
+                // TODO: error message instead of Chat message (because the chat is not visible)
                 Platform.runLater(() -> {
                     var elem = createHTMLElement(
                             "<--- " + resourceBundle.getString("failedToConnect") + " --->",
@@ -194,7 +189,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonClearSelectionPressed(Event event) {
+    private void onClearSelectionButtonPressed(Event event) {
         tableview_chat.getSelectionModel().clearSelection();
     }
 
@@ -203,7 +198,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonSendPressed(Event event) {
+    private void onSendButtonPressed(Event event) {
         printAndSendMessage();
     }
 
@@ -212,7 +207,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonWhisperPressed(Event event) {
+    private void onWhisperButtonPressed(Event event) {
         printAndSendWhisper();
     }
 
@@ -471,6 +466,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Returns the Document used for the chat log.
+     *
      * @return The Document used for the chat log.
      */
     private Document getDocument() {
@@ -487,7 +483,9 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Creates the HTML Text object with the specified text content.
+     *
      * @param textContent The text content for that element.
+     * @return The HTML Text object.
      */
     private Text createHTMLText(String textContent) {
 
@@ -495,9 +493,11 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Creates the HTMLElement with the specified message highlighting style.
+     * Creates the HTML Element with the specified message highlighting style.
+     *
      * @param textContent The text content for that element.
      * @param style The style for highlighting the message.
+     * @return The HTML Element.
      */
     private Element createHTMLElement(String textContent, MessageStyle style) {
 
@@ -507,8 +507,10 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Creates the HTMLElement with the specified message highlighting style.
+     * Creates the HTML Element with the specified message highlighting style.
+     *
      * @param style The style for highlighting the message.
+     * @return The HTML Element wit the highlighting style.
      */
     private Element createHTMLElement(MessageStyle style) {
 
@@ -523,8 +525,10 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Creates the HTMLElement with the specified message highlighting style.
+     * Creates the HTML Element with the specified message highlighting style.
+     *
      * @param tagName The HTML element's tag name.
+     * @return HTML Element with the highlighting style.
      */
     private Element createHTMLElementByTag(String tagName) {
         return getDocument().createElement(tagName);

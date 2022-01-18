@@ -10,7 +10,7 @@
 
    <top>
       <HBox minHeight="50.0" minWidth="500.0" BorderPane.alignment="CENTER">
-           <Button fx:id="gamesettings_button_back" alignment="CENTER" onAction="#onButtonBackPressed" text="Back">
+           <Button fx:id="gamesettings_button_back" alignment="CENTER" onAction="#onBackButtonPressed" text="Back">
                <HBox.margin>
                   <Insets left="3.0" top="3.0" />
                </HBox.margin>
@@ -159,18 +159,18 @@
         <HBox alignment="CENTER" centerShape="false" minHeight="80.0" minWidth="500.0"
               nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
             <Button fx:id="gamesettings_button_host" alignment="CENTER" contentDisplay="CENTER" disable="true"
-                    onAction="#onButtonHostGamePressed" text="%hostGame" HBox.hgrow="ALWAYS">
+                    onAction="#onHostGameButtonPressed" text="%hostGame" HBox.hgrow="ALWAYS">
                 <HBox.margin>
                     <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                 </HBox.margin>
             </Button>
             <Button fx:id="gamesettings_button_host_join" alignment="CENTER" contentDisplay="CENTER" disable="true"
-                    onAction="#onButtonHostAndJoinGamePressed" text="%hostGameAndJoin">
+                    onAction="#onHostAndJoinGameButtonPressed" text="%hostGameAndJoin">
                 <HBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </HBox.margin></Button>
             <Button fx:id="gamesettings_button_host_spectate" alignment="CENTER" contentDisplay="CENTER" disable="true"
-                    onAction="#onButtonHostAndSpectateGamePressed" text="%hostGameAndSpectate">
+                    onAction="#onHostAndSpectateGameButtonPressed" text="%hostGameAndSpectate">
                 <HBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </HBox.margin></Button>

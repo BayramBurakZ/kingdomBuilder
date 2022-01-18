@@ -14,7 +14,7 @@
 	<HBox alignment="CENTER">
 		<Label text="%clients" />
 		<Region HBox.hgrow="ALWAYS" />
-		<Button fx:id="chatview_button_clear" onAction="#onButtonClearSelectionPressed" text="%clearSelection" />
+		<Button fx:id="chatview_button_clear" onAction="#onClearSelectionButtonPressed" text="%clearSelection" />
 	</HBox>
 
 	<TableView fx:id="tableview_chat" prefHeight="200.0" prefWidth="200.0">
@@ -45,8 +45,8 @@
 		<TextArea fx:id="chatview_textarea_chatinput" disable="true" onKeyPressed="#onKeyPressed" prefRowCount="3" promptText="%enterMessage" wrapText="true" />
       <VBox prefWidth="100.0">
          <children>
-            <Button fx:id="chatview_button_whisper" disable="true" minHeight="35.0" minWidth="50" onAction="#onButtonWhisperPressed" style="-fx-padding: 0;" text="%whisper" textOverrun="CLIP" />
-      		<Button fx:id="chatview_button_send" disable="true" minHeight="35.0" minWidth="50" onAction="#onButtonSendPressed" text="%send" />
+            <Button fx:id="chatview_button_whisper" disable="true" minHeight="35.0" minWidth="50" onAction="#onWhisperButtonPressed" style="-fx-padding: 0;" text="%whisper" textOverrun="CLIP" />
+      		<Button fx:id="chatview_button_send" disable="true" minHeight="35.0" minWidth="50" onAction="#onSendButtonPressed" text="%send" />
          </children>
 	  </VBox>
 	</HBox>

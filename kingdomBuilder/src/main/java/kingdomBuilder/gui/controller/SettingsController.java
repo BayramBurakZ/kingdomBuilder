@@ -125,7 +125,7 @@ public class SettingsController extends Controller implements Initializable {
      * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonApply(Event event) {
+    private void onApplyButtonPressed(Event event) {
         String preferredName = textField_name.getText().trim();
         if (isNameValid(preferredName)) {
             store.dispatch(new SetPreferredNameAction(preferredName));

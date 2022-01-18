@@ -32,6 +32,12 @@ public class PlayerInformation extends HBox{
      */
     private Label score = new Label("00");
 
+    /**
+     * Constructs a new PlayerInformation Element which contains the name, the settlements left and the score.
+     * @param playerName The name of the player.
+     * @param color The color for the Player.
+     * @param colorMode Defines which colors should be used.
+     */
     public PlayerInformation(String playerName, PlayerColor color, boolean colorMode) {
         super();
 

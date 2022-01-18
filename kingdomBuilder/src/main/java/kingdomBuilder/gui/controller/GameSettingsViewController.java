@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -48,37 +49,37 @@ public class GameSettingsViewController extends Controller implements Initializa
     private Button gamesettings_button_back;
 
     /**
-     * Represents the Choicebox for one Quadrant.
+     * Represents the ChoiceBox for one Quadrant.
      */
     @FXML
     private ChoiceBox<Integer> gamesettings_choicebox_upperleft;
 
     /**
-     * Represents the Choicebox for one Quadrant.
+     * Represents the ChoiceBox for one Quadrant.
      */
     @FXML
     private ChoiceBox<Integer> gamesettings_choicebox_upperright;
 
     /**
-     * Represents the Choicebox for one Quadrant.
+     * Represents the ChoiceBox for one Quadrant.
      */
     @FXML
     private ChoiceBox<Integer> gamesettings_choicebox_bottomleft;
 
     /**
-     * Represents the Choicebox for one Quadrant.
+     * Represents the ChoiceBox for one Quadrant.
      */
     @FXML
     private ChoiceBox<Integer> gamesettings_choicebox_bottomright;
 
     /**
-     * Represents Gridpane for the Choiceboxes for the quadrants.
+     * Represents GridPane for the ChoiceBoxes for the quadrants.
      */
     @FXML
     private GridPane gamesettings_gridpane_ids;
 
     /**
-     * Represents the spinner, where the user sets, how many (humen-)players can join.
+     * Represents the spinner, where the user sets, how many (human-)players can join.
      */
     @FXML
     private Spinner<Integer> gamesettings_spinner_online_players;
@@ -138,13 +139,13 @@ public class GameSettingsViewController extends Controller implements Initializa
     private Button gamesettings_button_host_spectate;
 
     /**
-     * Represents the textfield, to set the name of the game.
+     * Represents the TextField, to set the name of the game.
      */
     @FXML
     private TextField gamesettings_textfield_name;
 
     /**
-     * Represents the textfield, to set the describtion of the game.
+     * Represents the TextField, to set the description of the game.
      */
     @FXML
     private TextField gamesettings_textfield_desc;
@@ -200,7 +201,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Initialize all Listeners.
+     * Initializes all Listeners.
      */
     private void initializeListeners() {
         setupSpinnerListener();
@@ -227,7 +228,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Initialize the choice boxes for the quadrant id selection.
+     * Initializes the ChoiceBoxes for the quadrant id selection.
      */
     private void initializeChoiceBox() {
         gamesettings_choicebox_upperleft.setItems(store.getState().quadrantIDs);
@@ -251,7 +252,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Initialize the spinner values for time and turn.
+     * Initializes the Spinner values for time and turn.
      */
     private void initializeSpinner() {
         // playerlimit
@@ -279,7 +280,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Sets the spinner listeners to adjust to the player limit.
+     * Sets the Spinner listeners to adjust to the player limit.
      */
     private void setupSpinnerListener() {
         gamesettings_spinner_online_players.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -317,7 +318,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Updates the spinner for bots.
+     * Updates the Spinner for bots.
      */
     private void updateBotSpinner() {
         int currentValue = gamesettings_spinner_bots.getValue();
@@ -332,7 +333,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Updates the spinner for hotseat players.
+     * Updates the Spinner for hotseat players.
      */
     private void updateHotseatSpinner() {
         int currentValue = gamesettings_spinner_hotseat.getValue();
@@ -347,7 +348,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Updates the spinner for human players.
+     * Updates the Spinner for human players.
      */
     private void updatePlayerSpinner() {
         int currentValue = gamesettings_spinner_online_players.getValue();
@@ -372,7 +373,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private void updateButtons() {
         // not all informations to host a game are filled in
-        if (hasAllHostInformations()) {
+        if (hasAllHostInformation()) {
             return;
         }
         // no players selected or only hotseat
@@ -410,7 +411,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Checks if all information are given to host a game.
      * @return True, if something is missing.
      */
-    private boolean hasAllHostInformations() {
+    private boolean hasAllHostInformation() {
         if (gamesettings_textfield_name.getText().trim().isEmpty()) {
             return true;
         }
@@ -435,39 +436,8 @@ public class GameSettingsViewController extends Controller implements Initializa
             return true;
         }
 
-        System.out.println("All Informations are set");
+        System.out.println("All Information are set");
         return false;
-    }
-
-    /**
-     * Sets the functionality for the Host Game Button.
-     */
-    @FXML
-    private void onButtonHostGamePressed() {
-        if(hostGame())
-            return;
-        sceneLoader.showGameSelectionView();
-    }
-
-    /**
-     * Sets the functionality for the Host and Join Game Button.
-     */
-    @FXML
-    private void onButtonHostAndJoinGamePressed() {
-        if(hostGame())
-            return;
-        // TODO: Network Message "join" (with id from host-answer)
-        sceneLoader.showGameView(false, isOnlineGame);
-    }
-
-    /**
-     * Sets the functionality for the Host and Spectate Game Button.
-     */
-    @FXML void onButtonHostAndSpectateGamePressed() {
-        if(hostGame())
-            return;
-        // TODO: Network Message "spectate" (with id from host-answer)
-        sceneLoader.showGameView(true, isOnlineGame);
     }
 
     /**
@@ -475,7 +445,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      * @return true if something is missing to host a game.
      */
     private boolean hostGame() {
-        if (hasAllHostInformations()) {
+        if (hasAllHostInformation()) {
             return true;
         }
         String gameName = gamesettings_textfield_name.getText().trim();
@@ -572,10 +542,45 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Sets the functionality for the GameList Button.
+     * Sets the functionality for the Host Game Button.
+     * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonBackPressed() {
+    private void onHostGameButtonPressed(Event event) {
+        if(hostGame())
+            return;
+        sceneLoader.showGameSelectionView();
+    }
+
+    /**
+     * Sets the functionality for the Host and Join Game Button.
+     * @param event Contains the data from the event source.
+     */
+    @FXML
+    private void onHostAndJoinGameButtonPressed(Event event) {
+        if(hostGame())
+            return;
+        // TODO: Network Message "join" (with id from host-answer)
+        sceneLoader.showGameView(false, isOnlineGame);
+    }
+
+    /**
+     * Sets the functionality for the Host and Spectate Game Button.
+     * @param event Contains the data from the event source.
+     */
+    @FXML void onHostAndSpectateGameButtonPressed(Event event) {
+        if(hostGame())
+            return;
+        // TODO: Network Message "spectate" (with id from host-answer)
+        sceneLoader.showGameView(true, isOnlineGame);
+    }
+
+    /**
+     * Sets the functionality for the GameList Button.
+     * @param event Contains the data from the event source.
+     */
+    @FXML
+    private void onBackButtonPressed(Event event) {
         if (isOnlineGame) {
             sceneLoader.showGameSelectionView();
         } else {

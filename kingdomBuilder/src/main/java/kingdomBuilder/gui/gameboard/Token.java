@@ -45,6 +45,7 @@ public class Token extends StackPane {
      * @param count The count, how many Tokens the user own.
      * @param gameViewController The gameViewController (to deactivate other Tokens).
      * @param disable If the Token is at the beginning disabled.
+     * @param resource The language support.
      */
     public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable, ResourceBundle resource) {
         super();

@@ -28,7 +28,7 @@
 
     <CheckBox fx:id="settings_checkBox_colors" text="%betterColors" />
 
-    <Button onAction="#onButtonApply" text="%apply"/>
+    <Button onAction="#onApplyButtonPressed" text="%apply"/>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>

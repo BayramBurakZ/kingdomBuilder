@@ -1,6 +1,5 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.network.protocol.server.Message;
 import kingdomBuilder.redux.Action;
 
 /**

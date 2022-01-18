@@ -55,16 +55,28 @@ public class GameSelectionViewController extends Controller implements Initializ
     }
 
     /**
+     * Initializes layout arrangement.
+     */
+    private void setupLayout() {
+        vbox_table.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
+        vbox_preview.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
+    }
+
+    /**
      * Sets the functionality for the CreateNewGame Button.
      * @param event Contains the data from the event source.
      */
     @FXML
-    private void onButtonCreateNewGamePressed(Event event) {
+    private void onCreateNewGameButtonPressed(Event event) {
         sceneLoader.showGameSettingsView(true);
     }
 
+    /**
+     * Sets the functionality for the LevelEditor Button.
+     * @param event Contains the data from the event source.
+     */
     @FXML
-    private void onLevelEditorButtonPressed() {
+    private void onLevelEditorButtonPressed(Event event) {
         sceneLoader.showLevelEditorView();
     }
 
@@ -86,13 +98,5 @@ public class GameSelectionViewController extends Controller implements Initializ
     private void onJoinGamePressed(Event event) {
         //TODO: Network send "join" Message
         sceneLoader.showGameView(false, true);
-    }
-
-    /**
-     * Initializes layout arrangement.
-     */
-    private void setupLayout() {
-        vbox_table.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
-        vbox_preview.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
     }
 }

@@ -85,7 +85,7 @@
 
 	<HBox alignment="CENTER" spacing="5.0">
 		<Button onAction="#onLevelEditorButtonPressed" text="Level Editor"/>
-		<Button onAction="#onButtonCreateNewGamePressed" prefWidth="120.0" text="%createNewGame" />
+		<Button onAction="#onCreateNewGameButtonPressed" prefWidth="120.0" text="%createNewGame" />
 		<Button onAction="#onJoinGamePressed" prefWidth="120.0" text="%joinGame" />
 		<Button prefWidth="120.0" text="%spectateGame" />
 		<padding>

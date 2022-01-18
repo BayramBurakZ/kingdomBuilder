@@ -16,13 +16,13 @@ import java.util.ResourceBundle;
  */
 public class ServerConnectViewController extends Controller implements Initializable {
     /**
-     * Represents the textfield for the server address.
+     * Represents the TextField for the server address.
      */
     @FXML
     private TextField textfield_address;
 
     /**
-     * Represents the textfield for the server address.
+     * Represents the TextField for the server address.
      */
     @FXML
     private TextField textfield_port;

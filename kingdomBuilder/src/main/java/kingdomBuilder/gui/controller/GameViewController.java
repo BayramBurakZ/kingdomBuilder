@@ -375,6 +375,7 @@ public class GameViewController extends Controller implements Initializable {
         game_subscene.widthProperty().bind(game_hbox_subscene.widthProperty());
         game_subscene.heightProperty().bind(game_hbox_subscene.heightProperty());
 
+        // resize the player list for current game
         game_hbox_players.maxWidthProperty().bind(game_vbox.widthProperty().subtract(75));
     }
 
@@ -542,14 +543,15 @@ public class GameViewController extends Controller implements Initializable {
      * Sets the functions for the "End"-Button. Here for ending the turn.
      * @param actionEvent the triggered event.
      */
-    public void onTurnEndButtonPressed(ActionEvent actionEvent) {
+    private void onTurnEndButtonPressed(ActionEvent actionEvent) {
+        //TODO: implement
     }
 
     /**
      * Sets the functions for the "End"-Button. Here for ending spectating
      * @param actionEvent the triggered event.
      */
-    public void onSpectateEndButtonPressed(ActionEvent actionEvent) {
+    private void onSpectateEndButtonPressed(ActionEvent actionEvent) {
         // TODO: Network Message "unspectate"
         if (isOnline) {
             sceneLoader.showGameSettingsView(true);
