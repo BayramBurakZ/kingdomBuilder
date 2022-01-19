@@ -82,7 +82,20 @@ public class KBState {
      */
     public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
 
-
+    public KBState(SceneLoader sceneLoader, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect, boolean betterColorsActiv, ObservableList<Integer> quadrantIDs) {
+        this.sceneLoader = sceneLoader;
+        this.clients = clients;
+        this.games = games;
+        this.selector = selector;
+        this.selectorThread = selectorThread;
+        this.client = client;
+        this.clientPreferredName = clientPreferredName;
+        this.isConnecting = isConnecting;
+        this.isConnected = isConnected;
+        this.failedToConnect = failedToConnect;
+        this.betterColorsActiv = betterColorsActiv;
+        this.quadrantIDs = quadrantIDs;
+    }
 
     /**
      * Initializes the state with initial value.
@@ -94,25 +107,6 @@ public class KBState {
         isConnecting = false;
         isConnected = false;
         failedToConnect = false;
-    }
-
-    /**
-     * Creates the same KBState object as the given KBState object.
-     * @param other the received KBState
-     */
-    public KBState(KBState other) {
-        sceneLoader = other.sceneLoader;
-        clients = other.clients;
-        games = other.games;
-        selector = other.selector;
-        selectorThread = other.selectorThread;
-        client = other.client;
-        clientPreferredName = other.clientPreferredName;
-        isConnecting = other.isConnecting;
-        isConnected = other.isConnected;
-        failedToConnect = other.failedToConnect;
-        quadrantIDs = other.quadrantIDs;
-        betterColorsActiv = other.betterColorsActiv;
     }
 
 }

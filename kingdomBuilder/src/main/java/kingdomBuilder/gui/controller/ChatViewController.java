@@ -278,7 +278,7 @@ public class ChatViewController extends Controller implements Initializable {
             messageStyle = MessageStyle.WHISPER;
             chatMessage = senderName + " " + resourceBundle.getString("whisperToYou");
             for (int i = 0; i < receivers.length; i++) {
-                if (receivers[i].equals(store.getState().client.getId())) {
+                if (receivers[i].equals(store.getState().client.getClientId())) {
                     continue;
                 }
 
@@ -394,7 +394,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientDAO -> clientDAO.getId() != store.getState().client.getId());
+                    .filtered(clientDAO -> clientDAO.getId() != store.getState().client.getClientId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -404,7 +404,7 @@ public class ChatViewController extends Controller implements Initializable {
             // creates message for the chat textarea
             chatMessage = resourceBundle.getString("youWhisper") + " ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).getId() == store.getState().client.getId()) {
+                if (receivers.get(i).getId() == store.getState().client.getClientId()) {
                     continue;
                 }
                 receiverIds.add(receivers.get(i).getId());
