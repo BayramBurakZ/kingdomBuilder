@@ -217,15 +217,16 @@ public class ChatViewController extends Controller implements Initializable {
     public void onMessage(Message chatMsg) {
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients.get(senderID).getName();
-        Integer[] receivers = chatMsg.receiverIds();
+        Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
         String message = chatMsg.message();
         String chatMessage = "";
+
 
         if (receivers.length < store.getState().clients.size()) {
             // whisper message
             chatMessage = senderName + " whispers to you";
             for (int i = 0; i < receivers.length; i++) {
-                if (receivers[i].equals(state.client.getId())) {
+                if (receivers[i].equals(state.client.getClientId())) {
                     continue;
                 }
 
@@ -284,7 +285,7 @@ public class ChatViewController extends Controller implements Initializable {
                 receiverIds.add(c.getKey());
             }
             // don't send message to ourselves
-            receiverIds.remove((Integer) store.getState().client.getId());
+            receiverIds.remove((Integer) store.getState().client.getClientId());
 
             message = "You: " + message;
 
@@ -311,7 +312,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientDAO -> clientDAO.getId() != state.client.getId());
+                    .filtered(clientDAO -> clientDAO.getId() != state.client.getClientId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -321,7 +322,7 @@ public class ChatViewController extends Controller implements Initializable {
             // creates message for the chat textarea
             chatMessage = "You whispered ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).getId() == state.client.getId()) {
+                if (receivers.get(i).getId() == state.client.getClientId()) {
                     continue;
                 }
                 receiverIds.add(receivers.get(i).getId());
