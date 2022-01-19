@@ -2,13 +2,14 @@ package kingdomBuilder;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
+import kingdomBuilder.network.protocol.GameData;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class KBState {
     /**
      * Maps game id to the game info of created games.
      */
-    public final Map<Integer, GameDAO> games;
+    public final Map<Integer, GameData> games;
 
     /**
      * Stores the selector, which handles network IO.
@@ -82,7 +83,12 @@ public class KBState {
      */
     public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
 
-    public KBState(SceneLoader sceneLoader, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect, boolean betterColorsActiv, ObservableList<Integer> quadrantIDs) {
+    /**
+     * Represents the game.
+     */
+    public Game game;
+
+    public KBState(SceneLoader sceneLoader, Map<Integer, ClientDAO> clients, Map<Integer, GameData> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect, boolean betterColorsActiv, ObservableList<Integer> quadrantIDs, Game game) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -95,6 +101,7 @@ public class KBState {
         this.failedToConnect = failedToConnect;
         this.betterColorsActiv = betterColorsActiv;
         this.quadrantIDs = quadrantIDs;
+        this.game = game;
     }
 
     /**
@@ -108,5 +115,4 @@ public class KBState {
         isConnected = false;
         failedToConnect = false;
     }
-
 }

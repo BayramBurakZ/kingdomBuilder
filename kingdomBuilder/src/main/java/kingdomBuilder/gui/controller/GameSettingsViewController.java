@@ -6,6 +6,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.HostGameAction;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -491,7 +493,10 @@ public class GameSettingsViewController extends Controller implements Initializa
                 "QBL: " + quadrantBottomLeft + "\n" +
                 "QBR: " + quadrantBottomRight + "\n"
         );
-        //TODO: Network Message "host"
+
+        store.dispatch(new HostGameAction(gameName, gameDesc, playerLimit, timeLimit, turnLimit,
+                quadrantUpperLeft, quadrantUpperRight, quadrantBottomLeft, quadrantBottomRight));
+
         return false;
     }
 

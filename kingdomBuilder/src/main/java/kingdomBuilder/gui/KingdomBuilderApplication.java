@@ -9,6 +9,8 @@ import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
 
+import java.io.IOException;
+
 /**
  * Represents the specified JavaFX application for the KingdomBuilder.
  */
@@ -24,6 +26,10 @@ public class KingdomBuilderApplication extends Application {
      * Represents the SceneLoader that contains all Views and Controllers.
      */
     private SceneLoader sceneLoader;
+
+    public KingdomBuilderApplication() throws IOException {
+        store = new Store<KBState>(new KBState(), new KBReducer());
+    }
 
     /**
      * Creates Scene object with given Stage object as root Node.

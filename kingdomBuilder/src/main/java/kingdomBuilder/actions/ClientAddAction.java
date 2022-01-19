@@ -21,7 +21,7 @@ public class ClientAddAction extends Action {
     public String name;
 
     /**
-     * gameI of the client that joined
+     * gameId of the client that joined
      */
     public int gameId;
 

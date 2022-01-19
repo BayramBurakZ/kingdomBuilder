@@ -139,12 +139,12 @@ public class Game {
     /**
      * Server takes quadrant IDs in this listed order.
      */
-    public class QuadrantIDs {
-        int leftUpper;
-        int rightUpper;
-        int lowerLeft;
-        int lowerRight;
-    }
+    public record QuadrantIDs(
+        int leftUpper,
+        int rightUpper,
+        int lowerLeft,
+        int lowerRight
+    ) {}
 
     /**
      * Win conditions for the game.

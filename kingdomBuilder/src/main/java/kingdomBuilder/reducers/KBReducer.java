@@ -2,6 +2,7 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
@@ -24,27 +25,31 @@ public class KBReducer implements Reducer<KBState> {
         using HashMap to accomplish the same thing at runtime that a switch statement would do at compile-time
          */
 
-        if (action instanceof ClientAddAction a) {
+        if (action instanceof ClientAddAction a)
             return reduce(oldState, a);
-        } else if (action instanceof ClientRemoveAction a) {
+        else if (action instanceof ClientRemoveAction a)
+          return reduce(oldState, a);
+        else if (action instanceof SetPreferredNameAction a)
+          return reduce(oldState, a);
+        else if (action instanceof ChatSendAction a)
+          return reduce(oldState, a);
+        else if (action instanceof ChatReceiveAction a)
+          return reduce(oldState, a);
+        else if (action instanceof ConnectAction a)
+          return reduce(store, oldState, a);
+        else if (action instanceof DisconnectAction a)
+          return reduce(oldState, a);
+        else if (action instanceof SetSceneLoaderAction a)
+          return reduce(oldState, a);
+        else if (action instanceof BetterColorModeAction a)
             return reduce(oldState, a);
-        } else if (action instanceof SetPreferredNameAction a) {
+        else if (action instanceof LoggedInAction a)
             return reduce(oldState, a);
-        } else if (action instanceof ChatSendAction a) {
+        else if (action instanceof ApplicationExitAction a)
             return reduce(oldState, a);
-        } else if (action instanceof ChatReceiveAction a) {
+        else if (action instanceof HostGameAction a)
             return reduce(oldState, a);
-        } else if (action instanceof ConnectAction a) {
-            return reduce(store, oldState, a);
-        } else if (action instanceof DisconnectAction a) {
-            return reduce(oldState, a);
-        } else if (action instanceof SetSceneLoaderAction a) {
-            return reduce(oldState, a);
-        } else if (action instanceof BetterColorModeAction a) {
-            return reduce(oldState, a);
-        } else if (action instanceof LoggedInAction a)
-            return reduce(oldState, a);
-        else if(action instanceof ApplicationExitAction a)
+        else if (action instanceof GameAddAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -181,4 +186,39 @@ public class KBReducer implements Reducer<KBState> {
         state.setBetterColorsActiv(a.active);
         return state;
     }
+
+    private DeferredState reduce(KBState oldState, HostGameAction a) {
+        DeferredState state = new DeferredState(oldState);
+        // TODO: send message "host game ..."
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, GameAddAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var games = oldState.games;
+        games.put(a.gameData.getGameId(), a.gameData);
+        state.setGames(games);
+        return state;
+    }
+/*
+    private DeferredState reduce(KBState oldState, JoinGameAction a) {
+        DeferredState state = new DeferredState(oldState);
+
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, StartGameAction a) {
+        DeferredState state = new DeferredState(oldState);
+        state.setGame(new Game(
+                a.gameName,
+                a.gameDescription,
+                a.playerLimit,
+                a.timeLimit,
+                a.turnLimit,
+                new Game.QuadrantIDs(a.quadrantId1, a.quadrantId2, a.quadrantId3, a.quadrantId4),
+                a.
+        ));
+        return state;
+    }
+*/
 }

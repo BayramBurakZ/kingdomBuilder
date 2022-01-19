@@ -5,7 +5,8 @@ import kingdomBuilder.annotations.Protocol;
 /**
  * Represents message to host a new KingdomBuilder game.
  */
-@Protocol(format = "host game [#{gameName};#{gameDescription};#{playerLimit};#{timeLimit};#{turnLimit};[#{quadrantId1};#{quadrantId2};#{quadrantId3};#{quadrantId4}]]")
+@Protocol(format = "host game [#{gameName};#{gameDescription};#{playerLimit};#{timeLimit};#{turnLimit};" +
+        "[#{quadrantId1};#{quadrantId2};#{quadrantId3};#{quadrantId4}]]")
 public record HostGame(
         String gameName,
         String gameDescription,

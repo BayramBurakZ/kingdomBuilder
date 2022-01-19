@@ -14,4 +14,20 @@ public record GameData(
         String gameDescription,
         int playerLimit,
         int playersJoined
-) {}
+) {
+    /**
+     * Gets the id of the game.
+     * @return id of the game.
+     */
+    public int getGameId() {
+        return gameId;
+    }
+
+    /**
+     * Gets name of the game.
+     * @return name of the game.
+     */
+    public String getGameName() {
+        return gameName;
+    }
+}
