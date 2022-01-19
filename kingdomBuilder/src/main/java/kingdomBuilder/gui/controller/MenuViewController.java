@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -30,6 +31,9 @@ public class MenuViewController extends Controller implements Initializable {
      * Represents the state for internal use.
      */
     private KBState state;
+
+    @FXML
+    private BooleanProperty isConnected;
 
     /**
      * Represents the BorderPane of the View.
@@ -83,19 +87,15 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store.subscribe(newState -> {
-            if(state == null) {
-                state = newState;
-                return;
-            }
-            // Client connection
-            if (newState.isConnected && !state.isConnected) {
-                onConnect();
-            } else if (!newState.isConnected && state.isConnected){
-                onDisconnect();
-            }
-            state = newState;
-        });
+        store.subscribe(s -> {
+            state = s;
+            if(s.isConnected) onConnect();
+            else              onDisconnect();
+        }, "isConnected");
+
+        store.subscribe(s -> {
+            menuview_connect_button.setDisable(s.isConnecting);
+        }, "isConnecting");
     }
 
     /**

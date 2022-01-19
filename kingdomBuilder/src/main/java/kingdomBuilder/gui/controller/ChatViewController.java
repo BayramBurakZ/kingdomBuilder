@@ -1,6 +1,5 @@
 package kingdomBuilder.gui.controller;
 
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,7 +10,7 @@ import javafx.scene.input.KeyEvent;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ChatSendAction;
 import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.network.protocol.server.Message;
+import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;

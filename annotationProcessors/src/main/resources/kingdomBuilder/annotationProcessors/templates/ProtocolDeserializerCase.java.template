@@ -1,0 +1,5 @@
+            case <%= case %>: {
+                <%= packetType %> packet = deserialize<%= packetType %>(<%= deserializeParam %>);
+                if(packet != null) consumer.accept(packet);
+                else consumer.onFailure(rawPacket);
+            } break;

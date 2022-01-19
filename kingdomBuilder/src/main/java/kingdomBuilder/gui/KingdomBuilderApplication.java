@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.ApplicationExitAction;
+import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
 
@@ -16,10 +18,12 @@ import java.net.URL;
  * Represents the specified JavaFX application for the KingdomBuilder.
  */
 public class KingdomBuilderApplication extends Application {
+
     /**
      * Stores the whole state of the application.
      */
-    private final Store<KBState> store = new Store<>(new KBState(), new KBReducer());
+    private Store<KBState> store;
+
 
     /**
      * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
@@ -53,6 +57,7 @@ public class KingdomBuilderApplication extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws Exception {
+
         // TODO: resources instead of path for .fxml-files
         // TODO: WARNING: Unsupported JavaFX configuration: classes were loaded from 'unnamed module @1933c126'
 
@@ -61,6 +66,8 @@ public class KingdomBuilderApplication extends Application {
          Code durch Zeilenumbrüche innerhalb der Linie bleibt, die IntelliJ  rechts anzeigt. Dann sieht man alles auf
          einmal.
          */
+
+        store = new Store<>(new KBState(), new KBReducer());
 
         URL resource = getClass().getResource("controller/MainView.fxml");
         FXMLLoader fxmlLoader = makeLoader(resource);
@@ -82,6 +89,8 @@ public class KingdomBuilderApplication extends Application {
     // TODO: general closing mechanism
     @Override
     public void stop() throws Exception {
+        store.dispatch(new ApplicationExitAction());
+
         super.stop();
     }
 }

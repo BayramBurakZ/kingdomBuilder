@@ -1,2 +1,2 @@
 rootProject.name = "kingdomBuilder"
-include("kingdomBuilder")
+include("kingdomBuilder", "network", "annotations", "annotationProcessors")

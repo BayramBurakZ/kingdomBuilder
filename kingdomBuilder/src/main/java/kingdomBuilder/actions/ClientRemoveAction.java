@@ -1,6 +1,6 @@
 package kingdomBuilder.actions;
 
-import kingdomBuilder.network.protocol.server.ClientLeft;
+import kingdomBuilder.network.protocol.ClientLeft;
 import kingdomBuilder.redux.Action;
 
 /**
@@ -28,7 +28,7 @@ public class ClientRemoveAction extends Action {
     /**
      * <p>
      * Constructor that creates a new ClientRemoveAction. Sets the fields according to the given
-     * {@link kingdomBuilder.network.protocol.server.ClientLeft ClientLeft} Message that the server
+     * {@link ClientLeft ClientLeft} Message that the server
      * has sent. Sets the clientId, name and the gameId to the values inside the ClientLeft-object.
      * </p>
      * @param c represents the message, that the server sent

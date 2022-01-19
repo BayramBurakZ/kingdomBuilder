@@ -1,25 +1,30 @@
 package kingdomBuilder.redux;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.application.Platform;
+
+import java.util.*;
 
 /**
  * Represents the store of the application.
  * @param <State> State of application.
  */
 public class Store<State> {
+    private final String ATTRIBUTE_WILDCARD = "*";
+
     /**
      * Represents the state of the application.
      */
     private State state;
+
     /**
      * Represents the reducer of the application.
      */
     private final Reducer<State> reducer;
+
     /**
      * Represents the list of subscribers which should be notified if the state is modified.
      */
-    private final List<Subscriber<State>> subscribers;
+    private final Map<String, Set<Subscriber<State>>> subscribers;
 
     /**
      * Creates a new Store object with the given state and reducer.
@@ -29,7 +34,7 @@ public class Store<State> {
     public Store(State state, Reducer<State> reducer) {
         this.state = state;
         this.reducer = reducer;
-        this.subscribers = new ArrayList<>();
+        this.subscribers = new HashMap<>();
     }
 
     /**
@@ -45,20 +50,51 @@ public class Store<State> {
      * @param action changes the state.
      */
     public synchronized void dispatch(Action action) {
-        State newState = reducer.reduce(this, this.state, action);
+        Platform.runLater(() -> {
+            final DeferredState<State> state = reducer.reduce(this, this.state, action);
+            if(state.getChangedAttributes().isEmpty()) return;
 
-        if(this.state != newState && !this.state.equals(newState)) {
-            this.state = newState;
-            subscribers.forEach(subscriber -> { subscriber.onChange(this.state); });
-        }
+            Set<Subscriber<State>> subscribers = new HashSet<>();
+            subscribers.addAll(getSubscriberSet(ATTRIBUTE_WILDCARD));
+            for(String attribute: state.getChangedAttributes())
+                subscribers.addAll(getSubscriberSet(attribute));
+
+            this.state = state.withChanges();
+            subscribers.forEach(s -> s.onChange(this.state));
+        });
     }
 
     /**
-     * Adds a new subscriber to the {@link #subscribers}.
-     * @param subscriber subscriber of the state that should be notified if the state changes.
+     * Subscribes an entity, which is then informed, when the state changes.
+     * @param subscriber
+     * @param attributes
      */
-    public void subscribe(Subscriber<State> subscriber) {
-        subscribers.add(subscriber);
+    public void subscribe(Subscriber<State> subscriber, String... attributes) {
+        final Set<String> attributeSet = Set.of(attributes);
+
+        if(attributeSet.isEmpty()) {
+            var subs = getSubscriberSet(ATTRIBUTE_WILDCARD);
+            subs.add(subscriber);
+            return;
+        }
+
+        for(var attribute: attributeSet) {
+            var subs = getSubscriberSet(attribute);
+            subs.add(subscriber);
+        }
+
         subscriber.onChange(this.state);
+    }
+
+    /**
+     * Helper method, which retrieves the set of subscribers or creates it if absent.
+     * @param name The name of the attribute, the subscribers listen too.
+     * @return The set of subscribers that listen to the specified attribute.
+     */
+    private Set<Subscriber<State>> getSubscriberSet(String name) {
+        return subscribers.computeIfAbsent(
+            name,
+            (String unused) -> new HashSet<>()
+        );
     }
 }

@@ -4,13 +4,18 @@ import kingdomBuilder.gui.controller.MainViewController;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
+import kingdomBuilder.network.ClientSelector;
+import kingdomBuilder.network.internal.ClientSelectorImpl;
+import kingdomBuilder.annotations.State;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Represents the state of the Kingdom Builder application.
  */
+@State
 public class KBState {
     // public for testing
     // TODO? :probably just make these ObservableLists directly
@@ -23,12 +28,22 @@ public class KBState {
     /**
      * Maps client id to the client info of connected clients.
      */
-    public Map<Integer, ClientDAO> clients = new HashMap<>();
+    public final Map<Integer, ClientDAO> clients;
 
     /**
      * Maps game id to the game info of created games.
      */
-    public Map<Integer, GameDAO> games = new HashMap<>();
+    public final Map<Integer, GameDAO> games;
+
+    /**
+     * Stores the selector, which handles network IO.
+     */
+    public final ClientSelector selector;
+
+    /**
+     * Stores the thread, which runs the selector.
+     */
+    public Thread selectorThread;
 
     /**
      * Represents the main client.
@@ -36,29 +51,49 @@ public class KBState {
     public Client client;
 
     /**
-     * Represents the thread of the client.
-     */
-    public Thread clientThread;
-
-    /**
      * Represents the login name entered by the player.
      */
     public String clientPreferredName;
 
     /**
+     * Whether the client is currently connecting or not.
+     */
+    public boolean isConnecting;
+
+    /**
      * Shows whether the client is connected to the server.
      */
-    public boolean isConnected = false;
+    public boolean isConnected;
 
     /**
      * Shows whether the connection to the server failed.
      */
-    public boolean failedToConnect = false;
+    public boolean failedToConnect;
+
+    public KBState(MainViewController controller, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect) {
+        this.controller = controller;
+        this.clients = clients;
+        this.games = games;
+        this.selector = selector;
+        this.selectorThread = selectorThread;
+        this.client = client;
+        this.clientPreferredName = clientPreferredName;
+        this.isConnecting = isConnecting;
+        this.isConnected = isConnected;
+        this.failedToConnect = failedToConnect;
+    }
 
     /**
-     * Represents the default constructor.
+     * Initializes the state with initial value.
      */
-    public KBState() { }
+    public KBState() throws IOException {
+        clients = new HashMap<>();
+        games = new HashMap<>();
+        selector = new ClientSelectorImpl();
+        isConnecting = false;
+        isConnected = false;
+        failedToConnect = false;
+    }
 
     /**
      * Creates the same KBState object as the given KBState object.
@@ -68,10 +103,13 @@ public class KBState {
         controller = other.controller;
         clients = other.clients;
         games = other.games;
+        selector = other.selector;
+        selectorThread = other.selectorThread;
         client = other.client;
-        clientThread = other.clientThread;
         clientPreferredName = other.clientPreferredName;
+        isConnecting = other.isConnecting;
         isConnected = other.isConnected;
         failedToConnect = other.failedToConnect;
     }
+
 }
