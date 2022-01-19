@@ -1,6 +1,8 @@
 package kingdomBuilder;
 
-import kingdomBuilder.gui.controller.MainViewController;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.model.ClientDAO;
 import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
@@ -21,9 +23,9 @@ public class KBState {
     // TODO? :probably just make these ObservableLists directly
 
     /**
-     * Represents the MainViewController.
+     * Represents the SceneLoader.
      */
-    public MainViewController controller;
+    public SceneLoader sceneLoader;
 
     /**
      * Maps client id to the client info of connected clients.
@@ -68,20 +70,19 @@ public class KBState {
     /**
      * Shows whether the connection to the server failed.
      */
-    public boolean failedToConnect;
+    public boolean failedToConnect = false;
 
-    public KBState(MainViewController controller, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect) {
-        this.controller = controller;
-        this.clients = clients;
-        this.games = games;
-        this.selector = selector;
-        this.selectorThread = selectorThread;
-        this.client = client;
-        this.clientPreferredName = clientPreferredName;
-        this.isConnecting = isConnecting;
-        this.isConnected = isConnected;
-        this.failedToConnect = failedToConnect;
-    }
+    /**
+     * Represents if the better color mode is active.
+     */
+    public boolean betterColorsActiv = false;
+
+    /**
+     * Represents a List with all the available quadrants on the server;
+     */
+    public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
+
+
 
     /**
      * Initializes the state with initial value.
@@ -100,7 +101,7 @@ public class KBState {
      * @param other the received KBState
      */
     public KBState(KBState other) {
-        controller = other.controller;
+        sceneLoader = other.sceneLoader;
         clients = other.clients;
         games = other.games;
         selector = other.selector;
@@ -110,6 +111,8 @@ public class KBState {
         isConnecting = other.isConnecting;
         isConnected = other.isConnected;
         failedToConnect = other.failedToConnect;
+        quadrantIDs = other.quadrantIDs;
+        betterColorsActiv = other.betterColorsActiv;
     }
 
 }

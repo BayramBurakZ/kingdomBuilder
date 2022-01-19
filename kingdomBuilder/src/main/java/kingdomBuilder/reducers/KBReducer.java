@@ -38,7 +38,9 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(store, oldState, a);
         } else if (action instanceof DisconnectAction a) {
             return reduce(oldState, a);
-        } else if (action instanceof SetMainControllerAction a) {
+        } else if (action instanceof SetSceneLoaderAction a) {
+            return reduce(oldState, a);
+        } else if (action instanceof BetterColorModeAction a) {
             return reduce(oldState, a);
         } else if (action instanceof LoggedInAction a)
             return reduce(oldState, a);
@@ -48,25 +50,27 @@ public class KBReducer implements Reducer<KBState> {
         return new DeferredState(oldState);
     }
 
+    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ClientAddAction a) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients;
         clients.put(a.id, new ClientDAO(a.id, a.name, a.gameId));
         state.setClients(clients);
 
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         sceneLoader.getChatViewController().onClientJoined(a.id, a.name, a.gameId);
 
         return state;
     }
 
+    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ClientRemoveAction a) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients;
         clients.remove(a.id);
         state.setClients(clients);
 
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         sceneLoader.getChatViewController().onClientLeft(a.id, a.name, a.gameId);
 
         return state;
@@ -83,8 +87,9 @@ public class KBReducer implements Reducer<KBState> {
         return new DeferredState(oldState);
     }
 
+    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ChatReceiveAction a) {
-        var sceneLoader = oldState.controller.getSceneLoader();
+        var sceneLoader = oldState.sceneLoader;
         var chatViewController = sceneLoader.getChatViewController();
         // chatViewController.onMessage(a.chatMessage);
         return new DeferredState(oldState);
@@ -124,6 +129,7 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
+    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState state, ApplicationExitAction a) {
         ClientSelector selector = state.selector;
         if(selector != null && selector.isRunning()) selector.stop();
@@ -147,7 +153,7 @@ public class KBReducer implements Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
 
         if(a.wasKicked) {
-            var sceneLoader = oldState.controller.getSceneLoader();
+            var sceneLoader = oldState.sceneLoader;
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
 
@@ -164,9 +170,15 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, SetMainControllerAction a) {
-        DeferredState state = new DeferredState(oldState);
-        state.setController(a.controller);
+    private KBState reduce(KBState oldState, SetSceneLoaderAction a) {
+        KBState state = new KBState(oldState);
+        state.sceneLoader = a.sceneLoader;
+        return state;
+    }
+
+    private KBState reduce(KBState oldState, BetterColorModeAction a) {
+        KBState state = new KBState(oldState);
+        state.betterColorsActiv = a.active;
         return state;
     }
 }

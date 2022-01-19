@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox fx:id="editor_hBox"
+            xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="kingdomBuilder.gui.levelEditor.LevelEditorController">
+
+
+    <VBox fx:id="editor_vbox_subscene" alignment="CENTER" HBox.hgrow="ALWAYS">
+        <SubScene fx:id="editor_subscene" depthBuffer="true" managed="false" pickOnBounds="true"
+                  BorderPane.alignment="CENTER">
+            <antiAliasing>
+                <SceneAntialiasing fx:constant="BALANCED" />
+            </antiAliasing>
+            <root>
+                <Group fx:id="editor_board_group" />
+            </root>
+        </SubScene>
+    </VBox>
+
+    <VBox fx:id="editor_vBox_settings" alignment="CENTER">
+        <ComboBox fx:id="editor_comboBox"/>
+        <Button text="%upload" onAction="#onUploadButtonPressed"/>
+        <Button text="%cancel" onAction="#onCancelButtonPressed"/>
+    </VBox>
+
+</HBox>

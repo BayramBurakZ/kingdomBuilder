@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane fx:id="gamesettings_borderpane" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="kingdomBuilder.gui.controller.GameSettingsViewController">
+
+   <top>
+      <HBox minHeight="50.0" minWidth="500.0" BorderPane.alignment="CENTER">
+           <Button fx:id="gamesettings_button_back" alignment="CENTER" onAction="#onBackButtonPressed" text="Back">
+               <HBox.margin>
+                  <Insets left="3.0" top="3.0" />
+               </HBox.margin>
+           </Button>
+
+        <Label alignment="CENTER" contentDisplay="TOP" text="%gameSettings" textAlignment="CENTER">
+           <font>
+              <Font size="23.0" />
+           </font>
+           <HBox.margin>
+              <Insets bottom="5.0" left="60.0" right="20.0" top="5.0" />
+           </HBox.margin>
+        </Label>
+
+      </HBox>
+   </top>
+   <padding>
+      <Insets left="15.0" />
+   </padding>
+
+
+   <center>
+         <VBox fx:id="gamesettings_vBox_preview" BorderPane.alignment="CENTER">
+
+              <GridPane alignment="CENTER" gridLinesVisible="true" VBox.vgrow="ALWAYS">
+                  <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                  </columnConstraints>
+                  <rowConstraints>
+                            <RowConstraints vgrow="ALWAYS" />
+                            <RowConstraints vgrow="ALWAYS" />
+                  </rowConstraints>
+
+                  <Pane GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                  <Pane GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                  <Pane GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                  <Pane GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+              </GridPane>
+
+              <GridPane alignment="CENTER" fx:id="gamesettings_gridpane_ids">
+                      <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                      </columnConstraints>
+                      <rowConstraints>
+                            <RowConstraints vgrow="ALWAYS" />
+                            <RowConstraints vgrow="ALWAYS" />
+                      </rowConstraints>
+
+                            <ChoiceBox fx:id="gamesettings_choicebox_upperleft"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_upperright"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_bottomright"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+              </GridPane>
+         </VBox>
+   </center>
+
+
+    <right>
+        <VBox>
+            <!-- Game Name -->
+            <TextField promptText="%gameName" fx:id="gamesettings_textfield_name">
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </TextField>
+            <!-- Game Description -->
+            <TextField promptText="%gameDesc:" fx:id="gamesettings_textfield_desc">
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </TextField>
+            <!-- Number of Players that can join -->
+            <Label text="%playersCanJoin">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Label>
+
+            <Spinner fx:id="gamesettings_spinner_online_players">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Spinner>
+            <!-- Number of Bots that can join -->
+            <Label text="%botsCanJoin">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Label>
+            <Spinner fx:id="gamesettings_spinner_bots">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Spinner>
+            <!-- Number of Hotseat that join -->
+            <Label text="%hotseatcanJoin">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Label>
+            <Spinner fx:id="gamesettings_spinner_hotseat">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Spinner>
+
+            <!-- Time -->
+            <CheckBox fx:id="gamesettings_checkBox_time" text="%enableTimeLimit">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </CheckBox>
+            <Spinner fx:id="gamesettings_spinner_time" editable="true" disable="true">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Spinner>
+            <!-- Turn -->
+            <CheckBox fx:id="gamesettings_checkBox_turn" text="%enableTurnLimit">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </CheckBox>
+            <Spinner fx:id="gamesettings_spinner_turn" editable="true" disable="true">
+                <VBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </VBox.margin>
+            </Spinner>
+        </VBox>
+    </right>
+
+    <bottom>
+        <HBox alignment="CENTER" centerShape="false" minHeight="80.0" minWidth="500.0"
+              nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
+            <Button fx:id="gamesettings_button_host" alignment="CENTER" contentDisplay="CENTER" disable="true"
+                    onAction="#onHostGameButtonPressed" text="%hostGame" HBox.hgrow="ALWAYS">
+                <HBox.margin>
+                    <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
+                </HBox.margin>
+            </Button>
+            <Button fx:id="gamesettings_button_host_join" alignment="CENTER" contentDisplay="CENTER" disable="true"
+                    onAction="#onHostAndJoinGameButtonPressed" text="%hostGameAndJoin">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </HBox.margin></Button>
+            <Button fx:id="gamesettings_button_host_spectate" alignment="CENTER" contentDisplay="CENTER" disable="true"
+                    onAction="#onHostAndSpectateGameButtonPressed" text="%hostGameAndSpectate">
+                <HBox.margin>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </HBox.margin></Button>
+        </HBox>
+    </bottom>
+
+</BorderPane>
