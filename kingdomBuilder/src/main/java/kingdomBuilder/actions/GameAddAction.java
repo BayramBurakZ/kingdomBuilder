@@ -1,5 +1,6 @@
 package kingdomBuilder.actions;
 
+import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.redux.Action;
 
@@ -8,18 +9,18 @@ import kingdomBuilder.redux.Action;
  * Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */
-public class GameAddAction extends Action {
+public final class GameAddAction extends Action {
     /**
      * Represents the data for a game.
      */
-    public GameData gameData;
+    public final GameDAO gameDAO;
 
     /**
      * Constructs a new GameAddAction.
      * @param gameData The game data.
      */
     public GameAddAction(GameData gameData) {
-        this.gameData = gameData;
+        this.gameDAO = new GameDAO(gameData);
     }
 
     /**
@@ -40,7 +41,7 @@ public class GameAddAction extends Action {
                          String gameDescription,
                          int playerLimit,
                          int playersJoined) {
-        this.gameData = new GameData(
+        this.gameDAO = new GameDAO(
                 clientId,
                 gameType,
                 gameId,

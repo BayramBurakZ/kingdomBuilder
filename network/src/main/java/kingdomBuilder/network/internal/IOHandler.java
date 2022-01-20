@@ -100,7 +100,6 @@ public class IOHandler {
 
         if(consumer != null)
             ProtocolDeserializer.deserialize(contents, consumer);
-
     }
 
     /**

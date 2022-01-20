@@ -1,77 +1,171 @@
 package kingdomBuilder.model;
 
+import kingdomBuilder.network.protocol.GameData;
+
 import java.util.Objects;
 
 /**
  * Stores information about the game.
  */
-public class GameDAO {
+public final class GameDAO {
     /**
-     * Represents the id of the game.
+     * Represents the ID of the client who hosted the game.
      */
-    private int id;
+    private final int clientId;
+    /**
+     * Represents the type of the game.
+     */
+    private final String gameType;
+    /**
+     * Represents the ID of the game.
+     */
+    private final int gameId;
     /**
      * Represents the name of the game.
      */
-    private String name;
+    private final String gameName;
+    /**
+     * Represents the description of the game.
+     */
+    private final String gameDescription;
+    /**
+     * Represents the limit for players.
+     */
+    private final int playerLimit;
+    /**
+     * Represents the players who already joined.
+     */
+    private final int playersJoined;
 
     /**
-     * Creates game object.
-     * @param id id of the game.
-     * @param name name of the game.
+     * Creates a new GameDAO object.
+     * @param clientId The ID of the client who hosted this game.
+     * @param gameType The type of the game.
+     * @param gameId The ID of the game.
+     * @param gameName The name of the game.
+     * @param gameDescription The description of the game.
+     * @param playerLimit The limit of players.
+     * @param playersJoined The current joined players.
      */
-    public GameDAO(int id, String name) {
-        this.id = id;
-        this.name = name;
+    public GameDAO(
+            int clientId,
+            String gameType,
+            int gameId,
+            String gameName,
+            String gameDescription,
+            int playerLimit,
+            int playersJoined
+    ) {
+        this.clientId = clientId;
+        this.gameType = gameType;
+        this.gameId = gameId;
+        this.gameName = gameName;
+        this.gameDescription = gameDescription;
+        this.playerLimit = playerLimit;
+        this.playersJoined = playersJoined;
     }
 
     /**
-     * Gets the id of the game.
-     * @return id of the game.
+     * Creates a new GameDAO object.
+     * @param gameData contains data of a game.
      */
-    public int getId() {
-        return id;
+    public GameDAO(GameData gameData) {
+        this(gameData.clientId(),
+                gameData.gameType(),
+                gameData.gameId(),
+                gameData.gameName(),
+                gameData.gameDescription(),
+                gameData.playerLimit(),
+                gameData.playersJoined());
     }
 
     /**
-     * Gets name of the game.
-     * @return name of the game.
+     * Gets the ID of the client who hosted the game.
+     * @return The ID of the client.
      */
-    public String getName() {
-        return name;
+    public int getClientId() {
+        return clientId;
     }
 
     /**
-     * Computes whether the game object and the given object are equal.
-     * @param obj object which is to be compared.
-     * @return whether the object is equal to this game object.
+     *{@return the type of a game.}
+     */
+    public String getGameType() {
+        return gameType;
+    }
+
+    /**
+     * {@return the ID of the game.}
+     */
+    public int getGameId() {
+        return gameId;
+    }
+
+    /**
+     * {@return the name of the game.}
+     */
+    public String getGameName() {
+        return gameName;
+    }
+
+    /**
+     * {@return the description of the game.}
+     */
+    public String getGameDescription() {
+        return gameDescription;
+    }
+
+    /**
+     * {@return the limit for players.}
+     */
+    public int getPlayerLimit() {
+        return playerLimit;
+    }
+
+    /**
+     * {@return the number of players currently in the game.}
+     */
+    public int getPlayersJoined() {
+        return playersJoined;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (GameDAO) obj;
-        return this.id == that.id &&
-                Objects.equals(this.name, that.name);
+        return this.clientId == that.clientId &&
+                Objects.equals(this.gameType, that.gameType) &&
+                this.gameId == that.gameId &&
+                Objects.equals(this.gameName, that.gameName) &&
+                Objects.equals(this.gameDescription, that.gameDescription) &&
+                this.playerLimit == that.playerLimit &&
+                this.playersJoined == that.playersJoined;
     }
 
     /**
-     * Generates hashcode for id and name of the game.
-     * @return the hashcode.
+     * {@inheritDoc}
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(clientId, gameType, gameId, gameName, gameDescription, playerLimit, playersJoined);
     }
 
     /**
-     * Generates a string of the game and its attributes.
-     * @return string of the game and its attributes.
+     * {@inheritDoc}
      */
     @Override
     public String toString() {
         return "GameDAO[" +
-                "id=" + id + ", " +
-                "name=" + name + ']';
+                "clientId=" + clientId + ", " +
+                "gameType=" + gameType + ", " +
+                "gameId=" + gameId + ", " +
+                "gameName=" + gameName + ", " +
+                "gameDescription=" + gameDescription + ", " +
+                "playerLimit=" + playerLimit + ", " +
+                "playersJoined=" + playersJoined + ']';
     }
 }

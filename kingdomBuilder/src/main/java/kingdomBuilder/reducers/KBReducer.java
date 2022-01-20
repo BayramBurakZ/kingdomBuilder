@@ -4,6 +4,7 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.model.ClientDAO;
+import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.redux.Action;
@@ -134,7 +135,6 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState state, ApplicationExitAction a) {
         ClientSelector selector = state.selector;
         if(selector != null && selector.isRunning()) selector.stop();
@@ -189,14 +189,15 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, HostGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        // TODO: send message "host game ..."
+        oldState.client.hostGame(a.gameName, a.gameDescription, a.playerLimit, a.timeLimit, a.turnLimit,
+                a.quadrantId1, a.quadrantId2, a.quadrantId3, a.quadrantId4);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, GameAddAction a) {
         DeferredState state = new DeferredState(oldState);
         final var games = oldState.games;
-        games.put(a.gameData.getGameId(), a.gameData);
+        games.put(a.gameDAO.getGameId(), a.gameDAO);
         state.setGames(games);
         return state;
     }

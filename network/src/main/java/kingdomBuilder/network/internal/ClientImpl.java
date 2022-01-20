@@ -16,6 +16,26 @@ import java.util.List;
 public class ClientImpl extends Client implements ProtocolConsumer {
     private final IOHandler ioHandler;
 
+    // TODO:
+    /*
+    // Eigene Implementierung von Client /////
+    public void accept(MyGameReply message) {
+        store.dispatch(new GameReplyAction());
+    }
+
+    // oder Client enthält nur events /////////////
+    Event<MyGameReply> onGameReply;
+    public void accept(MyGameReply message) {
+        onGameReply.dispatch();
+    }
+
+    void irgendwoAnders() {
+        // vermutlich direkt nach Erstellung vom Main Client
+        client.onGameReply.subscribe(m -> store.dispatch(new GameReplyAction());
+        // und alle anderen events ...
+    }
+     */
+
     /**
      * Initializes the client.
      *
@@ -50,6 +70,29 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void chat(List<Integer> recipients, String message) {
         final String command = ProtocolSerializer.serialize(new Chat(recipients, message));
+        trySendCommand(command);
+    }
+
+    @Override
+    public void hostGame(String gameName,
+                         String gameDescription,
+                         int playerLimit,
+                         int timeLimit,
+                         int turnLimit,
+                         int quadrantId1,
+                         int quadrantId2,
+                         int quadrantId3,
+                         int quadrantId4) {
+        final String command = ProtocolSerializer.serialize(new HostGame(
+                gameName,
+                gameDescription,
+                playerLimit,
+                timeLimit,
+                turnLimit,
+                quadrantId1,
+                quadrantId2,
+                quadrantId3,
+                quadrantId4));
         trySendCommand(command);
     }
 

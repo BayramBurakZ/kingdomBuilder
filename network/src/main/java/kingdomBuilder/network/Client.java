@@ -23,7 +23,7 @@ public abstract class Client {
      */
     protected String name;
     /**
-     * Represents the client´s id.
+     * Represents the id of a client.
      */
     protected int clientId;
     /**
@@ -47,7 +47,7 @@ public abstract class Client {
     public final Event<Client> onKicked;
 
     /**
-     * Event, that gets dispatched, whever a player joins the server.
+     * Event, that gets dispatched, whenever a player joins the server.
      */
     public final Event<ClientJoined> onClientJoined;
 
@@ -78,21 +78,21 @@ public abstract class Client {
     }
 
     /**
-     * {@return Returns the name of the client or null, if the client is NOT logged in.}
+     * {@return the name of the client or null, if the client is NOT logged in.}
      */
     public String getName() {
         return name;
     }
 
     /**
-     * {@return Returns the id of the client or NO_ID, if the client isn't logged in yet.}
+     * {@return the id of the client or NO_ID, if the client is not logged in yet.}
      */
     public int getClientId() {
         return clientId;
     }
 
     /**
-     * {@return Returns the id of the current game or NO_ID, if the client hasn't joined any games.}
+     * {@return the id of the current game or NO_ID if the client has not joined any games.}
      */
     public int getGameId() {
         return gameId;
@@ -121,18 +121,42 @@ public abstract class Client {
     public abstract void chat(List<Integer> recipients, String message);
 
     /**
-     * {@return Returns whether the client is connected.}
+     * Hosts a game with the given parameters.
+     *
+     * @param gameName
+     * @param gameDescription
+     * @param playerLimit
+     * @param timeLimit
+     * @param turnLimit
+     * @param quadrantId1
+     * @param quadrantId2
+     * @param quadrantId3
+     * @param quadrantId4
+     */
+    public abstract void hostGame(
+            String gameName,
+            String gameDescription,
+            int playerLimit,
+            int timeLimit,
+            int turnLimit,
+            int quadrantId1,
+            int quadrantId2,
+            int quadrantId3,
+            int quadrantId4);
+
+    /**
+     * {@return whether the client is connected.}
      */
     public abstract boolean isConnected();
 
     /**
-     * Closes the client's connection.
+     * Closes the connection of the client.
      */
     public abstract void disconnect();
 
     /**
-     * {@return Returns whether the client has commands stored internally,
-     *          that weren't transmitted successfully to the server yet.}
+     * {@return whether the client has commands stored internally
+     *  that were not transmitted successfully to the server yet.}
      */
     public abstract boolean hasPendingCommands();
 
