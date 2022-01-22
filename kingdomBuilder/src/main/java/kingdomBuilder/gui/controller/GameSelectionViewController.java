@@ -37,7 +37,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Constructs the GameSelectionViewController.
-     * @param store The Application's store to set the field.
+     * @param store the Application's store to set the field.
      */
     public GameSelectionViewController(Store<KBState> store) {
         super.store = store;
@@ -45,9 +45,9 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -64,7 +64,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the CreateNewGame Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onCreateNewGameButtonPressed(Event event) {
@@ -73,7 +73,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the LevelEditor Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onLevelEditorButtonPressed(Event event) {
@@ -82,7 +82,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the ReturnToMenu Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onReturnToMenuButtonPressed(Event event) {
@@ -92,7 +92,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the CreateNewGame Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onJoinGamePressed(Event event) {

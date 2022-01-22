@@ -18,7 +18,7 @@ public class BetterColorModeAction extends Action {
     /**
      * Constructor that creates a new BetterColorModeAction
      * that sets the betterColormode-field to the given state.
-     * @param active The value, if it is on or off.
+     * @param active the value, if it is on or off.
      */
     public BetterColorModeAction(boolean active) {
         this.active = active;

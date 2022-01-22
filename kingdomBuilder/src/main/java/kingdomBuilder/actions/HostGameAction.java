@@ -48,15 +48,15 @@ public class HostGameAction extends Action {
     /**
      * Constructs a new HostGameAction.
      *
-     * @param gameName The name.
-     * @param gameDescription The description.
-     * @param playerLimit The limit for players.
-     * @param timeLimit The limit of the time.
-     * @param turnLimit The limit for the turns.
-     * @param quadrantId1 The first quadrant.
-     * @param quadrantId2 The second quadrant.
-     * @param quadrantId3 The third quadrant.
-     * @param quadrantId4 The fourth quadrant.
+     * @param gameName the name.
+     * @param gameDescription the description.
+     * @param playerLimit the limit for players.
+     * @param timeLimit the limit of the time.
+     * @param turnLimit the limit for the turns.
+     * @param quadrantId1 the first quadrant.
+     * @param quadrantId2 the second quadrant.
+     * @param quadrantId3 the third quadrant.
+     * @param quadrantId4 the fourth quadrant.
      */
     public HostGameAction(String gameName,
                           String gameDescription,

@@ -38,7 +38,7 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Sets the store in the {@link Controller}.
-     * @param store The store to set.
+     * @param store the store to set.
      */
     public IAmViewController(Store<KBState> store) {
         super.store = store;
@@ -46,9 +46,9 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -58,7 +58,7 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Setup the Checkbox to change the language.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     private void setupCheckBox(ResourceBundle resources) {
         ObservableList<Locale> options = FXCollections.observableArrayList(Locale.ENGLISH, Locale.GERMAN);
@@ -97,8 +97,8 @@ public class IAmViewController extends Controller implements Initializable {
     class LanguageListCell extends ListCell<Locale> {
         /**
          * Transform the locales to String in their corresponding language.
-         * @param item The local to transform.
-         * @param empty If the cell is Empty.
+         * @param item the local to transform.
+         * @param empty if the cell is Empty.
          */
         @Override
         protected void updateItem(Locale item, boolean empty) {
@@ -111,7 +111,7 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality to change the language with the ComboBox.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onCheckBoxSelectionPressed(Event event) {
@@ -123,7 +123,7 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the MainMenu Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onButtonMainMenuShow(Event event) {
@@ -169,7 +169,7 @@ public class IAmViewController extends Controller implements Initializable {
 
     /**
      * Checks if the String is a valid name for the server.
-     * @param name The String to check.
+     * @param name the String to check.
      * @return whether the string is valid (true) or not (false)
      */
     private boolean isNameValid(String name) {

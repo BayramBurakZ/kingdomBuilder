@@ -6,10 +6,10 @@ import java.util.List;
 
 /**
  * Represents message that contains information of all clients registered at the server -
- *  * reply message ?clients {@link kingdomBuilder.network.protocol.RequestClients}.
+ *  * reply message ?clients {@link ClientsRequest}.
  */
 @Protocol(format = "[REPLY_MESSAGE] (?clients) <{#{clients}}>")
-public record RequestClientsResponse(
+public record ClientsReply(
     List<ClientData> clients
 ) {
 }

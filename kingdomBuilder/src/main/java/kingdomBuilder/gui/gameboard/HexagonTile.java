@@ -7,8 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.base.Tile;
-import kingdomBuilder.model.TileType;
 
 import java.util.ResourceBundle;
 
@@ -48,12 +48,12 @@ public class HexagonTile extends Tile {
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
-     * @param xPos The x-coordinate of the upper-left corner position.
-     * @param yPos The y-coordinate of the upper-left corner position.
-     * @param tileType The TileType of the Hexagon.
-     * @param resource The ResourceBundle to translate text.
+     * @param xPos the x-coordinate of the upper-left corner position.
+     * @param yPos the y-coordinate of the upper-left corner position.
+     * @param tileType the TileType of the Hexagon.
+     * @param resource the ResourceBundle to translate text.
      */
-    public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
+    public HexagonTile(double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
         super(xPos, yPos, tileType, resource);
 
         // add settlement to this group
@@ -62,8 +62,9 @@ public class HexagonTile extends Tile {
         // set up animation for elevating
         setupAnimation();
 
-        // TODO: execute only for Tokens
-        setTokenTooltip(tileType);
+        if (Game.tokenType.contains(tileType)) {
+            setTokenTooltip(tileType);
+        }
     }
 
     /**
@@ -80,13 +81,7 @@ public class HexagonTile extends Tile {
      * Set the rule for every generated special place to their rule.
      * @param tileType type for recognizing the special place.
      */
-    private void setTokenTooltip(TileType tileType) {
-        // TODO: Adjust to gameLogic enums
-
-        if (tileType.getValue() < 8) {
-            return;
-        }
-
+    private void setTokenTooltip(Game.TileType tileType) {
         Tooltip tokenTooltip = new Tooltip();
         switch (tileType) {
             case BARN -> tokenTooltip.setText(resourceBundle.getString("tokenBarnRule"));
@@ -180,7 +175,7 @@ public class HexagonTile extends Tile {
      * Gets the type of the hexagon.
      * @return The Type of the hexagon.
      */
-    public TileType getTileType() {
+    public Game.TileType getTileType() {
         return tileType;
     }
 

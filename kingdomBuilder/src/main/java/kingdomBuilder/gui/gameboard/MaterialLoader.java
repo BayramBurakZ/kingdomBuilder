@@ -3,7 +3,7 @@ package kingdomBuilder.gui.gameboard;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
-import kingdomBuilder.model.TileType;
+import kingdomBuilder.gamelogic.Game;
 
 /**
  * Class that contains all materials for the 3D objects.
@@ -125,10 +125,10 @@ public final class MaterialLoader {
 
     /**
      * Gets the Material according to the given type.
-     * @param type The requested type.
+     * @param type the requested type.
      * @return The material.
      */
-    public static PhongMaterial getMaterial(TileType type) {
+    public static PhongMaterial getMaterial(Game.TileType type) {
         return switch (type) {
             case CANYON -> CANYON;
             case DESERT -> DESERT;

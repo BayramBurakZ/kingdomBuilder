@@ -16,8 +16,7 @@ import java.util.List;
 public class ClientImpl extends Client implements ProtocolConsumer {
     private final IOHandler ioHandler;
 
-    // TODO:
-    /*
+    /* TODO:
     // Eigene Implementierung von Client /////
     public void accept(MyGameReply message) {
         store.dispatch(new GameReplyAction());
@@ -68,11 +67,59 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void loadNamespace() {
+        final String command = ProtocolSerializer.serialize(new Load("kingdom_builder"));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clientsRequest() {
+        final String command = ProtocolSerializer.serialize(new ClientsRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void gamesRequest() {
+        final String command = ProtocolSerializer.serialize(new GamesRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void quadrantsRequest() {
+        final String command = ProtocolSerializer.serialize(new QuadrantsRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void quadrantRequest(int quadrantId) {
+        final String command = ProtocolSerializer.serialize(new QuadrantRequest(quadrantId));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void chat(List<Integer> recipients, String message) {
         final String command = ProtocolSerializer.serialize(new Chat(recipients, message));
         trySendCommand(command);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void hostGame(String gameName,
                          String gameDescription,
@@ -93,6 +140,15 @@ public class ClientImpl extends Client implements ProtocolConsumer {
                 quadrantId2,
                 quadrantId3,
                 quadrantId4));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void joinGame(int gameId) {
+        final String command = ProtocolSerializer.serialize(new Join(gameId));
         trySendCommand(command);
     }
 
@@ -207,233 +263,244 @@ public class ClientImpl extends Client implements ProtocolConsumer {
         trySendCommand(command);
     }
 
+    // TODO: doc
     @Override
-    public void accept(RequestClientsResponse message) {
-
+    public void accept(ClientsReply message) {
+        onClientsReply.dispatch(message);
     }
 
+    /**
+     * Notifies listeners, that a new game was hosted.
+     *
+     * @param message The data of the new game.
+     */
     @Override
     public void accept(GameHosted message) {
-
-    }
+        onGameHosted.dispatch(message);
+    } // TODO: use GameData in network message
 
     @Override
     public void accept(YouAreRoot message) {
-
+        onYouAreRoot.dispatch(message);
     }
 
     @Override
     public void accept(NamespaceLoaded message) {
-
+        onNamespaceLoaded.dispatch(message);
     }
 
     @Override
     public void accept(NamespaceUnloaded message) {
-
+        onNamespaceUnloaded.dispatch(message);
     }
 
     @Override
     public void accept(YouSpectateGame message) {
-
+        onYouSpectateGame.dispatch(message);
     }
 
     @Override
     public void accept(StoppedSpectating message) {
-
+        onStoppedSpectating.dispatch(message);
     }
 
     @Override
     public void accept(YouLeftGame message) {
-
+        gameId = NO_ID;
+        onYouLeftGame.dispatch(message);
     }
 
     @Override
     public void accept(WelcomeToGame message) {
-
+        gameId = message.gameId();
+        onWelcomeToGame.dispatch(message);
+        // request the quadrants right after joining a game
+        final String command = ProtocolSerializer.serialize(new BoardRequest());
+        trySendCommand(command);
     }
 
     @Override
     public void accept(PlayerJoined message) {
-
+        onPlayerJoined.dispatch(message);
     }
 
     @Override
     public void accept(PlayerLeft message) {
-
+        onPlayerLeft.dispatch(message);
     }
 
     @Override
     public void accept(TurnEndedByServer message) {
-
+        onTurnEndedByServer.dispatch(message);
     }
 
     @Override
     public void accept(VersionReply message) {
-
+        onVersionReply.dispatch(message);
     }
 
     @Override
     public void accept(WhoAmIReply message) {
-
+        onWhoAmIReply.dispatch(message);
     }
 
     @Override
     public void accept(ClientReply message) {
-
+        onClientReply.dispatch(message);
     }
 
     @Override
     public void accept(GamesReply message) {
-
+        onGamesReply.dispatch(message);
     }
 
     @Override
     public void accept(PlayersOfGameReply message) {
-
+        onPlayersOfGameReply.dispatch(message);
     }
 
     @Override
     public void accept(ModulesReply message) {
-
+        onModulesReply.dispatch(message);
     }
 
     @Override
     public void accept(MyNamespacesReply message) {
-
+        onMyNamespacesReply.dispatch(message);
     }
 
     @Override
     public void accept(DetailsOfGameReply message) {
-
+        onDetailsOfGameReply.dispatch(message);
     }
 
     @Override
     public void accept(InitStart message) {
-
+        onInitStart.dispatch(message);
     }
 
     @Override
     public void accept(WinCondition message) {
-
+        onWinCondition.dispatch(message);
     }
 
     @Override
     public void accept(GameStart message) {
-
+        onGameStart.dispatch(message);
     }
 
     @Override
     public void accept(YourTerrainCard message) {
-
+        onYourTerrainCard.dispatch(message);
     }
 
     @Override
     public void accept(TurnStart message) {
-
+        onTurnStart.dispatch(message);
     }
 
     @Override
     public void accept(TerrainTypeOfTurn message) {
-
+        onTerrainTypeOfTurn.dispatch(message);
     }
 
     @Override
     public void accept(SettlementPlaced message) {
-
+        onSettlementPlaced.dispatch(message);
     }
 
     @Override
     public void accept(SettlementRemoved message) {
-
+        onSettlementRemoved.dispatch(message);
     }
 
     @Override
     public void accept(TokenReceived message) {
-
+        onTokenReceived.dispatch(message);
     }
 
     @Override
     public void accept(TokenLost message) {
-
+        onTokenLost.dispatch(message);
     }
 
     @Override
     public void accept(PlayerUsedLastSettlement message) {
-
+        onPlayerUsedLastSettlement.dispatch(message);
     }
 
     @Override
     public void accept(GameOver message) {
-
+        onGameOver.dispatch(message);
     }
 
     @Override
     public void accept(Scores message) {
-
+        onScores.dispatch(message);
     }
 
     @Override
     public void accept(QuadrantUploaded message) {
-
+        onQuadrantUploaded.dispatch(message);
     }
 
     @Override
     public void accept(QuadrantReply message) {
-
+        onQuadrantReply.dispatch(message);
     }
 
     @Override
     public void accept(QuadrantsReply message) {
-
+        onQuadrantsReply.dispatch(message);
     }
 
     @Override
     public void accept(TimeLimitReply message) {
-
+        onTimeLimitReply.dispatch(message);
     }
 
     @Override
     public void accept(PlayerLimitReply message) {
-
+        onPlayerLimitReply.dispatch(message);
     }
 
     @Override
     public void accept(PlayersReply message) {
-
+        onPlayersReply.dispatch(message);
     }
 
     @Override
     public void accept(TurnsReply message) {
-
+        onTurnsReply.dispatch(message);
     }
 
     @Override
     public void accept(TurnLimitReply message) {
-
+        onTurnLimitReply.dispatch(message);
     }
 
     @Override
     public void accept(WhoseTurnReply message) {
-
+        onWhoseTurnReply.dispatch(message);
     }
 
     @Override
     public void accept(SettlementsLeftReply message) {
-
+        onSettlementsLeftReply.dispatch(message);
     }
 
     @Override
     public void accept(BoardReply message) {
-
+        onBoardReply.dispatch(message);
     }
 
     @Override
     public void accept(WinConditionReply message) {
-
+        onWinConditionReply.dispatch(message);
     }
 
     @Override
     public void accept(MyGameReply message) {
-
+        onMyGameReply.dispatch(message);
     }
 }

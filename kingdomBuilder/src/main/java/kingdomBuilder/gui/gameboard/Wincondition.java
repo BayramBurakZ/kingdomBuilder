@@ -6,6 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.util.HexagonCalculator;
 
 import java.util.ArrayList;
@@ -15,20 +16,6 @@ import java.util.ResourceBundle;
  * Class to create a hexagon, which displays the win condition as Tooltip.
  */
 public class Wincondition extends Polygon {
-    //TODO: Remove and use GameLogic enum (this is copied from gamelogic branch)
-    public enum WinCondition {
-        FISHER,
-        LORDS,
-        MINER,
-        ANCHORITE,
-        FARMER,
-        MERCHANT,
-        KNIGHT,
-        EXPLORER,
-        CITIZEN,
-        WORKER
-    }
-
     /**
      * Represents the radius of one hexagon.
      */
@@ -42,10 +29,10 @@ public class Wincondition extends Polygon {
 
     /**
      * Creates a new hexagon with an icon and tooltip which matches the wincondition.
-     * @param winCondition The wincondtion.
-     * @param resourceBundle The language support.
+     * @param winCondition the wincondtion.
+     * @param resourceBundle the language support.
      */
-    public Wincondition(WinCondition winCondition, ResourceBundle resourceBundle) {
+    public Wincondition(Game.WinCondition winCondition, ResourceBundle resourceBundle) {
         // add all corners for a hexagon shape
         for (int i = 0; i < HexagonCalculator.NUMBER_OF_CORNERS; i++) {
             getPoints().add(vertices.get(i).getX());

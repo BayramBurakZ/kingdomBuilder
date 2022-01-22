@@ -2,7 +2,7 @@ package kingdomBuilder.gui.base;
 
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
-import kingdomBuilder.model.TileType;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public abstract class Board {
 
     /**
      * Constructs a board.
-     * @param store The store of the application.
+     * @param store the store of the application.
      */
     public Board(Store<KBState> store) {
         this.store = store;
@@ -31,11 +31,11 @@ public abstract class Board {
 
     /**
      * Set the GameBoard with textured hexagons up.
-     * @param group The pane on which the hexagons are drawn.
-     * @param gameBoardData The data with all information.
-     * @param resource The ResourceBundle for translating text.
+     * @param group the pane on which the hexagons are drawn.
+     * @param gameBoardData the data with all information.
+     * @param resource the ResourceBundle for translating text.
      */
-    public void setupBoard(Group group, TileType[][] gameBoardData, ResourceBundle resource) {
+    public void setupBoard(Group group, Game.TileType[][] gameBoardData, ResourceBundle resource) {
         int width = gameBoardData.length;
 
         for (int y = 0; y < width; y++) {
@@ -57,14 +57,14 @@ public abstract class Board {
     /**
      * Places a tile on the board.
      *
-     * @param group The group where the element is added.
-     * @param xPos The x-coordinate for the element.
-     * @param yPos The x-coordinate for the element.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @param tileType The type for the tile.
-     * @param resource The language support.
+     * @param group the group where the element is added.
+     * @param xPos the x-coordinate for the element.
+     * @param yPos the x-coordinate for the element.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param tileType the type for the tile.
+     * @param resource the language support.
      */
     public abstract void placeTileOnBoard(Group group, int x, int y,
-                                          int xPos, int yPos, TileType tileType, ResourceBundle resource);
+                                          int xPos, int yPos, Game.TileType tileType, ResourceBundle resource);
 }

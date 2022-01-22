@@ -44,7 +44,7 @@ public class SettingsController extends Controller implements Initializable {
 
     /**
      * Constructs the Settings View with the given store.
-     * @param store The Store for access to the state.
+     * @param store the Store for access to the state.
      */
     public SettingsController(Store<KBState> store) {
         this.store = store;
@@ -53,12 +53,12 @@ public class SettingsController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupCheckBox(resources);
-        settings_checkBox_colors.setSelected(store.getState().betterColorsActiv);
+        settings_checkBox_colors.setSelected(store.getState().betterColorsActive);
     }
 
     /**
      * Setup the Checkbox to change the language.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     private void setupCheckBox(ResourceBundle resources) {
         ObservableList<Locale> options = FXCollections.observableArrayList(Locale.ENGLISH, Locale.GERMAN);
@@ -97,8 +97,8 @@ public class SettingsController extends Controller implements Initializable {
     class LanguageListCell extends ListCell<Locale> {
         /**
          * Transform the locales to String in their corresponding language.
-         * @param item The local to transform.
-         * @param empty If the cell is Empty.
+         * @param item the local to transform.
+         * @param empty if the cell is Empty.
          */
         @Override
         protected void updateItem(Locale item, boolean empty) {
@@ -111,7 +111,7 @@ public class SettingsController extends Controller implements Initializable {
 
     /**
      * Sets the functionality to change the language with the ComboBox.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onCheckBoxSelectionPressed(Event event) {
@@ -122,7 +122,7 @@ public class SettingsController extends Controller implements Initializable {
 
     /**
      * Represents the functionality to apply the changes.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onApplyButtonPressed(Event event) {
@@ -134,7 +134,7 @@ public class SettingsController extends Controller implements Initializable {
         }
 
         // color mode
-        if (store.getState().betterColorsActiv != settings_checkBox_colors.isSelected()) {
+        if (store.getState().betterColorsActive != settings_checkBox_colors.isSelected()) {
             store.dispatch(new BetterColorModeAction(settings_checkBox_colors.isSelected()));
         }
 
@@ -143,7 +143,7 @@ public class SettingsController extends Controller implements Initializable {
 
     /**
      * Checks if the String is a valid name for the server.
-     * @param name The String to check.
+     * @param name the String to check.
      * @return whether the string is valid (true) or not (false)
      */
     private boolean isNameValid(String name) {

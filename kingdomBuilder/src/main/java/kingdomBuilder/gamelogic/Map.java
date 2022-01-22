@@ -43,7 +43,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Creates the map from the given quadrants.
      *
-     * @param startingTokenCount The amount of tokens that a special place contains at game start.
+     * @param startingTokenCount the amount of tokens that a special place contains at game start.
      * @param topLeft            The first quadrant in the top left.
      * @param topRight           The second quadrant in the top right.
      * @param bottomLeft         The third quadrant in the bottom left.
@@ -106,7 +106,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      *
      * @param x     The x position of the 2D array.
      * @param y     The y position of the 2D array.
-     * @param width The height/width of the 2D array.
+     * @param width the height/width of the 2D array.
      * @return The position in the 1D array.
      */
     protected static int to1DIndex(int x, int y, int width) {
@@ -118,7 +118,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      *
      * @param x     The x position of the 2D array.
      * @param y     The y position of the 2D array.
-     * @param width The height/width of the 2D quadrant.
+     * @param width the height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
     protected static int to1DIndexTopLeft(int x, int y, int width) {
@@ -130,7 +130,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      *
      * @param x     The x position of the 2D array.
      * @param y     The y position of the 2D array.
-     * @param width The height/width of the 2D quadrant.
+     * @param width the height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
     protected static int to1DIndexTopRight(int x, int y, int width) {
@@ -142,7 +142,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      *
      * @param x     The x position of the 2D array.
      * @param y     The y position of the 2D array.
-     * @param width The height/width of the 2D quadrant.
+     * @param width the height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
     protected static int to1DIndexBottomLeft(int x, int y, int width) {
@@ -154,7 +154,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      *
      * @param x     The x position of the 2D array.
      * @param y     The y position of the 2D array.
-     * @param width The height/width of the 2D quadrant.
+     * @param width the height/width of the 2D quadrant.
      * @return The position in the 1D array.
      */
     protected static int to1DIndexBottomRight(int x, int y, int width) {
@@ -164,8 +164,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Calculates the x position for the tile that lies top left from the tile with the given coordinates.
      *
-     * @param x The x coordinate of the original tile.
-     * @param y The y coordinate of the original tile.
+     * @param x the x coordinate of the original tile.
+     * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies top left from the original tile.
      */
     protected static int topLeftX(int x, int y) {
@@ -181,8 +181,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Calculates the x position for the tile that lies top right from the tile with the given coordinates.
      *
-     * @param x The x coordinate of the original tile.
-     * @param y The y coordinate of the original tile.
+     * @param x the x coordinate of the original tile.
+     * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies top right from the original tile.
      */
     protected static int topRightX(int x, int y) {
@@ -198,8 +198,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Calculates the x position for the tile that lies bottom left from the tile with the given coordinates.
      *
-     * @param x The x coordinate of the original tile.
-     * @param y The y coordinate of the original tile.
+     * @param x the x coordinate of the original tile.
+     * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom left from the original tile.
      */
     protected int bottomLeftX(int x, int y) {
@@ -209,8 +209,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Calculates the x position for the tile that lies bottom right from the tile with the given coordinates.
      *
-     * @param x The x coordinate of the original tile.
-     * @param y The y coordinate of the original tile.
+     * @param x the x coordinate of the original tile.
+     * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom right from the original tile.
      */
     protected int bottomRightX(int x, int y) {
@@ -220,8 +220,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Gets the tile at the given index.
      *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
+     * @param x the x coordinate of the tile.
+     * @param y the y coordinate of the tile.
      * @return The tile at the given index.
      */
     public T at(int x, int y) {
@@ -234,8 +234,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Checks if the given tile coordinates are within the boundaries of the map.
      *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
+     * @param x the x coordinate of the tile.
+     * @param y the y coordinate of the tile.
      * @return Whether the coordinates are within the boundaries of the map.
      */
     public boolean isWithinBounds(int x, int y) {
@@ -245,8 +245,8 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Returns an iterator that contains all surrounding tiles from a given hexagon.
      *
-     * @param x The x coordinate of the Tile.
-     * @param y The y coordinate of the Tile.
+     * @param x the x coordinate of the Tile.
+     * @param y the y coordinate of the Tile.
      * @return All surrounding Tiles.
      */
     public Iterator<T> surroundingTilesIterator(int x, int y) {
@@ -388,7 +388,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if settlement of a player has at least one neighbour.
      *
-     * @param player The player to check-
+     * @param player the player to check-
      * @param tile   Tile to look for.
      * @return True if player has a neighbouring settlement. False otherwise.
      */
@@ -426,7 +426,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if player has a chain of settlements on top right diagonal of a tile.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @param tile   The origin tile.
      * @return True if the next three tiles on top right diagonal are occupied by player. False otherwise.
      */
@@ -450,7 +450,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if player has a chain of settlements on top left diagonal of a tile.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @param tile   The origin tile.
      * @return True if the next three tiles on top left diagonal are occupied by player. False otherwise.
      */
@@ -474,7 +474,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if player has a chain of settlements on bottom right diagonal of a tile.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @param tile   The origin tile.
      * @return True if the next three tiles on bottom right diagonal are occupied by player. False otherwise.
      */
@@ -498,7 +498,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if player has a chain of settlements on bottom left diagonal of a tile.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @param tile   The origin tile.
      * @return True if the next three tiles on bottom left diagonal are occupied by player. False otherwise.
      */
@@ -522,7 +522,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Check if a tile is the front or back part of a chain that is occupied by a player.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @param tile   The origin tile.
      * @return True if tile is a part of a chain. False otherwise.
      */
@@ -560,7 +560,7 @@ class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     /**
      * Gets all free tiles that are in front or back of a chain of settlements that is occupied by the player.
      *
-     * @param player The player to check for.
+     * @param player the player to check for.
      * @return All free tiles that are in front or back of a chain of settlements.
      */
     public Set<T> allFreeTilesInFrontOrBackOfAChain(Player player) {
@@ -630,7 +630,7 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Creates the map from the given quadrants.
      *
-     * @param startingTokenCount The amount of tokens that a special place contains at game start.
+     * @param startingTokenCount the amount of tokens that a special place contains at game start.
      * @param topLeft            The first quadrant in the top left.
      * @param topRight           The second quadrant in the top right.
      * @param bottomLeft         The third quadrant in the bottom left.
@@ -651,8 +651,8 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Get all surrounding tiles of a given target tile.
      *
-     * @param x The x coordinate of the target tile.
-     * @param y The y coordinate of the target tile.
+     * @param x the x coordinate of the target tile.
+     * @param y the y coordinate of the target tile.
      * @return All tiles that surrounding target tile.
      */
     public Set<Tile> surroundingTiles(int x, int y) {
@@ -692,8 +692,8 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Check if next to the tile is a token and return it.
      *
-     * @param x The x coordinate of the tile.
-     * @param y The y coordinate of the tile.
+     * @param x the x coordinate of the tile.
+     * @param y the y coordinate of the tile.
      * @return The Token that is next to the settlement or null if there is no token;
      */
     public TileType specialPlaceInSurrounding(int x, int y) {
@@ -708,7 +708,7 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Checks whether there is another settlement of the player on surrounding tiles.
      *
-     * @param player The player that to check.
+     * @param player the player that to check.
      * @param x      The x coordinate of the Tile.
      * @param y      The x coordinate of the Tile.
      * @return True if the player has another settlement on surrounding tile. False otherwise.
@@ -725,7 +725,7 @@ public class Map extends MapReadOnly<Tile> {
      * Check if there is at least one settlement of a Player on a terrain.
      *
      * @param player  The player to check.
-     * @param terrain The terrain to check.
+     * @param terrain the terrain to check.
      * @return True if there is at least one settlement on terrain.
      */
     public boolean settlementOfPlayerOnTerrain(Player player, TileType terrain) {
@@ -743,7 +743,7 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Gets the entire terrain of a type.
      *
-     * @param terrain The terrain to filter.
+     * @param terrain the terrain to filter.
      * @return All tiles of a type.
      */
     public Set<Tile> getEntireTerrain(TileType terrain) {
@@ -815,7 +815,7 @@ public class Map extends MapReadOnly<Tile> {
     /**
      * Checks if there is only one settlement of a player next to a special place.
      *
-     * @param player The player to check-
+     * @param player the player to check-
      * @param x      The x position of the special place.
      * @param y      The y position of the special place.
      * @return

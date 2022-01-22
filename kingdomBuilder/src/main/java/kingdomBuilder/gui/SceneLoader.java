@@ -129,7 +129,7 @@ public class SceneLoader {
 
     /**
      * Constructor that initially loads every view.
-     * @param store The Store to have access to the state.
+     * @param store the Store to have access to the state.
      */
     public SceneLoader(Store<KBState> store) {
         this.store = store;
@@ -185,7 +185,7 @@ public class SceneLoader {
 
     /**
      * Loads the GameSettingsView into the center of the main borderPane.
-     * @param isOnlineGame If the game is online.
+     * @param isOnlineGame if the game is online.
      */
     public void showGameSettingsView(boolean isOnlineGame) {
         //reloads the view so its completely empty
@@ -197,8 +197,8 @@ public class SceneLoader {
 
     /**
      * Loads the gameView into the center of the main borderPane.
-     * @param isSpectating Whether the user wants to spectate.
-     * @param isOnline Whether the game is online.
+     * @param isSpectating whether the user wants to spectate.
+     * @param isOnline whether the game is online.
      */
     public void showGameView(boolean isSpectating, boolean isOnline) {
         // set Chat
@@ -275,7 +275,7 @@ public class SceneLoader {
      * Loads the View at the specific location of the parameter and put the view on the x-position of the
      * tuple and the corresponding controller at the  y-position of the tuple.
      *
-     * @param location String that contains the path to the location of the .fxml file.
+     * @param location string that contains the path to the location of the .fxml file.
      * @return Tuple x-position is the View as Node, y-position is the contoller.
      */
     private Pair<Node, Controller> loadView(String location, Locale locale) {
@@ -299,7 +299,7 @@ public class SceneLoader {
     /**
      * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
      * construction.
-     * @param location The location to load the FXML file from.
+     * @param location the location to load the FXML file from.
      * @return The newly created loader.
      */
     private FXMLLoader makeLoader(URL location) {
@@ -327,7 +327,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the MenuView.fxml and
      * sets the menuView and menuViewController fields.
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadMenuView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/MenuView.fxml", locale);
@@ -339,7 +339,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameSettingsView.fxml and
      * sets the gameSettingsView and gameSettingsViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadGameSettingsView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/GameSettingsView.fxml", locale);
@@ -351,7 +351,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameView.fxml and
      * sets the gameView and gameViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadGameView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/GameView.fxml", locale);
@@ -363,7 +363,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the IAmView.fxml and
      * sets the iAmView and iAmViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadIAmView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/IAmView.fxml", locale);
@@ -375,7 +375,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the ChatView.fxml and
      * sets the chatView and chatViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadChatView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/ChatView.fxml", locale);
@@ -387,7 +387,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameSelectionView.fxml and
      * sets the gameSelectionView and gameSelectionViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadGameSelectionView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/GameSelectionView.fxml", locale);
@@ -399,7 +399,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the GameSelectionView.fxml and
      * sets the gameSelectionView and gameSelectionViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadSettingsView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/SettingsView.fxml", locale);
@@ -411,7 +411,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the ServerConnect.fxml and
      * sets the serverConnectView and serverConnectViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadServerConnectView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/ServerConnect.fxml", locale);
@@ -423,7 +423,7 @@ public class SceneLoader {
      * Calls the loadView() method with the path of the LevelEditor.fxml and
      * sets the LevelEditorView and LevelEditorViewController fields
      * Used for reloading this View.
-     * @param locale The locale for language support.
+     * @param locale the locale for language support.
      */
     public void loadLevelEditorView(Locale locale) {
         Pair<Node, Controller> pair = loadView("controller/LevelEditor.fxml", locale);

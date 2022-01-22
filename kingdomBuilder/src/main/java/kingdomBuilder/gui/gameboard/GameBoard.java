@@ -2,8 +2,9 @@ package kingdomBuilder.gui.gameboard;
 
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.base.Board;
-import kingdomBuilder.model.TileType;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -17,15 +18,15 @@ public class GameBoard extends Board {
      * Represents the width of the board for a game.
      */
     private static final int SIZE = 20;
+
     /**
      * Represents the board that contains the hexagons.
      */
-    // TODO: use constants from Datalogic
     protected HexagonTile[][] board = new HexagonTile[SIZE][SIZE];
 
     /**
      * Constructor to instantiate the GameBoard.
-     * @param store The Store to access the state.
+     * @param store the Store to access the state.
      */
     public GameBoard(Store<KBState> store) {
         // TODO: make constant
@@ -38,16 +39,16 @@ public class GameBoard extends Board {
     /**
      * Places a tile on the board.
      *
-     * @param group The group where the element is added.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @param xPos The x-coordinate for the element.
-     * @param yPos The x-coordinate for the element.
-     * @param tileType The type for the tile.
-     * @param resource The language support.
+     * @param group the group where the element is added.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param xPos the x-coordinate for the element.
+     * @param yPos the x-coordinate for the element.
+     * @param tileType the type for the tile.
+     * @param resource the language support.
      */
     @Override
-    public void placeTileOnBoard(Group group,int x, int y, int xPos, int yPos,
+    public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
                                  TileType tileType, ResourceBundle resource) {
         HexagonTile hexagonTile = new HexagonTile(xPos, yPos, tileType, resource);
         board[x][y] = hexagonTile;
@@ -55,17 +56,17 @@ public class GameBoard extends Board {
         group.getChildren().add(hexagonTile);
     }
 
-
     /**
      * Highlights Hexagons on the map which matches the given type.
      */
     public void highlightTerrain() {
         // TODO: remove randomizer
-        int random = (int) (Math.random() * 5) + 1;
+        int random = (int) (Math.random() * Game.placeableTileTypes.size());
+        TileType tileType = (TileType) Game.placeableTileTypes.toArray()[random];
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board.length; x++) {
                 // //TODO: Change to Gamelogic
-                if (board[x][y].getTileType() == TileType.valueOf(random)) {
+                if (board[x][y].getTileType() == tileType) {
                     if (!board[x][y].isElevated())
                         board[x][y].setElevated();
                 } else {

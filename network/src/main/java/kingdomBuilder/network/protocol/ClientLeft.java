@@ -5,9 +5,7 @@ import kingdomBuilder.annotations.Protocol;
 /**
  * Represents message that will be sent when client left the server.
  */
-@Protocol(format="[SERVER_MESSAGE] [CLIENT_LEFT] <[#{clientId};#{name};#{gameId}]>")
+@Protocol(format="[SERVER_MESSAGE] [CLIENT_LEFT] <[#{clientData}]>")
 public record ClientLeft(
-        int clientId,
-        String name,
-        int gameId
+    ClientData clientData
 ) {}

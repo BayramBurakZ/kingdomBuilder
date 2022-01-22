@@ -4,7 +4,7 @@ import java.util.Set;
 
 /**
  * Interface for the generated deferred state.
- * @param <T> The type of the state.
+ * @param <T> the type of the state.
  */
 public interface DeferredState<T> {
     Set<String> getChangedAttributes();

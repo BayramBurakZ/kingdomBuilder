@@ -20,7 +20,7 @@ public class Controller {
 
     /**
      * Sets the SceneLoader.
-     * @param sceneLoader SceneLoader with all functions.
+     * @param sceneLoader sceneLoader with all functions.
      */
     public void setSceneLoader(SceneLoader sceneLoader) {
         this.sceneLoader = sceneLoader;
@@ -28,7 +28,7 @@ public class Controller {
 
     /**
      * Sets the Store.
-     * @param store The Store with the current state.
+     * @param store the Store with the current state.
      */
     public void setStore(Store<KBState> store) {
         this.store = store;

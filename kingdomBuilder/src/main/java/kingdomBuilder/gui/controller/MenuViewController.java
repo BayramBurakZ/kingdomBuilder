@@ -55,7 +55,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the store.
-     * @param store The store to set.
+     * @param store the store to set.
      */
     public MenuViewController(Store<KBState> store) {
         super.store = store;
@@ -63,9 +63,9 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -96,7 +96,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the LocalGame Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onLocalGameButtonPressed(Event event) {
@@ -105,7 +105,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the OnlineGame Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onOnlineGameButtonPressed(Event event) {
@@ -123,7 +123,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the Exit Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onExitButtonPressed(Event event) {

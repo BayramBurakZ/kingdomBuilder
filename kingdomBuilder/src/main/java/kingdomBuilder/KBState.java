@@ -1,15 +1,13 @@
 package kingdomBuilder;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.SceneLoader;
-import kingdomBuilder.model.ClientDAO;
-import kingdomBuilder.model.GameDAO;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
+import kingdomBuilder.network.protocol.ClientData;
+import kingdomBuilder.network.protocol.GameData;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,9 +18,6 @@ import java.util.Map;
  */
 @State
 public class KBState {
-    // public for testing
-    // TODO? :probably just make these ObservableLists directly
-
     /**
      * Represents the SceneLoader.
      */
@@ -31,12 +26,12 @@ public class KBState {
     /**
      * Maps client id to the client info of connected clients.
      */
-    public final Map<Integer, ClientDAO> clients;
+    public final Map<Integer, ClientData> clients;
 
     /**
      * Maps game id to the game info of created games.
      */
-    public final Map<Integer, GameDAO> games;
+    public final Map<Integer, GameData> games;
 
     /**
      * Stores the selector, which handles network IO.
@@ -76,19 +71,37 @@ public class KBState {
     /**
      * Represents if the better color mode is active.
      */
-    public boolean betterColorsActiv = false;
+    public boolean betterColorsActive = false;
 
     /**
-     * Represents a List with all the available quadrants on the server;
+     * Represents a Map with all the available quadrants on the server;
      */
-    public ObservableList<Integer> quadrantIDs = FXCollections.observableArrayList(0, 1, 2, 3, 4);
+    public final Map<Integer, Game.TileType[]> quadrants;
 
     /**
      * Represents the game.
      */
     public Game game;
 
-    public KBState(SceneLoader sceneLoader, Map<Integer, ClientDAO> clients, Map<Integer, GameDAO> games, ClientSelector selector, Thread selectorThread, Client client, String clientPreferredName, boolean isConnecting, boolean isConnected, boolean failedToConnect, boolean betterColorsActiv, ObservableList<Integer> quadrantIDs, Game game) {
+    /**
+     * Represents the quadrants used in the current game.
+     */
+    public Game.QuadrantIDs gameQuadrantIDs;
+
+    public KBState(SceneLoader sceneLoader,
+                   Map<Integer, ClientData> clients,
+                   Map<Integer, GameData> games,
+                   ClientSelector selector,
+                   Thread selectorThread,
+                   Client client,
+                   String clientPreferredName,
+                   boolean isConnecting,
+                   boolean isConnected,
+                   boolean failedToConnect,
+                   boolean betterColorsActive,
+                   Map<Integer, Game.TileType[]> quadrants,
+                   Game game,
+                   Game.QuadrantIDs gameQuadrantIDs) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -99,9 +112,10 @@ public class KBState {
         this.isConnecting = isConnecting;
         this.isConnected = isConnected;
         this.failedToConnect = failedToConnect;
-        this.betterColorsActiv = betterColorsActiv;
-        this.quadrantIDs = quadrantIDs;
+        this.betterColorsActive = betterColorsActive;
+        this.quadrants = quadrants;
         this.game = game;
+        this.gameQuadrantIDs = gameQuadrantIDs;
     }
 
     /**
@@ -110,6 +124,7 @@ public class KBState {
     public KBState() throws IOException {
         clients = new HashMap<>();
         games = new HashMap<>();
+        quadrants = new HashMap<>();
         selector = new ClientSelectorImpl();
         isConnecting = false;
         isConnected = false;

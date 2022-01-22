@@ -26,7 +26,7 @@ public class ConnectAction extends Action {
     /**
      * Creates a new ConnectAction. Sets the own fields to the value given: Sets the address to the address parameter
      * and the port to the port parameter
-     * @param address String that represents the address of the server that we want to connect to
+     * @param address string that represents the address of the server that we want to connect to
      * @param port int that represents the port for the server connection
      */
     public ConnectAction(String address, int port) {

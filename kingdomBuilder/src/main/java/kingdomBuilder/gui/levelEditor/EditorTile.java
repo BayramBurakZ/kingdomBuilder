@@ -1,9 +1,9 @@
 package kingdomBuilder.gui.levelEditor;
 
 import javafx.scene.paint.PhongMaterial;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.base.Tile;
 import kingdomBuilder.gui.gameboard.MaterialLoader;
-import kingdomBuilder.model.TileType;
 
 import java.util.ResourceBundle;
 
@@ -22,11 +22,12 @@ public class EditorTile extends Tile {
      *
      * @param xPos     The x position.
      * @param yPos     The y position.
-     * @param tileType The type of the hexagon.
-     * @param resource The language support.
-     * @param controller The LevelEditorController.
+     * @param tileType the type of the hexagon.
+     * @param resource the language support.
+     * @param controller the LevelEditorController.
      */
-    protected EditorTile(double xPos, double yPos, TileType tileType, ResourceBundle resource, LevelEditorController controller) {
+    protected EditorTile(double xPos, double yPos, Game.TileType tileType,
+                         ResourceBundle resource, LevelEditorController controller) {
         super(xPos, yPos, null, resource);
         levelEditorController = controller;
     }
@@ -37,7 +38,7 @@ public class EditorTile extends Tile {
     @Override
     protected void setMouseHandler() {
         setOnMouseClicked(event -> {
-            TileType tmp = levelEditorController.getTileTypeFromCombobox();
+            Game.TileType tmp = levelEditorController.getTileTypeFromCombobox();
 
             tileType = tmp;
 

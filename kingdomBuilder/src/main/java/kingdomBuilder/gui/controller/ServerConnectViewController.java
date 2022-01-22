@@ -29,7 +29,7 @@ public class ServerConnectViewController extends Controller implements Initializ
 
     /**
      * Constructs the ServerConnectViewController.
-     * @param store The Application's store to set the field.
+     * @param store the Application's store to set the field.
      */
     public ServerConnectViewController(Store<KBState> store) {
         this.store = store;
@@ -37,9 +37,9 @@ public class ServerConnectViewController extends Controller implements Initializ
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -54,7 +54,7 @@ public class ServerConnectViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the Connect Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onConnectButtonPressed(Event event) {
@@ -70,7 +70,7 @@ public class ServerConnectViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the Exit Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onBackToMenuButtonPressed(Event event) {

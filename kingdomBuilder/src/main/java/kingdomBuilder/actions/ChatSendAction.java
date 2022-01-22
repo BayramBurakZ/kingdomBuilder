@@ -26,8 +26,8 @@ public class ChatSendAction extends Action {
     /**
      * Constructor that creates a new ChatSendAction. Sets the internal fields for receiverIds to the given ones
      * and the field for the String that represents the message to the given one.
-     * @param receiverIds A list with all the receiverIds in form of Integers
-     * @param message String that represents the chatMessage to send to the server
+     * @param receiverIds a list with all the receiverIds in form of Integers
+     * @param message string that represents the chatMessage to send to the server
      */
     public ChatSendAction(List<Integer> receiverIds, String message) {
         this.receiverIds = receiverIds;

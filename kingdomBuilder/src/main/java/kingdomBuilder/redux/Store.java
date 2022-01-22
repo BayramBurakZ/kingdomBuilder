@@ -6,10 +6,10 @@ import java.util.*;
 
 /**
  * Represents the store of the application.
- * @param <State> State of application.
+ * @param <State> state of application.
  */
 public class Store<State> {
-    private final String ATTRIBUTE_WILDCARD = "*";
+    private static final String ATTRIBUTE_WILDCARD = "*";
 
     /**
      * Represents the state of the application.
@@ -28,8 +28,8 @@ public class Store<State> {
 
     /**
      * Creates a new Store object with the given state and reducer.
-     * @param state State of the application.
-     * @param reducer Reducer of the application.
+     * @param state state of the application.
+     * @param reducer reducer of the application.
      */
     public Store(State state, Reducer<State> reducer) {
         this.state = state;
@@ -88,7 +88,7 @@ public class Store<State> {
 
     /**
      * Helper method, which retrieves the set of subscribers or creates it if absent.
-     * @param name The name of the attribute, the subscribers listen too.
+     * @param name the name of the attribute, the subscribers listen too.
      * @return The set of subscribers that listen to the specified attribute.
      */
     private Set<Subscriber<State>> getSubscriberSet(String name) {

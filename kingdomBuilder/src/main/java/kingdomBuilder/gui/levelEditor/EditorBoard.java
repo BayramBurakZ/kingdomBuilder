@@ -2,8 +2,8 @@ package kingdomBuilder.gui.levelEditor;
 
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.base.Board;
-import kingdomBuilder.model.TileType;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -31,8 +31,8 @@ public class EditorBoard extends Board {
     /**
      * Constructs a board.
      *
-     * @param store The store of the application.
-     * @param editorController The LevelEditor Controller
+     * @param store the store of the application.
+     * @param editorController the LevelEditor Controller
      */
     public EditorBoard(Store<KBState> store, LevelEditorController editorController) {
         super(store);
@@ -42,17 +42,17 @@ public class EditorBoard extends Board {
     /**
      * Places an EditorTile on the board.
      *
-     * @param group The group where the element is added.
-     * @param x The x-coordinate.
-     * @param y The y-coordinate.
-     * @param xPos The x-coordinate for the element.
-     * @param yPos The x-coordinate for the element.
-     * @param tileType The type for the tile.
-     * @param resource The language support.
+     * @param group the group where the element is added.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param xPos the x-coordinate for the element.
+     * @param yPos the x-coordinate for the element.
+     * @param tileType the type for the tile.
+     * @param resource the language support.
      */
     @Override
     public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
-                                 TileType tileType, ResourceBundle resource) {
+                                 Game.TileType tileType, ResourceBundle resource) {
         EditorTile editorTile = new EditorTile(xPos, yPos, null, resource, editorController);
         board[x][y] = editorTile;
 
@@ -61,11 +61,11 @@ public class EditorBoard extends Board {
 
     /**
      * Creates a quadrant with empty tiles.
-     * @param group The group in which the Tiles should be added.
-     * @param resource The language support.
+     * @param group the group in which the Tiles should be added.
+     * @param resource the language support.
      */
     public void setupEmptyQuadrant(Group group, ResourceBundle resource) {
-        TileType[][] empty = new TileType[SIZE][SIZE];
+        Game.TileType[][] empty = new Game.TileType[SIZE][SIZE];
         setupBoard(group, empty, resource);
     }
 

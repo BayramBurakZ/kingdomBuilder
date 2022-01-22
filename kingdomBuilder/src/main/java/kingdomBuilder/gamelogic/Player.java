@@ -46,7 +46,7 @@ public class Player {
     /**
      * Gives the player a token.
      *
-     * @param tokenType The token type that is given to the player.
+     * @param tokenType the token type that is given to the player.
      */
     public void addToken(TileType tokenType) {
         tokens.get(tokenType).total++;
@@ -55,7 +55,7 @@ public class Player {
     /**
      * Removes a token from the player.
      *
-     * @param tokenType The token type that is removed.
+     * @param tokenType the token type that is removed.
      */
     public void removeToken(TileType tokenType) {
         Token token = tokens.get(tokenType);
@@ -67,7 +67,7 @@ public class Player {
     /**
      * Returns the amount of tokens from a type the player has.
      *
-     * @param tokenType The token type to check.
+     * @param tokenType the token type to check.
      * @return The amount of that type.
      */
     public int remainingToken(TileType tokenType) {
@@ -78,7 +78,7 @@ public class Player {
     /**
      * Check if player owns a specific type of token
      *
-     * @param tokenType The token type to check
+     * @param tokenType the token type to check
      * @return true if he ownes at least one of that token
      */
     public boolean playerHasTokenLeft(TileType tokenType) {

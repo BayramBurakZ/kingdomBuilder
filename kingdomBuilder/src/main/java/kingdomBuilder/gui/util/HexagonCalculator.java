@@ -26,7 +26,7 @@ public class HexagonCalculator {
     /**
      * Calculates the corners of a hexagon with the given radius.
      *
-     * @param radius The radius from the center of a hexagon to one of its corners.
+     * @param radius the radius from the center of a hexagon to one of its corners.
      * @return A list with six points of a hexagon.
      */
     public static ArrayList<Point2D> calculateCorners(int radius) {

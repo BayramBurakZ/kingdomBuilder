@@ -1,18 +1,18 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.ChatSendAction;
-import kingdomBuilder.model.ClientDAO;
+import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
 import org.w3c.dom.Document;
@@ -36,25 +36,25 @@ public class ChatViewController extends Controller implements Initializable {
      * Represents the table for the clients on the server.
      */
     @FXML
-    private TableView<ClientDAO> tableview_chat;
+    private TableView<ClientData> tableview_chat;
 
     /**
      * Represents the column for the client ids of the clients on the server in the table.
      */
     @FXML
-    private TableColumn<ClientDAO, String> column_id;
+    private TableColumn<ClientData, String> column_id;
 
     /**
      * Represents the column for the client names of the clients on the server.
      */
     @FXML
-    private TableColumn<ClientDAO, String> column_name;
+    private TableColumn<ClientData, String> column_name;
 
     /**
      * Represents the column for the game-ids of the clients on the server.
      */
     @FXML
-    private TableColumn<ClientDAO, String> column_gameid;
+    private TableColumn<ClientData, String> column_gameid;
 
     /**
      * Represents the tab for the global chat.
@@ -111,7 +111,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Constructs the ChatViewController.
-     * @param store The Application's store to set the field.
+     * @param store the Application's store to set the field.
      */
     public ChatViewController(Store<KBState> store) {
         this.store = store;
@@ -119,9 +119,9 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -161,11 +161,12 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Setup for the table that shows all connected clients.
      */
+    //Todo: update the list instead setting it only once
     private void setupClientList() {
         tableview_chat.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        column_id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        column_name.setCellValueFactory(new PropertyValueFactory<>("name"));
-        column_gameid.setCellValueFactory(new PropertyValueFactory<>("gameId"));
+        column_id.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().clientId())));
+        column_name.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().name())));
+        column_gameid.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
     }
 
     /**
@@ -186,7 +187,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the clear selection button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onClearSelectionButtonPressed(Event event) {
@@ -195,7 +196,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the send button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onSendButtonPressed(Event event) {
@@ -204,7 +205,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the whisper button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onWhisperButtonPressed(Event event) {
@@ -213,7 +214,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for KeyEvents.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     public void onKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {
@@ -263,11 +264,11 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView with the specific incoming message correctly.
-     * @param chatMsg Contains all information of the incoming chat message.
+     * @param chatMsg contains all information of the incoming chat message.
      */
     public void onMessage(Message chatMsg) {
         int senderID = chatMsg.clientId();
-        String senderName = store.getState().clients.get(senderID).getName();
+        String senderName = store.getState().clients.get(senderID).name();
         Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
         String message = chatMsg.message();
         String chatMessage;
@@ -282,7 +283,7 @@ public class ChatViewController extends Controller implements Initializable {
                     continue;
                 }
 
-                chatMessage += ", @" + store.getState().clients.get(receivers[i]).getName();
+                chatMessage += ", @" + store.getState().clients.get(receivers[i]).name();
             }
             chatMessage += ": ";
         } else {
@@ -308,14 +309,12 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the UI when another client left the server.
-     * @param clientId the ID of the client which left the server.
-     * @param name the name of the client which left the server.
-     * @param gameId the game ID of the client which left the server.
+     * @param clientData the data of the client who left the server.
      */
-    public void onClientLeft(int clientId, String name, int gameId) {
+    public void onClientLeft(ClientData clientData) {
         Platform.runLater(() -> {
             var elem = createHTMLElement(
-                    "<--- " + name + " " + resourceBundle.getString("leftTheServer") + ". --->",
+                    "<--- " + clientData.name() + " " + resourceBundle.getString("leftTheServer") + ". --->",
                     MessageStyle.SERVER);
             globalChatAppendElement(elem);
         });
@@ -323,14 +322,12 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the UI when another client joined the server.
-     * @param clientId the ID of the client which left the server.
-     * @param name the name of the client which left the server.
-     * @param gameId the game ID of the client which left the server.
+     * @param clientData the data of the client who joined the server.
      */
-    public void onClientJoined(int clientId, String name, int gameId) {
+    public void onClientJoined(ClientData clientData) {
         Platform.runLater(() -> {
             var element = createHTMLElement(
-                    "<--- " + name + " " + resourceBundle.getString("joinedTheServer") + ". --->",
+                    "<--- " + clientData.name() + " " + resourceBundle.getString("joinedTheServer") + ". --->",
                     MessageStyle.SERVER
             );
             globalChatAppendElement(element);
@@ -394,7 +391,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientDAO -> clientDAO.getId() != store.getState().client.getClientId());
+                    .filtered(clientData -> clientData.clientId() != store.getState().client.getClientId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -404,14 +401,14 @@ public class ChatViewController extends Controller implements Initializable {
             // creates message for the chat textarea
             chatMessage = resourceBundle.getString("youWhisper") + " ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).getId() == store.getState().client.getClientId()) {
+                if (receivers.get(i).clientId() == store.getState().client.getClientId()) {
                     continue;
                 }
-                receiverIds.add(receivers.get(i).getId());
-                chatMessage += "@" + receivers.get(i).getName() + ", ";
+                receiverIds.add(receivers.get(i).clientId());
+                chatMessage += "@" + receivers.get(i).name() + ", ";
             }
-            receiverIds.add(receivers.get(receivers.size()-1).getId());
-            chatMessage += "@" + receivers.get(receivers.size()-1).getName() + ": ";
+            receiverIds.add(receivers.get(receivers.size()-1).clientId());
+            chatMessage += "@" + receivers.get(receivers.size()-1).name() + ": ";
             Element receiversElement = createHTMLElement(chatMessage, MessageStyle.BOLD);
             Text textElement = createHTMLText(message);
 
@@ -484,7 +481,7 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Creates the HTML Text object with the specified text content.
      *
-     * @param textContent The text content for that element.
+     * @param textContent the text content for that element.
      * @return The HTML Text object.
      */
     private Text createHTMLText(String textContent) {
@@ -495,8 +492,8 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Creates the HTML Element with the specified message highlighting style.
      *
-     * @param textContent The text content for that element.
-     * @param style The style for highlighting the message.
+     * @param textContent the text content for that element.
+     * @param style the style for highlighting the message.
      * @return The HTML Element.
      */
     private Element createHTMLElement(String textContent, MessageStyle style) {
@@ -509,7 +506,7 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Creates the HTML Element with the specified message highlighting style.
      *
-     * @param style The style for highlighting the message.
+     * @param style the style for highlighting the message.
      * @return The HTML Element wit the highlighting style.
      */
     private Element createHTMLElement(MessageStyle style) {
@@ -527,7 +524,7 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Creates the HTML Element with the specified message highlighting style.
      *
-     * @param tagName The HTML element's tag name.
+     * @param tagName the HTML element's tag name.
      * @return HTML Element with the highlighting style.
      */
     private Element createHTMLElementByTag(String tagName) {
@@ -536,7 +533,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Appends the element with the specified tag name to the global chat html body.
-     * @param element The HTML element to be appended to the chat log.
+     * @param element the HTML element to be appended to the chat log.
      */
     private void globalChatAppendElement(Element element) {
 

@@ -43,7 +43,7 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
     }
 
     @Override
-    public void accept(RequestClientsResponse message) {
+    public void accept(ClientsReply message) {
         object = message;
     }
 

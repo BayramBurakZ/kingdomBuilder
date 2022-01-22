@@ -14,7 +14,7 @@ public class PLYLoader {
 
     /**
      * Loads a 3D Model from a .ply-File into a TriangleMesh.
-     * @param uri The Location of the .ply-File.
+     * @param uri the Location of the .ply-File.
      * @return The 3D Model or null if something goes wrong.
      */
     public static TriangleMesh readFromPlyFile(URI uri) {

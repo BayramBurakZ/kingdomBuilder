@@ -68,7 +68,7 @@ class TileReadOnly {
     /**
      * Check whether the tile at given index is at the border of the map.
      *
-     * @param map The map containing the tile.
+     * @param map the map containing the tile.
      * @return Whether the tile is at the border.
      */
     public boolean isAtBorder(MapReadOnly map) {
@@ -104,7 +104,7 @@ class TileReadOnly {
     /**
      * Checks if two tiles are neighbours in the hexagon map.
      *
-     * @param other The second tile.
+     * @param other the second tile.
      * @return Whether both tiles are neighbours.
      */
     public boolean areNeighbouringTiles(Tile other) {
@@ -138,7 +138,7 @@ public class Tile extends TileReadOnly {
     /**
      * Place a settlement on the tile that belongs to the given player.
      *
-     * @param ownerOfSettlement Player that places a settlement.
+     * @param ownerOfSettlement player that places a settlement.
      */
     public void placeSettlement(Player ownerOfSettlement) {
         if (occupiedBy != null)
@@ -165,7 +165,7 @@ public class Tile extends TileReadOnly {
     /**
      * Moves a settlement from this tile to another.
      *
-     * @param destination The tile that the settlement gets moved to.
+     * @param destination the tile that the settlement gets moved to.
      */
     public void moveSettlement(Tile destination) {
         Player player = removeSettlement();

@@ -1,8 +1,8 @@
 package kingdomBuilder.gui.base;
 
 import javafx.scene.Group;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.gameboard.Hexagon;
-import kingdomBuilder.model.TileType;
 
 import java.util.ResourceBundle;
 
@@ -23,16 +23,16 @@ public abstract class Tile extends Group {
     /**
      * Represents the tileType of the hexagon.
      */
-    protected TileType tileType;
+    protected Game.TileType tileType;
 
     /**
      * Constructs a new Tile with the given parameters.
-     * @param xPos The x position.
-     * @param yPos The y position.
-     * @param tileType The type of the hexagon.
-     * @param resource The language support.
+     * @param xPos the x position.
+     * @param yPos the y position.
+     * @param tileType the type of the hexagon.
+     * @param resource the language support.
      */
-    protected Tile(double xPos, double yPos,  TileType tileType, ResourceBundle resource) {
+    protected Tile(double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
         if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
@@ -62,7 +62,7 @@ public abstract class Tile extends Group {
      * Gets the type of this Tile.
      * @return The type.
      */
-    public TileType getTileType() {
+    public Game.TileType getTileType() {
         return tileType;
     }
 }

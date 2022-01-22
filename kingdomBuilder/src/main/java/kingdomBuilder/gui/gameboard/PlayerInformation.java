@@ -5,19 +5,12 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import kingdomBuilder.gamelogic.Game;
 
 /**
  * Class to create an information panel for a player.
  */
 public class PlayerInformation extends HBox{
-
-    //TODO: Remove
-    public enum PlayerColor {
-        RED,
-        BLUE,
-        BLACK,
-        WHITE
-    }
 
     /**
      * Represents the Label for the players name.
@@ -34,11 +27,11 @@ public class PlayerInformation extends HBox{
 
     /**
      * Constructs a new PlayerInformation Element which contains the name, the settlements left and the score.
-     * @param playerName The name of the player.
-     * @param color The color for the Player.
-     * @param colorMode Defines which colors should be used.
+     * @param playerName the name of the player.
+     * @param color the color for the Player.
+     * @param colorMode defines which colors should be used.
      */
-    public PlayerInformation(String playerName, PlayerColor color, boolean colorMode) {
+    public PlayerInformation(String playerName, Game.PlayerColor color, boolean colorMode) {
         super();
 
         // set the players name
@@ -90,7 +83,7 @@ public class PlayerInformation extends HBox{
 
     /**
      * Sets the count for the score to the given.
-     * @param count The count to set.
+     * @param count the count to set.
      */
     public void setScore(int count) {
         score.setText(integerToString(count));
@@ -98,7 +91,7 @@ public class PlayerInformation extends HBox{
 
     /**
      * Sets the count for the settlements to the given.
-     * @param count The count to set.
+     * @param count the count to set.
      */
     public void setSettlementCount(int count) {
         settlements.setText(integerToString(count));
@@ -106,8 +99,8 @@ public class PlayerInformation extends HBox{
 
     /**
      * Changes int to String and add a leading zero, so it has two digits.
-     * @param in The int to convert.
-     * @return The String that represents the int.
+     * @param in the int to convert.
+     * @return the String that represents the int.
      */
     private String integerToString(int in) {
         String out = Integer.toString(in);

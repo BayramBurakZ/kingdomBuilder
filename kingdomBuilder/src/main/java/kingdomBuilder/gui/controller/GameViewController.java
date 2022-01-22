@@ -20,10 +20,10 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
-import kingdomBuilder.model.Model;
-import kingdomBuilder.model.TileType;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -128,10 +128,6 @@ public class GameViewController extends Controller implements Initializable {
 
     //endregion FXML
 
-    //TODO: remove with adding subscribers
-    // temporary solution to store the board instead using the data from dataLogic
-    private TileType[][] gameBoardData;
-
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
@@ -174,7 +170,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Constructs the GameView with the given store.
-     * @param store The Store for access to the state.
+     * @param store the Store for access to the state.
      */
     public GameViewController(Store<KBState> store) {
         this.store = store;
@@ -182,13 +178,14 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                 or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
+        // - Initialize Board  -> setupBoard()
         // - PlayerData settlements -> updateSettlementsForPlayer()
         // - PlayerData score -> updateScoreForPlayer()
         // - when player joins -> addPlayer()
@@ -200,10 +197,6 @@ public class GameViewController extends Controller implements Initializable {
         // - if PlayersTurn -> disableTokens(false / true)
 
         resourceBundle = resources;
-
-        // TODO: Remove with adding subscribers
-        Model model = new Model();
-        gameBoardData = model.getGameBoardData();
 
         setupGameBoard();
         setupCamera();
@@ -267,7 +260,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Setup all connected EventHandler.
-     * @param camera The camera for the handlers.
+     * @param camera the camera for the handlers.
      */
     private void setupCameraHandlers(Camera camera) {
         setupCameraZoomHandler(camera);
@@ -276,7 +269,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Zooms the camera when the user scrolls the mousewheel.
-     * @param camera The camera for zooming.
+     * @param camera the camera for zooming.
      */
     private void setupCameraZoomHandler(Camera camera) {
         game_subscene.setOnScroll((ScrollEvent event) -> {
@@ -297,7 +290,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Translates the camera when the user presses the arrow keys.
-     * @param camera The camera to move.
+     * @param camera the camera to move.
      */
     private void setupCameraScrollHandler(Camera camera) {
         // TODO: smoother scrolling
@@ -311,8 +304,8 @@ public class GameViewController extends Controller implements Initializable {
                 //ToDO: remove - just for testing the highlight
                 case R -> gameBoard.highlightTerrain();
                 case T -> {
-                    int random = (int) (Math.random() * 5) + 1;
-                    updateCardDescription(TileType.valueOf(random));
+                    int random = (int) (Math.random() * Game.placeableTileTypes.size());
+                    updateCardDescription((TileType) Game.placeableTileTypes.toArray()[random]);
                     updateTokens();
                 }
                 case Z -> updateWinConditions();
@@ -328,7 +321,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     private void setupGameBoard() {
         // TODO: access data via state
-        gameBoard.setupBoard(gameBoard_group, gameBoardData, resourceBundle);
+        gameBoard.setupBoard(gameBoard_group, null, resourceBundle);
 
         HexagonTile[][] board = gameBoard.getBoard();
         boardCenter = new Point3D(
@@ -381,7 +374,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Updates the Card to the current card of the turn
-     * @param tileType The type to show.
+     * @param tileType the type to show.
      */
     private void updateCardDescription(TileType tileType) {
         // TODO read TileType from Datalogic/Store instead of parameter
@@ -404,7 +397,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Disables all tokens except the selected.
-     * @param disable If the tokens should be disabled then use true.
+     * @param disable if the tokens should be disabled then use true.
      */
     public void disableTokens(boolean disable) {
         if (tokens.size() == 0) {
@@ -439,10 +432,10 @@ public class GameViewController extends Controller implements Initializable {
         //  instead of using a randomizer and the for loop
         //  and clear tokens and hbox first (2 lines above)
 
-        int random = (int) (Math.random() * 8) + 9;
+        int random = (int) (Math.random() * Game.tokenType.size());
         int count = 2;
 
-        TileType tileType = TileType.valueOf(random);
+        TileType tileType = (TileType) Game.tokenType.toArray()[random];
 
         //gameview_hbox_tokens
         Token token = new Token(tileType, count, this, areTokensDisabled, resourceBundle);
@@ -453,20 +446,20 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Adds a player to the view.
-     * @param name The name of the player.
+     * @param name the name of the player.
      */
     private void addPlayer(String name) {
         // TODO: adjust to gamelogic or read from state
-        PlayerInformation.PlayerColor color = PlayerInformation.PlayerColor.RED;
+        Game.PlayerColor color = Game.PlayerColor.RED;
 
         int size = players.size();
-        if (size == 0)  color = PlayerInformation.PlayerColor.RED;
-        if (size == 1)  color = PlayerInformation.PlayerColor.BLUE;
-        if (size == 2)  color = PlayerInformation.PlayerColor.BLACK;
-        if (size == 3)  color = PlayerInformation.PlayerColor.WHITE;
+        if (size == 0)  color = Game.PlayerColor.RED;
+        if (size == 1)  color = Game.PlayerColor.BLUE;
+        if (size == 2)  color = Game.PlayerColor.BLACK;
+        if (size == 3)  color = Game.PlayerColor.WHITE;
         if (size > 3)   return;
 
-        boolean colorMode = store.getState().betterColorsActiv;
+        boolean colorMode = store.getState().betterColorsActive;
         PlayerInformation player = new PlayerInformation(name, color, colorMode);
         game_hbox_players.getChildren().add(player);
 
@@ -481,8 +474,8 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Updates the score of a player.
      *
-     * @param player The selected player (0-3).
-     * @param score The new score.
+     * @param player the selected player (0-3).
+     * @param score the new score.
      */
     private void updateScoreForPlayer(int player, int score) {
         players.get(player).setScore(score);
@@ -491,8 +484,8 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Updates the settlements of a player.
      *
-     * @param player The selected player (0-3).
-     * @param count The new settlement count.
+     * @param player the selected player (0-3).
+     * @param count the new settlement count.
      */
     private void updateSettlementsForPlayer(int player, int count) {
         players.get(player).setSettlementCount(count);
@@ -506,15 +499,15 @@ public class GameViewController extends Controller implements Initializable {
         game_hBox_windconditions.getChildren().clear();
 
         // TODO: read winconditions from Data
-        Wincondition.WinCondition[] wc = {
-                Wincondition.WinCondition.FISHER,
-                Wincondition.WinCondition.LORDS,
-                Wincondition.WinCondition.MINER,
-                Wincondition.WinCondition.ANCHORITE,
-                Wincondition.WinCondition.FARMER,
-                Wincondition.WinCondition.MERCHANT,
-                Wincondition.WinCondition.KNIGHT,
-                Wincondition.WinCondition.EXPLORER
+        Game.WinCondition[] wc = {
+                Game.WinCondition.FISHER,
+                Game.WinCondition.LORDS,
+                Game.WinCondition.MINER,
+                Game.WinCondition.ANCHORITE,
+                Game.WinCondition.FARMER,
+                Game.WinCondition.MERCHANT,
+                Game.WinCondition.KNIGHT,
+                Game.WinCondition.EXPLORER
         };
 
         for (int i = 0; i < 3; i++) {
@@ -563,7 +556,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Set the spectating value, if the game view is for a spectating game.
-     * @param spectating If the game is observed by a spectator.
+     * @param spectating if the game is observed by a spectator.
      */
     public void setSpectating(boolean spectating) {
         this.isSpectating = spectating;
@@ -571,7 +564,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Sets the online value, if the game is on an online server.
-     * @param isOnline If the game is an online game.
+     * @param isOnline if the game is an online game.
      */
     public void setIsOnline(boolean isOnline) {
         this.isOnline = isOnline;

@@ -39,9 +39,9 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
         ClientJoined typedPacket = assertInstanceOf(ClientJoined.class, testConsumer.getObject());
 
-        assertEquals(4, typedPacket.clientId());
-        assertEquals("Ich", typedPacket.name());
-        assertEquals(-1, typedPacket.gameId());
+        final var expectedClientData = new ClientData(4, "Ich", -1);
+
+        assertEquals(expectedClientData, typedPacket.clientData());
     }
 
     @Test
@@ -52,9 +52,9 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
         ClientJoined typedPacket = assertInstanceOf(ClientJoined.class, testConsumer.getObject());
 
-        assertEquals(4, typedPacket.clientId());
-        assertEquals(" H a h", typedPacket.name());
-        assertEquals(-1, typedPacket.gameId());
+        final var expectedClientData = new ClientData(4, " H a h", -1);
+
+        assertEquals(expectedClientData, typedPacket.clientData());
     }
 
     @Test
@@ -86,13 +86,13 @@ public class TestProtocolDeserializer {
     }
 
     @Test
-    void testDeserializingRequestClientsResponse() {
+    void testDeserializingClientsReply() {
         final String packet = "[REPLY_MESSAGE] (?clients) <{[4;Ich;-1],[42;Du;100]}>";
         ProtocolDeserializer.deserialize(packet, testConsumer);
 
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
-        RequestClientsResponse typedPacket = assertInstanceOf(
-                RequestClientsResponse.class, testConsumer.getObject()
+        ClientsReply typedPacket = assertInstanceOf(
+                ClientsReply.class, testConsumer.getObject()
         );
 
         final var expectedClients = List.of(
@@ -111,13 +111,16 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError());
         GameHosted typedPacket = assertInstanceOf(GameHosted.class, testConsumer.getObject());
 
-        assertEquals(1, typedPacket.clientId());
-        assertEquals("kingdom_builder:KB", typedPacket.gameType());
-        assertEquals(0, typedPacket.gameId());
-        assertEquals("Mein Spiel", typedPacket.gameName());
-        assertEquals("greatest Spiel ever", typedPacket.gameDescription());
-        assertEquals(2, typedPacket.playerLimit());
-        assertEquals(0, typedPacket.playersJoined());
+        final var expectedGameData = new GameData(
+                1,
+                "kingdom_builder:KB",
+                0,
+                "Mein Spiel",
+                "greatest Spiel ever",
+                2,
+                0);
+
+        assertEquals(expectedGameData, typedPacket.gameData());
     }
 
     @Test

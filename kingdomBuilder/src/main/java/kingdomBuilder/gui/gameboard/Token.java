@@ -12,9 +12,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.gui.util.HexagonCalculator;
-import kingdomBuilder.model.TileType;
 
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -41,13 +41,13 @@ public class Token extends StackPane {
 
     /**
      * Constructs a new Token, with given type, count.
-     * @param tileType The type of the Token.
-     * @param count The count, how many Tokens the user own.
-     * @param gameViewController The gameViewController (to deactivate other Tokens).
-     * @param disable If the Token is at the beginning disabled.
-     * @param resource The language support.
+     * @param tileType the type of the Token.
+     * @param count the count, how many Tokens the user own.
+     * @param gameViewController the gameViewController (to deactivate other Tokens).
+     * @param disable if the Token is at the beginning disabled.
+     * @param resource the language support.
      */
-    public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable, ResourceBundle resource) {
+    public Token(Game.TileType tileType, int count, GameViewController gameViewController, boolean disable, ResourceBundle resource) {
         super();
 
         // TODO: Subscribers:
@@ -100,7 +100,7 @@ public class Token extends StackPane {
 
     /**
      * Checks if the token is currently activated and ready to use.
-     * @return If the Token is ready to use.
+     * @return if the Token is ready to use.
      */
     public boolean isTokenActivated() {
         return hexagon.isActivated;
@@ -108,12 +108,12 @@ public class Token extends StackPane {
 
     /**
      * Set the rule for every generated special place to their rule.
-     * @param tileType type for recognizing the special place.
+     * @param tileType the type for recognizing the special place.
      */
-    private void setTokenTooltip(TileType tileType) {
-        // TODO: Adjust to gameLogic enums
+    private void setTokenTooltip(Game.TileType tileType) {
 
-        if (tileType.getValue() < 8) {
+        // if not a token, return
+        if (Game.regularTileTypes.contains(tileType)) {
             return;
         }
 
@@ -163,10 +163,10 @@ public class Token extends StackPane {
 
         /**
          * Constructs a new 2D hexagon with the given type.
-         * @param tileType The type for the texture.
-         * @param gameViewController The gameViewController.
+         * @param tileType the type for the texture.
+         * @param gameViewController the gameViewController.
          */
-        public Hexagon2D(TileType tileType, GameViewController gameViewController) {
+        public Hexagon2D(Game.TileType tileType, GameViewController gameViewController) {
             this.gameViewController = gameViewController;
 
             setStrokeWidth(2.0);
@@ -185,9 +185,9 @@ public class Token extends StackPane {
 
         /**
          * Adds the Mouse listener for the hexagon.
-         * @param tileType The type defines which action is triggered.
+         * @param tileType the type defines which action is triggered.
          */
-        private void addListener(TileType tileType) {
+        private void addListener(Game.TileType tileType) {
             setOnMouseClicked(event -> {
                 // if the tile is disabled: do nothing
                 if (isDisabled) {
@@ -202,7 +202,6 @@ public class Token extends StackPane {
                     // ... and disable all other tokens first
                     gameViewController.disableTokens(true);
 
-                    // TODO: Gamelogic Enums
                     switch (tileType) {
                         case BARN -> {
                             //TODO: activate Token in Gamelogic for highlight
@@ -244,7 +243,7 @@ public class Token extends StackPane {
         }
 
         // TODO: remove
-        private void placeholder(TileType tileType) {
+        private void placeholder(Game.TileType tileType) {
             if (isActivated) {
                 System.out.println("You activated your " + tileType + " -Token!");
             }
@@ -252,7 +251,7 @@ public class Token extends StackPane {
 
         /**
          * Sets the hexagon disable value.
-         * @param value Set to true if no Action should be triggered.
+         * @param value set to true if no Action should be triggered.
          */
         private void setHexagonDisabled(boolean value) {
             isDisabled = value;

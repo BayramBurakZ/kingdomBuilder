@@ -16,7 +16,7 @@ public class LoggedInAction extends Action {
 
     /**
      * Constructs a new LoggedInAction.
-     * @param client The client.
+     * @param client the client.
      */
     public LoggedInAction(Client client) {
         this.client = client;

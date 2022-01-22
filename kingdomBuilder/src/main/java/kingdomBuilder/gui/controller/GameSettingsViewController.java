@@ -1,5 +1,9 @@
 package kingdomBuilder.gui.controller;
 
+import com.sun.javafx.collections.ObservableListWrapper;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -174,7 +178,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Constructs the GameSettingsViewController.
-     * @param store The Application's store to set the field.
+     * @param store the Application's store to set the field.
      */
     public GameSettingsViewController(Store<KBState> store) {
         super.store = store;
@@ -185,7 +189,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      *
      * @param location  The location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -233,10 +237,10 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Initializes the ChoiceBoxes for the quadrant id selection.
      */
     private void initializeChoiceBox() {
-        gamesettings_choicebox_upperleft.setItems(store.getState().quadrantIDs);
-        gamesettings_choicebox_upperright.setItems(store.getState().quadrantIDs);
-        gamesettings_choicebox_bottomleft.setItems(store.getState().quadrantIDs);
-        gamesettings_choicebox_bottomright.setItems(store.getState().quadrantIDs);
+        gamesettings_choicebox_upperleft.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
+        gamesettings_choicebox_upperright.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
+        gamesettings_choicebox_bottomleft.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
+        gamesettings_choicebox_bottomright.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
     }
 
     /**
@@ -438,7 +442,8 @@ public class GameSettingsViewController extends Controller implements Initializa
             return true;
         }
 
-        System.out.println("All Information are set");
+        // debug
+        //System.out.println("All Information are set");
         return false;
     }
 
@@ -548,7 +553,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the Host Game Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onHostGameButtonPressed(Event event) {
@@ -559,7 +564,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the Host and Join Game Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onHostAndJoinGameButtonPressed(Event event) {
@@ -571,7 +576,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the Host and Spectate Game Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML void onHostAndSpectateGameButtonPressed(Event event) {
         if(hostGame())
@@ -582,7 +587,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the GameList Button.
-     * @param event Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onBackButtonPressed(Event event) {

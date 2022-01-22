@@ -1,5 +1,6 @@
 package kingdomBuilder.actions;
 
+import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.ClientLeft;
 import kingdomBuilder.redux.Action;
 
@@ -11,43 +12,13 @@ import kingdomBuilder.redux.Action;
  * Contains the client id, the name and his gameId
  * </p>
  */
-public class ClientRemoveAction extends Action {
+public class ClientRemoveAction extends ClientAction {
     /**
-     * id of the client that left the server
+     * Constructs a new ClientRemoveAction.
+     *
+     * @param clientData the client data.
      */
-    public int id;
-    /**
-     * name of the client that left the server
-     */
-    public String name;
-    /**
-     * gameId of the client that left the server
-     */
-    public int gameId;
-
-    /**
-     * <p>
-     * Constructor that creates a new ClientRemoveAction. Sets the fields according to the given
-     * {@link ClientLeft ClientLeft} Message that the server
-     * has sent. Sets the clientId, name and the gameId to the values inside the ClientLeft-object.
-     * </p>
-     * @param c represents the message, that the server sent
-     */
-    public ClientRemoveAction(ClientLeft c) {
-        this(c.clientId(), c.name(), c.gameId());
-    }
-
-    /**
-     * <p>
-     * Constructor that creates a new ClientRemoveAction. Sets the fields according to the given parameters.
-     * </p>
-     * @param id the id of the client that left the server
-     * @param name the name of the client that left the server
-     * @param gameId the gameId of the client that left the server
-     */
-    public ClientRemoveAction(int id, String name, int gameId) {
-        this.id = id;
-        this.name = name;
-        this.gameId = gameId;
+    public ClientRemoveAction(ClientData clientData) {
+        super(clientData);
     }
 }

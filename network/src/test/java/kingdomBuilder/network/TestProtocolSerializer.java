@@ -103,7 +103,7 @@ public class TestProtocolSerializer {
 
     @Test
     void testSerializingClientsRequest() {
-        final String message = ProtocolSerializer.serialize(new RequestClients());
+        final String message = ProtocolSerializer.serialize(new ClientsRequest());
         assertEquals("?clients", message);
     }
 

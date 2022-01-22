@@ -9,9 +9,9 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
-import kingdomBuilder.model.TileType;
 
 import java.net.URL;
 import java.security.InvalidParameterException;
@@ -94,7 +94,7 @@ public class LevelEditorController extends Controller implements Initializable {
      *
      * @param location  The location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
-     * @param resources The resources used to localize the root object, or null if the root object was not localized.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -132,7 +132,7 @@ public class LevelEditorController extends Controller implements Initializable {
 
     /**
      * Zooms the camera when the user scrolls the mousewheel.
-     * @param camera The camera for zooming.
+     * @param camera the camera for zooming.
      */
     private void setupCameraZoomHandler(Camera camera) {
         editor_subscene.setOnScroll((ScrollEvent event) -> {
@@ -258,50 +258,50 @@ public class LevelEditorController extends Controller implements Initializable {
      *
      * @return The tile type from combo box.
      */
-    public TileType getTileTypeFromCombobox() {
+    public Game.TileType getTileTypeFromCombobox() {
         return stringToTileType(editor_comboBox.getSelectionModel().getSelectedItem());
     }
 
     /**
      * Translates a given string to a tile type.
      *
-     * @param tileTypeString String to get translated into a tile type.
+     * @param tileTypeString string to get translated into a tile type.
      * @return The tile type as enum.
      */
-    private TileType stringToTileType(String tileTypeString) {
+    private Game.TileType stringToTileType(String tileTypeString) {
         switch (tileTypeString) {
             case "Canyon":
-                return TileType.CANYON;
+                return Game.TileType.CANYON;
             case "Desert":
-                return TileType.DESERT;
+                return Game.TileType.DESERT;
             case "Flower":
-                return TileType.FLOWER;
+                return Game.TileType.FLOWER;
             case "Forest":
-                return TileType.FORREST;
+                return Game.TileType.FORREST;
             case "Gras":
-                return TileType.GRAS;
+                return Game.TileType.GRAS;
             case "Mountain":
-                return TileType.MOUNTAIN;
+                return Game.TileType.MOUNTAIN;
             case "Water":
-                return TileType.WATER;
+                return Game.TileType.WATER;
             case "Castle":
-                return TileType.CASTLE;
+                return Game.TileType.CASTLE;
             case "Barn":
-                return TileType.BARN;
+                return Game.TileType.BARN;
             case "Farm":
-                return TileType.FARM;
+                return Game.TileType.FARM;
             case "Harbor":
-                return TileType.HARBOR;
+                return Game.TileType.HARBOR;
             case "Oasis":
-                return TileType.OASIS;
+                return Game.TileType.OASIS;
             case "Oracle":
-                return TileType.ORACLE;
+                return Game.TileType.ORACLE;
             case "Paddock":
-                return TileType.PADDOCK;
+                return Game.TileType.PADDOCK;
             case "Tavern":
-                return TileType.TAVERN;
+                return Game.TileType.TAVERN;
             case "Tower":
-                return TileType.TOWER;
+                return Game.TileType.TOWER;
             default:
                 throw new InvalidParameterException("String doesn't match to Tile type.");
         }

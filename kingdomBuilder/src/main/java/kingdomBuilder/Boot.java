@@ -12,7 +12,7 @@ public class Boot {
 
     /**
      * Starts the application.
-     * @param args The command line arguments.
+     * @param args the command line arguments.
      * @throws IOException When something goes wrong.
      */
     public static void main(String[] args) throws IOException {
