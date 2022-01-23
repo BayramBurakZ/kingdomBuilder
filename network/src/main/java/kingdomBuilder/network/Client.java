@@ -244,16 +244,54 @@ public abstract class Client {
      */
     public final Event<QuadrantUploaded> onQuadrantUploaded = new Event<>();
 
-    // TODO: doc
+    /**
+     * Event that gets dispatched whenever a message that contains the time limit is received.
+     */
     public final Event<TimeLimitReply> onTimeLimitReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the player limit of a game.
+     */
     public final Event<PlayerLimitReply> onPlayerLimitReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains information about other players.
+     */
     public final Event<PlayersReply> onPlayersReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the current turn number of a game.
+     */
     public final Event<TurnsReply> onTurnsReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the turn limit of a game.
+     */
     public final Event<TurnLimitReply> onTurnLimitReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the player whose turn it is.
+     */
     public final Event<WhoseTurnReply> onWhoseTurnReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the amount of settlements left.
+     */
     public final Event<SettlementsLeftReply> onSettlementsLeftReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the information about the board.
+     */
     public final Event<BoardReply> onBoardReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains the win cinditions of a game.
+     */
     public final Event<WinConditionReply> onWinConditionReply = new Event<>();
+
+    /**
+     * Event that gets dispatched whenever a message is received that contains data of a game.
+     */
     public final Event<MyGameReply> onMyGameReply = new Event<>();
 
     /**
@@ -326,6 +364,7 @@ public abstract class Client {
 
     /**
      * Requests the data of a quadrant on the server.
+     * @param quadrantId the id for the quadrant to request.
      */
     //ToDo: @apiNote?
     public abstract void quadrantRequest(int quadrantId);

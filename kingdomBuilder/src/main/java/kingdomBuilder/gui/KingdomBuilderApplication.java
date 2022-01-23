@@ -27,6 +27,10 @@ public class KingdomBuilderApplication extends Application {
      */
     private SceneLoader sceneLoader;
 
+    /**
+     * Creates a new KingdomBuilderApplication.
+     * @throws IOException if something goes wrong.
+     */
     public KingdomBuilderApplication() throws IOException {
         store = new Store<KBState>(new KBState(), new KBReducer());
     }
@@ -55,7 +59,7 @@ public class KingdomBuilderApplication extends Application {
 
     /**
      * Prepares for application exit and destroys resources.
-     * @throws Exception
+     * @throws Exception if something goes wrong.
      */
     // TODO: general closing mechanism
     @Override

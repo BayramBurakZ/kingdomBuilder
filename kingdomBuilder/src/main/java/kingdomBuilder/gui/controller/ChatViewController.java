@@ -28,6 +28,12 @@ import java.util.*;
  */
 public class ChatViewController extends Controller implements Initializable {
 
+    /**
+     * Represents a List with Clients to compare with the one in the state so new clients or
+     * removed clients can be detected.
+     */
+    private final List<ClientData> clients = new ArrayList<>();
+
     //region FXML-Imports
 
     /**
@@ -308,8 +314,6 @@ public class ChatViewController extends Controller implements Initializable {
             globalChatAppendElement(msg);
         });
     }
-
-    private final List<ClientData> clients = new ArrayList<>();
 
     /**
      * Sends a chat message when a client joined the server or left it.

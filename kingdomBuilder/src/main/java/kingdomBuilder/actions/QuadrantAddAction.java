@@ -1,6 +1,5 @@
 package kingdomBuilder.actions;
 
-import javafx.util.Pair;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.network.protocol.QuadrantReply;
 import kingdomBuilder.redux.Action;
@@ -11,17 +10,31 @@ import kingdomBuilder.redux.Action;
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */
 public class QuadrantAddAction extends Action {
-    // TODO: doc
+
+    /**
+     * Represents the id of the quadrant.
+     */
     public final int quadrantId;
+
+    /**
+     * Represents field type for every field on the quadrant.
+     */
     public final Game.TileType[] fieldTypes;
 
-    // TODO: doc
+    /**
+     * Creates a new QuadrantAddAction with the given id and the types.
+     * @param id the id of the quadrant.
+     * @param fieldTypes the types of every field on the quadrant.
+     */
     public QuadrantAddAction(int id, Game.TileType[] fieldTypes) {
         this.quadrantId = id;
         this.fieldTypes = fieldTypes;
     }
 
-    // TODO: doc
+    /**
+     * Creates a new QuadrantAddAction with the given QuadrantReply message.
+     * @param m a QuadrantReply message.
+     */
     public QuadrantAddAction(QuadrantReply m) {
         Game.TileType[] a = new Game.TileType[100];
 
