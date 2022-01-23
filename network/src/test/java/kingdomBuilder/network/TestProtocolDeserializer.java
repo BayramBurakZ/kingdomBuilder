@@ -26,9 +26,9 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError(), "Parsing failed with an error.");
         ClientLeft typedPacket = assertInstanceOf(ClientLeft.class, testConsumer.getObject());
 
-        assertEquals(4, typedPacket.clientId());
-        assertEquals("Ich", typedPacket.name());
-        assertEquals(-1, typedPacket.gameId());
+        final var expectedClientData = new ClientData(4, "Ich", -1);
+
+        assertEquals(expectedClientData, typedPacket.clientData());
     }
 
     @Test
@@ -263,9 +263,9 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError());
         ClientReply typedPacket = assertInstanceOf(ClientReply.class, testConsumer.getObject());
 
-        assertEquals(4, typedPacket.clientId());
-        assertEquals("Ich", typedPacket.clientName());
-        assertEquals(-1, typedPacket.gameId());
+        final var expectedClientData = new ClientData(4, "Ich", -1);
+
+        assertEquals(expectedClientData, typedPacket.clientData());
     }
 
     @Test
@@ -763,6 +763,8 @@ public class TestProtocolDeserializer {
         assertFalse(testConsumer.hasError());
         MyGameReply typedPacket = assertInstanceOf(MyGameReply.class, testConsumer.getObject());
 
+        final var expectedBoardData = new BoardData(0, 1, 2, 3);
+
         assertEquals(42, typedPacket.clientId());
         assertEquals("kingdom_builder:KB", typedPacket.gameType());
         assertEquals(0, typedPacket.gameId());
@@ -772,9 +774,6 @@ public class TestProtocolDeserializer {
         assertEquals(1, typedPacket.playersJoined());
         assertEquals(-1, typedPacket.timeLimit());
         assertEquals(-1, typedPacket.turnLimit());
-        assertEquals(0, typedPacket.boardData().quadrantId1());
-        assertEquals(1, typedPacket.boardData().quadrantId2());
-        assertEquals(2, typedPacket.boardData().quadrantId3());
-        assertEquals(3, typedPacket.boardData().quadrantId4());
+        assertEquals(expectedBoardData, typedPacket.boardData());
     }
 }
