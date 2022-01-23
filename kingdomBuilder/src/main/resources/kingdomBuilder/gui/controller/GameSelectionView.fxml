@@ -20,11 +20,11 @@
 					<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 				</padding>
 			</HBox>
-			<TableView VBox.vgrow="ALWAYS">
+			<TableView fx:id="gameselection_tableview" VBox.vgrow="ALWAYS">
 				<columns>
-					<TableColumn text="%gameName" />
-					<TableColumn text="%players" />
-					<TableColumn text="%status" />
+					<TableColumn text="%gameName" fx:id="gameselection_column_name" />
+					<TableColumn text="%players" fx:id="gameselection_column_players" />
+					<TableColumn text="%status" fx:id="gameselection_column_status"/>
 				</columns>
 				<columnResizePolicy>
 					<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -65,19 +65,20 @@
 					<RowConstraints valignment="TOP" vgrow="ALWAYS" />
 				</rowConstraints>
 				<Label text="%gameName:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-				<Label text="name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+				<Label text="name" fx:id="gameselection_label_gamename" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
 				<Label text="%host:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-				<Label text="name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+				<Label text="name" fx:id="gameselection_label_hostname" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
 				<Label text="%timeLimit:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-				<Label text="time" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+				<Label text="time" fx:id="gameselection_label_timelimit" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
 				<Label text="%turnLimit:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-				<Label text="time" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+				<Label text="turn" fx:id="gameselection_label_turnlimit" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
 				<Label text="%gameDesc:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-				<TextArea editable="false" promptText="description" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+				<TextArea editable="false" promptText="description" wrapText="true"
+						  fx:id="gameselection_textarea_description" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 			</GridPane>
 		</VBox>
 

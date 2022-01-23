@@ -1,12 +1,16 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.network.protocol.ClientData;
+import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -28,6 +32,37 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     @FXML
     private VBox vbox_table;
+
+    /**
+     * Represents the TableView that displays the games on the server.
+     */
+    @FXML
+    private TableView<GameData> gameselection_tableview;
+
+    @FXML
+    private TableColumn<GameData, String> gameselection_column_name;
+
+    @FXML
+    private TableColumn<GameData, String> gameselection_column_players;
+
+    @FXML
+    private TableColumn<GameData, String> gameselection_column_status;
+
+    @FXML
+    private Label gameselection_label_gamename;
+
+    @FXML
+    private Label gameselection_label_hostname;
+
+    @FXML
+    private Label gameselection_label_timelimit;
+
+    @FXML
+    private Label gameselection_label_turnlimit;
+
+    @FXML
+    private TextArea gameselection_textarea_description;
+
 
     /**
      * Layout that contains the preview of a game
@@ -52,6 +87,40 @@ public class GameSelectionViewController extends Controller implements Initializ
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupLayout();
+        setupGameList();
+
+        // updates the TableView
+        store.subscribe(kbState -> gameselection_tableview.getItems().setAll(kbState.games.values()), "games");
+        updateGameInformation();
+    }
+
+    /**
+     * Initializes the TableView for all games.
+     */
+    private void setupGameList() {
+        gameselection_tableview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        gameselection_column_name.setCellValueFactory(param -> new SimpleStringProperty(
+                String.valueOf(param.getValue().gameName())));
+        gameselection_column_players.setCellValueFactory(param -> new SimpleStringProperty(
+                String.valueOf(param.getValue().playersJoined()) + "/"
+                + String.valueOf(param.getValue().playerLimit())));
+        // TODO: make a status
+        //gameselection_column_status.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
+    }
+
+    private void updateGameInformation() {
+        gameselection_tableview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (oldValue != newValue) {
+
+                gameselection_label_gamename.setText(newValue.gameName());
+                ClientData host = store.getState().clients.get(newValue.clientId());
+                gameselection_label_hostname.setText(host.name());
+                // TODO?
+                //gameselection_label_timelimit;
+                //gameselection_label_turnlimit;
+                gameselection_textarea_description.setText(newValue.gameDescription());;
+            }
+        });
     }
 
     /**

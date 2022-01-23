@@ -20,9 +20,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * This class is used to control every user input on the ChatView. Additionally, it updates its
@@ -130,8 +128,13 @@ public class ChatViewController extends Controller implements Initializable {
         // TODO: anywhere where Platform.runLater is called
         //       any code in the GUI should be run by the JavaFX thread
         //       JavaFX thread should therefore be notified by Redux
+
+        store.subscribe(kbState -> {
+            tableview_chat.getItems().setAll(kbState.clients.values());
+            onClientChanges();
+        }, "clients");
+
         store.subscribe(state -> {
-            tableview_chat.getItems().setAll(state.clients.values());
 
             if (state.isConnected && !isConnected) {
                 onConnect();
@@ -141,7 +144,6 @@ public class ChatViewController extends Controller implements Initializable {
                 isConnected = false;
             }
 
-            // TODO: failedToConnect mechanism, multiple output in chatarea
             // Failed to connect
             if (state.failedToConnect) {
                 // TODO: error message instead of Chat message (because the chat is not visible)
@@ -152,7 +154,7 @@ public class ChatViewController extends Controller implements Initializable {
                     globalChatAppendElement(elem);
                 });
             }
-        });
+        }, "isConnected");
 
         setupClientList();
         setupWebView();
@@ -307,11 +309,46 @@ public class ChatViewController extends Controller implements Initializable {
         });
     }
 
+    private final List<ClientData> clients = new ArrayList<>();
+
     /**
-     * Updates the UI when another client left the server.
+     * Sends a chat message when a client joined the server or left it.
+     */
+    private void onClientChanges() {
+        List<ClientData> clientsState = new ArrayList<ClientData>(store.getState().clients.values());
+
+        List<ClientData> differences = new ArrayList<>();
+
+        if (clientsState.isEmpty()) {
+            return;
+        }
+
+        if (clientsState.size() > clients.size()) {
+            // client joined
+            differences.addAll(clientsState);
+            differences.removeAll(clients);
+
+            if (differences.get(0).clientId() == store.getState().client.getClientId()) {
+                return;
+            }
+            onClientJoined(differences.get(0));
+        } else {
+            // client left
+            differences.addAll(clients);
+            differences.removeAll(clientsState);
+
+            onClientLeft(differences.get(0));
+        }
+
+        clients.clear();
+        clients.addAll(clientsState);
+    }
+
+    /**
+     * Sends a chat message when another client left the server.
      * @param clientData the data of the client who left the server.
      */
-    public void onClientLeft(ClientData clientData) {
+    private void onClientLeft(ClientData clientData) {
         Platform.runLater(() -> {
             var elem = createHTMLElement(
                     "<--- " + clientData.name() + " " + resourceBundle.getString("leftTheServer") + ". --->",
@@ -321,10 +358,10 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the UI when another client joined the server.
+     * Sends a chat message when another client joined the server.
      * @param clientData the data of the client who joined the server.
      */
-    public void onClientJoined(ClientData clientData) {
+    private void onClientJoined(ClientData clientData) {
         Platform.runLater(() -> {
             var element = createHTMLElement(
                     "<--- " + clientData.name() + " " + resourceBundle.getString("joinedTheServer") + ". --->",

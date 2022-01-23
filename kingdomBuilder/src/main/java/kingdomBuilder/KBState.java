@@ -53,6 +53,7 @@ public class KBState {
      */
     public String clientPreferredName;
 
+    // TODO: same boolean twice for Connection
     /**
      * Whether the client is currently connecting or not.
      */

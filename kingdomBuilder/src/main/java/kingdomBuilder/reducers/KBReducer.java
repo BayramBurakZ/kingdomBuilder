@@ -66,28 +66,20 @@ public class KBReducer implements Reducer<KBState> {
         return new DeferredState(oldState);
     }
 
-    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ClientAddAction a) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients;
         clients.put(a.clientData.clientId(), a.clientData);
         state.setClients(clients);
 
-        var sceneLoader = oldState.sceneLoader;
-        sceneLoader.getChatViewController().onClientJoined(a.clientData);
-
         return state;
     }
 
-    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ClientRemoveAction a) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients;
         clients.remove(a.clientData.clientId());
         state.setClients(clients);
-
-        var sceneLoader = oldState.sceneLoader;
-        sceneLoader.getChatViewController().onClientLeft(a.clientData);
 
         return state;
     }
@@ -211,6 +203,7 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
+    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, DisconnectAction a) {
         DeferredState state = new DeferredState(oldState);
 
