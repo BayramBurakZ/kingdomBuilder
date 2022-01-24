@@ -207,7 +207,7 @@ public class SceneLoader {
 
 
         // reloads the view so its completely empty
-        loadGameView(locale);
+        //loadGameView(locale);
 
         // loads the gameView
         borderPane.setCenter(gameView);

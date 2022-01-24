@@ -72,6 +72,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Constructs the GameSelectionViewController.
+     *
      * @param store the Application's store to set the field.
      */
     public GameSelectionViewController(Store<KBState> store) {
@@ -80,8 +81,9 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location the location used to resolve relative paths for the root object,
-     *                 or null if the location is not known.
+     *
+     * @param location  the location used to resolve relative paths for the root object,
+     *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
@@ -103,7 +105,7 @@ public class GameSelectionViewController extends Controller implements Initializ
                 String.valueOf(param.getValue().gameName())));
         gameselection_column_players.setCellValueFactory(param -> new SimpleStringProperty(
                 String.valueOf(param.getValue().playersJoined()) + "/"
-                + String.valueOf(param.getValue().playerLimit())));
+                        + String.valueOf(param.getValue().playerLimit())));
         // TODO: make a status
         //gameselection_column_status.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
     }
@@ -118,7 +120,7 @@ public class GameSelectionViewController extends Controller implements Initializ
                 // TODO?
                 //gameselection_label_timelimit;
                 //gameselection_label_turnlimit;
-                gameselection_textarea_description.setText(newValue.gameDescription());;
+                gameselection_textarea_description.setText(newValue.gameDescription());
             }
         });
     }
@@ -133,6 +135,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the CreateNewGame Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -142,6 +145,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the LevelEditor Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -151,6 +155,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the ReturnToMenu Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -161,11 +166,13 @@ public class GameSelectionViewController extends Controller implements Initializ
 
     /**
      * Sets the functionality for the CreateNewGame Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
     private void onJoinGamePressed(Event event) {
-        //TODO: Network send "join" Message
+        int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
+        store.dispatch(new JoinGameAction(id));
         sceneLoader.showGameView(false, true);
     }
 }

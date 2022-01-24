@@ -1,6 +1,7 @@
 package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
@@ -85,9 +86,9 @@ public class KBState {
     public Game game;
 
     /**
-     * Represents the quadrants used in the current game.
+     * Represents the map used in the current game.
      */
-    public Game.QuadrantIDs gameQuadrantIDs;
+    public MapReadOnly map;
 
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
@@ -102,7 +103,7 @@ public class KBState {
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
                    Game game,
-                   Game.QuadrantIDs gameQuadrantIDs) {
+                   MapReadOnly map) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -116,7 +117,7 @@ public class KBState {
         this.betterColorsActive = betterColorsActive;
         this.quadrants = quadrants;
         this.game = game;
-        this.gameQuadrantIDs = gameQuadrantIDs;
+        this.map = map;
     }
 
     /**

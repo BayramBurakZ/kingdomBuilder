@@ -49,7 +49,7 @@ public class ServerConnectViewController extends Controller implements Initializ
                 System.out.println("Changes to GameSelection");
                 sceneLoader.showGameSelectionView();
             }
-        });
+        }, "isConnected");
     }
 
     /**

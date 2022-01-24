@@ -156,6 +156,16 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void boardRequest() {
+        // request the quadrants right after joining a game
+        final String command = ProtocolSerializer.serialize(new BoardRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isConnected() {
         return ioHandler.isConnected();
     }
@@ -314,9 +324,6 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(WelcomeToGame message) {
         gameId = message.gameId();
         onWelcomeToGame.dispatch(message);
-        // request the quadrants right after joining a game
-        final String command = ProtocolSerializer.serialize(new BoardRequest());
-        trySendCommand(command);
     }
 
     @Override

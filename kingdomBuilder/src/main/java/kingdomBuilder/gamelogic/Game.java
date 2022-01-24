@@ -11,6 +11,10 @@ import java.util.Set;
  */
 public class Game {
 
+    // constants
+    public static final int SETTLEMENTS_PER_TURN = 3;
+    public static final int DEFAULT_STARTING_SETTLEMENTS = 40;
+
     // TODO: maybe isolate this in a separate class for storage after ?games request
     // Data from hosting/joining a game.
     /**
@@ -38,11 +42,6 @@ public class Game {
      */
     private final int turnLimit;
 
-    /**
-     * The quadrants the game board is assembled from.
-     */
-    private final QuadrantIDs quadrantIDs;
-
     // Additional data for a game.
     /**
      * The ID of the client who created the game.
@@ -69,11 +68,6 @@ public class Game {
      */
     private final int startingSettlements;
 
-    // constants
-    public static final int SETTLEMENTS_PER_TURN = 3;
-    public static final int DEFAULT_STARTING_TOKEN_COUNT = 2;
-    public static final int DEFAULT_STARTING_SETTLEMENTS = 40;
-
     // Internal data of the map
     private final Map map;
     public Set<Tile> previewMap;
@@ -81,30 +75,28 @@ public class Game {
     /**
      * Constructs a new game object which is ready for the first move.
      *
-     * @param gameName            The name of the game.
-     * @param gameDescription     The description of the game.
-     * @param playerLimit         The maximum amount of players that can play in the game.
-     * @param timeLimit           The maximum amount of time a player can spend on each turn.
-     * @param turnLimit           The maximum amount of turns the game can run for.
-     * @param quadrantIDs         The quadrants the game board is assembled from.
-     * @param hostID              The ID of the client who created the game.
-     * @param startingPlayerID    The ID of the player who takes the first turn.
-     * @param winConditions       An array of the win conditions of the game.
-     * @param players             An array of the players playing in the game.
-     * @param startingTokenCount  The amount of tokens each special place should contain at the start of the game.
+     * @param map                 the map of the game.
+     * @param gameName            the name of the game.
+     * @param gameDescription     the description of the game.
+     * @param playerLimit         the maximum amount of players that can play in the game.
+     * @param timeLimit           the maximum amount of time a player can spend on each turn.
+     * @param turnLimit           the maximum amount of turns the game can run for.
+     * @param hostID              the ID of the client who created the game.
+     * @param startingPlayerID    the ID of the player who takes the first turn.
+     * @param winConditions       an array of the win conditions of the game.
+     * @param players             an array of the players playing in the game.
      * @param startingSettlements the total amount of settlements a player has to place to end the game.
      */
-    public Game(String gameName,
+    public Game(Map map,
+                String gameName,
                 String gameDescription,
                 int playerLimit,
                 int timeLimit,
                 int turnLimit,
-                QuadrantIDs quadrantIDs,
                 int hostID,
                 int startingPlayerID,
                 WinCondition[] winConditions,
                 Player[] players,
-                int startingTokenCount,
                 int startingSettlements
     ) {
         if (players.length > playerLimit)
@@ -113,12 +105,12 @@ public class Game {
         if (winConditions.length <= 0)
             throw new RuntimeException("No win conditions have been defined!");
 
+        this.map = map;
         this.gameName = gameName;
         this.gameDescription = gameDescription;
         this.playerLimit = playerLimit;
         this.timeLimit = timeLimit;
         this.turnLimit = turnLimit;
-        this.quadrantIDs = quadrantIDs;
         this.hostID = hostID;
         this.currentPlayerID = startingPlayerID;
         this.winConditions = winConditions;
@@ -126,25 +118,7 @@ public class Game {
         //       the constructor should only receive the player information that was relevant before game start
         this.players = players;
         this.startingSettlements = startingSettlements;
-        // TODO: get the TileType[] from the quadrant ID
-        this.map = new Map(startingTokenCount,
-                new TileType[100],
-                new TileType[100],
-                new TileType[100],
-                new TileType[100]);
     }
-
-    // TODO: maybe not a class for this idk
-
-    /**
-     * Server takes quadrant IDs in this listed order.
-     */
-    public record QuadrantIDs(
-        int leftUpper,
-        int rightUpper,
-        int lowerLeft,
-        int lowerRight
-    ) {}
 
     /**
      * Win conditions for the game.

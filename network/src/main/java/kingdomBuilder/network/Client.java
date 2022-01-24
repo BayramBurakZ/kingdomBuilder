@@ -407,6 +407,11 @@ public abstract class Client {
     public abstract void joinGame(int gameId);
 
     /**
+     * Requests the board configuration.
+     */
+    public abstract void boardRequest();
+
+    /**
      * {@return whether the client is connected.}
      */
     public abstract boolean isConnected();

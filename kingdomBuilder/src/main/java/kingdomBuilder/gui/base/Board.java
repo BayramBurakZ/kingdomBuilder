@@ -3,6 +3,7 @@ package kingdomBuilder.gui.base;
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -32,11 +33,11 @@ public abstract class Board {
     /**
      * Set the GameBoard with textured hexagons up.
      * @param group the pane on which the hexagons are drawn.
-     * @param gameBoardData the data with all information.
+     * @param map the map with all information.
      * @param resource the ResourceBundle for translating text.
      */
-    public void setupBoard(Group group, Game.TileType[][] gameBoardData, ResourceBundle resource) {
-        int width = gameBoardData.length;
+    public void setupBoard(Group group, MapReadOnly map, ResourceBundle resource) {
+        int width = map.mapWidth;
 
         for (int y = 0; y < width; y++) {
             for (int x = 0; x < width; x++) {
@@ -49,7 +50,32 @@ public abstract class Board {
 
                 int yPos = y * 60;
 
-                placeTileOnBoard(group, x, y, xPos, yPos, gameBoardData[x][y], resource);
+                placeTileOnBoard(group, x, y, xPos, yPos, map.at(x, y).tileType, resource);
+            }
+        }
+    }
+
+    /**
+     * Set the GameBoard with textured hexagons up.
+     * @param group the pane on which the hexagons are drawn.
+     * @param map the map with all information.
+     * @param resource the ResourceBundle for translating text.
+     */
+    public void setupBoard(Group group, Game.TileType[][] map, ResourceBundle resource) {
+        int width = map.length;
+
+        for (int y = 0; y < width; y++) {
+            for (int x = 0; x < width; x++) {
+                int xPos;
+                if (y % 2 == 0) {
+                    xPos = x * 70;
+                } else {
+                    xPos = x * 70 + 35;
+                }
+
+                int yPos = y * 60;
+
+                placeTileOnBoard(group, x, y, xPos, yPos, null, resource);
             }
         }
     }

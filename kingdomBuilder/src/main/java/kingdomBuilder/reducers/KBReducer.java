@@ -2,7 +2,7 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -60,7 +60,7 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if (action instanceof PlayerRemoveAction a)
             return reduce(oldState, a);
-        else if (action instanceof SetQuadrantIDsAction a)
+        else if (action instanceof SetMapAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -163,9 +163,9 @@ public class KBReducer implements Reducer<KBState> {
 
         client.onGameHosted.subscribe(m -> store.dispatch(new GameAddAction(m.gameData())));
 
-        //client.onWelcomeToGame.subscribe();
+        client.onWelcomeToGame.subscribe(m -> client.boardRequest());
 
-        client.onBoardReply.subscribe(m -> store.dispatch(new SetQuadrantIDsAction(m.boardData())));
+        client.onBoardReply.subscribe(m -> store.dispatch(new SetMapAction(m.boardData())));
 
         client.login(oldState.clientPreferredName);
 
@@ -192,9 +192,6 @@ public class KBReducer implements Reducer<KBState> {
         state.setIsConnected(true);
         System.out.println("Is connected.");
 
-        /* TODO:
-            load kingdom_builder
-        */
         oldState.client.loadNamespace();
         oldState.client.clientsRequest();
         //oldState.client.gamesRequest();
@@ -285,14 +282,14 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, SetQuadrantIDsAction a) {
+    private DeferredState reduce(KBState oldState, SetMapAction a) {
         DeferredState state = new DeferredState(oldState);
-        // TODO: maybe just use BoardData in Game, this isn't MVC
-        oldState.gameQuadrantIDs = new Game.QuadrantIDs(
-                a.boardData.quadrantId1(),
-                a.boardData.quadrantId2(),
-                a.boardData.quadrantId3(),
-                a.boardData.quadrantId4());
+        state.setMap(new MapReadOnly(
+                MapReadOnly.DEFAULT_STARTING_TOKEN_COUNT,
+                oldState.quadrants.get(a.boardData.quadrantId1()),
+                oldState.quadrants.get(a.boardData.quadrantId2()),
+                oldState.quadrants.get(a.boardData.quadrantId3()),
+                oldState.quadrants.get(a.boardData.quadrantId4())));
         return state;
     }
 /*

@@ -22,6 +22,7 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
+import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.redux.Store;
@@ -185,7 +186,6 @@ public class GameViewController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
-        // - Initialize Board  -> setupBoard()
         // - PlayerData settlements -> updateSettlementsForPlayer()
         // - PlayerData score -> updateScoreForPlayer()
         // - when player joins -> addPlayer()
@@ -198,9 +198,16 @@ public class GameViewController extends Controller implements Initializable {
 
         resourceBundle = resources;
 
-        setupGameBoard();
-        setupCamera();
-        setupLight();
+        // generates the map
+        store.subscribe(kbState -> {
+            if (kbState.map != null) {
+                setupGameBoard(store.getState().map);
+                setupCamera();
+                setupLight();
+            }
+        }, "map");
+
+        // set the initial layout of the view
         setupLayout();
 
         // create a testBox
@@ -318,10 +325,11 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Generates the 20 x 20 field of the hexagons.
+     *
+     * @param map the map with all information.
      */
-    private void setupGameBoard() {
-        // TODO: access data via state
-        gameBoard.setupBoard(gameBoard_group, null, resourceBundle);
+    private void setupGameBoard(MapReadOnly map) {
+        gameBoard.setupBoard(gameBoard_group, map, resourceBundle);
 
         HexagonTile[][] board = gameBoard.getBoard();
         boardCenter = new Point3D(
