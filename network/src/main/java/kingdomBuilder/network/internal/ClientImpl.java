@@ -14,26 +14,8 @@ import java.util.List;
  * Implements the {@link Client} using an IOHandler.
  */
 public class ClientImpl extends Client implements ProtocolConsumer {
+    // TODO: doc
     private final IOHandler ioHandler;
-
-    /* TODO:
-    // Eigene Implementierung von Client /////
-    public void accept(MyGameReply message) {
-        store.dispatch(new GameReplyAction());
-    }
-
-    // oder Client enthält nur events /////////////
-    Event<MyGameReply> onGameReply;
-    public void accept(MyGameReply message) {
-        onGameReply.dispatch();
-    }
-
-    void irgendwoAnders() {
-        // vermutlich direkt nach Erstellung vom Main Client
-        client.onGameReply.subscribe(m -> store.dispatch(new GameReplyAction());
-        // und alle anderen events ...
-    }
-     */
 
     /**
      * Initializes the client.
@@ -159,6 +141,16 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void boardRequest() {
         // request the quadrants right after joining a game
         final String command = ProtocolSerializer.serialize(new BoardRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void playersRequest() {
+        // request the quadrants right after joining a game
+        final String command = ProtocolSerializer.serialize(new PlayersRequest());
         trySendCommand(command);
     }
 

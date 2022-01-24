@@ -3,11 +3,8 @@ package kingdomBuilder.actions;
 import kingdomBuilder.redux.Action;
 
 /**
- * <p>
  * Represents the BetterColorModeAction. Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
- * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he need to run.
- * Contains a field that stores the boolean and a constructor that sets the boolean.
- * </p>
+ * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */
 public class BetterColorModeAction extends Action {
     /**

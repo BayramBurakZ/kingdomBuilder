@@ -5,7 +5,7 @@ import kingdomBuilder.redux.Action;
 
 /**
  * Represents the SetMapAction. Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
- * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he need to run.
+ * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */
 public class SetMapAction extends Action {
 

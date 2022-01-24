@@ -412,6 +412,11 @@ public abstract class Client {
     public abstract void boardRequest();
 
     /**
+     * Requests the players of a game.
+     */
+    public abstract void playersRequest();
+
+    /**
      * {@return whether the client is connected.}
      */
     public abstract boolean isConnected();

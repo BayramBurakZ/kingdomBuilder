@@ -207,6 +207,14 @@ public class GameViewController extends Controller implements Initializable {
             }
         }, "map");
 
+        store.subscribe(kbState -> {
+            game_hbox_players.getChildren().clear();
+            players.clear();
+            for (var player : kbState.playersOfGame) {
+                addPlayer(kbState.clients.get(player.clientId()).name());
+            }
+        }, "playersOfGame");
+
         // set the initial layout of the view
         setupLayout();
 

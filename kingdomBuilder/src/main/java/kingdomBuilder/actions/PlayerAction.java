@@ -2,6 +2,9 @@ package kingdomBuilder.actions;
 
 import kingdomBuilder.redux.Action;
 
+/**
+ * Used as a base class for any action that handles player data.
+ */
 public abstract class PlayerAction extends Action {
     /**
      * Represents the id of a client.

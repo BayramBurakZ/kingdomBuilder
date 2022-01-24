@@ -9,9 +9,12 @@ import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.network.protocol.PlayerData;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -90,6 +93,11 @@ public class KBState {
      */
     public MapReadOnly map;
 
+    /**
+     * Represents the players of the current game in the order they joined.
+     */
+    public final LinkedHashSet<PlayerData> playersOfGame;
+
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
                    Map<Integer, GameData> games,
@@ -103,7 +111,8 @@ public class KBState {
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
                    Game game,
-                   MapReadOnly map) {
+                   MapReadOnly map,
+                   LinkedHashSet<PlayerData> playersOfGame) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -118,6 +127,7 @@ public class KBState {
         this.quadrants = quadrants;
         this.game = game;
         this.map = map;
+        this.playersOfGame = playersOfGame;
     }
 
     /**
@@ -131,5 +141,6 @@ public class KBState {
         isConnecting = false;
         isConnected = false;
         failedToConnect = false;
+        playersOfGame = new LinkedHashSet<>();
     }
 }

@@ -7,6 +7,7 @@ import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.network.protocol.PlayerData;
 import kingdomBuilder.redux.Action;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
@@ -61,6 +62,8 @@ public class KBReducer implements Reducer<KBState> {
         else if (action instanceof PlayerRemoveAction a)
             return reduce(oldState, a);
         else if (action instanceof SetMapAction a)
+            return reduce(oldState, a);
+        else if (action instanceof SetPlayersAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -163,9 +166,14 @@ public class KBReducer implements Reducer<KBState> {
 
         client.onGameHosted.subscribe(m -> store.dispatch(new GameAddAction(m.gameData())));
 
-        client.onWelcomeToGame.subscribe(m -> client.boardRequest());
+        client.onWelcomeToGame.subscribe(m -> {
+            client.boardRequest();
+            client.playersRequest();
+        });
 
         client.onBoardReply.subscribe(m -> store.dispatch(new SetMapAction(m.boardData())));
+
+        client.onPlayersReply.subscribe(m -> store.dispatch(new SetPlayersAction(m)));
 
         client.login(oldState.clientPreferredName);
 
@@ -237,9 +245,14 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, PlayerAddAction a) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients;
-        var client = clients.get(a.clientId);
-        clients.put(a.clientId, new ClientData(a.clientId, client.name(), a.gameId));
+        var clientData = clients.get(a.clientId);
+        clients.put(a.clientId, new ClientData(a.clientId, clientData.name(), a.gameId));
         state.setClients(clients);
+
+        if (a.gameId == oldState.client.getGameId()) {
+            // for some reason you only get the color of a player via ?players
+            oldState.client.playersRequest();
+        }
         return state;
     }
 
@@ -290,6 +303,14 @@ public class KBReducer implements Reducer<KBState> {
                 oldState.quadrants.get(a.boardData.quadrantId2()),
                 oldState.quadrants.get(a.boardData.quadrantId3()),
                 oldState.quadrants.get(a.boardData.quadrantId4())));
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, SetPlayersAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var playersOfGame = oldState.playersOfGame;
+        playersOfGame.addAll(a.playersReply.playerDataList());
+        state.setPlayersOfGame(playersOfGame);
         return state;
     }
 /*
