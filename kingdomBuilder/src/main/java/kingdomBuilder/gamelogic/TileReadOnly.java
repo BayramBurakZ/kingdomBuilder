@@ -98,6 +98,19 @@ public class TileReadOnly {
     }
 
     /**
+     * Checks if tile is placeable on water.
+     *
+     * @return True if placeable on water. False otherwise.
+     */
+    public boolean isTilePlaceableOnWater() {
+        if (tileType != Game.TileType.WATER)
+            return false;
+        else if (isOccupied())
+            return false;
+        else return !nonPlaceableTileTypes.contains(tileType);
+    }
+
+    /**
      * Checks if two tiles are neighbours in the hexagon map.
      *
      * @param other the second tile.
@@ -120,4 +133,5 @@ public class TileReadOnly {
             return x == other.x + 1 || x == other.x;
         }
     }
+
 }

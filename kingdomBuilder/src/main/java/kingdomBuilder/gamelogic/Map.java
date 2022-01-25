@@ -36,8 +36,8 @@ class Map extends MapReadOnly<Tile> {
     /**
      * Get all surrounding tiles of a given target tile.
      *
-     * @param x the x coordinate of the target tile.
-     * @param y the y coordinate of the target tile.
+     * @param x The x coordinate of the target tile.
+     * @param y The y coordinate of the target tile.
      * @return All tiles that surrounding target tile.
      */
     public Set<Tile> surroundingTiles(int x, int y) {

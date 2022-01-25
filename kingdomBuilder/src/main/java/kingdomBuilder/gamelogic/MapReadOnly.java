@@ -392,7 +392,7 @@ public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
      * @param tile   Tile to look for.
      * @return True if player has a neighbouring settlement. False otherwise.
      */
-    private boolean playerHasASettlementInSurrounding(Player player, T tile) {
+    public boolean playerHasASettlementInSurrounding(Player player, T tile) {
         int x = tile.x;
         int y = tile.y;
 
@@ -619,5 +619,46 @@ public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
         return freeTiles;
     }
 
+    public Set<T> oneTileSkippedSurroundingTiles(int x, int y){
+        Set<T> freeTiles = new HashSet<>();
+        int tempX, tempY;
 
+        // top left diagonal
+        tempX = topLeftX(topLeftX(x, y), y + 1);
+        tempY = y + 2;
+
+        if(isWithinBounds(tempX, tempY) && at(tempX, tempY).isTilePlaceable())
+            freeTiles.add(at(tempX, tempY));
+
+        // top right diagonal
+        tempX = topRightX(topRightX(x, y), y + 1);
+        tempY = y + 2;
+
+        if(isWithinBounds(tempX, tempY) && at(tempX, tempY).isTilePlaceable())
+            freeTiles.add(at(tempX, tempY));
+
+        // left
+        if(isWithinBounds(x-2, y) && at(x-2, y).isTilePlaceable() )
+            freeTiles.add(at(x-2, y));
+
+        // right
+        if(isWithinBounds(x+2, y) && at(x-2, y).isTilePlaceable() )
+            freeTiles.add(at(x+2, y));
+
+        // bottom left diagonal
+        tempX = bottomLeftX(bottomLeftX(x, y), y - 1);
+        tempY = y - 2;
+
+        if(isWithinBounds(tempX, tempY) && at(tempX, tempY).isTilePlaceable())
+            freeTiles.add(at(tempX, tempY));
+
+        // bottom right diagonal
+        tempX = bottomRightX(bottomRightX(x, y), y - 1);
+        tempY = y - 2;
+
+        if(isWithinBounds(tempX, tempY) && at(tempX, tempY).isTilePlaceable())
+            freeTiles.add(at(tempX, tempY));
+
+        return freeTiles;
+    }
 }
