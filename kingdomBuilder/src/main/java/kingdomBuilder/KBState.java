@@ -98,6 +98,7 @@ public class KBState {
      */
     public final LinkedHashSet<PlayerData> playersOfGame;
 
+    // TODO: for some time in the far future: JavaDoc!
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
                    Map<Integer, GameData> games,
@@ -130,8 +131,11 @@ public class KBState {
         this.playersOfGame = playersOfGame;
     }
 
+    //TODO: JavaDoc!
     /**
      * Initializes the state with initial value.
+     *
+     * @throws IOException if the selector has troubles.
      */
     public KBState() throws IOException {
         clients = new HashMap<>();

@@ -5,12 +5,9 @@ import kingdomBuilder.redux.Action;
 import java.net.InetSocketAddress;
 
 /**
- * <p>
  * Represents the ConnectAction. Only triggered if this client wants to connect to a server.
  * Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he need to run.
- * Contains the String that represents the server address and the server port as an int.
- * </p>
  */
 public class ConnectAction extends Action {
 
@@ -19,6 +16,10 @@ public class ConnectAction extends Action {
      */
     public final InetSocketAddress address;
 
+    /**
+     * Creates a new ConnectAction with the given address.
+     * @param address hte address.
+     */
     public ConnectAction(InetSocketAddress address) {
         this.address = address;
     }

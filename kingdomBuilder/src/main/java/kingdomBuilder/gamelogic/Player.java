@@ -9,21 +9,55 @@ import static kingdomBuilder.gamelogic.Game.*;
  */
 public class Player {
 
+    /**
+     * Represents the Client ID of this player.
+     */
     public final int ID;
+
+    /**
+     * Represents the name of this player.
+     */
     public final String name;
+
+    /**
+     * Represents the color of this player.
+     */
     public final PlayerColor color;
+
+    /**
+     * Represents the remaining settlements of this player.
+     */
     public int remainingSettlements;
+
+    /**
+     * Represents the tokens that this player has.
+     */
     private final HashMap<TileType, Token> tokens;
 
     // data of the player's current/next turn
+    /**
+     * Represents the terrain card for this player.
+     */
     public TileType terrainCard;
+
+    /**
+     * Represents the settlements that the player needs to place in this turn.
+     */
     public int remainingSettlementsOfTurn;
 
+    // TODO: JavaDoc!
     private static class Token {
         int total;
         int remaining;
     }
 
+    /**
+     * Constructs a new player object with the given information.
+     * @param ID the client id.
+     * @param name the name of the client.
+     * @param color the color of the client.
+     * @param totalSettlements the amount of settlement that the player has.
+     */
     public Player(int ID, String name, PlayerColor color, int totalSettlements) {
         this.ID = ID;
         this.name = name;
@@ -33,6 +67,10 @@ public class Player {
         tokenType.forEach(tileType -> tokens.put(tileType, new Token()));
     }
 
+    /**
+     * Updates the information for the player at the start of a turn.
+     * @param terrainCard the TileType of the terrain card of the turn.
+     */
     public void startTurn(TileType terrainCard) {
         this.terrainCard = terrainCard;
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
@@ -88,6 +126,10 @@ public class Player {
         return false;
     }
 
+    /**
+     * Uses the given token.
+     * @param tokenType the type of the token to use it.
+     */
     public void useToken(TileType tokenType) {
         //TODO: this function exists twice? @removeToken
         Token token = tokens.get(tokenType);

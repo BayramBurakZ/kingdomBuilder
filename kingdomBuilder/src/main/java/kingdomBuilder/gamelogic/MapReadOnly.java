@@ -18,6 +18,9 @@ import java.util.stream.Collector;
  */
 public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
 
+    /**
+     * Represents the amount of Tokens that a special place has at the start of the game.
+     */
     public static final int DEFAULT_STARTING_TOKEN_COUNT = 2;
 
     /**
@@ -381,6 +384,7 @@ public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
         }
     }
 
+    // TODO: JavaDoc!
     public SurroundingTilesCollector toSurroundingTilesSet(Set<T> tiles) {
         return new SurroundingTilesCollector(tiles);
     }
@@ -619,6 +623,7 @@ public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
         return freeTiles;
     }
 
+    // TODO: JavaDoc!
     public Set<T> oneTileSkippedSurroundingTiles(int x, int y){
         Set<T> freeTiles = new HashSet<>();
         int tempX, tempY;

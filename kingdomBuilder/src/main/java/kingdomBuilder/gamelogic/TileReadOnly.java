@@ -28,6 +28,14 @@ public class TileReadOnly {
      */
     protected int remainingTokens;
 
+    /**
+     * Constructs a new TileReadOnly object with the given coordinate, the TileType and the amount of tokens.
+     *
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param tileType the tileType.
+     * @param remainingTokens the amount of tokens that remains on that tile.
+     */
     public TileReadOnly(int x, int y, Game.TileType tileType, int remainingTokens) {
 
         this.x = x;

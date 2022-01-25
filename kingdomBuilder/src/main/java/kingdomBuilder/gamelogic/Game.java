@@ -12,7 +12,14 @@ import java.util.Set;
 public class Game {
 
     // constants
+    /**
+     * Represents how many settlements can be placed with the basic turn.
+     */
     public static final int SETTLEMENTS_PER_TURN = 3;
+
+    /**
+     * Represents the amount of settlements with which the player starts.
+     */
     public static final int DEFAULT_STARTING_SETTLEMENTS = 40;
 
     // TODO: maybe isolate this in a separate class for storage after ?games request
@@ -178,26 +185,85 @@ public class Game {
      * Tiles that represent a hexagon in game board.
      */
     public enum TileType {
-        // normal tiles
+        /**
+         * Represents the grass type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes.
+         */
         GRAS,
+        /**
+         * Represents the flower type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
+         */
         FLOWER,
+        /**
+         * Represents the forest type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
+         */
         FORREST,
+        /**
+         * Represents the canyon type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
+         */
         CANYON,
+        /**
+         * Represents the desert type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
+         */
         DESERT,
+        /**
+         * Represents the water type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
+         */
         WATER,
+        /**
+         * Represents the mountain type. It is a normal type.
+         * Is part of following enum sets: regularTileTypes.
+         */
         MOUNTAIN,
-
-        // special place
+        /**
+         * Represents the castle type. It is a normal type.
+         * Is part of following enum sets: nonPlaceableTileTypes.
+         */
         CASTLE,
-
-        // token tiles
+        /**
+         * Represents the oracle type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes.
+         */
         ORACLE,
+        /**
+         * Represents the farm type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         FARM,
+        /**
+         * Represents the tavern type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         TAVERN,
+        /**
+         * Represents the tower type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         TOWER,
+        /**
+         * Represents the harbor type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         HARBOR,
+        /**
+         * Represents the paddock type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         PADDOCK,
+        /**
+         * Represents the barn type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         BARN,
+        /**
+         * Represents the oasis type. It is a token type.
+         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
+         */
         OASIS
     }
 
@@ -225,9 +291,21 @@ public class Game {
      * Colors for each player that are assign in order of joining the game.
      */
     public enum PlayerColor {
+        /**
+         * Represents the RED-Color for the first player that joined.
+         */
         RED,
+        /**
+         * Represents the BLUE-Color for the second player that joined.
+         */
         BLUE,
+        /**
+         * Represents the BLACK-Color for the third player that joined.
+         */
         BLACK,
+        /**
+         * Represents the WHITE-Color for the fourth player that joined.
+         */
         WHITE
     }
 
@@ -264,10 +342,10 @@ public class Game {
     /**
      * Checks if a settlement can be placed.
      *
-     * @param x      The horizontal position of the settlement on the map.
-     * @param y      The vertical position of the settlement on the map.
+     * @param x the horizontal position of the settlement on the map.
+     * @param y the vertical position of the settlement on the map.
      * @param player the player whose turn it is and who owns the settlement.
-     * @return
+     * @return true if the a settlement can be placed.
      */
     public boolean canPlaceSettlement(Player player, int x, int y) {
         //TODO: implement settlement placement WITHOUT a terrain
@@ -306,6 +384,14 @@ public class Game {
                 && (hasSurroundingSettlement || !existsUnoccupiedNeighbouringTile);
     }
 
+    /**
+     * Chechs if the player can place a settlement on a tile with the type of water.
+     *
+     * @param player the player.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @return true if the player can build on that tile.
+     */
     public boolean canPlaceSettlementOnWater(Player player, int x, int y) {
         if (map.at(x, y).tileType != TileType.WATER)
             return false;
@@ -343,7 +429,6 @@ public class Game {
      * @param x      The horizontal position of the settlement on the map.
      * @param y      The vertical position of the settlement on the map.
      * @param player the player whose turn it is and who owns the settlement.
-     * @return
      */
     public void placeSettlement(Player player, int x, int y) {
         checkIsPlayersTurn(player);
@@ -371,6 +456,7 @@ public class Game {
      * @param toX    The new horizontal position of the settlement on the map.
      * @param toY    The new vertical position of the settlement on the map.
      * @param player the player whose turn it is and who owns the settlement.
+     * @return true if the settlement can be moved.
      */
     public boolean canMoveSettlement(Player player, int fromX, int fromY, int toX, int toY) {
         return isPlayersTurn(player)
@@ -573,8 +659,9 @@ public class Game {
     /**
      * Updates GUI preview for all possible tiles to place settlement
      *
-     * @param player
-     * @param terrain
+     * @param player the player.
+     * @param terrain the terrain.
+     * @return the set of Tiles where the player could place a settlement.
      */
     public Set<Tile> updatePreviewWithTerrain(Player player, TileType terrain) {
         //TODO: TileReadOnly
@@ -586,7 +673,8 @@ public class Game {
     /**
      * Preview all Settlements of a player on the map.
      *
-     * @param player
+     * @param player the player.
+     * @return the set of tiles where the player has a settlement on.
      */
     public Set<Tile> previewAllPlayerSettlements(Player player) {
         //TODO: TileReadOnly
@@ -610,10 +698,12 @@ public class Game {
     }
 
     /**
-     * use a token that places a settlement.
+     * Uses a token that place a settlement.
      *
      * @param tokenType that is used.
      * @param player    player that uses it.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
      */
     public void useToken(TileType tokenType, Player player, int x, int y) {
         // TODO: only keep this if token function are getting changed to private
@@ -643,14 +733,14 @@ public class Game {
     }
 
     /**
-     * use a token that moves a settlement.
+     * Uses a token that moves a settlement from one tile to another with the given Token.
      *
-     * @param tokenType
-     * @param player
-     * @param fromX
-     * @param fromY
-     * @param toX
-     * @param toY
+     * @param tokenType the token used for this.
+     * @param player the player who uses a token.
+     * @param fromX the x-coordinate from where the settlement is moved.
+     * @param fromY the y-coordinate from where the settlement is moved.
+     * @param toX the x-coordinate where the settlement is moved to.
+     * @param toY the y-coordinate where the settlement is moved to.
      */
     public void useToken(TileType tokenType, Player player, int fromX, int fromY, int toX, int toY) {
         // TODO: only keep this if token function are getting changed to private
@@ -691,7 +781,7 @@ public class Game {
     /**
      * Updates map preview before using oracle token.
      *
-     * @param player
+     * @param player the player.
      */
     public void previewTokenOracle(Player player) {
         updatePreviewWithTerrain(player, player.terrainCard);
@@ -714,7 +804,7 @@ public class Game {
     /**
      * Updates map preview before using farm token.
      *
-     * @param player
+     * @param player the player.
      */
     public void previewTokenFarm(Player player) {
         updatePreviewWithTerrain(player, TileType.GRAS);
@@ -740,6 +830,7 @@ public class Game {
      * Updates the preview for tavern token.
      *
      * @param player the player to update for.
+     * @return the set of tiles where the player could place a settlement.
      */
     public Set<Tile> previewTokenTavern(Player player) {
         //TODO: TileReadOnly
@@ -766,6 +857,7 @@ public class Game {
      * Use tower token. The player can place a token at the border of the map.
      *
      * @param player the player to update for.
+     * @return the set of tiles where the player could place a settlement.
      */
     public Set<Tile> previewWithTower(Player player) {
         //TODO: TileReadOnly
@@ -796,7 +888,7 @@ public class Game {
     /**
      * Updates map preview before using farm token Oasis.
      *
-     * @param player
+     * @param player the player who wants that preview.
      */
     public void previewTokenOasis(Player player) {
         updatePreviewWithTerrain(player, TileType.DESERT);
@@ -829,6 +921,14 @@ public class Game {
         }
     }
 
+    // TODO: JavaDoc!
+    /**
+     *
+     * @param player the player.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @return
+     */
     public Set<Tile> previewTokenPaddockPlaceSettlement(Player player, int x, int y) {
         if (!map.at(x, y).isOccupiedByPlayer(player))
             throw new InvalidParameterException("player does not own a settlement at this place");
@@ -852,6 +952,12 @@ public class Game {
         }
     }
 
+    // TODO: JavaDoc!
+    /**
+     *
+     * @param player the player.
+     * @return
+     */
     public Set<Tile> previewTokenBarnPlaceSettlement(Player player) {
         //TODO: TileReadOnly
         return allPossibleSettlementPlacementsOnTerrain(player, player.terrainCard);
