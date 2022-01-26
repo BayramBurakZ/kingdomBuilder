@@ -175,4 +175,15 @@ public class GameSelectionViewController extends Controller implements Initializ
         store.dispatch(new JoinGameAction(id));
         sceneLoader.showGameView(false, true);
     }
+
+    /**
+     * Sets the functionality for the Refresh Button.
+     *
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void onRefreshButtonPressed(Event event) {
+        //TODO: maybe use an Action instead
+        store.getState().client.gamesRequest();
+    }
 }

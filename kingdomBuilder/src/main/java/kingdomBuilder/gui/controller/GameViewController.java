@@ -25,6 +25,7 @@ import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
+import kingdomBuilder.network.protocol.MyGameReply;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -189,7 +190,6 @@ public class GameViewController extends Controller implements Initializable {
         // - PlayerData settlements -> updateSettlementsForPlayer()
         // - PlayerData score -> updateScoreForPlayer()
         // - when player joins -> addPlayer()
-        // - Win Conditions -> updateWinConditions()
         // - Tokens from the current Player -> updateTokens()
         // - Token used -> updateTokens()
         // - In Basic turn -> disableTokens(false/true)
@@ -198,39 +198,55 @@ public class GameViewController extends Controller implements Initializable {
 
         resourceBundle = resources;
 
-        // generates the map
         store.subscribe(kbState -> {
-            if (kbState.map != null) {
-                setupGameBoard(store.getState().map);
+            // MAP
+            if (kbState.gameInfo.map() != null) {
+                setupGameBoard(store.getState().gameInfo.map());
                 setupCamera();
                 setupLight();
             }
-        }, "map");
 
-        store.subscribe(kbState -> {
+            //PLAYERS
             game_hbox_players.getChildren().clear();
             players.clear();
-            for (var player : kbState.playersOfGame) {
+            for (var player : kbState.gameInfo.playersOfGame()) {
                 addPlayer(kbState.clients.get(player.clientId()).name());
             }
-        }, "playersOfGame");
 
-        store.subscribe(kbState -> {
-            if (kbState.gameInformation != null) {
+            //TIME and TURN LIMIT
+
+            MyGameReply myGame = kbState.gameInfo.gameInformation();
+            if (myGame != null) {
                 // display time limit
-                double time = 1000;
+                int time = 1000;
 
-                if (kbState.gameInformation.timeLimit() != -1)
-                    time = kbState.gameInformation.timeLimit() / 1000;
+                if (myGame.timeLimit() != -1) {
+                    time = (int) myGame.timeLimit() / 1000;
                     game_label_time.setText(resources.getObject("timeLimit:")
-                            + " " + Double.toString(time));
+                            + " " + time);
+                }
 
                 // display turn limit
-                if (kbState.gameInformation.turnLimit() != -1)
+                if (myGame.turnLimit() != -1)
                     game_label_turn.setText(resources.getObject("turnLimit:")
-                            + " " + Integer.toString(kbState.gameInformation.turnLimit()));
+                            + " " + myGame.turnLimit());
             }
-        }, "gameInformation");
+
+            // WIN CONDITIONS
+
+            if (kbState.gameInfo.winConditions() != null) {
+                updateWinConditions();
+            }
+
+            // TERRAIN CARD
+
+            if (kbState.gameInfo.terrainTypeOfTurn() != null) {
+                updateCardDescription(TileType.valueOf(kbState.gameInfo.terrainTypeOfTurn().terrainType()));
+            }
+
+        }, "gameInfo");
+
+
 
         // set the initial layout of the view
         setupLayout();
@@ -340,7 +356,6 @@ public class GameViewController extends Controller implements Initializable {
                     updateCardDescription((TileType) Game.placeableTileTypes.toArray()[random]);
                     updateTokens();
                 }
-                case Z -> updateWinConditions();
 
             }
             event.consume();
@@ -530,30 +545,11 @@ public class GameViewController extends Controller implements Initializable {
         // should be empty but safe is safe
         game_hBox_windconditions.getChildren().clear();
 
-        // TODO: read winconditions from Data
-        Game.WinCondition[] wc = {
-                Game.WinCondition.FISHER,
-                Game.WinCondition.LORDS,
-                Game.WinCondition.MINER,
-                Game.WinCondition.ANCHORITE,
-                Game.WinCondition.FARMER,
-                Game.WinCondition.MERCHANT,
-                Game.WinCondition.KNIGHT,
-                Game.WinCondition.EXPLORER
-        };
+        Game.WinCondition[] winConditions = store.getState().gameInfo.winConditions();
 
         for (int i = 0; i < 3; i++) {
-            int random = (int) (Math.random() * 8);
-            game_hBox_windconditions.getChildren().add(new Wincondition(wc[random], resourceBundle));
+            game_hBox_windconditions.getChildren().add(new Wincondition(winConditions[i], resourceBundle));
         }
-
-        /*
-        Wincondition one = new Wincondition(winConditionOne, resourceBundle);
-        Wincondition two = new Wincondition(winConditionTwo, resourceBundle);
-        Wincondition three = new Wincondition(winConditionThree, resourceBundle);
-
-        game_hBox_windconditions.getChildren().addAll(one, two, three);
-        */
     }
 
     /**

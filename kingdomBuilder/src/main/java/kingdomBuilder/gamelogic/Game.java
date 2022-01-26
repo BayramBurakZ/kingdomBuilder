@@ -1,5 +1,7 @@
 package kingdomBuilder.gamelogic;
 
+import kingdomBuilder.network.protocol.MyGameReply;
+
 import java.security.InvalidParameterException;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -81,49 +83,39 @@ public class Game {
     /**
      * Constructs a new game object which is ready for the first move.
      *
-     * @param map                 the map of the game.
-     * @param gameName            the name of the game.
-     * @param gameDescription     the description of the game.
-     * @param playerLimit         the maximum amount of players that can play in the game.
-     * @param timeLimit           the maximum amount of time a player can spend on each turn.
-     * @param turnLimit           the maximum amount of turns the game can run for.
-     * @param hostID              the ID of the client who created the game.
-     * @param startingPlayerID    the ID of the player who takes the first turn.
-     * @param winConditions       an array of the win conditions of the game.
-     * @param players             an array of the players playing in the game.
-     * @param startingSettlements the total amount of settlements a player has to place to end the game.
+     * @param gameInfo contains all information about the current game.
+     * @param startingPlayerID the ID of the player who takes the first turn.
+     * @param players an array of the players playing in the game.
      */
-    public Game(Map map,
-                String gameName,
-                String gameDescription,
-                int playerLimit,
-                int timeLimit,
-                int turnLimit,
-                int hostID,
+    public Game(GameInfo gameInfo,
                 int startingPlayerID,
-                WinCondition[] winConditions,
-                Player[] players,
-                int startingSettlements
+                Player[] players
     ) {
-        if (players.length > playerLimit)
+        MyGameReply gameInformation = gameInfo.gameInformation();
+        WinCondition[] winConditions = gameInfo.winConditions();
+
+        if (players.length > gameInformation.playerLimit())
             throw new RuntimeException("The amount of players surpasses the player limit!");
 
         if (winConditions.length <= 0)
             throw new RuntimeException("No win conditions have been defined!");
 
-        this.map = map;
-        this.gameName = gameName;
-        this.gameDescription = gameDescription;
-        this.playerLimit = playerLimit;
-        this.timeLimit = timeLimit;
-        this.turnLimit = turnLimit;
-        this.hostID = hostID;
+        // TODO: using a cast or something instead of weird constructor calls
+        this.map = new Map(gameInfo.map());
+        this.gameName = gameInformation.gameName();
+        this.gameDescription = gameInformation.gameDescription();
+        this.playerLimit = gameInformation.playerLimit();
+        this.timeLimit = gameInformation.timeLimit();
+        this.turnLimit = gameInformation.turnLimit();
+        this.hostID = gameInformation.clientId();
         this.currentPlayerID = startingPlayerID;
         this.winConditions = winConditions;
         // TODO: the players array should be created by the Game itself
         //       the constructor should only receive the player information that was relevant before game start
         this.players = players;
-        this.startingSettlements = startingSettlements;
+        this.startingSettlements = DEFAULT_STARTING_SETTLEMENTS;
+
+        System.out.println(this);
     }
 
     /**

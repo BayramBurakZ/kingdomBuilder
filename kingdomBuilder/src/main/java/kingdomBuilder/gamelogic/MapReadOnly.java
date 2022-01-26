@@ -105,6 +105,17 @@ public class MapReadOnly<T extends TileReadOnly> implements Iterable<T> {
     }
 
     /**
+     * Creates a MapReadOnly with an existing MapReadOnly.
+     * @param mapReadOnly the map.
+     */
+    public MapReadOnly(MapReadOnly mapReadOnly) {
+        this.tiles = mapReadOnly.tiles;
+        quadrantWidth = mapReadOnly.quadrantWidth;
+        mapWidth = mapReadOnly.mapWidth;
+        startingTokenCount = mapReadOnly.startingTokenCount;
+    }
+
+    /**
      * Get the position of a 1D array from a 2D index.
      *
      * @param x     The x position of the 2D array.

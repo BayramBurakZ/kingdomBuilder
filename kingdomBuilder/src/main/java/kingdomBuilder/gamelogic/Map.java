@@ -32,6 +32,14 @@ class Map extends MapReadOnly<Tile> {
         super(startingTokenCount, topLeft, topRight, bottomLeft, bottomRight);
     }
 
+    /**
+     * Creates a Map with a MapReadOnly.
+     * @param mapReadOnly the map.
+     */
+    public Map(MapReadOnly mapReadOnly) {
+        super(mapReadOnly);
+    }
+
 
     /**
      * Get all surrounding tiles of a given target tile.

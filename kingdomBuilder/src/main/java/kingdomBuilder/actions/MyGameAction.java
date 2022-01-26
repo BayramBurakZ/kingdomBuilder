@@ -9,8 +9,15 @@ import kingdomBuilder.redux.Action;
  */
 public class MyGameAction extends Action {
 
+    /**
+     * Represents the MyGameReplay from the network.
+     */
     public MyGameReply myGameReply;
 
+    /**
+     * Creates a new MyGameAction.
+     * @param myGameReply the myGameReply message.
+     */
     public MyGameAction(MyGameReply myGameReply) {
         this.myGameReply = myGameReply;
     }

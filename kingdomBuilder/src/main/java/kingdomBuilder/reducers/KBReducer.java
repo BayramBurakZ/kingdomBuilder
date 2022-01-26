@@ -2,7 +2,11 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.WinCondition;
+import kingdomBuilder.gamelogic.GameInfo;
 import kingdomBuilder.gamelogic.MapReadOnly;
+import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -15,6 +19,7 @@ import kingdomBuilder.redux.Store;
 import kingdomBuilder.generated.DeferredState;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
 
 public class KBReducer implements Reducer<KBState> {
 
@@ -64,6 +69,10 @@ public class KBReducer implements Reducer<KBState> {
         else if (action instanceof SetPlayersAction a)
             return reduce(oldState, a);
         else if (action instanceof MyGameAction a)
+            return reduce(oldState, a);
+        else if (action instanceof WinConditionsAction a)
+            return reduce(oldState, a);
+        else if (action instanceof TerrainOfTurnAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -176,6 +185,10 @@ public class KBReducer implements Reducer<KBState> {
         client.onMyGameReply.subscribe(m -> store.dispatch(new MyGameAction(m)));
 
         client.login(oldState.clientPreferredName);
+
+        client.onWinCondition.subscribe(m -> store.dispatch(new WinConditionsAction(m)));
+
+        client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(new TerrainOfTurnAction(m)));
 
         state.setClient(client);
         state.setIsConnecting(true);
@@ -298,38 +311,108 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, SetPlayersAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var playersOfGame = oldState.playersOfGame;
+        final var oldGameInfo = oldState.gameInfo;
+
+        LinkedHashSet<PlayerData> playersOfGame = oldGameInfo.playersOfGame();
         playersOfGame.addAll(a.playersReply.playerDataList());
-        state.setPlayersOfGame(playersOfGame);
+
+        GameInfo newGameInfo = new GameInfo(playersOfGame, oldGameInfo.gameInformation(),
+                oldGameInfo.map(), oldGameInfo.winConditions(), oldGameInfo.terrainTypeOfTurn());
+        state.setGameInfo(newGameInfo);
+
+        if (newGameInfo.playersOfGame() != null)
+            if (newGameInfo.playersOfGame().size() == newGameInfo.gameInformation().playerLimit())
+                if (newGameInfo.winConditions() != null) {
+                    System.out.println("Game created from PlayerAction");
+                    state = createGame(oldState, state, newGameInfo);
+                }
+
         return state;
     }
 
     private DeferredState reduce(KBState oldState, MyGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        state.setGameInformation(a.myGameReply);
+        var oldGameInfo = oldState.gameInfo;
 
-        state.setMap(new MapReadOnly(
+        MapReadOnly map = new MapReadOnly(
                 MapReadOnly.DEFAULT_STARTING_TOKEN_COUNT,
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId1()),
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId2()),
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId3()),
-                oldState.quadrants.get(a.myGameReply.boardData().quadrantId4())));
+                oldState.quadrants.get(a.myGameReply.boardData().quadrantId4()));
+
+        GameInfo newGameInfo = new GameInfo(oldGameInfo.playersOfGame(), a.myGameReply, map,
+                oldState.gameInfo.winConditions(), oldGameInfo.terrainTypeOfTurn());
+        state.setGameInfo(newGameInfo);
+        return state;
+    }
+
+    // TODO: pls someone make it better D:
+    private DeferredState reduce(KBState oldState, WinConditionsAction a) {
+        DeferredState state = new DeferredState(oldState);
+
+        // TODO: debug
+        System.out.println(
+                a.winConditionReply.winCondition1() + " " +
+                a.winConditionReply.winCondition2() + " " +
+                a.winConditionReply.winCondition3());
+
+        WinCondition[] winConditions = {
+                WinCondition.valueOf(a.winConditionReply.winCondition1()),
+                WinCondition.valueOf(a.winConditionReply.winCondition2()),
+                WinCondition.valueOf(a.winConditionReply.winCondition3())
+        };
+
+        final var oldGameInfo = oldState.gameInfo;
+        GameInfo newGameInfo = new GameInfo(oldGameInfo.playersOfGame(), oldGameInfo.gameInformation(),
+                oldGameInfo.map(), winConditions, oldGameInfo.terrainTypeOfTurn());
+        state.setGameInfo(newGameInfo);
+
+        if (newGameInfo.winConditions() != null)
+            if (newGameInfo.gameInformation() != null)
+                if (newGameInfo.playersOfGame().size() == newGameInfo.gameInformation().playerLimit()) {
+                    System.out.println("Game created from WinConditionAction");
+                    state = createGame(oldState, state, newGameInfo);
+                }
 
         return state;
     }
-/*
-    private DeferredState reduce(KBState oldState, StartGameAction a) {
-        DeferredState state = new DeferredState(oldState);
+
+    /**
+     * Creates a game and sets it in the state.
+     * @param oldState the oldState to read data.
+     * @param state the deferredState to set the changes.
+     * @param gameInfo the updated gameInfo.
+     * @return the updated deferredState.
+     */
+    private DeferredState createGame(KBState oldState, DeferredState state, GameInfo gameInfo) {
+
+        Player[] player = new Player[gameInfo.playersOfGame().size()];
+
+        int i = 0;
+        for (PlayerData pd : gameInfo.playersOfGame()) {
+            ClientData cd = oldState.clients.get(pd.clientId());
+
+            player[i++] = new Player(pd.clientId(), cd.name(), Game.PlayerColor.valueOf(pd.color()), 40);
+        }
+
         state.setGame(new Game(
-                a.gameName,
-                a.gameDescription,
-                a.playerLimit,
-                a.timeLimit,
-                a.turnLimit,
-                new Game.QuadrantIDs(a.quadrantId1, a.quadrantId2, a.quadrantId3, a.quadrantId4),
-                a.
-        ));
+                oldState.gameInfo,
+                player[0].ID,
+                player));
+
+        return state;
+
+    }
+
+    private DeferredState reduce(KBState oldState, TerrainOfTurnAction a) {
+        DeferredState state = new DeferredState(oldState);
+        GameInfo oldGameInfo = oldState.gameInfo;
+        GameInfo newGameInfo = new GameInfo(oldGameInfo.playersOfGame(),
+                oldGameInfo.gameInformation(), oldGameInfo.map(), oldGameInfo.winConditions(),
+                a.terrainTypeOfTurn);
+        state.setGameInfo(newGameInfo);
         return state;
     }
-*/
+
 }

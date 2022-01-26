@@ -1,6 +1,7 @@
 package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.GameInfo;
 import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
@@ -90,19 +91,9 @@ public class KBState {
     public Game game;
 
     /**
-     * Represents the map used in the current game.
+     * Represents the information of the current game.
      */
-    public MapReadOnly map;
-
-    /**
-     * Represents the players of the current game in the order they joined.
-     */
-    public final LinkedHashSet<PlayerData> playersOfGame;
-
-    /**
-     * Represents all information of the current game.
-     */
-    public MyGameReply gameInformation;
+    public GameInfo gameInfo;
 
     // TODO: for some time in the far future: JavaDoc!
     public KBState(SceneLoader sceneLoader,
@@ -118,9 +109,7 @@ public class KBState {
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
                    Game game,
-                   MapReadOnly map,
-                   LinkedHashSet<PlayerData> playersOfGame,
-                   MyGameReply myGameReply) {
+                   GameInfo gameInfo) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -134,9 +123,7 @@ public class KBState {
         this.betterColorsActive = betterColorsActive;
         this.quadrants = quadrants;
         this.game = game;
-        this.map = map;
-        this.playersOfGame = playersOfGame;
-        this.gameInformation = myGameReply;
+        this.gameInfo = gameInfo;
     }
 
     //TODO: JavaDoc!
@@ -153,6 +140,6 @@ public class KBState {
         isConnecting = false;
         isConnected = false;
         failedToConnect = false;
-        playersOfGame = new LinkedHashSet<>();
+        gameInfo = new GameInfo(new LinkedHashSet<PlayerData>(), null, null, null, null);
     }
 }

@@ -82,7 +82,7 @@ public class ClientSelectorImpl implements ClientSelector {
      * @param key The key of the channel.
      */
     private void onSelect(SelectionKey key) {
-        System.out.println("SELECTING.");
+        //System.out.println("SELECTING.");
         IOHandler handler = (IOHandler) key.attachment();
         if(key.isValid() && key.isConnectable()) handler.onIsConnectable(key);
         if(key.isValid() && key.isReadable()) handler.onIsReadable(key);
