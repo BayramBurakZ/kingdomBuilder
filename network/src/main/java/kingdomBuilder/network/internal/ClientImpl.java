@@ -103,6 +103,15 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void myGameRequest() {
+        final String command = ProtocolSerializer.serialize(new MyGameRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void hostGame(String gameName,
                          String gameDescription,
                          int playerLimit,

@@ -61,9 +61,9 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if (action instanceof PlayerRemoveAction a)
             return reduce(oldState, a);
-        else if (action instanceof SetMapAction a)
-            return reduce(oldState, a);
         else if (action instanceof SetPlayersAction a)
+            return reduce(oldState, a);
+        else if (action instanceof MyGameAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -167,13 +167,13 @@ public class KBReducer implements Reducer<KBState> {
         client.onGameHosted.subscribe(m -> store.dispatch(new GameAddAction(m.gameData())));
 
         client.onWelcomeToGame.subscribe(m -> {
-            client.boardRequest();
+            client.myGameRequest();
             client.playersRequest();
         });
 
-        client.onBoardReply.subscribe(m -> store.dispatch(new SetMapAction(m.boardData())));
-
         client.onPlayersReply.subscribe(m -> store.dispatch(new SetPlayersAction(m)));
+
+        client.onMyGameReply.subscribe(m -> store.dispatch(new MyGameAction(m)));
 
         client.login(oldState.clientPreferredName);
 
@@ -202,6 +202,7 @@ public class KBReducer implements Reducer<KBState> {
 
         oldState.client.loadNamespace();
         oldState.client.clientsRequest();
+        // TODO: uncomment if fixed
         //oldState.client.gamesRequest();
         oldState.client.quadrantsRequest();
 
@@ -295,22 +296,25 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, SetMapAction a) {
-        DeferredState state = new DeferredState(oldState);
-        state.setMap(new MapReadOnly(
-                MapReadOnly.DEFAULT_STARTING_TOKEN_COUNT,
-                oldState.quadrants.get(a.boardData.quadrantId1()),
-                oldState.quadrants.get(a.boardData.quadrantId2()),
-                oldState.quadrants.get(a.boardData.quadrantId3()),
-                oldState.quadrants.get(a.boardData.quadrantId4())));
-        return state;
-    }
-
     private DeferredState reduce(KBState oldState, SetPlayersAction a) {
         DeferredState state = new DeferredState(oldState);
         final var playersOfGame = oldState.playersOfGame;
         playersOfGame.addAll(a.playersReply.playerDataList());
         state.setPlayersOfGame(playersOfGame);
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, MyGameAction a) {
+        DeferredState state = new DeferredState(oldState);
+        state.setGameInformation(a.myGameReply);
+
+        state.setMap(new MapReadOnly(
+                MapReadOnly.DEFAULT_STARTING_TOKEN_COUNT,
+                oldState.quadrants.get(a.myGameReply.boardData().quadrantId1()),
+                oldState.quadrants.get(a.myGameReply.boardData().quadrantId2()),
+                oldState.quadrants.get(a.myGameReply.boardData().quadrantId3()),
+                oldState.quadrants.get(a.myGameReply.boardData().quadrantId4())));
+
         return state;
     }
 /*

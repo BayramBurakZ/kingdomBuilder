@@ -377,6 +377,11 @@ public abstract class Client {
     public abstract void chat(List<Integer> recipients, String message);
 
     /**
+     * Sends the myGame message.
+     */
+    public abstract void myGameRequest();
+
+    /**
      * Hosts a game with the given parameters.
      *
      * @param gameName the name of the game.

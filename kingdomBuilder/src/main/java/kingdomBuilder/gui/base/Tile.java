@@ -42,7 +42,6 @@ public abstract class Tile extends Group {
         getChildren().add(hexagon);
 
         // set tileType
-        // TODO use Datalogic enum
         this.tileType = tileType;
 
         // move this group to new position
