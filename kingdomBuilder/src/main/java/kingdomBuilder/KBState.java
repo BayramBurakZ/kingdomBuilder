@@ -9,6 +9,7 @@ import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.network.protocol.MyGameReply;
 import kingdomBuilder.network.protocol.PlayerData;
 
 import java.io.IOException;
@@ -98,6 +99,11 @@ public class KBState {
      */
     public final LinkedHashSet<PlayerData> playersOfGame;
 
+    /**
+     * Represents all information of the current game.
+     */
+    public MyGameReply gameInformation;
+
     // TODO: for some time in the far future: JavaDoc!
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
@@ -113,7 +119,8 @@ public class KBState {
                    Map<Integer, Game.TileType[]> quadrants,
                    Game game,
                    MapReadOnly map,
-                   LinkedHashSet<PlayerData> playersOfGame) {
+                   LinkedHashSet<PlayerData> playersOfGame,
+                   MyGameReply myGameReply) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -129,6 +136,7 @@ public class KBState {
         this.game = game;
         this.map = map;
         this.playersOfGame = playersOfGame;
+        this.gameInformation = myGameReply;
     }
 
     //TODO: JavaDoc!

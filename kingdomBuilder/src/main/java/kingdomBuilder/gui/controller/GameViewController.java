@@ -215,6 +215,23 @@ public class GameViewController extends Controller implements Initializable {
             }
         }, "playersOfGame");
 
+        store.subscribe(kbState -> {
+            if (kbState.gameInformation != null) {
+                // display time limit
+                double time = 1000;
+
+                if (kbState.gameInformation.timeLimit() != -1)
+                    time = kbState.gameInformation.timeLimit() / 1000;
+                    game_label_time.setText(resources.getObject("timeLimit:")
+                            + " " + Double.toString(time));
+
+                // display turn limit
+                if (kbState.gameInformation.turnLimit() != -1)
+                    game_label_turn.setText(resources.getObject("turnLimit:")
+                            + " " + Integer.toString(kbState.gameInformation.turnLimit()));
+            }
+        }, "gameInformation");
+
         // set the initial layout of the view
         setupLayout();
 
@@ -324,7 +341,6 @@ public class GameViewController extends Controller implements Initializable {
                     updateTokens();
                 }
                 case Z -> updateWinConditions();
-                case P -> addPlayer("Tom44");
 
             }
             event.consume();
