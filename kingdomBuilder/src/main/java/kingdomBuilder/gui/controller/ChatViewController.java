@@ -11,7 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.ChatSendAction;
+import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;

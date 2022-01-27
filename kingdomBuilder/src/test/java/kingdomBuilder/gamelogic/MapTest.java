@@ -80,20 +80,25 @@ public class MapTest {
     public void testMapCreationFromQuadrants() {
         // Test if each tile is in the correct position.
 
-
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
                 assertEquals(map.at(x, y).tileType, quadrant1[y * QUADRANT_WIDTH + x]);
+                assertEquals(x, map.at(x, y).x);
+                assertEquals(y, map.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
                 assertEquals(map.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[y * QUADRANT_WIDTH + x]);
+                assertEquals(x, map.at(x, y).x);
+                assertEquals(y, map.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
                 assertEquals(map.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[y * QUADRANT_WIDTH + x]);
+                assertEquals(x, map.at(x, y).x);
+                assertEquals(y, map.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
@@ -102,6 +107,8 @@ public class MapTest {
                         map.at(x + QUADRANT_WIDTH, y + QUADRANT_WIDTH).tileType,
                         quadrant4[y * QUADRANT_WIDTH + x]
                 );
+                assertEquals(x, map.at(x, y).x);
+                assertEquals(y, map.at(x, y).y);
             }
         }
     }

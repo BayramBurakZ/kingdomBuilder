@@ -129,6 +129,6 @@ public class KBState {
         isConnecting = false;
         isConnected = false;
         failedToConnect = false;
-        game = new Game();
+        game = null;
     }
 }

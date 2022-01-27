@@ -10,7 +10,7 @@ import static kingdomBuilder.gamelogic.Game.tokenType;
 /**
  * Contains the data of a tile.
  */
-class Tile extends TileReadOnly {
+public class Tile extends TileReadOnly {
 
     public Tile(int x, int y, TileType tileType, int remainingTokens) {
         super(x, y, tileType, remainingTokens);

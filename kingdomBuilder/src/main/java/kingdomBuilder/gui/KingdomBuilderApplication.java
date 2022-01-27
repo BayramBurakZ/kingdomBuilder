@@ -4,8 +4,7 @@ import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.ApplicationExitAction;
-import kingdomBuilder.network.ClientSelector;
+import kingdomBuilder.actions.general.ApplicationExitAction;
 import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
 

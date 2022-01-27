@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.ConnectAction;
+import kingdomBuilder.actions.general.ConnectAction;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;

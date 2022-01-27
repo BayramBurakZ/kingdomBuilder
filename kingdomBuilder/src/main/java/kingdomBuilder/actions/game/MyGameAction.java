@@ -1,4 +1,4 @@
-package kingdomBuilder.actions;
+package kingdomBuilder.actions.game;
 
 import kingdomBuilder.network.protocol.MyGameReply;
 import kingdomBuilder.redux.Action;

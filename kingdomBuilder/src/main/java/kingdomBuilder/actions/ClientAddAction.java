@@ -1,7 +1,7 @@
 package kingdomBuilder.actions;
 
+import kingdomBuilder.actions.base.ClientAction;
 import kingdomBuilder.network.protocol.ClientData;
-import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.redux.Action;
 
 /**

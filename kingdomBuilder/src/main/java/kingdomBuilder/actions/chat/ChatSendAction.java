@@ -1,4 +1,4 @@
-package kingdomBuilder.actions;
+package kingdomBuilder.actions.chat;
 
 import kingdomBuilder.redux.Action;
 

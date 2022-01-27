@@ -59,11 +59,6 @@ public class Game {
     private int hostID;
 
     /**
-     * The ID of the player whose turn it currently is.
-     */
-    private int currentPlayerID;
-
-    /**
      * An array of the win conditions of the game.
      */
     private WinCondition[] winConditions;
@@ -109,6 +104,7 @@ public class Game {
     public Game() {
 
     }
+
     /**
      * Win conditions for the game.
      */
@@ -293,13 +289,22 @@ public class Game {
     }
 
     /**
+     * Show all possible placements at the start of the turn.
+     *
+     * @return all possible tiles at the start of the game.
+     */
+    public Set<Tile> startTurn() {
+        return updatePreviewWithTerrain(currentPlayer, terrainCard);
+    }
+
+    /**
      * Checks if it's the given player's turn.
      *
      * @param player the player to check if it's their turn.
      * @return Whether it's the given player's turn.
      */
     public boolean isPlayersTurn(Player player) {
-        return currentPlayerID == player.ID;
+        return currentPlayer == player;
     }
 
     /**
@@ -325,8 +330,8 @@ public class Game {
     /**
      * Checks if a settlement can be placed.
      *
-     * @param x the horizontal position of the settlement on the map.
-     * @param y the vertical position of the settlement on the map.
+     * @param x      the horizontal position of the settlement on the map.
+     * @param y      the vertical position of the settlement on the map.
      * @param player the player whose turn it is and who owns the settlement.
      * @return true if the a settlement can be placed.
      */
@@ -371,8 +376,8 @@ public class Game {
      * Chechs if the player can place a settlement on a tile with the type of water.
      *
      * @param player the player.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
+     * @param x      the x-coordinate.
+     * @param y      the y-coordinate.
      * @return true if the player can build on that tile.
      */
     public boolean canPlaceSettlementOnWater(Player player, int x, int y) {
@@ -594,14 +599,10 @@ public class Game {
 
         Set<Tile> allowedTiles = new HashSet<>();
         Set<Tile> freeTiles = map.freeTilesOnTerrain(terrain);
-        Iterator<Tile> freeTilesIterator = freeTiles.iterator();
-        Tile current;
 
-        while (freeTilesIterator.hasNext()) {
-            current = freeTilesIterator.next();
-
-            if (map.settlementOfPlayerOnSurroundingTiles(player, current.x, current.y)) {
-                allowedTiles.add(current);
+        for (Tile freeTile : freeTiles) {
+            if (map.settlementOfPlayerOnSurroundingTiles(player, freeTile.x, freeTile.y)) {
+                allowedTiles.add(freeTile);
             }
         }
         return allowedTiles;
@@ -642,7 +643,7 @@ public class Game {
     /**
      * Updates GUI preview for all possible tiles to place settlement
      *
-     * @param player the player.
+     * @param player  the player.
      * @param terrain the terrain.
      * @return the set of Tiles where the player could place a settlement.
      */
@@ -685,8 +686,8 @@ public class Game {
      *
      * @param tokenType that is used.
      * @param player    player that uses it.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
+     * @param x         the x-coordinate.
+     * @param y         the y-coordinate.
      */
     public void useToken(TileType tokenType, Player player, int x, int y) {
         // TODO: only keep this if token function are getting changed to private
@@ -719,11 +720,11 @@ public class Game {
      * Uses a token that moves a settlement from one tile to another with the given Token.
      *
      * @param tokenType the token used for this.
-     * @param player the player who uses a token.
-     * @param fromX the x-coordinate from where the settlement is moved.
-     * @param fromY the y-coordinate from where the settlement is moved.
-     * @param toX the x-coordinate where the settlement is moved to.
-     * @param toY the y-coordinate where the settlement is moved to.
+     * @param player    the player who uses a token.
+     * @param fromX     the x-coordinate from where the settlement is moved.
+     * @param fromY     the y-coordinate from where the settlement is moved.
+     * @param toX       the x-coordinate where the settlement is moved to.
+     * @param toY       the y-coordinate where the settlement is moved to.
      */
     public void useToken(TileType tokenType, Player player, int fromX, int fromY, int toX, int toY) {
         // TODO: only keep this if token function are getting changed to private
@@ -905,11 +906,11 @@ public class Game {
     }
 
     // TODO: JavaDoc!
+
     /**
-     *
      * @param player the player.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
+     * @param x      the x-coordinate.
+     * @param y      the y-coordinate.
      * @return
      */
     public Set<Tile> previewTokenPaddockPlaceSettlement(Player player, int x, int y) {
@@ -936,8 +937,8 @@ public class Game {
     }
 
     // TODO: JavaDoc!
+
     /**
-     *
      * @param player the player.
      * @return
      */
@@ -948,52 +949,67 @@ public class Game {
 
     /**
      * Set map of the game.
+     *
      * @param map the map to set.
      */
-    public void setMap(Map map){
+    public void setMap(Map map) {
         this.map = map;
     }
 
     /**
      * Set players for the game.
+     *
      * @param newPlayers the players to set for the game.
      */
-    public void setPlayers(Player[] newPlayers){
+    public void setPlayers(Player[] newPlayers) {
         players = newPlayers;
     }
 
     /**
+     * Sets the turn of the next player.
+     *
+     * @param newPlayer the next player for the turn.
+     */
+    public void setCurrentPlayer(Player newPlayer) {
+        currentPlayer = newPlayer;
+    }
+
+    /**
      * Set win conditions for the game.
+     *
      * @param newWinConditions the win conditions to set.
      */
-    public void setWinConditions(WinCondition[] newWinConditions){
+    public void setWinConditions(WinCondition[] newWinConditions) {
         winConditions = newWinConditions;
     }
 
     /**
      * Set terrain card of current turn.
+     *
      * @param newTerrainCard the current terrain type of the game.
      */
-    public void setTerrainCardOfTurn(TileType newTerrainCard){
+    public void setTerrainCardOfTurn(TileType newTerrainCard) {
         terrainCard = newTerrainCard;
     }
 
     /**
-     * Set the turn of the current player.
-     * @param playerID the player for current turn.
+     * Translates player id to the player object.
+     *
+     * @param playerID the id to switch.
+     * @return the player object to return.
      */
-    public void setTurnStart(int playerID){
-
-        for (int i = 0; i < players.length; i++){
-            if(players[i].ID == playerID){
-                currentPlayer = players[i];
-                break;
+    public Player playerIDtoObject(int playerID) {
+        for (int i = 0; i < players.length; i++) {
+            if (players[i].ID == playerID) {
+                return players[i];
             }
         }
+        return null;
     }
 
     /**
      * Gets the myGameReply field.
+     *
      * @return myGameReply field.
      */
     public MyGameReply getMyGameReply() {
@@ -1002,6 +1018,7 @@ public class Game {
 
     /**
      * Set game info.
+     *
      * @param myGameReply The game info to set.
      */
     public void setGameInfo(MyGameReply myGameReply) {
@@ -1012,15 +1029,17 @@ public class Game {
     }
 
     /**
+     * Gets the map of the game.
      *
-     * @return
+     * @return the map.
      */
-    public Iterator<TileReadOnly> getTiles() {
-        return (Iterator)map.iterator();
+    public Map getMap() {
+        return map;
     }
 
     /**
      * Gets the players of this game.
+     *
      * @return all the players of this game.
      */
     public Player[] getPlayers() {
@@ -1029,6 +1048,7 @@ public class Game {
 
     /**
      * Gets the WinConditions of this game.
+     *
      * @return the WinConditions.
      */
     public WinCondition[] getWinConditions() {
@@ -1037,9 +1057,19 @@ public class Game {
 
     /**
      * Gets the terrain card of current turn.
+     *
      * @return the terrain card of current turn.
      */
     public TileType getTerrainCard() {
         return terrainCard;
+    }
+
+    /**
+     * Gets the current player.
+     *
+     * @return the current player.
+     */
+    public Player getCurrentPlayer() {
+        return currentPlayer;
     }
 }

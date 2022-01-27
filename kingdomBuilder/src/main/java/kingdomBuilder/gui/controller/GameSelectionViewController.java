@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.actions.general.DisconnectAction;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.redux.Store;
@@ -116,7 +117,7 @@ public class GameSelectionViewController extends Controller implements Initializ
 
                 gameselection_label_gamename.setText(newValue.gameName());
                 ClientData host = store.getState().clients.get(newValue.clientId());
-                gameselection_label_hostname.setText(host.name());
+                gameselection_label_hostname.setText(host != null ? host.name() : "???");
                 // TODO?
                 //gameselection_label_timelimit;
                 //gameselection_label_turnlimit;

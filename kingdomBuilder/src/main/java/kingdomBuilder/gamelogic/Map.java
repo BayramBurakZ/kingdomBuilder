@@ -778,13 +778,14 @@ public class Map implements Iterable<Tile> {
         for (int y = 0; y < mapWidth; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 if (at(x, y).tileType == terrain) {
-                    entireTerrain.add((Tile) at(x, y));
+                    entireTerrain.add(at(x, y));
                 }
             }
         }
         return entireTerrain;
     }
 
+    //TODO: javaDoc!
     /**
      * Get only the free tiles of a terrain.
      *
@@ -796,19 +797,17 @@ public class Map implements Iterable<Tile> {
             throw new InvalidParameterException("not a landscape!");
 
         Set<Tile> freeTiles = new HashSet<>();
-        Iterator<Tile> terrainIterator = getEntireTerrain(terrain).iterator();
-        Tile current;
 
-        while (terrainIterator.hasNext()) {
-            current = terrainIterator.next();
+        for (Tile tile : getEntireTerrain(terrain)) {
 
-            if (at(current.x, current.y).isTilePlaceable())
-                freeTiles.add(current);
+            if (tile.isTilePlaceable())
+                freeTiles.add(tile);
         }
 
         return freeTiles;
     }
 
+    //TODO: javaDoc!
     /**
      * Get all free tiles at the border of the map.
      *

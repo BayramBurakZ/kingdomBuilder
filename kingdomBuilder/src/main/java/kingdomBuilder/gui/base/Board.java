@@ -4,7 +4,7 @@ import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Map;
-import kingdomBuilder.gamelogic.MapReadOnly;
+import kingdomBuilder.gamelogic.TileReadOnly;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -50,8 +50,8 @@ public abstract class Board {
                 }
 
                 int yPos = y * 60;
-
-                placeTileOnBoard(group, x, y, xPos, yPos, map.at(x, y).tileType, resource);
+                // TODO: this cast was necessary cause IntelliJ bugged out, remove
+                placeTileOnBoard(group, x, y, xPos, yPos, ((TileReadOnly) map.at(x, y)).tileType, resource);
             }
         }
     }

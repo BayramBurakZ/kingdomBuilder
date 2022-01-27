@@ -2,9 +2,16 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.actions.chat.ChatReceiveAction;
+import kingdomBuilder.actions.chat.ChatSendAction;
+import kingdomBuilder.actions.game.*;
+import kingdomBuilder.actions.general.ApplicationExitAction;
+import kingdomBuilder.actions.general.ConnectAction;
+import kingdomBuilder.actions.general.DisconnectAction;
+import kingdomBuilder.actions.general.LoggedInAction;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.WinCondition;
-import kingdomBuilder.gamelogic.MapReadOnly;
+import kingdomBuilder.gamelogic.Map;
 import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
@@ -18,7 +25,6 @@ import kingdomBuilder.redux.Store;
 import kingdomBuilder.generated.DeferredState;
 
 import java.io.IOException;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 public class KBReducer implements Reducer<KBState> {
@@ -73,6 +79,8 @@ public class KBReducer implements Reducer<KBState> {
         else if (action instanceof WinConditionsAction a)
             return reduce(oldState, a);
         else if (action instanceof TerrainOfTurnAction a)
+            return reduce(oldState, a);
+        else if (action instanceof TurnStartAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -184,11 +192,13 @@ public class KBReducer implements Reducer<KBState> {
 
         client.onMyGameReply.subscribe(m -> store.dispatch(new MyGameAction(m)));
 
-        client.login(oldState.clientPreferredName);
-
         client.onWinCondition.subscribe(m -> store.dispatch(new WinConditionsAction(m)));
 
+        client.onTurnStart.subscribe(m->store.dispatch(new TurnStartAction(m)));
+
         client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(new TerrainOfTurnAction(m)));
+
+        client.login(oldState.clientPreferredName);
 
         state.setClient(client);
         state.setIsConnecting(true);
@@ -304,7 +314,9 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, JoinGameAction a) {
         DeferredState state = new DeferredState(oldState);
         oldState.client.joinGame(a.gameId);
+        Game game = new Game();
         state.setClient(oldState.client);
+        state.setGame(game);
         return state;
     }
 
@@ -325,6 +337,12 @@ public class KBReducer implements Reducer<KBState> {
         }
 
         game.setPlayers(player);
+
+        if (startTurnLater >= 0) {
+            game.setCurrentPlayer(game.playerIDtoObject(startTurnLater));
+            startTurnLater = -1;
+        }
+
         state.setGame(game);
         return state;
     }
@@ -333,8 +351,8 @@ public class KBReducer implements Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
         var game = oldState.game;
 
-        MapReadOnly map = new MapReadOnly(
-                MapReadOnly.DEFAULT_STARTING_TOKEN_COUNT,
+        Map map = new Map(
+                Map.DEFAULT_STARTING_TOKEN_COUNT,
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId1()),
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId2()),
                 oldState.quadrants.get(a.myGameReply.boardData().quadrantId3()),
@@ -379,4 +397,20 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
+    // hack
+    private int startTurnLater = -1;
+
+    private DeferredState reduce(KBState oldState, TurnStartAction a) {
+        DeferredState state = new DeferredState(oldState);
+        var game = oldState.game;
+
+        if (game.getPlayers() == null) {
+            startTurnLater = a.turnStart.clientId();
+            return state;
+        }
+
+        game.setCurrentPlayer(game.playerIDtoObject(a.turnStart.clientId()));
+        state.setGame(game);
+        return state;
+    }
 }

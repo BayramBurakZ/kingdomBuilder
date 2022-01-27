@@ -1,4 +1,4 @@
-package kingdomBuilder.actions;
+package kingdomBuilder.actions.base;
 
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.redux.Action;

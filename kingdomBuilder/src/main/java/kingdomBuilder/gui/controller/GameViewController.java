@@ -22,7 +22,8 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
-import kingdomBuilder.gamelogic.MapReadOnly;
+import kingdomBuilder.gamelogic.Map;
+import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
@@ -170,8 +171,12 @@ public class GameViewController extends Controller implements Initializable {
      */
     private ArrayList<PlayerInformation> players = new ArrayList<>();
 
+    private boolean hasMap = false;
+    private Player current = null;
+
     /**
      * Constructs the GameView with the given store.
+     *
      * @param store the Store for access to the state.
      */
     public GameViewController(Store<KBState> store) {
@@ -180,8 +185,9 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location the location used to resolve relative paths for the root object,
-     *                 or null if the location is not known.
+     *
+     * @param location  the location used to resolve relative paths for the root object,
+     *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
@@ -199,14 +205,21 @@ public class GameViewController extends Controller implements Initializable {
         resourceBundle = resources;
 
         store.subscribe(kbState -> {
+            if (kbState.game == null)
+                return;
+
             // MAP
             if (kbState.game.getMap() != null) {
-                setupGameBoard(kbState.game.getMap());
-                setupCamera();
-                setupLight();
+                // ugly as hell but it works maybe
+                if (!hasMap) {
+                    hasMap = true;
+                    setupGameBoard(kbState.game.getMap());
+                    setupCamera();
+                    setupLight();
+                }
             }
 
-            //PLAYERS
+            // PLAYERS
             game_hbox_players.getChildren().clear();
             players.clear();
             if (store.getState().game.getPlayers() != null) {
@@ -215,8 +228,7 @@ public class GameViewController extends Controller implements Initializable {
                 }
             }
 
-            //TIME and TURN LIMIT
-
+            // TIME and TURN LIMIT
             MyGameReply myGame = kbState.game.getMyGameReply();
             if (myGame != null) {
                 // display time limit
@@ -235,20 +247,24 @@ public class GameViewController extends Controller implements Initializable {
             }
 
             // WIN CONDITIONS
-
             if (kbState.game.getWinConditions() != null) {
                 updateWinConditions();
             }
 
             // TERRAIN CARD
-
             if (kbState.game.getTerrainCard() != null) {
                 updateCardDescription(kbState.game.getTerrainCard());
             }
 
+            // START TURN
+            if (kbState.game.getCurrentPlayer() != null) {
+                if (kbState.game.getCurrentPlayer() != current) {
+                    current = kbState.game.getCurrentPlayer();
+                    gameBoard.highlightTerrain(kbState.game.startTurn());
+                }
+            }
+
         }, "game");
-
-
 
         // set the initial layout of the view
         setupLayout();
@@ -261,10 +277,10 @@ public class GameViewController extends Controller implements Initializable {
         box.translateXProperty().set(1500);
         box.translateYProperty().set(1500);
         box.setOnMouseEntered(e -> {
-            ((PhongMaterial)box.getMaterial()).setDiffuseColor(Color.CHOCOLATE);
+            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.CHOCOLATE);
         });
         box.setOnMouseExited(e -> {
-            ((PhongMaterial)box.getMaterial()).setDiffuseColor(Color.WHITE);
+            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.WHITE);
         });
         gameBoard_group.getChildren().add(box);
     }
@@ -310,6 +326,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Setup all connected EventHandler.
+     *
      * @param camera the camera for the handlers.
      */
     private void setupCameraHandlers(Camera camera) {
@@ -319,6 +336,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Zooms the camera when the user scrolls the mousewheel.
+     *
      * @param camera the camera for zooming.
      */
     private void setupCameraZoomHandler(Camera camera) {
@@ -340,6 +358,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Translates the camera when the user presses the arrow keys.
+     *
      * @param camera the camera to move.
      */
     private void setupCameraScrollHandler(Camera camera) {
@@ -352,7 +371,6 @@ public class GameViewController extends Controller implements Initializable {
                 case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
                 case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
                 //ToDO: remove - just for testing the highlight
-                case R -> gameBoard.highlightTerrain();
                 case T -> updateTokens();
             }
             event.consume();
@@ -364,7 +382,7 @@ public class GameViewController extends Controller implements Initializable {
      *
      * @param map the map with all information.
      */
-    private void setupGameBoard(MapReadOnly map) {
+    private void setupGameBoard(Map map) {
         gameBoard.setupBoard(gameBoard_group, map, resourceBundle);
 
         HexagonTile[][] board = gameBoard.getBoard();
@@ -418,6 +436,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Updates the Card to the current card of the turn
+     *
      * @param tileType the type to show.
      */
     private void updateCardDescription(TileType tileType) {
@@ -429,7 +448,7 @@ public class GameViewController extends Controller implements Initializable {
 
         //Update Text
         String cardDescription = "";
-        switch(tileType) {
+        switch (tileType) {
             case GRAS -> cardDescription = resourceBundle.getString("gras");
             case FLOWER -> cardDescription = resourceBundle.getString("flower");
             case DESERT -> cardDescription = resourceBundle.getString("desert");
@@ -441,6 +460,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Disables all tokens except the selected.
+     *
      * @param disable if the tokens should be disabled then use true.
      */
     public void disableTokens(boolean disable) {
@@ -490,17 +510,18 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Adds a player to the view.
+     *
      * @param name the name of the player.
      */
     private void addPlayer(String name) {
         Game.PlayerColor color = Game.PlayerColor.RED;
 
         int size = players.size();
-        if (size == 0)  color = Game.PlayerColor.RED;
-        if (size == 1)  color = Game.PlayerColor.BLUE;
-        if (size == 2)  color = Game.PlayerColor.BLACK;
-        if (size == 3)  color = Game.PlayerColor.WHITE;
-        if (size > 3)   return;
+        if (size == 0) color = Game.PlayerColor.RED;
+        if (size == 1) color = Game.PlayerColor.BLUE;
+        if (size == 2) color = Game.PlayerColor.BLACK;
+        if (size == 3) color = Game.PlayerColor.WHITE;
+        if (size > 3) return;
 
         boolean colorMode = store.getState().betterColorsActive;
         PlayerInformation player = new PlayerInformation(name, color, colorMode);
@@ -510,7 +531,7 @@ public class GameViewController extends Controller implements Initializable {
         Region region = new Region();
         game_hbox_players.getChildren().add(region);
         HBox.setHgrow(region, Priority.ALWAYS);
-        
+
         players.add(player);
     }
 
@@ -518,7 +539,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the score of a player.
      *
      * @param player the selected player (0-3).
-     * @param score the new score.
+     * @param score  the new score.
      */
     private void updateScoreForPlayer(int player, int score) {
         players.get(player).setScore(score);
@@ -528,7 +549,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the settlements of a player.
      *
      * @param player the selected player (0-3).
-     * @param count the new settlement count.
+     * @param count  the new settlement count.
      */
     private void updateSettlementsForPlayer(int player, int count) {
         players.get(player).setSettlementCount(count);
@@ -550,6 +571,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Gets the SubScene for the game board.
+     *
      * @return SubScene for displaying the game board
      */
     public SubScene getGame_subscene() {
@@ -558,6 +580,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Sets the functions for the "End"-Button. Here for ending the turn.
+     *
      * @param actionEvent the triggered event.
      */
     private void onTurnEndButtonPressed(ActionEvent actionEvent) {
@@ -566,6 +589,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Sets the functions for the "End"-Button. Here for ending spectating
+     *
      * @param actionEvent the triggered event.
      */
     private void onSpectateEndButtonPressed(ActionEvent actionEvent) {
@@ -580,6 +604,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Set the spectating value, if the game view is for a spectating game.
+     *
      * @param spectating if the game is observed by a spectator.
      */
     public void setSpectating(boolean spectating) {
@@ -588,6 +613,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Sets the online value, if the game is on an online server.
+     *
      * @param isOnline if the game is an online game.
      */
     public void setIsOnline(boolean isOnline) {

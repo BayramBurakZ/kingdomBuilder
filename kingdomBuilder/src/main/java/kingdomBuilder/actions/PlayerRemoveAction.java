@@ -1,5 +1,6 @@
 package kingdomBuilder.actions;
 
+import kingdomBuilder.actions.base.PlayerAction;
 import kingdomBuilder.network.protocol.PlayerLeft;
 import kingdomBuilder.redux.Action;
 
