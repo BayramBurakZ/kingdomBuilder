@@ -90,7 +90,7 @@ public class Map implements Iterable<Tile> {
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
-                        new Tile(x, y, topRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x + quadrantWidth, y, topRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
 
@@ -98,11 +98,11 @@ public class Map implements Iterable<Tile> {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y, bottomLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y + quadrantWidth, bottomLeft[y * quadrantWidth + x], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
-                        new Tile(x, y, bottomRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x + quadrantWidth, y + quadrantWidth, bottomRight[y * quadrantWidth + x], startingTokenCount);
             }
         }
     }
@@ -294,13 +294,13 @@ public class Map implements Iterable<Tile> {
                         }
                     case 4:
                         // bottom left
-                        if (bottomLeftX(x, y) >= 0 && y <= mapWidth) {
+                        if (bottomLeftX(x, y) >= 0 && y + 1 < mapWidth) {
                             state = 4;
                             return true;
                         }
                     case 5:
                         // bottom right
-                        if (bottomRightX(x, y) < mapWidth && y <= mapWidth) {
+                        if (bottomRightX(x, y) < mapWidth && y + 1 < mapWidth) {
                             state = 5;
                             return true;
                         }
@@ -686,27 +686,27 @@ public class Map implements Iterable<Tile> {
 
         // top left
         if (topLeftX(x, y) >= 0 && y > 0)
-            surroundingTiles.add((Tile) at(topLeftX(x, y), y - 1));
+            surroundingTiles.add(at(topLeftX(x, y), y - 1));
 
         // top right
         if (topRightX(x, y) < mapWidth && y > 0)
-            surroundingTiles.add((Tile) at(topRightX(x, y), y - 1));
+            surroundingTiles.add(at(topRightX(x, y), y - 1));
 
         // left
         if (x - 1 >= 0)
-            surroundingTiles.add((Tile) at(x - 1, y));
+            surroundingTiles.add(at(x - 1, y));
 
         // right
         if (x + 1 >= mapWidth)
-            surroundingTiles.add((Tile) at(x + 1, y));
+            surroundingTiles.add(at(x + 1, y));
 
         // bottom left
-        if (bottomLeftX(x, y) >= 0 && y <= mapWidth)
-            surroundingTiles.add((Tile) at(bottomLeftX(x, y), y + 1));
+        if (bottomLeftX(x, y) >= 0 && y + 1 < mapWidth)
+            surroundingTiles.add(at(bottomLeftX(x, y), y + 1));
 
         // bottom right
-        if (bottomRightX(x, y) < mapWidth && y <= mapWidth)
-            surroundingTiles.add((Tile) at(bottomRightX(x, y), y + 1));
+        if (bottomRightX(x, y) < mapWidth && y + 1 < mapWidth)
+            surroundingTiles.add(at(bottomRightX(x, y), y + 1));
 
         return surroundingTiles;
     }
@@ -736,6 +736,9 @@ public class Map implements Iterable<Tile> {
      * @return True if the player has another settlement on surrounding tile. False otherwise.
      */
     public boolean settlementOfPlayerOnSurroundingTiles(Player player, int x, int y) {
+        if (!isWithinBounds(x, y))
+            return false;
+
         for (Tile tile : surroundingTiles(x, y)) {
             if (tile.isOccupiedByPlayer(player))
                 return true;
