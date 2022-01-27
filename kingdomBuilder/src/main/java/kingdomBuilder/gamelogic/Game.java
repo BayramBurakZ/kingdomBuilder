@@ -29,33 +29,33 @@ public class Game {
     /**
      * The name of the game.
      */
-    private final String gameName;
+    private String gameName;
 
     /**
      * The description of the game.
      */
-    private final String gameDescription;
+    private String gameDescription;
 
     /**
      * The maximum amount of players that can play in the game.
      */
-    private final int playerLimit;
+    private int playerLimit;
 
     /**
      * The maximum amount of time a player can spend on each turn.
      */
-    private final int timeLimit;
+    private int timeLimit;
 
     /**
      * The maximum amount of turns the game can run for.
      */
-    private final int turnLimit;
+    private int turnLimit;
 
     // Additional data for a game.
     /**
      * The ID of the client who created the game.
      */
-    private final int hostID;
+    private int hostID;
 
     /**
      * The ID of the player whose turn it currently is.
@@ -65,59 +65,42 @@ public class Game {
     /**
      * An array of the win conditions of the game.
      */
-    private final WinCondition[] winConditions;
+    private WinCondition[] winConditions;
+
+    /**
+     * The current terrain card of a players turn.
+     */
+    private TileType terrainCard;
 
     /**
      * An array of the players playing in the game.
      */
-    private final Player[] players;
+    private Player[] players;
+
+    /**
+     * The player for current turn.
+     */
+    private Player currentPlayer;
 
     /**
      * The total amount of settlements a player has to place to end the game.
      */
-    private final int startingSettlements;
-
-    // Internal data of the map
-    private final Map map;
+    private int startingSettlements;
 
     /**
-     * Constructs a new game object which is ready for the first move.
-     *
-     * @param gameInfo contains all information about the current game.
-     * @param startingPlayerID the ID of the player who takes the first turn.
-     * @param players an array of the players playing in the game.
+     * The network message infos of the game.
      */
-    public Game(GameInfo gameInfo,
-                int startingPlayerID,
-                Player[] players
-    ) {
-        MyGameReply gameInformation = gameInfo.gameInformation();
-        WinCondition[] winConditions = gameInfo.winConditions();
+    private MyGameReply myGameReply;
 
-        if (players.length > gameInformation.playerLimit())
-            throw new RuntimeException("The amount of players surpasses the player limit!");
+    //TODO: javadoc
+    private boolean gameRunning = false;
 
-        if (winConditions.length <= 0)
-            throw new RuntimeException("No win conditions have been defined!");
+    // Internal data of the map
+    private Map map;
 
-        // TODO: using a cast or something instead of weird constructor calls
-        this.map = new Map(gameInfo.map());
-        this.gameName = gameInformation.gameName();
-        this.gameDescription = gameInformation.gameDescription();
-        this.playerLimit = gameInformation.playerLimit();
-        this.timeLimit = gameInformation.timeLimit();
-        this.turnLimit = gameInformation.turnLimit();
-        this.hostID = gameInformation.clientId();
-        this.currentPlayerID = startingPlayerID;
-        this.winConditions = winConditions;
-        // TODO: the players array should be created by the Game itself
-        //       the constructor should only receive the player information that was relevant before game start
-        this.players = players;
-        this.startingSettlements = DEFAULT_STARTING_SETTLEMENTS;
+    public Game() {
 
-        System.out.println(this);
     }
-
     /**
      * Win conditions for the game.
      */
@@ -953,5 +936,102 @@ public class Game {
     public Set<Tile> previewTokenBarnPlaceSettlement(Player player) {
         //TODO: TileReadOnly
         return allPossibleSettlementPlacementsOnTerrain(player, player.terrainCard);
+    }
+
+    /**
+     * Set map of the game.
+     * @param newMap the map to set.
+     */
+    public void setMap(MapReadOnly newMap){
+        map = new Map(newMap);
+    }
+
+    /**
+     * Set players for the game.
+     * @param newPlayers the players to set for the game.
+     */
+    public void setPlayers(Player[] newPlayers){
+        players = newPlayers;
+    }
+
+    /**
+     * Set win conditions for the game.
+     * @param newWinConditions the win conditions to set.
+     */
+    public void setWinConditions(WinCondition[] newWinConditions){
+        winConditions = newWinConditions;
+    }
+
+    /**
+     * Set terrain card of current turn.
+     * @param newTerrainCard the current terrain type of the game.
+     */
+    public void setTerrainCardOfTurn(TileType newTerrainCard){
+        terrainCard = newTerrainCard;
+    }
+
+    /**
+     * Set the turn of the current player.
+     * @param playerID the player for current turn.
+     */
+    public void setTurnStart(int playerID){
+
+        for (int i = 0; i < players.length; i++){
+            if(players[i].ID == playerID){
+                currentPlayer = players[i];
+                break;
+            }
+        }
+    }
+
+    /**
+     * Gets the myGameReply field.
+     * @return myGameReply field.
+     */
+    public MyGameReply getMyGameReply() {
+        return myGameReply;
+    }
+
+    /**
+     * Set game info.
+     * @param myGameReply The game info to set.
+     */
+    public void setGameInfo(MyGameReply myGameReply) {
+        this.myGameReply = myGameReply;
+        timeLimit = myGameReply.timeLimit();
+        turnLimit = myGameReply.turnLimit();
+        playerLimit = myGameReply.playerLimit();
+    }
+
+    /**
+     * Gets the map of the game.
+     * @return the map of the game.
+     */
+    public MapReadOnly getMap() {
+        return (MapReadOnly) map;
+    }
+
+    /**
+     * Gets the players of this game.
+     * @return all the players of this game.
+     */
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    /**
+     * Gets the WinConditions of this game.
+     * @return the WinConditions.
+     */
+    public WinCondition[] getWinConditions() {
+        return winConditions;
+    }
+
+    /**
+     * Gets the terrain card of current turn.
+     * @return the terrain card of current turn.
+     */
+    public TileType getTerrainCard() {
+        return terrainCard;
     }
 }

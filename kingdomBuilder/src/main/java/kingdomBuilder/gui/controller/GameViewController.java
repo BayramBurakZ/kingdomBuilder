@@ -200,8 +200,8 @@ public class GameViewController extends Controller implements Initializable {
 
         store.subscribe(kbState -> {
             // MAP
-            if (kbState.gameInfo.map() != null) {
-                setupGameBoard(store.getState().gameInfo.map());
+            if (kbState.game.getMap() != null) {
+                setupGameBoard(kbState.game.getMap());
                 setupCamera();
                 setupLight();
             }
@@ -209,13 +209,15 @@ public class GameViewController extends Controller implements Initializable {
             //PLAYERS
             game_hbox_players.getChildren().clear();
             players.clear();
-            for (var player : kbState.gameInfo.playersOfGame()) {
-                addPlayer(kbState.clients.get(player.clientId()).name());
+            if (store.getState().game.getPlayers() != null) {
+                for (var player : store.getState().game.getPlayers()) {
+                    addPlayer(kbState.clients.get(player.ID).name());
+                }
             }
 
             //TIME and TURN LIMIT
 
-            MyGameReply myGame = kbState.gameInfo.gameInformation();
+            MyGameReply myGame = kbState.game.getMyGameReply();
             if (myGame != null) {
                 // display time limit
                 int time = 1000;
@@ -234,17 +236,17 @@ public class GameViewController extends Controller implements Initializable {
 
             // WIN CONDITIONS
 
-            if (kbState.gameInfo.winConditions() != null) {
+            if (kbState.game.getWinConditions() != null) {
                 updateWinConditions();
             }
 
             // TERRAIN CARD
 
-            if (kbState.gameInfo.terrainTypeOfTurn() != null) {
-                updateCardDescription(TileType.valueOf(kbState.gameInfo.terrainTypeOfTurn().terrainType()));
+            if (kbState.game.getTerrainCard() != null) {
+                updateCardDescription(kbState.game.getTerrainCard());
             }
 
-        }, "gameInfo");
+        }, "game");
 
 
 
@@ -351,12 +353,7 @@ public class GameViewController extends Controller implements Initializable {
                 case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
                 //ToDO: remove - just for testing the highlight
                 case R -> gameBoard.highlightTerrain();
-                case T -> {
-                    int random = (int) (Math.random() * Game.placeableTileTypes.size());
-                    updateCardDescription((TileType) Game.placeableTileTypes.toArray()[random]);
-                    updateTokens();
-                }
-
+                case T -> updateTokens();
             }
             event.consume();
         });
@@ -496,7 +493,6 @@ public class GameViewController extends Controller implements Initializable {
      * @param name the name of the player.
      */
     private void addPlayer(String name) {
-        // TODO: adjust to gamelogic or read from state
         Game.PlayerColor color = Game.PlayerColor.RED;
 
         int size = players.size();
@@ -545,7 +541,7 @@ public class GameViewController extends Controller implements Initializable {
         // should be empty but safe is safe
         game_hBox_windconditions.getChildren().clear();
 
-        Game.WinCondition[] winConditions = store.getState().gameInfo.winConditions();
+        Game.WinCondition[] winConditions = store.getState().game.getWinConditions();
 
         for (int i = 0; i < 3; i++) {
             game_hBox_windconditions.getChildren().add(new Wincondition(winConditions[i], resourceBundle));

@@ -1,9 +1,11 @@
 package kingdomBuilder.gamelogic;
 
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
@@ -145,6 +147,7 @@ class Map extends MapReadOnly<Tile> {
 
         Set<Tile> entireTerrain = new HashSet<>();
 
+        // return Arrays.stream(tiles).filter(t -> t.isTilePlaceable()).collect(Collectors.toSet());
         for (int y = 0; y < mapWidth; y++) {
             for (int x = 0; x < mapWidth; x++) {
                 if (at(x, y).tileType == terrain) {

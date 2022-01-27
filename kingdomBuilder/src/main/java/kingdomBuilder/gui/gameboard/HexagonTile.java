@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.base.Tile;
 
 import java.util.ResourceBundle;
@@ -53,7 +54,7 @@ public class HexagonTile extends Tile {
      * @param tileType the TileType of the Hexagon.
      * @param resource the ResourceBundle to translate text.
      */
-    public HexagonTile(double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
+    public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
         super(xPos, yPos, tileType, resource);
 
         // add settlement to this group
@@ -81,7 +82,7 @@ public class HexagonTile extends Tile {
      * Set the rule for every generated special place to their rule.
      * @param tileType type for recognizing the special place.
      */
-    private void setTokenTooltip(Game.TileType tileType) {
+    private void setTokenTooltip(TileType tileType) {
         Tooltip tokenTooltip = new Tooltip();
         switch (tileType) {
             case BARN -> tokenTooltip.setText(resourceBundle.getString("tokenBarnRule"));
@@ -175,7 +176,7 @@ public class HexagonTile extends Tile {
      * Gets the type of the hexagon.
      * @return The Type of the hexagon.
      */
-    public Game.TileType getTileType() {
+    public TileType getTileType() {
         return tileType;
     }
 

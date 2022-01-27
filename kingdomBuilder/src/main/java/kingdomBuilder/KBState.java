@@ -1,8 +1,6 @@
 package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.GameInfo;
-import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
@@ -10,8 +8,6 @@ import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
-import kingdomBuilder.network.protocol.MyGameReply;
-import kingdomBuilder.network.protocol.PlayerData;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -90,11 +86,6 @@ public class KBState {
      */
     public Game game;
 
-    /**
-     * Represents the information of the current game.
-     */
-    public GameInfo gameInfo;
-
     // TODO: for some time in the far future: JavaDoc!
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
@@ -108,8 +99,7 @@ public class KBState {
                    boolean failedToConnect,
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
-                   Game game,
-                   GameInfo gameInfo) {
+                   Game game) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -123,7 +113,6 @@ public class KBState {
         this.betterColorsActive = betterColorsActive;
         this.quadrants = quadrants;
         this.game = game;
-        this.gameInfo = gameInfo;
     }
 
     //TODO: JavaDoc!
@@ -140,6 +129,6 @@ public class KBState {
         isConnecting = false;
         isConnected = false;
         failedToConnect = false;
-        gameInfo = new GameInfo(new LinkedHashSet<PlayerData>(), null, null, null, null);
+        game = new Game();
     }
 }
