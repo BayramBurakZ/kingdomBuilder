@@ -284,6 +284,17 @@ public class TestProtocolDeserializer {
     }
 
     @Test
+    void testDeserializingGamesReplyWithEmptyPayload() {
+        final String packet = "[REPLY_MESSAGE] (?games) <{}>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        GamesReply typedPacket = assertInstanceOf(GamesReply.class, testConsumer.getObject());
+
+        assertEquals(List.of(), typedPacket.games());
+    }
+
+    @Test
     void testDeserializingPlayersOfGameReply() {
         final String packet = "[REPLY_MESSAGE] (?playersofgame) <[21;{7,11,3}]>";
         ProtocolDeserializer.deserialize(packet, testConsumer);

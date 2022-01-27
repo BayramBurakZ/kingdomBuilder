@@ -116,6 +116,7 @@ public class ProtocolDeserializerMethod {
             return String.format("""
 splitList(tokens.get(%d))
             .stream()
+            .filter(t -> !t.isEmpty())
             .map(ProtocolDeserializer::deserialize%s)
             .toList()""", idx, name);
         }
