@@ -75,7 +75,7 @@ public class TileReadOnly {
      * @param map the map containing the tile.
      * @return Whether the tile is at the border.
      */
-    public boolean isAtBorder(MapReadOnly map) {
+    public boolean isAtBorder(Map map) {
         return (x == 0 || y == 0 || x == map.mapWidth - 1 || y == map.mapWidth - 1);
     }
 

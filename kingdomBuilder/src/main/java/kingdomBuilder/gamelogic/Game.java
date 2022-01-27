@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Contains all the information of a game hosted on the server.
@@ -92,12 +93,19 @@ public class Game {
      */
     private MyGameReply myGameReply;
 
-    //TODO: javadoc
+    /**
+     * Represents the state if the game has started.
+     */
     private boolean gameRunning = false;
 
-    // Internal data of the map
+    /**
+     * Internal data of the map
+     */
     private Map map;
 
+    /**
+     * Constructs a new Game object.
+     */
     public Game() {
 
     }
@@ -327,7 +335,7 @@ public class Game {
 
         boolean hasSurroundingSettlement = false;
         for (var it = map.surroundingTilesIterator(x, y); it.hasNext(); ) {
-            Tile pos = it.next();
+            Tile pos = (Tile) it.next();
             if (map.at(pos.x, pos.y).occupiedBy == player) {
                 hasSurroundingSettlement = true;
                 break;
@@ -340,7 +348,7 @@ public class Game {
                 for (int x2 = 0; x2 < map.mapWidth; x2++) {
                     if (map.at(x2, y2).occupiedBy == player) {
                         for (var it = map.surroundingTilesIterator(x2, y2); it.hasNext(); ) {
-                            Tile pos = it.next();
+                            Tile pos = (Tile) it.next();
                             if (map.at(pos.x, pos.y).occupiedBy == player) {
                                 existsUnoccupiedNeighbouringTile = true;
                                 break outer;
@@ -379,7 +387,7 @@ public class Game {
                 for (int x2 = 0; x2 < map.mapWidth; x2++) {
                     if (map.at(x2, y2).occupiedBy == player) {
                         for (var it = map.surroundingTilesIterator(x2, y2); it.hasNext(); ) {
-                            Tile pos = it.next();
+                            Tile pos = (Tile) it.next();
                             if (map.at(pos.x, pos.y).occupiedBy == player) {
                                 existsUnoccupiedNeighbouringTile = true;
                                 break outer;
@@ -940,10 +948,10 @@ public class Game {
 
     /**
      * Set map of the game.
-     * @param newMap the map to set.
+     * @param map the map to set.
      */
-    public void setMap(MapReadOnly newMap){
-        map = new Map(newMap);
+    public void setMap(Map map){
+        this.map = map;
     }
 
     /**
@@ -1004,11 +1012,11 @@ public class Game {
     }
 
     /**
-     * Gets the map of the game.
-     * @return the map of the game.
+     *
+     * @return
      */
-    public MapReadOnly getMap() {
-        return (MapReadOnly) map;
+    public Iterator<TileReadOnly> getTiles() {
+        return (Iterator)map.iterator();
     }
 
     /**

@@ -3,6 +3,7 @@ package kingdomBuilder.gui.base;
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Map;
 import kingdomBuilder.gamelogic.MapReadOnly;
 import kingdomBuilder.redux.Store;
 
@@ -36,7 +37,7 @@ public abstract class Board {
      * @param map the map with all information.
      * @param resource the ResourceBundle for translating text.
      */
-    public void setupBoard(Group group, MapReadOnly map, ResourceBundle resource) {
+    public void setupBoard(Group group, Map map, ResourceBundle resource) {
         int width = map.mapWidth;
 
         for (int y = 0; y < width; y++) {
