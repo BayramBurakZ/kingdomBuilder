@@ -117,6 +117,50 @@ public class HexagonTile extends Tile {
     }
 
     /**
+     * Places a house with the given color.
+     * @param color the color.
+     */
+    public void placeSettlement(Game.PlayerColor color) {
+        switch (color) {
+            case RED -> {
+                Image img = TextureLoader.generateImage(1,0,0);
+                PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
+
+                settlement.setMaterial(mat);
+            }
+
+            case BLUE -> {
+                Image img = TextureLoader.generateImage(0,0,1);
+                PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
+
+                settlement.setMaterial(mat);
+            }
+
+            case BLACK -> {
+                Image img = TextureLoader.generateImage(0,0,0);
+                PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
+
+                settlement.setMaterial(mat);
+            }
+
+            case WHITE -> {
+                Image img = TextureLoader.generateImage(1,1,1);
+                PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
+
+                settlement.setMaterial(mat);
+            }
+        }
+        settlement.setOpacity(1.0);
+    }
+
+    /**
+     * Removes the settlement from this Tile.
+     */
+    public void removeSettlement() {
+        settlement.setOpacity(0.0);
+    }
+
+    /**
      * Activates the color highlighting of a tile.
      */
     private void setColorHighlighted() {

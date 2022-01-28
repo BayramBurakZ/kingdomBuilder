@@ -20,7 +20,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Initializes the client.
      *
-     * @param ioHandler A handler, which deals with asynchronous IO using javas selector mechanism.
+     * @param ioHandler a handler, which deals with asynchronous IO using javas selector mechanism.
      */
     public ClientImpl(IOHandler ioHandler) {
         this.ioHandler = ioHandler;
@@ -211,7 +211,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Notifies listeners, that a client left the server.
      *
-     * @param message The client data of the client, that left the server.
+     * @param message the client data of the client, that left the server.
      */
     @Override
     public void accept(ClientLeft message) {
@@ -221,7 +221,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Notifies listeners, that a new message was received.
      *
-     * @param message The message and its recipients.
+     * @param message the message and its recipients.
      */
     @Override
     public void accept(Message message) {
@@ -231,7 +231,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Updates the internal client data and notifies listeners of this state change.
      *
-     * @param message The client data assigned by the server.
+     * @param message the client data assigned by the server.
      */
     @Override
     public void accept(WelcomeToServer message) {
@@ -244,7 +244,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Notifies listeners that a client joined the server.
      *
-     * @param message The client data of the newly joined client.
+     * @param message the client data of the newly joined client.
      */
     @Override
     public void accept(ClientJoined message) {
@@ -254,7 +254,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Disconnects the client and notifies listeners that client was kicked.
      *
-     * @param message Not used.
+     * @param message not used.
      */
     @Override
     public void accept(YouHaveBeenKicked message) {
@@ -266,7 +266,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Responds with a 'PONG' to the server.
      *
-     * @param message Not used.
+     * @param message not used.
      */
     @Override
     public void accept(Ping message) {
@@ -283,7 +283,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * Notifies listeners, that a new game was hosted.
      *
-     * @param message The data of the new game.
+     * @param message the data of the new game.
      */
     @Override
     public void accept(GameHosted message) {

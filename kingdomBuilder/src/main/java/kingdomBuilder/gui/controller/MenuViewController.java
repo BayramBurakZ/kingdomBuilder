@@ -114,7 +114,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the Settings Button.
-     * @param event  Contains the data from the event source.
+     * @param event contains the data from the event source.
      */
     @FXML
     private void onSettingsButtonPressed(Event event) {

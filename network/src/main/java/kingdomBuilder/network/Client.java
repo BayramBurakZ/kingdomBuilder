@@ -326,7 +326,7 @@ public abstract class Client {
 
     /**
      * Logs into the server with a preferred name.
-     * @param preferredName The preferred name.
+     * @param preferredName the preferred name.
      *
      * @apiNote This method may be non-blocking.
      */
@@ -371,8 +371,8 @@ public abstract class Client {
 
     /**
      * Sends a message to all recipients.
-     * @param recipients The recipients of the message.
-     * @param message The message to send.
+     * @param recipients the recipients of the message.
+     * @param message the message to send.
      */
     public abstract void chat(List<Integer> recipients, String message);
 
@@ -407,7 +407,7 @@ public abstract class Client {
 
     /**
      * Joins a game with the given id.
-     * @param gameId The id.
+     * @param gameId the id.
      */
     public abstract void joinGame(int gameId);
 

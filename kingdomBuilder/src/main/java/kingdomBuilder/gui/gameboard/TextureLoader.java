@@ -175,7 +175,7 @@ public final class TextureLoader {
 
     /**
      * Gets the Image for the given WinCondition.
-     * @param wincondition  The WinCondition for requesting the Image.
+     * @param wincondition the WinCondition for requesting the Image.
      * @return The Image for the requested WinCondition.
      */
     public static Image getWinConditionTexture(Game.WinCondition wincondition) {

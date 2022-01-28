@@ -20,8 +20,8 @@ public class EditorTile extends Tile {
     /**
      * Constructs a new Tile with the given parameters.
      *
-     * @param xPos     The x position.
-     * @param yPos     The y position.
+     * @param xPos the x position.
+     * @param yPos the y position.
      * @param tileType the type of the hexagon.
      * @param resource the language support.
      * @param controller the LevelEditorController.

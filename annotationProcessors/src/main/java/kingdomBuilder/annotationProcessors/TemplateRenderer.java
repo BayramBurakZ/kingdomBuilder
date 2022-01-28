@@ -13,7 +13,7 @@ public class TemplateRenderer {
 
     /**
      * Capitalizes the first letter of given string.
-     * @param name The string to capitalize the first letter of.
+     * @param name the string to capitalize the first letter of.
      * @return The string with its first letter capitalized.
      */
     private static String capitalizeFirstLetter(String name) {
@@ -22,8 +22,8 @@ public class TemplateRenderer {
 
     /**
      * Evaluates a method to retrieve the value of a placeholder.
-     * @param name The name of the method to evaluate.
-     * @param template The template object to which the method belongs to.
+     * @param name the name of the method to evaluate.
+     * @param template the template object to which the method belongs to.
      * @return The evaluation result as a string.
      */
     private static <T> String evaluateFromContext(String name, T template) {
@@ -49,10 +49,10 @@ public class TemplateRenderer {
 
     /**
      * Evaluates a placeholder and returns the value.
-     * @param contents The template which this method operates on.
-     * @param begin The beginning of the placeholder.
-     * @param end The end of the placeholder.
-     * @param template The context to the placeholder values from.
+     * @param contents the template which this method operates on.
+     * @param begin the beginning of the placeholder.
+     * @param end the end of the placeholder.
+     * @param template the context to the placeholder values from.
      */
     private static <T> String eval(String contents, int begin, int end, T template) {
         if(contents.startsWith("<%=", begin)) {
@@ -68,7 +68,7 @@ public class TemplateRenderer {
 
     /**
      * Renders a template, by substituting placeholders with results of the public methods provided by the object.
-     * @param template The template object to render.
+     * @param template the template object to render.
      * @return The rendered template as String.
      * @throws IOException when the template file could not be loaded.
      */

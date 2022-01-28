@@ -28,8 +28,8 @@ public class IOHandler {
 
     /**
      * Initializes the handler to default state.
-     * @param selector The selector to which the channel is registered to.
-     * @param channel The channel to operate upon.
+     * @param selector the selector to which the channel is registered to.
+     * @param channel the channel to operate upon.
      */
     public IOHandler(Selector selector, SocketChannel channel) {
         this.selector = selector;
@@ -42,7 +42,7 @@ public class IOHandler {
 
     /**
      * Sets the consumer, which is notified about incoming packets.
-     * @param consumer The consumer to notify.
+     * @param consumer the consumer to notify.
      */
     public void setConsumer(ProtocolConsumer consumer) {
         this.consumer = consumer;
@@ -51,7 +51,7 @@ public class IOHandler {
     /**
      * Used by {@link kingdomBuilder.network.ClientSelector}, when the connection has been established
      * or errored out.
-     * @param key The key under which the underlying socket was registered.
+     * @param key the key under which the underlying socket was registered.
      */
     public void onIsConnectable(SelectionKey key) {
         try {
@@ -74,7 +74,7 @@ public class IOHandler {
 
     /**
      * Used by {@link kingdomBuilder.network.ClientSelector}, when the connection received data.
-     * @param key The key under which the underlying socket was registered.
+     * @param key the key under which the underlying socket was registered.
      */
     public synchronized void onIsReadable(SelectionKey key) {
         int bytesRead = 0;
@@ -105,7 +105,7 @@ public class IOHandler {
     /**
      * Used by {@link kingdomBuilder.network.ClientSelector}, when the connection is ready to
      * transmit more data.
-     * @param key The key under which the underlying socket was registered.
+     * @param key the key under which the underlying socket was registered.
      */
     public void onIsWriteable(SelectionKey key) {
         try { tryFlush(); }
@@ -117,7 +117,7 @@ public class IOHandler {
 
     /**
      * Pushes the command to the internal command queue and tries to flush the queue.
-     * @param command The command to transmit.
+     * @param command the command to transmit.
      * @throws IOException Thrown when the connection was lost.
      */
     public void sendCommand(String command) throws IOException {

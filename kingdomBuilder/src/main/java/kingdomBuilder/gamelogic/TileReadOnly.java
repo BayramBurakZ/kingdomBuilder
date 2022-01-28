@@ -141,5 +141,4 @@ public class TileReadOnly {
             return x == other.x + 1 || x == other.x;
         }
     }
-
 }

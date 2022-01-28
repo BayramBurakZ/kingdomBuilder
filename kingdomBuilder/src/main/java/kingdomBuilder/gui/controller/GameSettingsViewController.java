@@ -187,7 +187,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location  The location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */

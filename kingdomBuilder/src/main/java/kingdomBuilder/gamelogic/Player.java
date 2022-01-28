@@ -45,7 +45,9 @@ public class Player {
      */
     public int remainingSettlementsOfTurn;
 
-    // TODO: JavaDoc!
+    /**
+     * Class that represents a token.
+     */
     private static class Token {
         int total;
         int remaining;

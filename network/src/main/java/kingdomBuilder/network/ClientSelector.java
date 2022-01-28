@@ -17,7 +17,7 @@ public interface ClientSelector extends Runnable {
 
     /**
      * Creates a client with a new connection to given address.
-     * @param address The address to connect to.
+     * @param address the address to connect to.
      * @return The new client.
      * @throws IOException Thrown when no connection could be initiated.
      */

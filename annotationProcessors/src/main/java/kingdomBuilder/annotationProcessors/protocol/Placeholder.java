@@ -17,7 +17,7 @@ public record Placeholder(
 
     /**
      * Parses a format string and returns a list of placeholders.
-     * @param format The format to parse.
+     * @param format the format to parse.
      * @return A list of the placeholders found within the string.
      */
     public static List<Placeholder> fromFormatString(String format) {

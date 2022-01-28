@@ -13,6 +13,7 @@ import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.WinCondition;
 import kingdomBuilder.gamelogic.Map;
 import kingdomBuilder.gamelogic.Player;
+import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -81,6 +82,10 @@ public class KBReducer implements Reducer<KBState> {
         else if (action instanceof TerrainOfTurnAction a)
             return reduce(oldState, a);
         else if (action instanceof TurnStartAction a)
+            return reduce(oldState, a);
+        else if (action instanceof ServerTurnAction a)
+            return reduce(oldState, a);
+        else if (action instanceof ClientTurnAction a)
             return reduce(oldState, a);
 
         return new DeferredState(oldState);
@@ -194,9 +199,15 @@ public class KBReducer implements Reducer<KBState> {
 
         client.onWinCondition.subscribe(m -> store.dispatch(new WinConditionsAction(m)));
 
-        client.onTurnStart.subscribe(m->store.dispatch(new TurnStartAction(m)));
+        client.onTurnStart.subscribe(m -> store.dispatch(new TurnStartAction(m)));
 
         client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(new TerrainOfTurnAction(m)));
+
+        client.onSettlementPlaced.subscribe(m -> store.dispatch(
+                new ServerTurnAction(new ServerTurn(m.clientId(), ServerTurn.TurnType.PLACE, m.row(), m.column(), -1, -1))));
+
+        client.onSettlementRemoved.subscribe(m -> store.dispatch(
+                new ServerTurnAction(new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))));
 
         client.login(oldState.clientPreferredName);
 
@@ -322,7 +333,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, SetPlayersAction a) {
         DeferredState state = new DeferredState(oldState);
-        var game = oldState.game;
+        final var game = oldState.game;
 
         List<PlayerData> playersList = a.playersReply.playerDataList();
 
@@ -343,13 +354,18 @@ public class KBReducer implements Reducer<KBState> {
             startTurnLater = -1;
         }
 
+        if (terrainTypeLater != null) {
+            game.setTerrainCardOfTurn(terrainTypeLater);
+            terrainTypeLater = null;
+        }
+
         state.setGame(game);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, MyGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        var game = oldState.game;
+        final var game = oldState.game;
 
         Map map = new Map(
                 Map.DEFAULT_STARTING_TOKEN_COUNT,
@@ -367,7 +383,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, WinConditionsAction a) {
         DeferredState state = new DeferredState(oldState);
-        var game = oldState.game;
+        final var game = oldState.game;
 
         // TODO: remove debug messages
         System.out.println(
@@ -388,9 +404,17 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
+    // hack
+    private Game.TileType terrainTypeLater = null;
+
     private DeferredState reduce(KBState oldState, TerrainOfTurnAction a) {
         DeferredState state = new DeferredState(oldState);
-        var game = oldState.game;
+        final var game = oldState.game;
+
+        if (game.getPlayers() == null) {
+            terrainTypeLater = Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType());
+            return state;
+        }
 
         game.setTerrainCardOfTurn(Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
         state.setGame(game);
@@ -402,7 +426,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, TurnStartAction a) {
         DeferredState state = new DeferredState(oldState);
-        var game = oldState.game;
+        final var game = oldState.game;
 
         if (game.getPlayers() == null) {
             startTurnLater = a.turnStart.clientId();
@@ -411,6 +435,85 @@ public class KBReducer implements Reducer<KBState> {
 
         game.setCurrentPlayer(game.playerIDtoObject(a.turnStart.clientId()));
         state.setGame(game);
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ServerTurnAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var game = oldState.game;
+
+        switch(a.turn.type) {
+
+            case PLACE -> {
+                ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
+                        (ServerTurn) oldState.gameLastTurn : null;
+                if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.REMOVE) {
+                    game.moveSettlement(game.getCurrentPlayer(), lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
+                    state.setGameLastTurn(new ServerTurn(
+                            a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
+                } else {
+                    game.placeSettlement(game.getCurrentPlayer(), a.turn.x, a.turn.y);
+                    state.setGameLastTurn(a.turn);
+                }
+            }
+            case REMOVE -> {
+                state.setGameLastTurn(a.turn);
+            }
+        }
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ClientTurnAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var game = oldState.game;
+
+        Player player = game.playersMap.get(a.turn.clientId);
+        int x = a.turn.x;
+        int y = a.turn.y;
+        int toX = a.turn.toX;
+        int toY = a.turn.toY;
+        // TODO: use enums from gamelogic I guess
+        switch(a.turn.type) {
+
+            case PLACE -> {
+                game.placeSettlement(player, x, y);
+                //oldState.client.placeSettlement();
+            }
+
+            case ORACLE -> {
+                game.useToken(player, Game.TileType.ORACLE, x, y, toX, toY);
+                //oldState.client.useTokenOracle();
+            }
+            case FARM -> {
+                game.useToken(player, Game.TileType.FARM, x, y, toX, toY);
+                //oldState.client.useTokenFarm();
+            }
+            case TAVERN -> {
+                game.useToken(player, Game.TileType.TAVERN, x, y, toX, toY);
+                //oldState.client.useTokenTavern();
+            }
+            case TOWER -> {
+                game.useToken(player, Game.TileType.TOWER, x, y, toX, toY);
+                //oldState.client.useTokenTower();
+            }
+            case HARBOR -> {
+                game.useToken(player, Game.TileType.HARBOR, x, y, toX, toY);
+                //oldState.client.useTokenHarbor();
+            }
+            case PADDOCK -> {
+                game.useToken(player, Game.TileType.PADDOCK, x, y, toX, toY);
+                //oldState.client.useTokenPaddock();
+            }
+            case BARN -> {
+                game.useToken(player, Game.TileType.BARN, x, y, toX, toY);
+                //oldState.client.useTokenBarn();
+            }
+            case OASIS -> {
+                game.useToken(player, Game.TileType.OASIS, x, y, toX, toY);
+                //oldState.client.useTokenOasis();
+            }
+        }
+
         return state;
     }
 }

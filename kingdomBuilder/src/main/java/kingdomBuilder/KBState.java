@@ -1,6 +1,7 @@
 package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Turn;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
@@ -10,10 +11,7 @@ import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents the state of the Kingdom Builder application.
@@ -55,7 +53,6 @@ public class KBState {
      */
     public String clientPreferredName;
 
-    // TODO: same boolean twice for Connection
     /**
      * Whether the client is currently connecting or not.
      */
@@ -86,6 +83,11 @@ public class KBState {
      */
     public Game game;
 
+    /**
+     * Represents the last turns that was taken in the current game.
+     */
+    public Turn gameLastTurn;
+
     // TODO: for some time in the far future: JavaDoc!
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
@@ -99,7 +101,8 @@ public class KBState {
                    boolean failedToConnect,
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
-                   Game game) {
+                   Game game,
+                   Turn gameLastTurn) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -113,6 +116,7 @@ public class KBState {
         this.betterColorsActive = betterColorsActive;
         this.quadrants = quadrants;
         this.game = game;
+        this.gameLastTurn = gameLastTurn;
     }
 
     //TODO: JavaDoc!
@@ -130,5 +134,6 @@ public class KBState {
         isConnected = false;
         failedToConnect = false;
         game = null;
+        gameLastTurn = null;
     }
 }

@@ -48,8 +48,8 @@ public class ProtocolDeserializer {
 
     /**
      * Splits the payload into chunks.
-     * @param payload The payload to split.
-     * @param components The count of components to split in.
+     * @param payload the payload to split.
+     * @param components the count of components to split in.
      * @return The list of chunks.
      */
     private static List<String> split(String payload, int count) {
@@ -65,7 +65,7 @@ public class ProtocolDeserializer {
     /**
      * Splits the payload, containing a list of tuples, into substrings, where
      * each substring represents a single element of the list.
-     * @param payload The payload to split.
+     * @param payload the payload to split.
      * @return A list of substrings, where each string represents an element of the list.
      */
     private static List<String> splitList(String payload) {
@@ -77,7 +77,7 @@ public class ProtocolDeserializer {
 
     /**
      * Parses the payload and extracts the list of integers.
-     * @param payload The payload to parse.
+     * @param payload the payload to parse.
      * @return A list containing all integers extracted from the payload.
      */
     private static List<Integer> parseIntegerList(String payload) {

@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 /**
  * Utility class, which allows one to subscribe an arbitrary amount of subscriber,
  * which conform to the Consumer interface.
- * @param <T> The event payload dispatched.
+ * @param <T> the event payload dispatched.
  */
 public class Event<T> {
     private final Set<Consumer<T>> subscriber = new HashSet<>();

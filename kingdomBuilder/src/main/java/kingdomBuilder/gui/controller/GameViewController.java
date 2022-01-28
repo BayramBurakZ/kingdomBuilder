@@ -21,9 +21,11 @@ import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.PlayerColor;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.Map;
 import kingdomBuilder.gamelogic.Player;
+import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
@@ -186,7 +188,7 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location  the location used to resolve relative paths for the root object,
+     * @param location the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
@@ -204,6 +206,7 @@ public class GameViewController extends Controller implements Initializable {
 
         resourceBundle = resources;
 
+        // subscribe to the GAME object in the state
         store.subscribe(kbState -> {
             if (kbState.game == null)
                 return;
@@ -223,6 +226,11 @@ public class GameViewController extends Controller implements Initializable {
             game_hbox_players.getChildren().clear();
             players.clear();
             if (store.getState().game.getPlayers() != null) {
+                // TERRAIN CARD
+                if (kbState.game.getCurrentPlayer() != null) {
+                    updateCardDescription(kbState.game.getCurrentPlayer().terrainCard);
+                }
+                
                 for (var player : store.getState().game.getPlayers()) {
                     addPlayer(kbState.clients.get(player.ID).name());
                 }
@@ -251,20 +259,33 @@ public class GameViewController extends Controller implements Initializable {
                 updateWinConditions();
             }
 
-            // TERRAIN CARD
-            if (kbState.game.getTerrainCard() != null) {
-                updateCardDescription(kbState.game.getTerrainCard());
-            }
-
             // START TURN
             if (kbState.game.getCurrentPlayer() != null) {
                 if (kbState.game.getCurrentPlayer() != current) {
                     current = kbState.game.getCurrentPlayer();
-                    gameBoard.highlightTerrain(kbState.game.startTurn());
+                    // only preview for this client
+                    if (current.ID == kbState.client.getClientId())
+                        gameBoard.highlightTerrain(kbState.game.startTurn());
                 }
             }
-
         }, "game");
+
+        // subscribe to the GAME_LAST_TURN object in the state
+        store.subscribe(kbState -> {
+            if (kbState.gameLastTurn == null)
+                return;
+
+            ServerTurn lastTurn = kbState.gameLastTurn instanceof ServerTurn ?
+                    (ServerTurn) kbState.gameLastTurn : null;
+
+            if (lastTurn != null) {
+                PlayerColor color = kbState.game.playersMap.get(lastTurn.clientId).color;
+                switch (lastTurn.type) {
+                    case PLACE -> setServerSettlement(lastTurn.x, lastTurn.y, color);
+                    case MOVE -> moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
+                }
+            }
+        }, "gameLastTurn");
 
         // set the initial layout of the view
         setupLayout();
@@ -283,6 +304,31 @@ public class GameViewController extends Controller implements Initializable {
             ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.WHITE);
         });
         gameBoard_group.getChildren().add(box);
+    }
+
+    /**
+     * Sets a settlement that comes from a server message.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param color the color for the settlement.
+     */
+    private void setServerSettlement(int x, int y, PlayerColor color) {
+        // TODO: Camera movement
+        gameBoard.placeSettlement(x, y, color);
+    }
+
+    /**
+     * Moves a settlement from one location to another.
+     * @param fromX the x-coordinate where the settlement is moved from.
+     * @param fromY the y-coordinate where the settlement is moved from.
+     * @param toX the x-coordinate where the settlement is moved to.
+     * @param toY the y-coordinate where the settlement is moved to.
+     * @param color the player color.
+     */
+    private void moveServerSettlement(int fromX, int fromY, int toX, int toY, PlayerColor color) {
+        gameBoard.removeSettlement(fromX, fromY);
+        //TODO: animation
+        gameBoard.placeSettlement(toX, toY, color);
     }
 
     /**
@@ -514,13 +560,13 @@ public class GameViewController extends Controller implements Initializable {
      * @param name the name of the player.
      */
     private void addPlayer(String name) {
-        Game.PlayerColor color = Game.PlayerColor.RED;
+        PlayerColor color = PlayerColor.RED;
 
         int size = players.size();
-        if (size == 0) color = Game.PlayerColor.RED;
-        if (size == 1) color = Game.PlayerColor.BLUE;
-        if (size == 2) color = Game.PlayerColor.BLACK;
-        if (size == 3) color = Game.PlayerColor.WHITE;
+        if (size == 0) color = PlayerColor.RED;
+        if (size == 1) color = PlayerColor.BLUE;
+        if (size == 2) color = PlayerColor.BLACK;
+        if (size == 3) color = PlayerColor.WHITE;
         if (size > 3) return;
 
         boolean colorMode = store.getState().betterColorsActive;
@@ -539,7 +585,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the score of a player.
      *
      * @param player the selected player (0-3).
-     * @param score  the new score.
+     * @param score the new score.
      */
     private void updateScoreForPlayer(int player, int score) {
         players.get(player).setScore(score);
@@ -549,7 +595,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the settlements of a player.
      *
      * @param player the selected player (0-3).
-     * @param count  the new settlement count.
+     * @param count the new settlement count.
      */
     private void updateSettlementsForPlayer(int player, int count) {
         players.get(player).setSettlementCount(count);

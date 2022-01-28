@@ -79,7 +79,7 @@ public class ClientSelectorImpl implements ClientSelector {
     /**
      * Callback used within run, which is invoked, whenever a socket either
      * successfully establishes a connection or receives data from the server.
-     * @param key The key of the channel.
+     * @param key the key of the channel.
      */
     private void onSelect(SelectionKey key) {
         //System.out.println("SELECTING.");

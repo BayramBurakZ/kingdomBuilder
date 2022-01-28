@@ -13,7 +13,7 @@ public interface ProtocolConsumer {
 
     /**
      * Used to notify the consumer, that the parser failed to process a particular message.
-     * @param message The message the parser failed to process.
+     * @param message the message the parser failed to process.
      */
     void onFailure(String packet);
 

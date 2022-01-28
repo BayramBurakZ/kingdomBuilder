@@ -42,11 +42,11 @@ public class GameBoard extends Board {
     /**
      * Places a tile on the board.
      *
-     * @param group    the group where the element is added.
-     * @param x        the x-coordinate.
-     * @param y        the y-coordinate.
-     * @param xPos     the x-coordinate for the element.
-     * @param yPos     the x-coordinate for the element.
+     * @param group the group where the element is added.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param xPos the x-coordinate for the element.
+     * @param yPos the x-coordinate for the element.
      * @param tileType the type for the tile.
      * @param resource the language support.
      */
@@ -78,6 +78,25 @@ public class GameBoard extends Board {
      */
     private void updateBoard() {
         //TODO: implement
+    }
+
+    /**
+     * Sets a settlement in the gui.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @param color the player color.
+     */
+    public void placeSettlement(int x, int y, Game.PlayerColor color) {
+        board[x][y].placeSettlement(color);
+    }
+
+    /**
+     * Removes a settlement in the gui.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public void removeSettlement(int x, int y) {
+        board[x][y].removeSettlement();
     }
 
     /**
