@@ -5,10 +5,15 @@ import kingdomBuilder.network.generated.ProtocolDeserializer;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,19 +92,29 @@ public class IOHandler {
             while(bytesRead > 0 && buffer.hasRemaining());
         } catch(IOException ignored) {}
 
-        if(totalBytesRead <= 0) {
-            System.out.println("Selector woke up with no data.");
-            return;
-        }
+        // The selector reports 'readable' despite no data being received
+        // on linux. Is this a bug in JRE?
+        if(totalBytesRead <= 0) return;
 
         String contents = new String(buffer.array(), 0, totalBytesRead).trim();
         buffer.clear();
         buffer.rewind();
 
-        System.out.println("Received: " + contents);
+        System.out.println("START");
 
+        Scanner t = new Scanner(contents);
+        while(t.hasNextLine()) {
+            String line = t.nextLine();
+            if(consumer != null)
+                ProtocolDeserializer.deserialize(line, consumer);
+        }
+
+        System.out.println("END");
+/*
         if(consumer != null)
             ProtocolDeserializer.deserialize(contents, consumer);
+
+ */
     }
 
     /**
@@ -155,7 +170,7 @@ public class IOHandler {
             SelectionKey key = channel.keyFor(selector);
             key.cancel();
             channel.close();
-        } catch(Exception exc) {}
+        } catch(Exception unused) {}
     }
 
     /**

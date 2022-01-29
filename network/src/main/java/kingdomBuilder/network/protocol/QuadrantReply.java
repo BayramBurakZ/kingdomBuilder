@@ -2,6 +2,8 @@ package kingdomBuilder.network.protocol;
 
 import kingdomBuilder.annotations.Protocol;
 
+import java.lang.reflect.Field;
+
 /**
  * Represents message that contains details of one quadrant -
  * reply message ?quadrant {@link kingdomBuilder.network.protocol.QuadrantRequest}.
@@ -124,4 +126,22 @@ public record QuadrantReply(
         String fieldType99,
         String fieldType100
 ) {
+
+    String at(int index) {
+        Field field;
+        try {
+            field = getClass().getField("fieldType" + index);
+            return (String) field.get(this);
+        }
+        catch(Exception unused) { throw new ArrayIndexOutOfBoundsException(); }
+    }
+
+    void setAt(int index, String value) {
+        Field field;
+        try {
+            field = getClass().getField("fieldType" + index);
+            field.set(this, value);
+        } catch(Exception unused) { throw new ArrayIndexOutOfBoundsException(); }
+    }
+
 }

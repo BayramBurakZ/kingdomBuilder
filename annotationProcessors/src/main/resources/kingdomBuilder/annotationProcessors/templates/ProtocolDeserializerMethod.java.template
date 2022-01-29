@@ -3,7 +3,11 @@
      * Returns {@code null} on error.
      */
     private static <%= packetType %> deserialize<%= packetType %>(<%= deserializerParam %>) {
-        <%= payloadPreprocessing %>
-        <%= constructionVariables %>
-        return new <%= packetType %>(<%= constructionArgs %>);
+        try {
+            <%= payloadPreprocessing %>
+            <%= constructionVariables %>
+            return new <%= packetType %>(<%= constructionArgs %>);
+        } catch(Exception e) {
+            return null;
+        }
     }
