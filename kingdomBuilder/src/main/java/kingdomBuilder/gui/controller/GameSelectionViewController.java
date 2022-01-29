@@ -41,6 +41,9 @@ public class GameSelectionViewController extends Controller implements Initializ
     private TableView<GameData> gameselection_tableview;
 
     @FXML
+    private TableColumn<GameData, String> gameselection_column_id;
+
+    @FXML
     private TableColumn<GameData, String> gameselection_column_name;
 
     @FXML
@@ -102,13 +105,18 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     private void setupGameList() {
         gameselection_tableview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        gameselection_column_id.setCellValueFactory(param -> new SimpleStringProperty(
+                String.valueOf(param.getValue().gameId())));;
         gameselection_column_name.setCellValueFactory(param -> new SimpleStringProperty(
                 String.valueOf(param.getValue().gameName())));
         gameselection_column_players.setCellValueFactory(param -> new SimpleStringProperty(
-                String.valueOf(param.getValue().playersJoined()) + "/"
-                        + String.valueOf(param.getValue().playerLimit())));
-        // TODO: make a status
-        //gameselection_column_status.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
+                param.getValue().playersJoined() + "/"
+                        + param.getValue().playerLimit()));
+        gameselection_column_status.setCellValueFactory(param -> {
+            int playerLeft = param.getValue().playerLimit() - param.getValue().playersJoined();
+            return new SimpleStringProperty(
+                    playerLeft > 0 ? "OPEN" : "CLOSED");
+        });
     }
 
     private void updateGameInformation() {
