@@ -405,19 +405,21 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, TerrainOfTurnAction a) {
         DeferredState state = new DeferredState(oldState);
+        final var game = oldState.game;
+
+        if (oldState.players != null) {
+            game.startTurn(oldState.nextPlayer, Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+            state.setGame(game);
+        }
 
         state.setNextTerrainCard(Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+
         return state;
     }
 
     private DeferredState reduce(KBState oldState, TurnStartAction a) {
         DeferredState state = new DeferredState(oldState);
         final var game = oldState.game;
-
-        if (oldState.players != null) {
-            game.startTurn(a.turnStart.clientId(), oldState.nextTerrainCard);
-            state.setGame(game);
-        }
 
         state.setNextPlayer(a.turnStart.clientId());
         return state;

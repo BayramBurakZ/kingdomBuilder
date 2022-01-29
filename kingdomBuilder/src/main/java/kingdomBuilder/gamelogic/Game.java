@@ -437,6 +437,8 @@ public class Game {
                 || map.at(x, y).tileType != terrain)
             return false;
 
+        System.out.println("passed");
+
         // Settlement is next to another settlement on same terrain.
         boolean hasSurroundingSettlementOnTerrain =
                 map.settlementOfPlayerOnSurroundingTilesOnTerrain(player, terrain, x, y);
