@@ -64,9 +64,9 @@
 
                             <ChoiceBox fx:id="gamesettings_choicebox_upperleft"
                                        GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft"
-                                       GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
                             <ChoiceBox fx:id="gamesettings_choicebox_upperright"
+                                       GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft"
                                        GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
                             <ChoiceBox fx:id="gamesettings_choicebox_bottomright"
                                        GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />

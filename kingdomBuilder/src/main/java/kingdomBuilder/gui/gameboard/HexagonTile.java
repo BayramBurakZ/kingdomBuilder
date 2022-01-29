@@ -114,7 +114,7 @@ public class HexagonTile extends Tile {
         setOnMouseEntered(event -> setColorHighlighted());
         setOnMouseExited(event -> removeColorHighlighted());
 
-        System.out.println("Clicked!");
+        //System.out.println("Clicked!");
     }
 
     /**

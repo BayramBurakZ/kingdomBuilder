@@ -90,7 +90,7 @@ public class Map implements Iterable<Tile> {
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
-                        new Tile(x + quadrantWidth, y, topRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x + quadrantWidth, y, bottomLeft[y * quadrantWidth + x], startingTokenCount);
             }
         }
 
@@ -98,7 +98,7 @@ public class Map implements Iterable<Tile> {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y + quadrantWidth, bottomLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y + quadrantWidth, topRight[y * quadrantWidth + x], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
