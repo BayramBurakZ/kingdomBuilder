@@ -16,7 +16,7 @@ public abstract class Board {
     /**
      * Represents the store of the application.
      */
-    private final Store<KBState> store;
+    protected final Store<KBState> store;
 
     /**
      * Represents the resourceBundle that used for language support.

@@ -179,6 +179,12 @@ public class ClientImpl extends Client implements ProtocolConsumer {
         ioHandler.disconnect();
     }
 
+    @Override
+    public void placeSettlement(int x, int y) {
+        final String command = ProtocolSerializer.serialize(new Place(x, y));
+        trySendCommand(command);
+    }
+
     /**
      * {@inheritDoc}
      */

@@ -7,9 +7,13 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
+import kingdomBuilder.KBState;
+import kingdomBuilder.actions.game.ClientTurnAction;
+import kingdomBuilder.gamelogic.ClientTurn;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.base.Tile;
+import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
 
@@ -47,6 +51,11 @@ public class HexagonTile extends Tile {
      */
     private Settlement settlement = new Settlement();
 
+    private final Store<KBState> store;
+
+    private final int x;
+    private final int y;
+
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
      * @param xPos the x-coordinate of the upper-left corner position.
@@ -54,8 +63,11 @@ public class HexagonTile extends Tile {
      * @param tileType the TileType of the Hexagon.
      * @param resource the ResourceBundle to translate text.
      */
-    public HexagonTile(double xPos, double yPos, TileType tileType, ResourceBundle resource) {
+    public HexagonTile(double xPos, double yPos, int x, int y, TileType tileType, ResourceBundle resource, Store<KBState> store) {
         super(xPos, yPos, tileType, resource);
+        this.store = store;
+        this.x = x;
+        this.y = y;
 
         // add settlement to this group
         getChildren().add(settlement);
@@ -109,12 +121,21 @@ public class HexagonTile extends Tile {
             PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
             settlement.setMaterial(mat);
+
+            ClientTurn turn = new ClientTurn(
+                store.getState().client.getClientId(),
+                ClientTurn.TurnType.PLACE,
+                x,
+                y,
+                0,
+                0
+            );
+
+            store.dispatch(new ClientTurnAction(turn));
         });
 
         setOnMouseEntered(event -> setColorHighlighted());
         setOnMouseExited(event -> removeColorHighlighted());
-
-        //System.out.println("Clicked!");
     }
 
     /**

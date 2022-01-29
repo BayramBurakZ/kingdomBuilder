@@ -477,6 +477,7 @@ public class KBReducer implements Reducer<KBState> {
 
             case PLACE -> {
                 game.placeSettlement(player, x, y);
+                oldState.client.placeSettlement(x, y);
                 //oldState.client.placeSettlement();
             }
 

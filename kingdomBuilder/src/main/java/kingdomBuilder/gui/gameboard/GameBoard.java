@@ -53,7 +53,7 @@ public class GameBoard extends Board {
     @Override
     public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
                                  TileType tileType, ResourceBundle resource) {
-        HexagonTile hexagonTile = new HexagonTile(xPos, yPos, tileType, resource);
+        HexagonTile hexagonTile = new HexagonTile(xPos, yPos, x, y, tileType, resource, store);
         board[x][y] = hexagonTile;
 
         group.getChildren().add(hexagonTile);

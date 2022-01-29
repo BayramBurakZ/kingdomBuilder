@@ -432,6 +432,13 @@ public abstract class Client {
     public abstract void disconnect();
 
     /**
+     *
+     * @param x
+     * @param y
+     */
+    public abstract void placeSettlement(int x, int y);
+
+    /**
      * {@return whether the client has commands stored internally
      *  that were not transmitted successfully to the server yet.}
      */

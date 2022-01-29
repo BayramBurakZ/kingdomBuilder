@@ -136,7 +136,7 @@ public class GameViewController extends Controller implements Initializable {
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
-    public GameBoard gameBoard = new GameBoard(store);
+    public GameBoard gameBoard;
 
     /**
      * Represents the center of the gameboard as a Point3D.
@@ -183,6 +183,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     public GameViewController(Store<KBState> store) {
         this.store = store;
+        this.gameBoard = new GameBoard(store);
     }
 
     /**
