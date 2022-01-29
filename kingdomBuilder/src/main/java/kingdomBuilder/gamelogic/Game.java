@@ -431,7 +431,8 @@ public class Game {
                 || !map.at(x, y).isTilePlaceable()
                 || !isPlayersTurn(player)
                 || !player.hasRemainingSettlements()
-                || map.at(x, y).tileType != terrain)
+                || map.at(x, y).tileType != terrain
+                || map.terrainIsFull(terrain))
             return false;
 
         // Settlement is next to another settlement on same terrain.

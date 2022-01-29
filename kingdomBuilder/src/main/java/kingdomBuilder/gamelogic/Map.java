@@ -837,7 +837,7 @@ public class Map implements Iterable<Tile> {
      * @param player the player to check.
      * @param x      the x position of the special place.
      * @param y      the y position of the special place.
-     * @return
+     * @return true if player has only one settlement next to a speacial place.
      */
     public boolean playerHasOnlyOneSettlementNextToSpecialPlace(Player player, int x, int y) {
         Tile token;
@@ -855,8 +855,8 @@ public class Map implements Iterable<Tile> {
     /**
      * Get all positions where the player has a settlement.
      *
-     * @param player
-     * @return
+     * @param player the player as the owner of the settlements.
+     * @return all settlements of the player.
      */
     public Set<Tile> allSettlementsOfPlayerOnMap(Player player) {
         Set<Tile> allSettlements = new HashSet<>();
@@ -867,5 +867,22 @@ public class Map implements Iterable<Tile> {
                     allSettlements.add(at(x, y));
             }
         return allSettlements;
+    }
+
+    /**
+     * Checks if terrain is filled with settlement and therefore has no placeable tiles.
+     *
+     * @param terrain the terrain to check for.
+     * @return true if terrain has no more free tiles. False otherwise.
+     */
+    public boolean terrainIsFull(TileType terrain){
+
+        for(Tile tile : getEntireTerrain(terrain)){
+            if(tile.isTilePlaceable()){
+                return false;
+            }
+        }
+
+        return true;
     }
 }
