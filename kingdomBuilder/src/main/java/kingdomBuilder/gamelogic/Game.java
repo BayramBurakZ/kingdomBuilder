@@ -289,6 +289,7 @@ public class Game {
     // TODO: JavaDoc
     public void startTurn(Player player, TileType terrainCard) {
         currentPlayer = player;
+        player.remainingSettlements = 3;
         player.startTurn(terrainCard);
     }
 
@@ -359,7 +360,7 @@ public class Game {
      * @param y      the vertical position of the settlement on the map.
      * @param player the player whose turn it is and who owns the settlement.
      */
-    public void placeSettlement(Player player, int x, int y) {
+    private void placeSettlement(Player player, int x, int y) {
         if (!canPlaceSettlement(player, x, y))
             throw new RuntimeException("can't place settlement");
 
@@ -437,11 +438,9 @@ public class Game {
                 || map.at(x, y).tileType != terrain)
             return false;
 
-        System.out.println("passed");
-
         // Settlement is next to another settlement on same terrain.
         boolean hasSurroundingSettlementOnTerrain =
-                map.settlementOfPlayerOnSurroundingTilesOnTerrain(player, terrain, x, y);
+                map.settlementOfPlayerOnSurroundingTiles(player, terrain, x, y);
 
         // Player has no other free places on terrain and can place anywhere within terrain.
         boolean noFreeTilesNextToSettlements =
@@ -463,6 +462,7 @@ public class Game {
 
         map.at(x, y).placeSettlement(player);
         player.remainingSettlements--;
+        player.remainingSettlementsOfTurn--;
 
         Tile token = map.specialPlaceInSurrounding(x, y);
 
@@ -549,7 +549,7 @@ public class Game {
      * @param terrain the terrain the player has.
      * @return A set of all positions a player can place a settlement.
      */
-    public Set<Tile> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
+    private Set<Tile> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
         Set<Tile> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
         return (allPossiblePlacements.isEmpty()) ? map.freeTilesOnTerrain(terrain) : allPossiblePlacements;
     }
@@ -609,8 +609,11 @@ public class Game {
      */
     public Set<Tile> updatePreviewWithTerrain(Player player, TileType terrain) {
         //TODO: TileReadOnly
-        Set<Tile> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
 
+        if(player.remainingSettlementsOfTurn <=  0)
+            return new HashSet<>();
+
+        final Set<Tile> allPossiblePlacements = allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain);
         return (allPossiblePlacements.isEmpty()) ? map.freeTilesOnTerrain(terrain) : allPossiblePlacements;
     }
 

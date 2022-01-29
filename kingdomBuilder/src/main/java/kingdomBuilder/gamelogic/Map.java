@@ -768,19 +768,19 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
-     * Checks whether there is another settlement of the player on surrounding tiles AND the terrain is the same.
+     * Checks whether there is another settlement of the player on surrounding tiles.
      *
      * @param player the player that to check.
      * @param x      the x coordinate of the Tile.
      * @param y      the x coordinate of the Tile.
      * @return True if the player has another settlement on surrounding tile within same terrain. False otherwise.
      */
-    public boolean settlementOfPlayerOnSurroundingTilesOnTerrain(Player player, TileType terrain, int x, int y) {
+    public boolean settlementOfPlayerOnSurroundingTiles(Player player, TileType terrain, int x, int y) {
         if (!isWithinBounds(x, y) && nonPlaceableTileTypes.contains(terrain))
             return false;
 
         for (Tile tile : surroundingTiles(x, y)) {
-            if (tile.isOccupiedByPlayer(player) && tile.tileType == terrain)
+            if (tile.isOccupiedByPlayer(player))
                 return true;
         }
         return false;
