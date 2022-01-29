@@ -64,6 +64,10 @@ public class SceneLoader {
      * Stores the current levelEditorView.
      */
     private Node levelEditorView;
+    /**
+     * Stores the current winView.
+     */
+    private Node winView;
 
     //endregion Nodes
 
@@ -105,6 +109,10 @@ public class SceneLoader {
      * Stores the levelEditorController.
      */
     private LevelEditorController levelEditorController;
+    /**
+     * Stores the winViewController.
+     */
+    private WinViewController winViewController;
 
     //endregion Controller for every View
 
@@ -158,6 +166,7 @@ public class SceneLoader {
         loadGameSelectionView(locale);
         loadSettingsView(locale);
         loadServerConnectView(locale);
+        loadWinView(locale);
     }
 
     /**
@@ -267,6 +276,16 @@ public class SceneLoader {
         loadLevelEditorView(locale);
 
         borderPane.setCenter(levelEditorView);
+    }
+
+    /**
+     * Loads the WinView into the center of the main borderPane.
+     */
+    public void showWinView() {
+        //reloads the view so its completely empty
+        loadWinView(locale);
+
+        borderPane.setCenter(winView);
     }
 
     // load-methods
@@ -429,6 +448,18 @@ public class SceneLoader {
         Pair<Node, Controller> pair = loadView("controller/LevelEditor.fxml", locale);
         levelEditorView = pair.getKey();
         levelEditorController = (LevelEditorController) pair.getValue();
+    }
+
+    /**
+     * Calls the loadView() method with the path of the LevelEditor.fxml and
+     * sets the WinView and WinViewController fields
+     * Used for reloading this View.
+     * @param locale the locale for language support.
+     */
+    public void loadWinView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/WinView.fxml", locale);
+        winView = pair.getKey();
+        winViewController = (WinViewController) pair.getValue();
     }
 
     // TODO: Remove
