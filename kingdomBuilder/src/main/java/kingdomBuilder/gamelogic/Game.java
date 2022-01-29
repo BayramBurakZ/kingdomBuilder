@@ -1,6 +1,5 @@
 package kingdomBuilder.gamelogic;
 
-import kingdomBuilder.gui.gameboard.Token;
 import kingdomBuilder.network.protocol.MyGameReply;
 
 import java.security.InvalidParameterException;
@@ -49,6 +48,11 @@ public class Game {
      */
     private int turnLimit;
 
+    /**
+     * Internal data of the map
+     */
+    private Map map;
+
     // Additional data for a game.
     /**
      * The ID of the client who created the game.
@@ -61,24 +65,16 @@ public class Game {
     private WinCondition[] winConditions;
 
     /**
-     * The current terrain card of a players turn.
-     */
-    private TileType terrainCard;
-
-    /**
      * An array of the players playing in the game.
      */
     private Player[] players;
+
+    public Player currentPlayer;
 
     /**
      * A map of the players playing in the game.
      */
     public final HashMap<Integer, Player> playersMap = new HashMap<>();
-
-    /**
-     * The player for current turn.
-     */
-    private Player currentPlayer;
 
     /**
      * The total amount of settlements a player has to place to end the game.
@@ -94,11 +90,6 @@ public class Game {
      * Represents the state if the game has started.
      */
     private boolean gameRunning = false;
-
-    /**
-     * Internal data of the map
-     */
-    private Map map;
 
     /**
      * Constructs a new Game object.
@@ -290,13 +281,29 @@ public class Game {
         WHITE
     }
 
+    // TODO: JavaDoc
+    public void startTurn(int clientId, TileType terrainCard) {
+        startTurn(playerIDtoObject(clientId), terrainCard);
+    }
+
+    // TODO: JavaDoc
+    public void startTurn(Player player, TileType terrainCard) {
+        currentPlayer = player;
+        player.startTurn(terrainCard);
+    }
+
+    // TODO: JavaDoc
+    public void endTurn() {
+        // placeholder, in case it's needed later
+    }
+
     /**
      * Show all possible placements at the start of the turn.
      *
      * @return all possible tiles at the start of the game.
      */
-    public Set<Tile> startTurn() {
-        return updatePreviewWithTerrain(currentPlayer, currentPlayer.terrainCard);
+    public Set<Tile> canPlaceSettlementsAll() {
+        return updatePreviewWithTerrain(currentPlayer, currentPlayer.getTerrainCard());
     }
 
     /**
@@ -339,12 +346,10 @@ public class Game {
      * @return true if settlement can be placed on tile. False otherwise.
      */
     private boolean canPlaceSettlement(Player player, int x, int y) {
-        if (!map.isWithinBounds(x, y)
-                || !map.at(x, y).isTilePlaceable()
-                || !isPlayersTurn(player)
-                || !player.hasRemainingSettlements())
-            return false;
-        return true;
+        return map.isWithinBounds(x, y)
+                && map.at(x, y).isTilePlaceable()
+                && isPlayersTurn(player)
+                && player.hasRemainingSettlements();
     }
 
     /**
@@ -355,13 +360,13 @@ public class Game {
      * @param player the player whose turn it is and who owns the settlement.
      */
     public void placeSettlement(Player player, int x, int y) {
-        if (canPlaceSettlement(player, x, y))
-            return;
+        if (!canPlaceSettlement(player, x, y))
+            throw new RuntimeException("can't place settlement");
 
         map.at(x, y).placeSettlement(player);
         player.remainingSettlements--;
 
-        TileType token = map.specialPlaceInSurrounding(x, y);
+        Tile token = map.specialPlaceInSurrounding(x, y);
 
         // Player gets a token if settlement is next to special place
         if (token != null) {
@@ -395,20 +400,18 @@ public class Game {
      */
     public void moveSettlement(Player player, int fromX, int fromY, int toX, int toY) {
         if (!canMoveSettlement(player, fromX, fromY, toX, toY))
-            return;
+            throw new RuntimeException("can't move settlement");
 
         // Take token from player if settlement was last one on special place
         if (map.playerHasOnlyOneSettlementNextToSpecialPlace(player, fromX, fromY)) {
 
-            TileType token = map.specialPlaceInSurrounding(fromX, fromY);
-
-            if (player.playerHasTokenLeft(token))
-                player.removeToken(token);
+            Tile token = map.specialPlaceInSurrounding(fromX, fromY);
+            player.removeToken(token);
         }
 
         map.at(fromX, fromY).moveSettlement(map.at(toX, toY));
 
-        TileType token = map.specialPlaceInSurrounding(toX, toY);
+        Tile token = map.specialPlaceInSurrounding(toX, toY);
 
         // Player gets a token if settlement is next to special place
         if (token != null) {
@@ -431,8 +434,7 @@ public class Game {
                 || !map.at(x, y).isTilePlaceable()
                 || !isPlayersTurn(player)
                 || !player.hasRemainingSettlements()
-                || map.at(x, y).tileType != terrain
-                || map.terrainIsFull(terrain))
+                || map.at(x, y).tileType != terrain)
             return false;
 
         // Settlement is next to another settlement on same terrain.
@@ -443,7 +445,7 @@ public class Game {
         boolean noFreeTilesNextToSettlements =
                 allPossibleSettlementPlacementsNextToOtherSettlement(player, terrain).isEmpty();
 
-        return hasSurroundingSettlementOnTerrain || !noFreeTilesNextToSettlements;
+        return hasSurroundingSettlementOnTerrain || noFreeTilesNextToSettlements;
     }
 
     /**
@@ -454,13 +456,13 @@ public class Game {
      * @param player the player whose turn it is and who owns the settlement.
      */
     public void placeSettlementOnTerrain(Player player, TileType terrain, int x, int y) {
-        if (canPlaceSettlementOnTerrain(player, terrain, x, y))
-            return;
+        if (!canPlaceSettlementOnTerrain(player, terrain, x, y))
+            throw new RuntimeException("Can't place settlement on terrain: " + map.at(x,y).tileType + " at " + x + "," + y + " tile: " + map.at(x,y).tileType + " at " + map.at(x,y).x + "," + map.at(x,y).y);
 
         map.at(x, y).placeSettlement(player);
         player.remainingSettlements--;
 
-        TileType token = map.specialPlaceInSurrounding(x, y);
+        Tile token = map.specialPlaceInSurrounding(x, y);
 
         // Player gets a token if settlement is next to special place
         if (token != null) {
@@ -495,20 +497,18 @@ public class Game {
     public void moveSettlementOnTerrain(Player player, TileType terrain, int fromX, int fromY, int toX, int toY) {
 
         if (!canMoveSettlementOnTerrain(player, terrain, fromX, fromY, toX, toY))
-            return;
+            throw new RuntimeException("can't move settlement on terrain");
 
         // Take token from player if settlement was last one on special place
         if (map.playerHasOnlyOneSettlementNextToSpecialPlace(player, fromX, fromY)) {
 
-            TileType token = map.specialPlaceInSurrounding(fromX, fromY);
-
-            if (player.playerHasTokenLeft(token))
-                player.removeToken(token);
+            Tile token = map.specialPlaceInSurrounding(fromX, fromY);
+            player.removeToken(token);
         }
 
         map.at(fromX, fromY).moveSettlement(map.at(toX, toY));
 
-        TileType token = map.specialPlaceInSurrounding(toX, toY);
+        Tile token = map.specialPlaceInSurrounding(toX, toY);
 
         // Player gets a token if settlement is next to special place
         if (token != null) {
@@ -624,23 +624,7 @@ public class Game {
     }
 
     /**
-     * Gives player a token and removes it from the special place.
-     *
-     * @param player the player the token is given to.
-     * @param x      the x coordinate of the tile.
-     * @param y      the y coordinate of the tile.
-     */
-    public void addToken(Player player, int x, int y) {
-        //TODO: don't add token from the same place twice
-
-        if (map.at(x, y).hasTokens()) {
-            player.addToken(map.at(x, y).tileType);
-            map.at(x, y).takeTokenFromSpecialPlace();
-        }
-    }
-
-    /**
-     * Use one of the token to place or remove a settlement.
+     * Use one of the token to place or move a settlement.
      *
      * @param tokenType the token to use.
      * @param player    the player that uses the token.
@@ -733,38 +717,45 @@ public class Game {
      * Use the oracle token. The player is allowed to place an extra settlement on a tile that has the same type as
      * the players' terrain card.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param x      the x position of the settlement to place.
      * @param y      the y position of the settlement to place.
+     * @throws RuntimeException gets thrown when player can not use oracle token.
      */
     private void useTokenOracle(Player player, int x, int y) {
-        if (canPlaceSettlementOnTerrain(player, player.terrainCard, x, y)) {
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.ORACLE);
-        }
+
+        if (!canPlaceSettlementOnTerrain(player, player.getTerrainCard(), x, y))
+            throw new RuntimeException("can't use token oracle");
+
+
+        //placeSettlement(player, x, y);
+        player.useToken(TileType.ORACLE);
     }
 
     /**
      * Updates map preview before using oracle token.
      *
-     * @param player the player.
+     * @param player the player that is using the token.
      */
     private void previewTokenOracle(Player player) {
-        updatePreviewWithTerrain(player, player.terrainCard);
+        updatePreviewWithTerrain(player, player.getTerrainCard());
     }
 
     /**
      * Use the farm token. The player can place an extra settlement on gras.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param x      the x position of the settlement to place.
      * @param y      the y position of the settlement to place.
+     * @throws RuntimeException gets thrown when player can not use farm token.
      */
     private void useTokenFarm(Player player, int x, int y) {
-        if (canPlaceSettlementOnTerrain(player, TileType.GRAS, x, y)) {
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.FARM);
-        }
+
+        if (!canPlaceSettlementOnTerrain(player, TileType.GRAS, x, y))
+            throw new RuntimeException("can't use token Farm");
+
+        //placeSettlement(player, x, y);
+        player.useToken(TileType.FARM);
     }
 
     /**
@@ -780,15 +771,18 @@ public class Game {
      * Use the Tavern token. The player can place an extra settlement at the front or back of a
      * chain of settlements that is owned by the player.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param x      the x position of the settlement to place.
      * @param y      the y position of the settlement to place.
+     * @throws RuntimeException gets thrown when player can not use tavern token.
      */
     private void useTokenTavern(Player player, int x, int y) {
-        if (canPlaceSettlement(player, x, y) || map.freeTileIsInFrontOrBackOfAChain(player, map.at(x, y))) {
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.TAVERN);
-        }
+
+        if (!canPlaceSettlement(player, x, y) || !map.tileIsInFrontOrBackOfAChain(player, map.at(x, y)))
+            throw new RuntimeException("can't use token tavern");
+
+        //placeSettlement(player, x, y);
+        player.useToken(TileType.TAVERN);
     }
 
     /**
@@ -808,14 +802,16 @@ public class Game {
      * @param player that is using the token.
      * @param x      the x position of the settlement to place.
      * @param y      the y position of the settlement to place.
+     * @throws RuntimeException gets thrown when player can not use tower token.
      */
     private void useTokenTower(Player player, int x, int y) {
-        if (canPlaceSettlement(player, x, y)
-                && allPossibleSettlementPlacementsOnBorderOfMap(player).contains(map.at(x, y))) {
 
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.TOWER);
-        }
+        if (!canPlaceSettlement(player, x, y)
+                || !allPossibleSettlementPlacementsOnBorderOfMap(player).contains(map.at(x, y)))
+            throw new RuntimeException("can't use token tower");
+
+        //placeSettlement(player, x, y);
+        player.useToken(TileType.TOWER);
     }
 
     /**
@@ -833,34 +829,54 @@ public class Game {
     /**
      * Use Oasis token. The player can place an extra settlement on Desert.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param x      the x position of the settlement to place.
      * @param y      the y position of the settlement to place.
+     * @throws RuntimeException gets thrown when player can not use oasis token.
      */
     private void useTokenOasis(Player player, int x, int y) {
-        if (canPlaceSettlementOnTerrain(player, TileType.DESERT, x, y)) {
-            placeSettlement(player, x, y);
-            player.removeToken(TileType.OASIS);
-        }
+
+        if (canPlaceSettlementOnTerrain(player, TileType.DESERT, x, y))
+            throw new RuntimeException("can't use token oasis");
+
+        //placeSettlement(player, x, y);
+        player.useToken(TileType.OASIS);
     }
 
     /**
      * Updates map preview before using farm token Oasis.
      *
-     * @param player the player who wants that preview.
+     * @param player the player to update for.
      */
     private void previewTokenOasis(Player player) {
         updatePreviewWithTerrain(player, TileType.DESERT);
     }
 
-    // TODO: implement, parameters should match the protocol message format
+    /**
+     * Use Harbor token. The player can move a settlement from any tile to a water tile.
+     *
+     * @param player the player that is using the token.
+     * @param fromX  the x coordinate of settlement to move.
+     * @param fromY  the y coordinate of settlement to move.
+     * @param toX    the x coordinate of target tile to put settlement.
+     * @param toY    the y coordinate of target tile to put settlement.
+     * @throws RuntimeException gets thrown when player can not use harbor token.
+     */
     private void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
-        if (canMoveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY)) {
-            moveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY);
-            player.removeToken(TileType.OASIS);
-        }
+
+        if (canMoveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY))
+            throw new RuntimeException("can't use token harbor");
+
+        //moveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY);
+        player.useToken(TileType.OASIS);
     }
 
+    /**
+     * Preview for token harbor AFTER selecting a settlement to move.
+     *
+     * @param player the player to update for.
+     * @return all tiles that are placeable with token harbor.
+     */
     public Set<Tile> previewTokenHarborPlaceSettlement(Player player) {
         //TODO: readonly tile
         return allPossibleSettlementPlacementsOnTerrain(player, TileType.WATER);
@@ -870,28 +886,33 @@ public class Game {
      * Use Paddock token. The player can move a settlement two tiles in horizontal or diagonal
      * direction.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param fromX  the x coordinate of settlement to move.
      * @param fromY  the y coordinate of settlement to move.
      * @param toX    the x coordinate of target tile to put settlement.
      * @param toY    the y coordinate of target tile to put settlement.
+     * @throws RuntimeException gets thrown when player can not use paddock token.
      */
     private void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
-        if (canPlaceSettlement(player, toX, toY)) {
-            player.removeToken(TileType.PADDOCK);
-            moveSettlement(player, fromX, fromY, toX, toY);
-        }
+
+        if (canPlaceSettlement(player, toX, toY))
+            throw new RuntimeException("can't use token paddock");
+
+        //moveSettlement(player, fromX, fromY, toX, toY);
+        player.useToken(TileType.PADDOCK);
     }
 
     /**
-     * Preview for token Paddock AFTER selecting a settlement.
+     * Preview for token Paddock AFTER selecting a settlement to move.
      *
-     * @param player the player.
+     * @param player the player to update for.
      * @param x      the x-coordinate.
      * @param y      the y-coordinate.
-     * @return
+     * @return all tiles that are placeable with token paddock.
+     * @throws InvalidParameterException when player does not own a settlement at given position.
      */
     public Set<Tile> previewTokenPaddockPlaceSettlement(Player player, int x, int y) {
+
         if (!map.at(x, y).isOccupiedByPlayer(player))
             throw new InvalidParameterException("player does not own a settlement at this place");
 
@@ -901,28 +922,31 @@ public class Game {
     /**
      * Use Barn token. The player can move a settlement on a tile with current terrain  card.
      *
-     * @param player that is using the token.
+     * @param player the player that is using the token.
      * @param fromX  the x coordinate of settlement to move.
      * @param fromY  the y coordinate of settlement to move.
      * @param toX    the x coordinate of target tile to put settlement.
      * @param toY    the y coordinate of target tile to put settlement.
+     * @throws RuntimeException gets thrown when player can not use barn token.
      */
     public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
-        if (canMoveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY)) {
-            player.removeToken(TileType.BARN);
-            moveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY);
-        }
+
+        if (!canMoveSettlementOnTerrain(player, player.getTerrainCard(), fromX, fromY, toX, toY))
+            throw new RuntimeException("can't use token paddock");
+
+        //moveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY);
+        player.useToken(TileType.BARN);
     }
 
     /**
-     * Preview for token Barn AFTER selecting a settlement.
+     * Preview for token Barn AFTER selecting a settlement to move.
      *
-     * @param player the player.
-     * @return
+     * @param player the player to update for.
+     * @return all tiles that are placeable with token barn.
      */
     public Set<Tile> previewTokenBarnPlaceSettlement(Player player) {
         //TODO: TileReadOnly
-        return allPossibleSettlementPlacementsOnTerrain(player, player.terrainCard);
+        return allPossibleSettlementPlacementsOnTerrain(player, player.getTerrainCard());
     }
 
     /**
@@ -948,30 +972,12 @@ public class Game {
     }
 
     /**
-     * Sets the turn of the next player.
-     *
-     * @param newPlayer the next player for the turn.
-     */
-    public void setCurrentPlayer(Player newPlayer) {
-        currentPlayer = newPlayer;
-    }
-
-    /**
      * Set win conditions for the game.
      *
      * @param newWinConditions the win conditions to set.
      */
     public void setWinConditions(WinCondition[] newWinConditions) {
         winConditions = newWinConditions;
-    }
-
-    /**
-     * Set terrain card of current turn.
-     *
-     * @param newTerrainCard the current terrain type of the game.
-     */
-    public void setTerrainCardOfTurn(TileType newTerrainCard) {
-        currentPlayer.terrainCard = newTerrainCard;
     }
 
     /**
@@ -1035,23 +1041,5 @@ public class Game {
      */
     public WinCondition[] getWinConditions() {
         return winConditions;
-    }
-
-    /**
-     * Gets the terrain card of current turn.
-     *
-     * @return the terrain card of current turn.
-     */
-    public TileType getTerrainCard() {
-        return terrainCard;
-    }
-
-    /**
-     * Gets the current player.
-     *
-     * @return the current player.
-     */
-    public Player getCurrentPlayer() {
-        return currentPlayer;
     }
 }

@@ -87,7 +87,12 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if (action instanceof ClientTurnAction a)
             return reduce(oldState, a);
+        else if (action instanceof TurnEndAction a)
+            return reduce(oldState, a);
+        else if (action instanceof ReadyGameAction a)
+            return reduce(oldState, a);
 
+        System.out.println("Unknown action");
         return new DeferredState(oldState);
     }
 
@@ -208,6 +213,9 @@ public class KBReducer implements Reducer<KBState> {
 
         client.onSettlementRemoved.subscribe(m -> store.dispatch(
                 new ServerTurnAction(new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))));
+
+        store.subscribe(kbState -> store.dispatch(new ReadyGameAction()),
+                "players", "nextTerrainCard", "nextPlayer");
 
         client.login(oldState.clientPreferredName);
 
@@ -349,17 +357,8 @@ public class KBReducer implements Reducer<KBState> {
 
         game.setPlayers(player);
 
-        if (startTurnLater >= 0) {
-            game.setCurrentPlayer(game.playerIDtoObject(startTurnLater));
-            startTurnLater = -1;
-        }
-
-        if (terrainTypeLater != null) {
-            game.setTerrainCardOfTurn(terrainTypeLater);
-            terrainTypeLater = null;
-        }
-
         state.setGame(game);
+        state.setPlayers(List.of(player));
         return state;
     }
 
@@ -404,37 +403,23 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    // hack
-    private Game.TileType terrainTypeLater = null;
-
     private DeferredState reduce(KBState oldState, TerrainOfTurnAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
-        if (game.getPlayers() == null) {
-            terrainTypeLater = Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType());
-            return state;
-        }
-
-        game.setTerrainCardOfTurn(Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
-        state.setGame(game);
+        state.setNextTerrainCard(Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
         return state;
     }
-
-    // hack
-    private int startTurnLater = -1;
 
     private DeferredState reduce(KBState oldState, TurnStartAction a) {
         DeferredState state = new DeferredState(oldState);
         final var game = oldState.game;
 
-        if (game.getPlayers() == null) {
-            startTurnLater = a.turnStart.clientId();
-            return state;
+        if (oldState.players != null) {
+            game.startTurn(a.turnStart.clientId(), oldState.nextTerrainCard);
+            state.setGame(game);
         }
 
-        game.setCurrentPlayer(game.playerIDtoObject(a.turnStart.clientId()));
-        state.setGame(game);
+        state.setNextPlayer(a.turnStart.clientId());
         return state;
     }
 
@@ -448,11 +433,12 @@ public class KBReducer implements Reducer<KBState> {
                 ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
                         (ServerTurn) oldState.gameLastTurn : null;
                 if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.REMOVE) {
-                    game.moveSettlement(game.getCurrentPlayer(), lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
+                    game.moveSettlement(game.currentPlayer, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
-                    game.placeSettlement(game.getCurrentPlayer(), a.turn.x, a.turn.y);
+                    game.placeSettlementOnTerrain(game.currentPlayer, game.currentPlayer.getTerrainCard(), a.turn.y, a.turn.x);
+                    //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
                 }
             }
@@ -476,7 +462,7 @@ public class KBReducer implements Reducer<KBState> {
         switch(a.turn.type) {
 
             case PLACE -> {
-                game.placeSettlement(player, x, y);
+                //game.placeSettlement(player, x, y);
                 oldState.client.placeSettlement(x, y);
                 //oldState.client.placeSettlement();
             }
@@ -515,6 +501,25 @@ public class KBReducer implements Reducer<KBState> {
             }
         }
 
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, TurnEndAction a) {
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.client.endTurn();
+        //TODO: end turn in gamelogic
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ReadyGameAction a) {
+        DeferredState state = new DeferredState(oldState);
+        final var game = oldState.game;
+        if (oldState.gameStarted == false && oldState.players != null && oldState.nextPlayer >= 0 && oldState.nextTerrainCard != null) {
+            game.startTurn(oldState.nextPlayer, oldState.nextTerrainCard);
+            state.setGameStarted(true);
+            state.setGame(game);
+        }
         return state;
     }
 }

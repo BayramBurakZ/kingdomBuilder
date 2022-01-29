@@ -12,7 +12,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
@@ -86,11 +85,11 @@ public class Map implements Iterable<Tile> {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y, topLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y, topLeft[x * quadrantWidth + y], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
-                        new Tile(x + quadrantWidth, y, bottomLeft[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x + quadrantWidth, y, topRight[x * quadrantWidth + y], startingTokenCount);
             }
         }
 
@@ -98,11 +97,11 @@ public class Map implements Iterable<Tile> {
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y + quadrantWidth, topRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x, y + quadrantWidth, bottomLeft[x * quadrantWidth + y], startingTokenCount);
             }
             for (int x = 0; x < quadrantWidth; x++) {
                 tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
-                        new Tile(x + quadrantWidth, y + quadrantWidth, bottomRight[y * quadrantWidth + x], startingTokenCount);
+                        new Tile(x + quadrantWidth, y + quadrantWidth, bottomRight[x * quadrantWidth + y], startingTokenCount);
             }
         }
     }
@@ -288,7 +287,7 @@ public class Map implements Iterable<Tile> {
                         }
                     case 3:
                         // right
-                        if (x + 1 >= mapWidth) {
+                        if (x + 1 < mapWidth) {
                             state = 3;
                             return true;
                         }
@@ -530,7 +529,7 @@ public class Map implements Iterable<Tile> {
      * @param tile   the origin tile.
      * @return True if tile is a part of a chain. False otherwise.
      */
-    public boolean freeTileIsInFrontOrBackOfAChain(Player player, Tile tile) {
+    public boolean tileIsInFrontOrBackOfAChain(Player player, Tile tile) {
         int x = tile.x;
         int y = tile.y;
 
@@ -573,7 +572,7 @@ public class Map implements Iterable<Tile> {
                 if (at(x, y).tileType != TileType.WATER
                         && at(x, y).isTilePlaceable()
                         && playerHasASettlementInSurrounding(player, at(x, y))
-                        && freeTileIsInFrontOrBackOfAChain(player, at(x, y)))
+                        && tileIsInFrontOrBackOfAChain(player, at(x, y)))
 
                     freeTiles.add(at(x, y));
             }
@@ -719,7 +718,7 @@ public class Map implements Iterable<Tile> {
             surroundingTiles.add(at(x - 1, y));
 
         // right
-        if (x + 1 >= mapWidth)
+        if (x + 1 < mapWidth)
             surroundingTiles.add(at(x + 1, y));
 
         // bottom left
@@ -740,10 +739,10 @@ public class Map implements Iterable<Tile> {
      * @param y the y coordinate of the tile.
      * @return The Token that is next to the settlement or null if there is no token;
      */
-    public TileType specialPlaceInSurrounding(int x, int y) {
+    public Tile specialPlaceInSurrounding(int x, int y) {
         for (Tile tile : surroundingTiles(x, y)) {
             if (tokenType.contains(tile.tileType)) {
-                return tile.tileType;
+                return tile;
             }
         }
         return null;

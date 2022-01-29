@@ -87,7 +87,7 @@ public class GameBoard extends Board {
      * @param color the player color.
      */
     public void placeSettlement(int x, int y, Game.PlayerColor color) {
-        board[x][y].placeSettlement(color);
+        board[y][x].placeSettlement(color);
     }
 
     /**
@@ -96,7 +96,7 @@ public class GameBoard extends Board {
      * @param y the y-coordinate.
      */
     public void removeSettlement(int x, int y) {
-        board[x][y].removeSettlement();
+        board[y][x].removeSettlement();
     }
 
     /**

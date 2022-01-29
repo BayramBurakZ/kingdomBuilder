@@ -20,6 +20,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.game.TurnEndAction;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.PlayerColor;
 import kingdomBuilder.gamelogic.Game.TileType;
@@ -174,7 +175,6 @@ public class GameViewController extends Controller implements Initializable {
     private ArrayList<PlayerInformation> players = new ArrayList<>();
 
     private boolean hasMap = false;
-    private Player current = null;
 
     /**
      * Constructs the GameView with the given store.
@@ -198,11 +198,9 @@ public class GameViewController extends Controller implements Initializable {
         //TODO: Subscribers:
         // - PlayerData settlements -> updateSettlementsForPlayer()
         // - PlayerData score -> updateScoreForPlayer()
-        // - when player joins -> addPlayer()
         // - Tokens from the current Player -> updateTokens()
         // - Token used -> updateTokens()
         // - In Basic turn -> disableTokens(false/true)
-        // - current Terrain -> updateCardDescription()
         // - if PlayersTurn -> disableTokens(false / true)
 
         resourceBundle = resources;
@@ -227,11 +225,6 @@ public class GameViewController extends Controller implements Initializable {
             game_hbox_players.getChildren().clear();
             players.clear();
             if (store.getState().game.getPlayers() != null) {
-                // TERRAIN CARD
-                if (kbState.game.getCurrentPlayer() != null) {
-                    updateCardDescription(kbState.game.getCurrentPlayer().terrainCard);
-                }
-                
                 for (var player : store.getState().game.getPlayers()) {
                     addPlayer(kbState.clients.get(player.ID).name());
                 }
@@ -259,16 +252,6 @@ public class GameViewController extends Controller implements Initializable {
             if (kbState.game.getWinConditions() != null) {
                 updateWinConditions();
             }
-
-            // START TURN
-            if (kbState.game.getCurrentPlayer() != null) {
-                if (kbState.game.getCurrentPlayer() != current) {
-                    current = kbState.game.getCurrentPlayer();
-                    // only preview for this client
-                    if (current.ID == kbState.client.getClientId())
-                        gameBoard.highlightTerrain(kbState.game.startTurn());
-                }
-            }
         }, "game");
 
         // subscribe to the GAME_LAST_TURN object in the state
@@ -286,7 +269,33 @@ public class GameViewController extends Controller implements Initializable {
                     case MOVE -> moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
                 }
             }
+            // Highlight Terrain only for client
+            if (kbState.nextPlayer == kbState.client.getClientId()) {
+                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+            }
         }, "gameLastTurn");
+
+        store.subscribe(kbState -> {
+            // TERRAIN CARD
+            if (kbState.nextTerrainCard != null) {
+                updateCardDescription(kbState.nextTerrainCard);
+            }
+
+            // maybe bug?
+            if (kbState.game != null && kbState.game.currentPlayer != null)
+                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+
+        }, "nextTerrainCard");
+
+        store.subscribe(kbState -> {
+            // START TURN
+            if (kbState.nextPlayer >= 0 && kbState.gameStarted) {
+                // only preview for this client
+                if (kbState.nextPlayer == kbState.client.getClientId())
+                    gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+            }
+        }, "gameStarted", "nextPlayer");
+
 
         // set the initial layout of the view
         setupLayout();
@@ -631,7 +640,7 @@ public class GameViewController extends Controller implements Initializable {
      * @param actionEvent the triggered event.
      */
     private void onTurnEndButtonPressed(ActionEvent actionEvent) {
-        //TODO: implement
+        store.dispatch(new TurnEndAction());
     }
 
     /**

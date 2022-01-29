@@ -51,7 +51,7 @@ public abstract class Board {
 
                 int yPos = y * 60;
                 // TODO: this cast was necessary cause IntelliJ bugged out, remove
-                placeTileOnBoard(group, x, y, xPos, yPos, ((TileReadOnly) map.at(x, y)).tileType, resource);
+                placeTileOnBoard(group, x, y, xPos, yPos, map.at(x, y).tileType, resource);
             }
         }
     }

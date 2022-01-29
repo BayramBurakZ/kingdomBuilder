@@ -432,11 +432,16 @@ public abstract class Client {
     public abstract void disconnect();
 
     /**
-     *
-     * @param x
-     * @param y
+     * Sends a place message to the server with the given coordinates.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
      */
     public abstract void placeSettlement(int x, int y);
+
+    /**
+     * Send an EndTurn Message to the server.
+     */
+    public abstract void endTurn();
 
     /**
      * {@return whether the client has commands stored internally

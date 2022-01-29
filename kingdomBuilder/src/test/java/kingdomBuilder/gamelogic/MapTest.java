@@ -199,9 +199,9 @@ public class MapTest {
         assertEquals(TileType.TOWER, map.at(3, 5).tileType, "not a tower.");
 
         // Testing with tile that is on top right of tower
-        TileType tokenToTest =  map.specialPlaceInSurrounding(4, 4);
+        Tile tokenToTest =  map.specialPlaceInSurrounding(4, 4);
 
-        assertEquals(TileType.TOWER, tokenToTest, "failed to find Token in surrounding.");
+        assertEquals(TileType.TOWER, tokenToTest.tileType, "failed to find Token in surrounding.");
     }
 
     @Test
@@ -210,11 +210,11 @@ public class MapTest {
         // need instance of a game to test this.
 
         Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20 );
-        player.terrainCard = TileType.FORREST;
-        player.addToken(TileType.ORACLE);
+        player.startTurn(TileType.FORREST);
+        //player.addToken(TileType.ORACLE);
 
         //check if player has received that token
         assertTrue(player.playerHasTokenLeft(TileType.ORACLE), "failed to add Oracle token");
-        assertEquals(1, player.remainingToken(TileType.ORACLE), "Player doesn't have one Oracle token");
+        assertEquals(1, player.getRemainingTokens(TileType.ORACLE), "Player doesn't have one Oracle token");
     }
 }

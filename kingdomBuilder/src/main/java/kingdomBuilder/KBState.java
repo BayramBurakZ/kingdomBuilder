@@ -1,6 +1,7 @@
 package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.gamelogic.Turn;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
@@ -88,7 +89,21 @@ public class KBState {
      */
     public Turn gameLastTurn;
 
-    // TODO: for some time in the far future: JavaDoc!
+    /**
+     * The terrain card of the next player's turn.
+     */
+    public Game.TileType nextTerrainCard;
+
+    /**
+     * The player whose turn it is next.
+     */
+    public int nextPlayer;
+
+    // lol
+    public boolean gameStarted;
+
+    public List<Player> players;
+
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
                    Map<Integer, GameData> games,
@@ -102,7 +117,11 @@ public class KBState {
                    boolean betterColorsActive,
                    Map<Integer, Game.TileType[]> quadrants,
                    Game game,
-                   Turn gameLastTurn) {
+                   Turn gameLastTurn,
+                   Game.TileType nextTerrainCard,
+                   int nextPlayer,
+                   boolean gameStarted,
+                   List<Player> players) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -117,6 +136,10 @@ public class KBState {
         this.quadrants = quadrants;
         this.game = game;
         this.gameLastTurn = gameLastTurn;
+        this.nextTerrainCard = nextTerrainCard;
+        this.nextPlayer = nextPlayer;
+        this.gameStarted = gameStarted;
+        this.players = players;
     }
 
     //TODO: JavaDoc!
@@ -135,5 +158,8 @@ public class KBState {
         failedToConnect = false;
         game = null;
         gameLastTurn = null;
+        nextTerrainCard = null;
+        nextPlayer = -1;
+        gameStarted = false;
     }
 }

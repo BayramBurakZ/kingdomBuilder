@@ -115,23 +115,18 @@ public class HexagonTile extends Tile {
     @Override
     protected void setMouseHandler() {
         setOnMouseClicked(event -> {
-            // TODO integrate player color
-            settlement.setOpacity(1.0);
-            Image img = TextureLoader.generateImage(Math.random(),Math.random(),Math.random());
-            PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
-
-            settlement.setMaterial(mat);
-
-            ClientTurn turn = new ClientTurn(
-                store.getState().client.getClientId(),
-                ClientTurn.TurnType.PLACE,
-                x,
-                y,
-                0,
-                0
-            );
-
-            store.dispatch(new ClientTurnAction(turn));
+            // place settlement only if the tile is elevated/highlighted
+            if (isElevated) {
+                ClientTurn turn = new ClientTurn(
+                        store.getState().client.getClientId(),
+                        ClientTurn.TurnType.PLACE,
+                        x,
+                        y,
+                        -1,
+                        -1
+                );
+                store.dispatch(new ClientTurnAction(turn));
+            }
         });
 
         setOnMouseEntered(event -> setColorHighlighted());

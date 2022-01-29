@@ -1,6 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
@@ -25,9 +26,9 @@ public class Player {
     public final PlayerColor color;
 
     /**
-     * Represents the remaining settlements of this player.
+     * Represents the total remaining settlements of this player for the rest of the game.
      */
-    public int remainingSettlements;
+    int remainingSettlements;
 
     /**
      * Represents the tokens that this player has.
@@ -35,22 +36,26 @@ public class Player {
     private final HashMap<TileType, Token> tokens;
 
     // data of the player's current/next turn
-    /**
+     /**
      * Represents the terrain card for this player.
      */
-    public TileType terrainCard;
+     private TileType terrainCard;
 
     /**
      * Represents the settlements that the player needs to place in this turn.
      */
-    public int remainingSettlementsOfTurn;
+    int remainingSettlementsOfTurn;
 
     /**
      * Class that represents a token.
      */
     private static class Token {
-        int total;
+        HashSet<Tile> originTiles = new HashSet<>();
         int remaining;
+
+        int total() {
+            return originTiles.size();
+        }
     }
 
     /**
@@ -73,67 +78,63 @@ public class Player {
      * Updates the information for the player at the start of a turn.
      * @param terrainCard the TileType of the terrain card of the turn.
      */
-    public void startTurn(TileType terrainCard) {
+    void startTurn(TileType terrainCard) {
         this.terrainCard = terrainCard;
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
-        tokens.forEach((tileType, token) -> token.remaining = token.total);
+        tokens.forEach((tileType, token) -> token.remaining = token.total());
     }
 
-    public void endTurn() {
+    void endTurn() {
         // placeholder, in case it's needed later
     }
 
     /**
      * Gives the player a token.
      *
-     * @param tokenType the token type that is given to the player.
+     * @param originTile the tile whose token is given to the player.
      */
-    public void addToken(TileType tokenType) {
-        tokens.get(tokenType).total++;
+    void addToken(Tile originTile) {
+        if (!tokenType.contains(originTile.tileType))
+            throw new RuntimeException("The tile's type is not a token type!");
+
+        Token token = tokens.get(originTile.tileType);
+
+        //if (token.originTiles.contains(originTile))
+        //    throw new RuntimeException("The player already owns a token from this tile!");
+
+        token.originTiles.add(originTile);
+    }
+
+    public boolean hasToken(Tile originTile) {
+        if (!tokenType.contains(originTile.tileType))
+            throw new RuntimeException("The tile's type is not a token type!");
+
+        Token token = tokens.get(originTile.tileType);
+        return token.originTiles.contains(originTile);
     }
 
     /**
-     * Removes a token from the player.
+     * Removes a token from the player's total amount of tokens of that type.
      *
-     * @param tokenType the token type that is removed.
+     * @param originTile the tile whose token is taken from the player and returned to the tile.
      */
-    public void removeToken(TileType tokenType) {
-        Token token = tokens.get(tokenType);
-        if (token.total <= 0)
-            throw new RuntimeException("Tried to remove a token but the player had none!");
-        token.total--;
+    void removeToken(Tile originTile) {
+        if (!tokenType.contains(originTile.tileType))
+            throw new RuntimeException("The tile's type is not a token type!");
+
+        Token token = tokens.get(originTile.tileType);
+
+        //if (!token.originTiles.contains(originTile))
+        //    throw new RuntimeException("The player doesn't own a token from this tile!");
+
+        token.originTiles.remove(originTile);
     }
 
     /**
-     * Returns the amount of tokens from a type the player has.
-     *
-     * @param tokenType the token type to check.
-     * @return The amount of that type.
-     */
-    public int remainingToken(TileType tokenType) {
-        return tokens.get(tokenType).remaining;
-    }
-
-
-    /**
-     * Check if player owns a specific type of token
-     *
-     * @param tokenType the token type to check
-     * @return true if he ownes at least one of that token
-     */
-    public boolean playerHasTokenLeft(TileType tokenType) {
-        if (remainingToken(tokenType) > 0)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Uses the given token.
+     * Uses the given token by reducing the amount of remaining uses for the current turn.
      * @param tokenType the type of the token to use it.
      */
-    public void useToken(TileType tokenType) {
-        //TODO: this function exists twice? @removeToken
+    void useToken(TileType tokenType) {
         Token token = tokens.get(tokenType);
         if (token.remaining <= 0)
             throw new RuntimeException("Tried to use a token but the player had none remaining!");
@@ -147,5 +148,53 @@ public class Player {
      */
     public boolean hasRemainingSettlements() {
         return remainingSettlements > 0;
+    }
+
+    /**
+     * Represents the remaining settlements of this player.
+     */
+    public int getRemainingSettlements() {
+        return remainingSettlements;
+    }
+
+    /**
+     * Represents the terrain card for this player.
+     */
+    public TileType getTerrainCard() {
+        return terrainCard;
+    }
+
+    /**
+     * Returns the amount of tokens from a type the player has.
+     *
+     * @param tokenType the token type to check.
+     * @return The amount of that type.
+     */
+    public int getRemainingTokens(TileType tokenType) {
+        return tokens.get(tokenType).remaining;
+    }
+
+
+    /**
+     * Returns the amount of tokens from a type the player has.
+     *
+     * @param tokenType the token type to check.
+     * @return The amount of that type.
+     */
+    public int getTotalTokens(TileType tokenType) {
+        return tokens.get(tokenType).total();
+    }
+
+    /**
+     * Check if player owns a specific type of token.
+     *
+     * @param tokenType the token type to check.
+     * @return true if he owns at least one of that token.
+     */
+    public boolean playerHasTokenLeft(TileType tokenType) {
+        if (getRemainingTokens(tokenType) > 0)
+            return true;
+
+        return false;
     }
 }
