@@ -8,10 +8,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
+import kingdomBuilder.gui.gameboard.TextureLoader;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
@@ -60,6 +63,9 @@ public class ChatViewController extends Controller implements Initializable {
     @FXML
     private TableColumn<ClientData, String> column_gameid;
 
+    @FXML
+    private TabPane tab;
+
     /**
      * Represents the tab for the global chat.
      */
@@ -71,6 +77,12 @@ public class ChatViewController extends Controller implements Initializable {
      */
     @FXML
     private Tab tab_game;
+
+    /**
+     * Represents the tab for the game log.
+     */
+    @FXML
+    private Tab tab_log;
 
     /**
      * Represents the textarea used for the input for the chat.
@@ -91,10 +103,10 @@ public class ChatViewController extends Controller implements Initializable {
     private Button chatview_button_whisper;
 
     /**
-     * Represents the webview used for displaying the globalchat.
+     * Represents the webview used for displaying the log.
      */
     @FXML
-    private WebView webview_globalchat;
+    private WebView webview_log;
 
     //endregion FXML-Imports
 
@@ -140,6 +152,18 @@ public class ChatViewController extends Controller implements Initializable {
             onClientChanges();
         }, "clients");
 
+        store.subscribe(this::onMessage, "message");
+
+        store.subscribe(state -> {
+            if (state.game == null) {
+                tab_game.setDisable(true);
+                tab_log.setDisable(true);
+            } else {
+                tab_game.setDisable(false);
+                tab_log.setDisable(false);
+            }
+        }, "game");
+
         store.subscribe(state -> {
 
             if (state.isConnected && !isConnected) {
@@ -177,20 +201,47 @@ public class ChatViewController extends Controller implements Initializable {
         column_gameid.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
     }
 
+    private static String globalStylesheetPath =
+            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/global.css").toString();
+    private static String gameStylesheetPath =
+            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/game.css").toString();
+
+    WebView webview_globalchat;
+
     /**
      * Setup for the WebView that displays the Chat-Log.
      */
     private void setupWebView() {
-        webview_globalchat.setContextMenuEnabled(false);
 
+        // create Webview here instead of in the fxml-file because changing content in tabs has weird behavior.
+        webview_globalchat = new WebView();
+        VBox chatContent = new VBox(webview_globalchat);
+        VBox.setVgrow(webview_globalchat, Priority.ALWAYS);
+
+        tab_global.setContent(chatContent);
+
+        webview_globalchat.setContextMenuEnabled(false);
         WebEngine webEngine = webview_globalchat.getEngine();
-        webEngine.setUserStyleSheetLocation(
-                this.getClass().getResource("/kingdomBuilder/gui/chatStylesheets/global.css").toString());
+        webEngine.setUserStyleSheetLocation(globalStylesheetPath);
         webEngine.loadContent("<html><body></body></html>");
+
+        // move chat from game and global tab
+        tab.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == tab_global) {
+                webEngine.setUserStyleSheetLocation(globalStylesheetPath);
+                tab_global.setContent(chatContent);
+                tab_game.setContent(null);
+            } else if (newValue == tab_game) {
+                webEngine.setUserStyleSheetLocation(gameStylesheetPath);
+                tab_game.setContent(chatContent);
+                tab_global.setContent(null);
+            }
+        });
 
         webEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
             globalChatBody = (Element) webEngine.getDocument().getElementsByTagName("body").item(0);
         });
+
     }
 
     /**
@@ -272,9 +323,12 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView with the specific incoming message correctly.
-     * @param chatMsg contains all information of the incoming chat message.
      */
-    public void onMessage(Message chatMsg) {
+    public void onMessage(KBState state) {
+        Message chatMsg = state.message;
+        if (chatMsg == null)
+            return;
+
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients.get(senderID).name();
         Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
@@ -295,24 +349,41 @@ public class ChatViewController extends Controller implements Initializable {
             }
             chatMessage += ": ";
         } else {
-            // global message
-            messageStyle = MessageStyle.GLOBAL_CHAT;
+
+            if (state.clients.get(chatMsg.clientId()).gameId() == state.client.getGameId() &&
+                            state.client.getGameId() != -1) {
+                // chat message
+                System.out.println("GameChat");
+                messageStyle = MessageStyle.GAME_CHAT;
+            } else {
+                // global message
+                messageStyle = MessageStyle.GLOBAL_CHAT;
+            }
+
             chatMessage = senderName + ": ";
         }
 
-        String finalChatMessage = chatMessage;
-        MessageStyle finalMessageStyle = messageStyle;
+        Element msg = createMessage(message, chatMessage, messageStyle);
 
-        Platform.runLater(() -> {
-            Element senderElement = createHTMLElement(finalChatMessage, MessageStyle.BOLD);
-            Text textElement = createHTMLText(message);
+        globalChatAppendElement(msg);
+        //gameChatAppendElement(msg);
+    }
 
-            Element msg = createHTMLElement(finalMessageStyle);
-            msg.appendChild(senderElement);
-            msg.appendChild(textElement);
+    /**
+     * Creates an element for the chat.
+     * @param messageStyle the style.
+     * @return the element.
+     */
+    private Element createMessage(String text, String sender, MessageStyle messageStyle ) {
 
-            globalChatAppendElement(msg);
-        });
+        Element senderElement = createHTMLElement(sender, MessageStyle.BOLD);
+        Text textElement = createHTMLText(text);
+
+        Element msg = createHTMLElement(messageStyle);
+        msg.appendChild(senderElement);
+        msg.appendChild(textElement);
+
+        return msg;
     }
 
     /**
@@ -413,7 +484,10 @@ public class ChatViewController extends Controller implements Initializable {
                 msg.appendChild(textElement);
                 globalChatAppendElement(msg);
             } else {
-                // TODO: text output for game chat
+                Element msg = createHTMLElement(MessageStyle.GAME_CHAT);
+                msg.appendChild(senderElement);
+                msg.appendChild(textElement);
+                globalChatAppendElement(msg);
             }
 
             store.dispatch(new ChatSendAction(receiverIds, chatMessage));
@@ -459,7 +533,10 @@ public class ChatViewController extends Controller implements Initializable {
                 messageElement.appendChild(textElement);
                 globalChatAppendElement(messageElement);
             } else {
-                // TODO: text output for game chat
+                Element messageElement = createHTMLElement(MessageStyle.WHISPER);
+                messageElement.appendChild(receiversElement);
+                messageElement.appendChild(textElement);
+                globalChatAppendElement(messageElement);
             }
 
             store.dispatch(new ChatSendAction(receiverIds, message));
@@ -586,18 +663,17 @@ public class ChatViewController extends Controller implements Initializable {
         WebEngine webEngine = webview_globalchat.getEngine();
         Document doc = getDocument();
 
-        Platform.runLater(() -> {
-            int scrollY = (Integer) webEngine.executeScript("window.scrollY");
-            int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
-            int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
-            boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
 
-            globalChatBody.appendChild(element);
-            element.appendChild(doc.createElement("br"));
+        int scrollY = (Integer) webEngine.executeScript("window.scrollY");
+        int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
+        int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
+        boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
 
-            if (scrollToBottom) {
-                webEngine.executeScript("window.scrollTo(0, document.documentElement.scrollHeight);");
-            }
-        });
+        globalChatBody.appendChild(element);
+        element.appendChild(doc.createElement("br"));
+
+        if (scrollToBottom) {
+            webEngine.executeScript("window.scrollTo(0, document.documentElement.scrollHeight);");
+        }
     }
 }

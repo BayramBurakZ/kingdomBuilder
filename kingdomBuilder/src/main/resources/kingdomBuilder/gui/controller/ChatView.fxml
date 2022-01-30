@@ -28,17 +28,15 @@
 		</columnResizePolicy>
 	</TableView>
 
-	<TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-		<Tab fx:id="tab_global" text="%global">
-			<VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
-            	<WebView fx:id="webview_globalchat" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+	<TabPane fx:id="tab" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+		<Tab fx:id="tab_global" text="%global"/>
+		<Tab fx:id="tab_game" disable="true" text="%game"/>
+		<Tab fx:id="tab_log" disable="true" text="LOG">
+            <VBox>
+                <WebView fx:id="webview_log"  minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
 			</VBox>
 		</Tab>
-		<Tab fx:id="tab_game" disable="true" text="%game">
-			<VBox>
-				<TextArea fx:id="textarea_gamechat" editable="false" wrapText="true" VBox.vgrow="ALWAYS" />
-			</VBox>
-		</Tab>
+
 	</TabPane>
 
 	<HBox alignment="CENTER" spacing="2.0">

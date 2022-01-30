@@ -10,6 +10,7 @@ import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.annotations.State;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.network.protocol.Scores;
 
 import java.io.IOException;
@@ -109,6 +110,8 @@ public class KBState {
 
     public Scores scores;
 
+    public Message message;
+
     public KBState(SceneLoader sceneLoader,
                    Map<Integer, ClientData> clients,
                    Map<Integer, GameData> games,
@@ -128,7 +131,8 @@ public class KBState {
                    boolean gameStarted,
                    List<Player> players,
                    Game.TileType token,
-                   Scores scores) {
+                   Scores scores,
+                   Message message) {
         this.sceneLoader = sceneLoader;
         this.clients = clients;
         this.games = games;
@@ -149,6 +153,7 @@ public class KBState {
         this.players = players;
         this.token = token;
         this.scores = scores;
+        this.message = message;
     }
 
     //TODO: JavaDoc!
@@ -172,5 +177,6 @@ public class KBState {
         gameStarted = false;
         token = null;
         scores = null;
+        message = null;
     }
 }

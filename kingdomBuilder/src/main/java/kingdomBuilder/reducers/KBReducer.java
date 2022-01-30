@@ -131,12 +131,12 @@ public class KBReducer implements Reducer<KBState> {
         return new DeferredState(oldState);
     }
 
-    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, ChatReceiveAction a) {
-        var sceneLoader = oldState.sceneLoader;
-        var chatViewController = sceneLoader.getChatViewController();
-        chatViewController.onMessage(a.chatMessage);
-        return new DeferredState(oldState);
+        DeferredState state = new DeferredState(oldState);
+
+        state.setMessage(a.chatMessage);
+
+        return state;
     }
 
     private DeferredState reduce(Store<KBState> store, KBState oldState, ConnectAction a) {
@@ -191,8 +191,6 @@ public class KBReducer implements Reducer<KBState> {
         client.onClientJoined.subscribe(m -> store.dispatch(new ClientAddAction(m.clientData())));
 
         client.onClientLeft.subscribe(m -> store.dispatch(new ClientRemoveAction(m.clientData())));
-
-        client.onMessageReceived.subscribe(m -> store.dispatch(new ChatReceiveAction(m)));
 
         client.onPlayerJoined.subscribe(m -> store.dispatch(new PlayerAddAction(m)));
 
@@ -261,10 +259,10 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    // TODO: remove sceneloader/controller
     private DeferredState reduce(KBState oldState, DisconnectAction a) {
         DeferredState state = new DeferredState(oldState);
 
+        // TODO: remove sceneloader/controller
         if (a.wasKicked) {
             var sceneLoader = oldState.sceneLoader;
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
