@@ -13,14 +13,16 @@ import java.util.Iterator;
 public class MapTest {
 
     // quadrants that are stored in the server
-    String first = "FORREST;FORREST;FLOWER;DESERT;DESERT;DESERT;DESERT;CANYON;DESERT;DESERT;FORREST;MOUNTAIN;" +
-            "FLOWER;FLOWER;DESERT;CANYON;DESERT;CANYON;CANYON;CANYON;FORREST;FORREST;FORREST;FLOWER;DESERT;DESERT;" +
-            "CANYON;TOWER;WATER;CANYON;FORREST;FORREST;FLOWER;FLOWER;DESERT;DESERT;DESERT;DESERT;WATER;WATER;" +
-            "MOUNTAIN;FLOWER;FLOWER;WATER;FLOWER;DESERT;DESERT;WATER;WATER;FORREST;MOUNTAIN;GRAS;FLOWER;TOWER;" +
-            "WATER;WATER;WATER;FLOWER;FORREST;FORREST;GRAS;MOUNTAIN;GRAS;GRAS;GRAS;WATER;FLOWER;FLOWER;FORREST;" +
-            "FORREST;MOUNTAIN;MOUNTAIN;GRAS;WATER;WATER;CANYON;CASTLE;FLOWER;FLOWER;GRAS;CANYON;MOUNTAIN;WATER;" +
-            "MOUNTAIN;CANYON;GRAS;GRAS;GRAS;GRAS;GRAS;CANYON;CANYON;MOUNTAIN;MOUNTAIN;CANYON;CANYON;CANYON;GRAS;" +
-            "GRAS;GRAS";
+    String first = "FORREST;FORREST;FLOWER;DESERT;DESERT;DESERT;DESERT;CANYON;DESERT;DESERT;" +
+            "FORREST;MOUNTAIN;FLOWER;FLOWER;DESERT;CANYON;DESERT;CANYON;CANYON;CANYON;" +
+            "FORREST;FORREST;FORREST;FLOWER;DESERT;DESERT;CANYON;TOWER;WATER;CANYON;" +
+            "FORREST;FORREST;FLOWER;FLOWER;DESERT;DESERT;DESERT;DESERT;WATER;WATER;" +
+            "MOUNTAIN;FLOWER;FLOWER;WATER;FLOWER;DESERT;DESERT;WATER;WATER;FORREST;" +
+            "MOUNTAIN;GRAS;FLOWER;TOWER;WATER;WATER;WATER;FLOWER;FORREST;FORREST;" +
+            "GRAS;MOUNTAIN;GRAS;GRAS;GRAS;WATER;FLOWER;FLOWER;FORREST;FORREST;" +
+            "MOUNTAIN;MOUNTAIN;GRAS;WATER;WATER;CANYON;CASTLE;FLOWER;FLOWER;GRAS;" +
+            "CANYON;MOUNTAIN;WATER;MOUNTAIN;CANYON;GRAS;GRAS;GRAS;GRAS;GRAS;" +
+            "CANYON;CANYON;MOUNTAIN;MOUNTAIN;CANYON;CANYON;CANYON;GRAS;GRAS;GRAS";
 
     String second = "DESERT;DESERT;DESERT;WATER;WATER;WATER;WATER;WATER;WATER;WATER;DESERT;CANYON;DESERT;WATER;" +
             "WATER;FORREST;FORREST;CASTLE;WATER;WATER;CANYON;WATER;WATER;WATER;WATER;FORREST;CANYON;CANYON;CANYON;" +
@@ -82,21 +84,21 @@ public class MapTest {
 
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x, y).tileType, quadrant1[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x, y).tileType, quadrant1[x * QUADRANT_WIDTH + y]);
                 assertEquals(x, map.at(x, y).x);
                 assertEquals(y, map.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[x * QUADRANT_WIDTH + y]);
                 assertEquals(x, map.at(x, y).x);
                 assertEquals(y, map.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[y * QUADRANT_WIDTH + x]);
+                assertEquals(map.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[x * QUADRANT_WIDTH + y]);
                 assertEquals(x, map.at(x, y).x);
                 assertEquals(y, map.at(x, y).y);
             }
@@ -105,7 +107,7 @@ public class MapTest {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
                 assertEquals(
                         map.at(x + QUADRANT_WIDTH, y + QUADRANT_WIDTH).tileType,
-                        quadrant4[y * QUADRANT_WIDTH + x]
+                        quadrant4[x * QUADRANT_WIDTH + y]
                 );
                 assertEquals(x, map.at(x, y).x);
                 assertEquals(y, map.at(x, y).y);
@@ -116,10 +118,10 @@ public class MapTest {
     @Test
     public void testGetEntireTerrainPlaceableTiles() {
 
-        Tile gras = map.at(1, 5);
-        Tile flower = map.at(2, 1);
-        Tile desert = map.at(5, 0);
-        Tile forest = map.at(1, 0);
+        Tile gras = map.at(5, 1);
+        Tile flower = map.at(1, 2);
+        Tile desert = map.at(0, 5);
+        Tile forest = map.at(0, 1);
 
         Iterator<Tile> allGrasTiles = map.getEntireTerrain(TileType.GRAS).iterator();
         Iterator<Tile> allDesertTiles = map.getEntireTerrain(TileType.DESERT).iterator();
@@ -195,11 +197,11 @@ public class MapTest {
     @Test
     public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
 
-        Tile tower = map.at(3, 5);
-        assertEquals(TileType.TOWER, map.at(3, 5).tileType, "not a tower.");
+        Tile tower = map.at(5, 3);
+        assertEquals(TileType.TOWER, map.at(5, 3).tileType, "not a tower.");
 
-        // Testing with tile that is on top right of tower
-        Tile tokenToTest =  map.specialPlaceInSurrounding(4, 4);
+        // Testing with tile that is on bottom left (after mirroring diagonally) of tower
+        Tile tokenToTest =  map.specialPlaceInSurrounding(5, 4);
 
         assertEquals(TileType.TOWER, tokenToTest.tileType, "failed to find Token in surrounding.");
     }
