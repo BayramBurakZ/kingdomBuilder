@@ -339,6 +339,8 @@ public class GameViewController extends Controller implements Initializable {
         // set the initial layout of the view
         setupLayout();
 
+        game_subscene.setFill(Color.LIGHTSKYBLUE);
+
         // create a testBox
         Box box = new Box(100, 100, 100);
         box.setMaterial(new PhongMaterial(

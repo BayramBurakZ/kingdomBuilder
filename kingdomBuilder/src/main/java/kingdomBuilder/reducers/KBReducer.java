@@ -343,6 +343,11 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, JoinGameAction a) {
         DeferredState state = new DeferredState(oldState);
+        final var clients = oldState.clients;
+        var clientData = clients.get(oldState.client.getClientId());
+        clients.put(clientData.clientId(), new ClientData(clientData.clientId(), clientData.name(), a.gameId));
+        state.setClients(clients);
+
         oldState.client.joinGame(a.gameId);
         Game game = new Game();
         state.setClient(oldState.client);
