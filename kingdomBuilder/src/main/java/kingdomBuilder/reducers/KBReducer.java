@@ -42,19 +42,19 @@ public class KBReducer implements Reducer<KBState> {
         if (action instanceof ClientAddAction a)
             return reduce(oldState, a);
         else if (action instanceof ClientRemoveAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof SetPreferredNameAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof ChatSendAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof ChatReceiveAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof ConnectAction a)
-          return reduce(store, oldState, a);
+            return reduce(store, oldState, a);
         else if (action instanceof DisconnectAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof SetSceneLoaderAction a)
-          return reduce(oldState, a);
+            return reduce(oldState, a);
         else if (action instanceof BetterColorModeAction a)
             return reduce(oldState, a);
         else if (action instanceof LoggedInAction a)
@@ -137,14 +137,15 @@ public class KBReducer implements Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
 
         Client client;
-        try { client = oldState.selector.connect(a.address); }
-        catch(IOException exc) {
+        try {
+            client = oldState.selector.connect(a.address);
+        } catch (IOException exc) {
             state.setFailedToConnect(true);
             return state;
         }
 
         Thread selectorThread = oldState.selectorThread;
-        if(selectorThread == null || !selectorThread.isAlive()) {
+        if (selectorThread == null || !selectorThread.isAlive()) {
             assert !oldState.selector.isRunning();
 
             selectorThread = new Thread(oldState.selector);
@@ -214,6 +215,8 @@ public class KBReducer implements Reducer<KBState> {
         client.onSettlementRemoved.subscribe(m -> store.dispatch(
                 new ServerTurnAction(new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))));
 
+        client.onTokenReceived.subscribe(m -> store.dispatch(new ReceiveTokenAction(m)));
+
         store.subscribe(kbState -> store.dispatch(new ReadyGameAction()),
                 "players", "nextTerrainCard", "nextPlayer");
 
@@ -227,10 +230,10 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState state, ApplicationExitAction a) {
         ClientSelector selector = state.selector;
-        if(selector != null && selector.isRunning()) selector.stop();
+        if (selector != null && selector.isRunning()) selector.stop();
 
         Thread selectorThread = state.selectorThread;
-        if(selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
+        if (selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
 
         // Return old state, so that no other subscribers are called.
         return new DeferredState(state);
@@ -254,7 +257,7 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, DisconnectAction a) {
         DeferredState state = new DeferredState(oldState);
 
-        if(a.wasKicked) {
+        if (a.wasKicked) {
             var sceneLoader = oldState.sceneLoader;
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
@@ -387,8 +390,8 @@ public class KBReducer implements Reducer<KBState> {
         // TODO: remove debug messages
         System.out.println(
                 a.winConditionReply.winCondition1() + " " +
-                a.winConditionReply.winCondition2() + " " +
-                a.winConditionReply.winCondition3());
+                        a.winConditionReply.winCondition2() + " " +
+                        a.winConditionReply.winCondition3());
 
         WinCondition[] winConditions = {
                 WinCondition.valueOf(a.winConditionReply.winCondition1()),
@@ -429,7 +432,7 @@ public class KBReducer implements Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
         final var game = oldState.game;
 
-        switch(a.turn.type) {
+        switch (a.turn.type) {
 
             case PLACE -> {
                 ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
@@ -461,7 +464,7 @@ public class KBReducer implements Reducer<KBState> {
         int toX = a.turn.toX;
         int toY = a.turn.toY;
         // TODO: use enums from gamelogic I guess
-        switch(a.turn.type) {
+        switch (a.turn.type) {
 
             case PLACE -> {
                 //game.placeSettlement(player, x, y);
@@ -522,6 +525,14 @@ public class KBReducer implements Reducer<KBState> {
             state.setGameStarted(true);
             state.setGame(game);
         }
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ReceiveTokenAction a){
+        DeferredState state = new DeferredState(oldState);
+
+        state.setGame(oldState.game);
+
         return state;
     }
 }

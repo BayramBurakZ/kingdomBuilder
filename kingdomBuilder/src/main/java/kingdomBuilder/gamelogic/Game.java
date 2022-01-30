@@ -1047,4 +1047,5 @@ public class Game {
     public WinCondition[] getWinConditions() {
         return winConditions;
     }
+
 }

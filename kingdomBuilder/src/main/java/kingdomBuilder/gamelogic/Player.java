@@ -36,10 +36,10 @@ public class Player {
     private final HashMap<TileType, Token> tokens;
 
     // data of the player's current/next turn
-     /**
+    /**
      * Represents the terrain card for this player.
      */
-     private TileType terrainCard;
+    private TileType terrainCard;
 
     /**
      * Represents the settlements that the player needs to place in this turn.
@@ -60,9 +60,10 @@ public class Player {
 
     /**
      * Constructs a new player object with the given information.
-     * @param ID the client id.
-     * @param name the name of the client.
-     * @param color the color of the client.
+     *
+     * @param ID               the client id.
+     * @param name             the name of the client.
+     * @param color            the color of the client.
      * @param totalSettlements the amount of settlement that the player has.
      */
     public Player(int ID, String name, PlayerColor color, int totalSettlements) {
@@ -76,6 +77,7 @@ public class Player {
 
     /**
      * Updates the information for the player at the start of a turn.
+     *
      * @param terrainCard the TileType of the terrain card of the turn.
      */
     void startTurn(TileType terrainCard) {
@@ -132,6 +134,7 @@ public class Player {
 
     /**
      * Uses the given token by reducing the amount of remaining uses for the current turn.
+     *
      * @param tokenType the type of the token to use it.
      */
     void useToken(TileType tokenType) {
@@ -196,5 +199,23 @@ public class Player {
             return true;
 
         return false;
+    }
+
+    /**
+     * Get the tokens of a player.
+     *
+     * @return the tokens of a player.
+     */
+    public java.util.Map<TileType, Integer> getPlayerToken() {
+        return java.util.Map.of(
+             TileType.ORACLE, getRemainingTokens(TileType.ORACLE),
+             TileType.FARM, getRemainingTokens(TileType.FARM),
+             TileType.TAVERN, getRemainingTokens(TileType.TAVERN),
+             TileType.TOWER, getRemainingTokens(TileType.TOWER),
+             TileType.OASIS, getRemainingTokens(TileType.OASIS),
+             TileType.HARBOR, getRemainingTokens(TileType.HARBOR),
+             TileType.PADDOCK, getRemainingTokens(TileType.PADDOCK),
+             TileType.BARN, getRemainingTokens(TileType.BARN)
+        );
     }
 }

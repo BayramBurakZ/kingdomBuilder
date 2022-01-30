@@ -184,12 +184,34 @@ public class GameViewController extends Controller implements Initializable {
     public GameViewController(Store<KBState> store) {
         this.store = store;
         this.gameBoard = new GameBoard(store);
+
+        store.subscribe(this::onGameChanged, "game");
+    }
+
+
+    private void onGameChanged(KBState state) {
+        if(state.game == null)
+            return;
+
+        tokens.clear();
+        gameview_hbox_tokens.getChildren().clear();
+
+        for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
+            if(entry.getValue() == 0)
+                continue;
+
+            Token token = new Token(entry.getKey(), entry.getValue(), this,
+                    areTokensDisabled, resourceBundle);
+
+            tokens.add(token);
+            gameview_hbox_tokens.getChildren().add(token);
+        }
     }
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location the location used to resolve relative paths for the root object,
+     * @param location  the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
@@ -318,8 +340,9 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Sets a settlement that comes from a server message.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
+     *
+     * @param x     the x-coordinate.
+     * @param y     the y-coordinate.
      * @param color the color for the settlement.
      */
     private void setServerSettlement(int x, int y, PlayerColor color) {
@@ -329,10 +352,11 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Moves a settlement from one location to another.
+     *
      * @param fromX the x-coordinate where the settlement is moved from.
      * @param fromY the y-coordinate where the settlement is moved from.
-     * @param toX the x-coordinate where the settlement is moved to.
-     * @param toY the y-coordinate where the settlement is moved to.
+     * @param toX   the x-coordinate where the settlement is moved to.
+     * @param toY   the y-coordinate where the settlement is moved to.
      * @param color the player color.
      */
     private void moveServerSettlement(int fromX, int fromY, int toX, int toY, PlayerColor color) {
@@ -427,7 +451,7 @@ public class GameViewController extends Controller implements Initializable {
                 case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
                 case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
                 //ToDO: remove - just for testing the highlight
-                case T -> updateTokens();
+                //case T -> updateTokens();
             }
             event.consume();
         });
@@ -545,6 +569,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the token bar at the bottom of the screen.
      */
     private void updateTokens() {
+        //TODO: revisit and probably delete this.
         //tokens.clear();
         //gameview_hbox_tokens.getChildren().clear();
 
@@ -552,16 +577,18 @@ public class GameViewController extends Controller implements Initializable {
         //  instead of using a randomizer and the for loop
         //  and clear tokens and hbox first (2 lines above)
 
-        int random = (int) (Math.random() * Game.tokenType.size());
-        int count = 2;
+        //int random = (int) (Math.random() * Game.tokenType.size());
+        //int count = 2;
 
-        TileType tileType = (TileType) Game.tokenType.toArray()[random];
+        //TileType tileType = (TileType) Game.tokenType.toArray()[random];
+
 
         //gameview_hbox_tokens
-        Token token = new Token(tileType, count, this, areTokensDisabled, resourceBundle);
-        tokens.add(token);
+        //Token token = new Token(tileType, count, this, areTokensDisabled, resourceBundle);
+        //tokens.add(token);
 
-        gameview_hbox_tokens.getChildren().add(token);
+
+        //gameview_hbox_tokens.getChildren().add(token);
     }
 
     /**
@@ -595,7 +622,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the score of a player.
      *
      * @param player the selected player (0-3).
-     * @param score the new score.
+     * @param score  the new score.
      */
     private void updateScoreForPlayer(int player, int score) {
         players.get(player).setScore(score);
@@ -605,7 +632,7 @@ public class GameViewController extends Controller implements Initializable {
      * Updates the settlements of a player.
      *
      * @param player the selected player (0-3).
-     * @param count the new settlement count.
+     * @param count  the new settlement count.
      */
     private void updateSettlementsForPlayer(int player, int count) {
         players.get(player).setSettlementCount(count);
