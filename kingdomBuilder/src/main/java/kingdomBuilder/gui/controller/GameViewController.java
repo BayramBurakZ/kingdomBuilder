@@ -186,8 +186,18 @@ public class GameViewController extends Controller implements Initializable {
         this.store = store;
         this.gameBoard = new GameBoard(store);
 
+        // GAME
         store.subscribe(this::onGameChanged, "game");
+        // TOKEN
         store.subscribe(this::onTokenActivated, "token");
+        // TERRAIN CARD
+        store.subscribe(this::onGameLastTurnChanges, "nextTerrainCard");
+
+        store.subscribe(state -> {
+            if (store.getState().scores != null) {
+                sceneLoader.showWinView(state.scores);
+            }
+        }, "scores");
     }
 
     private void onTokenActivated(KBState state) {
@@ -206,14 +216,14 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     private void onGameChanged(KBState state) {
-        if(state.game == null || state.game.currentPlayer == null)
+        if(state.game == null || state.game.getPlayers() == null)
             return;
 
         // TOKENS
         tokens.clear();
         gameview_hbox_tokens.getChildren().clear();
 
-        if (state.game.currentPlayer.ID == state.client.getClientId())
+        if (state.game.currentPlayer != null && state.game.currentPlayer.ID == state.client.getClientId())
         for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
             if(entry.getValue() == 0)
                 continue;
@@ -225,7 +235,27 @@ public class GameViewController extends Controller implements Initializable {
             gameview_hbox_tokens.getChildren().add(token);
         }
 
-        /*
+        // MAP
+        if (state.game.getMap() != null) {
+            // ugly as hell but it works maybe
+            if (!hasMap) {
+                hasMap = true;
+                setupGameBoard(state.game.getMap());
+                setupCamera();
+                setupLight();
+            }
+        }
+
+        // PLAYERS
+        game_hbox_players.getChildren().clear();
+        players.clear();
+        if (store.getState().game.getPlayers() != null) {
+            for (var player : store.getState().game.getPlayers()) {
+                addPlayer(state.clients.get(player.ID).name());
+            }
+        }
+
+        // SETTLEMENTS
         Player[] players = state.game.getPlayers();
 
         for (int i = 0; i < state.players.size(); i++) {
@@ -233,7 +263,28 @@ public class GameViewController extends Controller implements Initializable {
                 updateSettlementsForPlayer(i, players[i].getRemainingSettlements());
         }
 
-        */
+        // TIME and TURN LIMIT
+        MyGameReply myGame = state.game.getMyGameReply();
+        if (myGame != null) {
+            // display time limit
+            int time = 1000;
+
+            if (myGame.timeLimit() != -1) {
+                time = (int) myGame.timeLimit() / 1000;
+                game_label_time.setText(resourceBundle.getObject("timeLimit:")
+                        + " " + time);
+            }
+
+            // display turn limit
+            if (myGame.turnLimit() != -1)
+                game_label_turn.setText(resourceBundle.getObject("turnLimit:")
+                        + " " + myGame.turnLimit());
+        }
+
+        // WIN CONDITIONS
+        if (state.game.getWinConditions() != null) {
+            updateWinConditions();
+        }
     }
 
     /**
@@ -255,55 +306,6 @@ public class GameViewController extends Controller implements Initializable {
 
         resourceBundle = resources;
 
-        // subscribe to the GAME object in the state
-        store.subscribe(kbState -> {
-            if (kbState.game == null)
-                return;
-
-            // MAP
-            if (kbState.game.getMap() != null) {
-                // ugly as hell but it works maybe
-                if (!hasMap) {
-                    hasMap = true;
-                    setupGameBoard(kbState.game.getMap());
-                    setupCamera();
-                    setupLight();
-                }
-            }
-
-            // PLAYERS
-            game_hbox_players.getChildren().clear();
-            players.clear();
-            if (store.getState().game.getPlayers() != null) {
-                for (var player : store.getState().game.getPlayers()) {
-                    addPlayer(kbState.clients.get(player.ID).name());
-                }
-            }
-
-            // TIME and TURN LIMIT
-            MyGameReply myGame = kbState.game.getMyGameReply();
-            if (myGame != null) {
-                // display time limit
-                int time = 1000;
-
-                if (myGame.timeLimit() != -1) {
-                    time = (int) myGame.timeLimit() / 1000;
-                    game_label_time.setText(resources.getObject("timeLimit:")
-                            + " " + time);
-                }
-
-                // display turn limit
-                if (myGame.turnLimit() != -1)
-                    game_label_turn.setText(resources.getObject("turnLimit:")
-                            + " " + myGame.turnLimit());
-            }
-
-            // WIN CONDITIONS
-            if (kbState.game.getWinConditions() != null) {
-                updateWinConditions();
-            }
-        }, "game");
-
         // subscribe to the GAME_LAST_TURN object in the state
         store.subscribe(kbState -> {
             if (kbState.gameLastTurn == null)
@@ -324,18 +326,6 @@ public class GameViewController extends Controller implements Initializable {
                 gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
             }
         }, "gameLastTurn");
-
-        store.subscribe(kbState -> {
-            // TERRAIN CARD
-            if (kbState.nextTerrainCard != null) {
-                updateCardDescription(kbState.nextTerrainCard);
-            }
-
-            // maybe bug?
-            if (kbState.game != null && kbState.game.currentPlayer != null)
-                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
-
-        }, "nextTerrainCard");
 
         store.subscribe(kbState -> {
             // START TURN
@@ -375,6 +365,16 @@ public class GameViewController extends Controller implements Initializable {
     private void setServerSettlement(int x, int y, PlayerColor color) {
         // TODO: Camera movement
         gameBoard.placeSettlement(x, y, color);
+    }
+
+    private void onGameLastTurnChanges(KBState kbState) {
+        if (kbState.nextTerrainCard != null) {
+            updateCardDescription(kbState.nextTerrainCard);
+        }
+
+        // maybe bug?
+        if (kbState.game != null && kbState.game.currentPlayer != null)
+            gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
     }
 
     /**

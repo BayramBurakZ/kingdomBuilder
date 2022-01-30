@@ -295,9 +295,9 @@ public class Game {
     }
 
     // TODO: JavaDoc
-    public void startTurn(Player player, TileType terrainCard) {
+    private void startTurn(Player player, TileType terrainCard) {
         currentPlayer = player;
-        player.remainingSettlements = 3;
+        player.remainingSettlementsOfTurn = 3;
         player.startTurn(terrainCard);
     }
 
@@ -1047,5 +1047,6 @@ public class Game {
     public WinCondition[] getWinConditions() {
         return winConditions;
     }
+
 
 }

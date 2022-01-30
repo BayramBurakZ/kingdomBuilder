@@ -228,8 +228,7 @@ public class KBReducer implements Reducer<KBState> {
 
         client.login(oldState.clientPreferredName);
 
-        // TODO:
-        //client.onScores.subscribe(m -> store.dispatch(new ScoreAction(m)));
+        client.onScores.subscribe(m -> store.dispatch(new ScoreAction(m)));
 
         state.setClient(client);
         state.setIsConnecting(true);
@@ -454,6 +453,7 @@ public class KBReducer implements Reducer<KBState> {
                     game.placeSettlementOnTerrain(game.currentPlayer, game.currentPlayer.getTerrainCard(), a.turn.y, a.turn.x);
                     //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
+                    state.setGame(game);
                 }
             }
             case REMOVE -> {
@@ -528,7 +528,10 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, ReadyGameAction a) {
         DeferredState state = new DeferredState(oldState);
         final var game = oldState.game;
-        if (oldState.gameStarted == false && oldState.players != null && oldState.nextPlayer >= 0 && oldState.nextTerrainCard != null) {
+        // super mario hack
+        if (oldState.gameStarted == false && oldState.players != null &&
+                oldState.game.getMyGameReply().playerLimit() == oldState.players.size()
+                && oldState.nextPlayer >= 0 && oldState.nextTerrainCard != null) {
             game.startTurn(oldState.nextPlayer, oldState.nextTerrainCard);
             state.setGameStarted(true);
             state.setGame(game);

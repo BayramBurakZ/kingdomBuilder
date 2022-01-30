@@ -9,6 +9,7 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.actions.SetSceneLoaderAction;
 import kingdomBuilder.gui.controller.*;
 import kingdomBuilder.gui.levelEditor.LevelEditorController;
+import kingdomBuilder.network.protocol.Scores;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
@@ -281,9 +282,10 @@ public class SceneLoader {
     /**
      * Loads the WinView into the center of the main borderPane.
      */
-    public void showWinView() {
+    public void showWinView(Scores scores) {
         //reloads the view so its completely empty
         loadWinView(locale);
+        winViewController.setScoreWithName(scores);;
 
         borderPane.setCenter(winView);
     }
