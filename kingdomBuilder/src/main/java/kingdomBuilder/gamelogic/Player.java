@@ -35,7 +35,7 @@ public class Player {
      */
     private final HashMap<TileType, Token> tokens;
 
-    // data of the player's current/next turn
+    // data of the placyer's current/next turn
     /**
      * Represents the terrain card for this player.
      */
@@ -208,14 +208,14 @@ public class Player {
      */
     public java.util.Map<TileType, Integer> getPlayerToken() {
         return java.util.Map.of(
-             TileType.ORACLE, getRemainingTokens(TileType.ORACLE),
-             TileType.FARM, getRemainingTokens(TileType.FARM),
-             TileType.TAVERN, getRemainingTokens(TileType.TAVERN),
-             TileType.TOWER, getRemainingTokens(TileType.TOWER),
-             TileType.OASIS, getRemainingTokens(TileType.OASIS),
-             TileType.HARBOR, getRemainingTokens(TileType.HARBOR),
-             TileType.PADDOCK, getRemainingTokens(TileType.PADDOCK),
-             TileType.BARN, getRemainingTokens(TileType.BARN)
+                TileType.ORACLE, getRemainingTokens(TileType.ORACLE),
+                TileType.FARM, getRemainingTokens(TileType.FARM),
+                TileType.TAVERN, getRemainingTokens(TileType.TAVERN),
+                TileType.TOWER, getRemainingTokens(TileType.TOWER),
+                TileType.OASIS, getRemainingTokens(TileType.OASIS),
+                TileType.HARBOR, getRemainingTokens(TileType.HARBOR),
+                TileType.PADDOCK, getRemainingTokens(TileType.PADDOCK),
+                TileType.BARN, getRemainingTokens(TileType.BARN)
         );
     }
 }

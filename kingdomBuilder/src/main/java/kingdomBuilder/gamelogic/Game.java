@@ -688,40 +688,32 @@ public class Game {
      * @param player    the player that gets a preview.
      * @param tokenType the token type.
      */
-    public void previewToken(Player player, TileType tokenType) {
+    public Set<Tile> previewToken(Player player, TileType tokenType) {
         if (!player.playerHasTokenLeft(tokenType))
-            return;
+            return null;
 
         switch (tokenType) {
 
             case ORACLE:
-                previewTokenOracle(player);
-                break;
+                return previewTokenOracle(player);
             case FARM:
-                previewTokenFarm(player);
-                break;
+                return previewTokenFarm(player);
             case TAVERN:
-                previewTokenTavern(player);
-                break;
+                return previewTokenTavern(player);
             case TOWER:
-                previewTokenTower(player);
-                break;
+                return previewTokenTower(player);
             case OASIS:
-                previewTokenOasis(player);
-                break;
+                return previewTokenOasis(player);
 
             // Following three Tokens have one preview for selecting a token and one for placing one.
             case HARBOR:
-                previewAllPlayerSettlements(player);
-                break;
+                return previewAllPlayerSettlements(player);
             case PADDOCK:
-                previewAllPlayerSettlements(player);
-                break;
+                 return previewAllPlayerSettlements(player);
             case BARN:
-                previewAllPlayerSettlements(player);
-                break;
+                return previewAllPlayerSettlements(player);
             default:
-                return;
+                return null;
         }
     }
 
@@ -750,8 +742,8 @@ public class Game {
      *
      * @param player the player that is using the token.
      */
-    private void previewTokenOracle(Player player) {
-        updatePreviewWithTerrain(player, player.getTerrainCard());
+    private Set<Tile> previewTokenOracle(Player player) {
+        return updatePreviewWithTerrain(player, player.getTerrainCard());
     }
 
     /**
@@ -776,8 +768,8 @@ public class Game {
      *
      * @param player the player.
      */
-    private void previewTokenFarm(Player player) {
-        updatePreviewWithTerrain(player, TileType.GRAS);
+    private Set<Tile> previewTokenFarm(Player player) {
+        return updatePreviewWithTerrain(player, TileType.GRAS);
     }
 
     /**
@@ -861,8 +853,8 @@ public class Game {
      *
      * @param player the player to update for.
      */
-    private void previewTokenOasis(Player player) {
-        updatePreviewWithTerrain(player, TileType.DESERT);
+    private Set<Tile> previewTokenOasis(Player player) {
+        return updatePreviewWithTerrain(player, TileType.DESERT);
     }
 
     /**

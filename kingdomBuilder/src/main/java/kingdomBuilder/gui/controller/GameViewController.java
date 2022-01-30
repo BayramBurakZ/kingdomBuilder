@@ -30,6 +30,7 @@ import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
+import kingdomBuilder.network.protocol.PlayerData;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -186,16 +187,33 @@ public class GameViewController extends Controller implements Initializable {
         this.gameBoard = new GameBoard(store);
 
         store.subscribe(this::onGameChanged, "game");
+        store.subscribe(this::onTokenActivated, "token");
     }
 
-
-    private void onGameChanged(KBState state) {
-        if(state.game == null)
+    private void onTokenActivated(KBState state) {
+        if(state.game == null || state.game.currentPlayer == null)
             return;
 
+        if (state.token == null) {
+            gameBoard.highlightTerrain(state.game.canPlaceSettlementsAll());
+            return;
+        }
+
+        TileType token = state.token;
+        Game game = state.game;
+        gameBoard.highlightTerrain(game.previewToken(game.currentPlayer, token));
+        return;
+    }
+
+    private void onGameChanged(KBState state) {
+        if(state.game == null || state.game.currentPlayer == null)
+            return;
+
+        // TOKENS
         tokens.clear();
         gameview_hbox_tokens.getChildren().clear();
 
+        if (state.game.currentPlayer.ID == state.client.getClientId())
         for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
             if(entry.getValue() == 0)
                 continue;
@@ -206,6 +224,16 @@ public class GameViewController extends Controller implements Initializable {
             tokens.add(token);
             gameview_hbox_tokens.getChildren().add(token);
         }
+
+        /*
+        Player[] players = state.game.getPlayers();
+
+        for (int i = 0; i < state.players.size(); i++) {
+            if (players[i] != null)
+                updateSettlementsForPlayer(i, players[i].getRemainingSettlements());
+        }
+
+        */
     }
 
     /**

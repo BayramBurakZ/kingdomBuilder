@@ -609,7 +609,7 @@ public class Map implements Iterable<Tile> {
                 allSettlementsOfPlayerOnBorder.add(at(0, y));
             }
 
-            if (at(mapWidth, y).isOccupiedByPlayer(player)) {
+            if (at(mapWidth - 1, y).isOccupiedByPlayer(player)) {
                 // right border
                 allSettlementsOfPlayerOnBorder.add(at(mapWidth, y));
             }

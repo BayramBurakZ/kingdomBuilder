@@ -79,7 +79,12 @@ public class WinViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        store.subscribe(state -> {
+            if (store.getState().scores != null) {
+                sceneLoader.showWinView();
+                setScoreWithName(state.scores);
+            }
+        }, "scores");
     }
 
     /**

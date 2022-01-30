@@ -175,6 +175,7 @@ public class Token extends StackPane {
          * @param gameViewController the gameViewController.
          */
         public Hexagon2D(Game.TileType tileType, GameViewController gameViewController, Store<KBState> store) {
+            this.store = store;
             this.gameViewController = gameViewController;
 
             setStrokeWidth(2.0);
@@ -211,11 +212,12 @@ public class Token extends StackPane {
                     gameViewController.disableTokens(true);
 
                     //TODO: store is null, so its not possible to use token.
-                    return;
-                    //store.dispatch(new ActivateToken(tileType));
+                    //return;
+                    store.dispatch(new ActivateToken(tileType));
 
                 } else {
                     gameViewController.disableTokens(false);
+                    store.dispatch(new ActivateToken(null));
                 }
             });
         }

@@ -523,32 +523,33 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamesettings_button_host.setDisable(true);
     }
 
+    // TODO: Remove because of missing features of the server
     /**
      * Activates the Host Game and Join Button.
      */
     private void activateHostAndJoinGameButton() {
-        gamesettings_button_host_join.setDisable(false);
+        //gamesettings_button_host_join.setDisable(false);
     }
 
     /**
      * Deactivates the Host Game and Join Button.
      */
     private void deactivateHostAndJoinGameButton() {
-        gamesettings_button_host_join.setDisable(true);
+        //gamesettings_button_host_join.setDisable(true);
     }
 
     /**
      * Activates the Host Game and Spectate Button.
      */
     private void activateHostAndSpectateGameButton() {
-        gamesettings_button_host_spectate.setDisable(false);
+        //gamesettings_button_host_spectate.setDisable(false);
     }
 
     /**
      * Deactivates the Host Game and Spectate Button.
      */
     private void deactivateHostAndSpectateGameButton() {
-        gamesettings_button_host_spectate.setDisable(true);
+        //gamesettings_button_host_spectate.setDisable(true);
     }
 
     /**

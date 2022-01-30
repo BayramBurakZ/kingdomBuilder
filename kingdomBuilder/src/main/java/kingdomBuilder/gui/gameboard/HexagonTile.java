@@ -115,16 +115,30 @@ public class HexagonTile extends Tile {
     @Override
     protected void setMouseHandler() {
         setOnMouseClicked(event -> {
+
+
             // place settlement only if the tile is elevated/highlighted
             if (isElevated) {
-                ClientTurn turn = new ClientTurn(
-                        store.getState().client.getClientId(),
-                        ClientTurn.TurnType.PLACE,
-                        x,
-                        y,
-                        -1,
-                        -1
-                );
+                ClientTurn turn;
+                if (store.getState().token != null) {
+                    turn = new ClientTurn(
+                            store.getState().client.getClientId(),
+                            ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
+                            x,
+                            y,
+                            -1,
+                            -1
+                    );
+                } else {
+                    turn = new ClientTurn(
+                            store.getState().client.getClientId(),
+                            ClientTurn.TurnType.PLACE,
+                            x,
+                            y,
+                            -1,
+                            -1
+                    );
+                }
                 store.dispatch(new ClientTurnAction(turn));
             }
         });

@@ -95,6 +95,8 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if( action instanceof ActivateToken a)
             return reduce(oldState, a);
+        else if( action instanceof ScoreAction a)
+            return reduce(oldState, a);
 
             System.out.println("Unknown action");
         return new DeferredState(oldState);
@@ -225,6 +227,9 @@ public class KBReducer implements Reducer<KBState> {
                 "players", "nextTerrainCard", "nextPlayer");
 
         client.login(oldState.clientPreferredName);
+
+        // TODO:
+        //client.onScores.subscribe(m -> store.dispatch(new ScoreAction(m)));
 
         state.setClient(client);
         state.setIsConnecting(true);
@@ -544,8 +549,20 @@ public class KBReducer implements Reducer<KBState> {
 
         final Game game = oldState.game;
 
-        game.selectedToken = a.getToken();
-        state.setGame(game);
+        if (a.getToken() != null) {
+            game.selectedToken = a.getToken();
+            state.setGame(game);
+        }
+
+        state.setToken(a.getToken());
+
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ScoreAction a){
+        DeferredState state = new DeferredState(oldState);
+
+        state.setScores(a.scores);
 
         return state;
     }
