@@ -14,7 +14,7 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
-import kingdomBuilder.gui.gameboard.TextureLoader;
+import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
@@ -116,6 +116,11 @@ public class ChatViewController extends Controller implements Initializable {
     private Element globalChatBody;
 
     /**
+     * The body of the html file used for displaying the turn log.
+     */
+    private Element turnLogBody;
+
+    /**
      * Represents the Gui State, if the client is connected.
      */
     private boolean isConnected;
@@ -154,6 +159,8 @@ public class ChatViewController extends Controller implements Initializable {
 
         store.subscribe(this::onMessage, "message");
 
+        store.subscribe(this::onTurn, "gameLastTurn");
+
         store.subscribe(state -> {
             if (state.game == null) {
                 tab_game.setDisable(true);
@@ -186,6 +193,8 @@ public class ChatViewController extends Controller implements Initializable {
             }
         }, "isConnected");
 
+        store.subscribe(this::onTurnStart, "nextTerrainCard");
+
         setupClientList();
         setupWebView();
     }
@@ -213,6 +222,7 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private void setupWebView() {
 
+        // Setup for chat log /////////////////////////
         // create Webview here instead of in the fxml-file because changing content in tabs has weird behavior.
         webview_globalchat = new WebView();
         VBox chatContent = new VBox(webview_globalchat);
@@ -221,27 +231,37 @@ public class ChatViewController extends Controller implements Initializable {
         tab_global.setContent(chatContent);
 
         webview_globalchat.setContextMenuEnabled(false);
-        WebEngine webEngine = webview_globalchat.getEngine();
-        webEngine.setUserStyleSheetLocation(globalStylesheetPath);
-        webEngine.loadContent("<html><body></body></html>");
+        WebEngine chatWebEngine = webview_globalchat.getEngine();
+        chatWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
+        chatWebEngine.loadContent("<html><body></body></html>");
 
         // move chat from game and global tab
         tab.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == tab_global) {
-                webEngine.setUserStyleSheetLocation(globalStylesheetPath);
+                chatWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
                 tab_global.setContent(chatContent);
                 tab_game.setContent(null);
             } else if (newValue == tab_game) {
-                webEngine.setUserStyleSheetLocation(gameStylesheetPath);
+                chatWebEngine.setUserStyleSheetLocation(gameStylesheetPath);
                 tab_game.setContent(chatContent);
                 tab_global.setContent(null);
             }
         });
 
-        webEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
-            globalChatBody = (Element) webEngine.getDocument().getElementsByTagName("body").item(0);
+        chatWebEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
+            globalChatBody = (Element) chatWebEngine.getDocument().getElementsByTagName("body").item(0);
         });
 
+        // Setup for turn log /////////////////////////
+        webview_log.setContextMenuEnabled(false);
+        WebEngine turnLogWebEngine = webview_log.getEngine();
+        // TODO: stylesheet for turn log
+        turnLogWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
+        turnLogWebEngine.loadContent("<html><body></body></html>");
+
+        turnLogWebEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
+            turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0);
+        });
     }
 
     /**
@@ -322,7 +342,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the ChatView with the specific incoming message correctly.
+     * Updates the ChatView with the specific incoming message.
      */
     public void onMessage(KBState state) {
         Message chatMsg = state.message;
@@ -366,15 +386,77 @@ public class ChatViewController extends Controller implements Initializable {
         Element msg = createMessage(message, chatMessage, messageStyle);
 
         globalChatAppendElement(msg);
-        //gameChatAppendElement(msg);
     }
 
     /**
-     * Creates an element for the chat.
-     * @param messageStyle the style.
+     * Updates the ChatView with the start of the next turn of the current game.
+     */
+    public void onTurnStart(KBState state) {
+        // TODO: lol
+        if (state.gameStarted) {
+            // game probably has the old player at this point lol
+            var player = state.game.playerIDtoObject(state.nextPlayer);
+            String context = " started their turn: ";
+            String terrainName = player.getTerrainCard().name();
+
+            //String textContent = context + terrainName;
+            //turnLogAppendElement(createMessage(textContent, player.name, MessageStyle.GAME_CHAT));
+
+            // the main element containing the overall text style and the individual text components
+            Element main = createHTMLElement(MessageStyle.GAME_CHAT);
+
+            // the individual text components with their own highlighting
+            Element sender = createHTMLElement(player.name, MessageStyle.BOLD);
+            Text text = createHTMLText(context);
+            // TODO: fix enum names or write a method that prints them neatly
+            Element terrain = createHTMLElement(terrainName, MessageStyle.BOLD);
+
+            // assembling the final HTML element by ordering the text components
+            main.appendChild(sender);
+            main.appendChild(text);
+            main.appendChild(terrain);
+
+            turnLogAppendElement(main);
+        }
+    }
+
+    /**
+     * Updates the ChatView with the settlement placement or movement of the current game.
+     */
+    public void onTurn(KBState state) {
+        if (state.gameLastTurn instanceof ServerTurn a) {
+            String textContent =  a.type == ServerTurn.TurnType.PLACE ?
+                    " has placed a settlement at (" + a.x + "," + a.y + ")" :
+                    " has moved a settlement from (" + a.x + "," + a.y + ") to (" + a.toX + "," + a.toY + ")";
+            turnLogAppendElement(createMessage(textContent, state.game.currentPlayer.name, MessageStyle.GAME_CHAT));
+        }
+    }
+
+    /**
+     * Creates an element specifying a sender or cause and the following text.
+     * @param text the text content of the message.
+     * @param sender the sender of the message.
+     * @param messageStyle the style of the new element.
      * @return the element.
      */
     private Element createMessage(String text, String sender, MessageStyle messageStyle ) {
+
+        Element senderElement = createHTMLElement(sender, MessageStyle.BOLD);
+        Text textElement = createHTMLText(text);
+
+        Element msg = createHTMLElement(messageStyle);
+        msg.appendChild(senderElement);
+        msg.appendChild(textElement);
+
+        return msg;
+    }
+
+    /**
+     * Creates an element for the turn log.
+     * @param messageStyle the style.
+     * @return the element.
+     */
+    private Element createTurn(String text, String sender, MessageStyle messageStyle) {
 
         Element senderElement = createHTMLElement(sender, MessageStyle.BOLD);
         Text textElement = createHTMLText(text);
@@ -584,13 +666,32 @@ public class ChatViewController extends Controller implements Initializable {
      *
      * @return The Document used for the chat log.
      */
-    private Document getDocument() {
+    private Document getChatDocument() {
+        return getDocument(webview_globalchat);
+    }
 
-        WebEngine webEngine = webview_globalchat.getEngine();
+    /**
+     * Returns the Document used for the turn log.
+     *
+     * @return The Document used for the turn log.
+     */
+    private Document getTurnLogDocument() {
+        return getDocument(webview_log);
+    }
+
+    /**
+     * Returns the Document used by the specified WebView.
+     *
+     * @param webView the WebView whose document to get.
+     * @return The Document used by the specified WebView.
+     */
+    private Document getDocument(WebView webView) {
+
+        WebEngine webEngine = webView.getEngine();
         Document doc = webEngine.getDocument();
 
         if (doc == null) {
-            throw new NullPointerException("Document was null!");
+            throw new NullPointerException("Document of " + webView + " was null!");
         }
         // TODO: maybe return as HTMLDocument instead
         return doc;
@@ -603,8 +704,8 @@ public class ChatViewController extends Controller implements Initializable {
      * @return The HTML Text object.
      */
     private Text createHTMLText(String textContent) {
-
-        return getDocument().createTextNode(textContent);
+        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
+        return getChatDocument().createTextNode(textContent);
     }
 
     /**
@@ -646,30 +747,49 @@ public class ChatViewController extends Controller implements Initializable {
      * @return HTML Element with the highlighting style.
      */
     private Element createHTMLElementByTag(String tagName) {
-        return getDocument().createElement(tagName);
+        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
+        return getChatDocument().createElement(tagName);
     }
 
     /**
-     * Appends the element with the specified tag name to the global chat html body.
+     * Appends the element with the specified tag name to the global chat HTML body.
      * @param element the HTML element to be appended to the chat log.
      */
     private void globalChatAppendElement(Element element) {
+        appendElement(element, webview_globalchat, globalChatBody);
+    }
 
-        if (globalChatBody == null) {
-            System.out.println("Global chat body was null while printing: \"" + element.toString() + "\"");
+    /**
+     * Appends the element with the specified tag name to the global chat HTML body.
+     * @param element the HTML element to be appended to the turn log.
+     */
+    private void turnLogAppendElement(Element element) {
+        appendElement(element, webview_log, turnLogBody);
+    }
+
+    /**
+     * Appends the element with the specified tag name to the specified HTML body.
+     * @param element the HTML element to be appended to the specified body.
+     * @param webView the WebView displaying the specified body.
+     * @param body the body to append the element to.
+     */
+    private void appendElement(Element element, WebView webView, Element body) {
+
+        if (body == null) {
+            System.out.println("Body of " + webView + " was null while printing: \"" + element.toString() + "\"");
             return;
         }
 
-        WebEngine webEngine = webview_globalchat.getEngine();
-        Document doc = getDocument();
-
+        WebEngine webEngine = webView.getEngine();
+        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
+        Document doc = getChatDocument();
 
         int scrollY = (Integer) webEngine.executeScript("window.scrollY");
         int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
         int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
         boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
 
-        globalChatBody.appendChild(element);
+        body.appendChild(element);
         element.appendChild(doc.createElement("br"));
 
         if (scrollToBottom) {
