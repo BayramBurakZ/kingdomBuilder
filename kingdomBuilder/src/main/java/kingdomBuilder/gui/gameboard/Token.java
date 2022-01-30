@@ -12,9 +12,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
+import kingdomBuilder.KBState;
+import kingdomBuilder.actions.game.ActivateToken;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.gui.util.HexagonCalculator;
+import kingdomBuilder.redux.Store;
 
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -47,12 +50,13 @@ public class Token extends StackPane {
      * @param disable if the Token is at the beginning disabled.
      * @param resource the language support.
      */
-    public Token(Game.TileType tileType, int count, GameViewController gameViewController, boolean disable, ResourceBundle resource) {
+    public Token(Game.TileType tileType, int count, GameViewController gameViewController, boolean disable,
+                 ResourceBundle resource, Store<KBState> store) {
         super();
 
         // TODO: Subscribers:
         //  - Token used -> tokenUsed
-        hexagon = new Hexagon2D(tileType, gameViewController);
+        hexagon = new Hexagon2D(tileType, gameViewController, store);
 
         // set resource
         this.resource = resource;
@@ -160,13 +164,17 @@ public class Token extends StackPane {
          */
         private GameViewController gameViewController;
 
+        /**
+         * Represents the store.
+         */
+        private Store<KBState> store;
 
         /**
          * Constructs a new 2D hexagon with the given type.
          * @param tileType the type for the texture.
          * @param gameViewController the gameViewController.
          */
-        public Hexagon2D(Game.TileType tileType, GameViewController gameViewController) {
+        public Hexagon2D(Game.TileType tileType, GameViewController gameViewController, Store<KBState> store) {
             this.gameViewController = gameViewController;
 
             setStrokeWidth(2.0);
@@ -202,40 +210,10 @@ public class Token extends StackPane {
                     // ... and disable all other tokens first
                     gameViewController.disableTokens(true);
 
-                    switch (tileType) {
-                        case BARN -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case FARM -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case HARBOR -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case OASIS -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case ORACLE -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case PADDOCK -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case TAVERN -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                        case TOWER -> {
-                            //TODO: activate Token in Gamelogic for highlight
-                            placeholder(tileType);
-                        }
-                    }
+                    //TODO: store is null, so its not possible to use token.
+                    return;
+                    //store.dispatch(new ActivateToken(tileType));
+
                 } else {
                     gameViewController.disableTokens(false);
                 }

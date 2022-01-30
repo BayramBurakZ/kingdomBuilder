@@ -91,8 +91,12 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if (action instanceof ReadyGameAction a)
             return reduce(oldState, a);
+        else if (action instanceof ReceiveTokenAction a)
+            return reduce(oldState, a);
+        else if( action instanceof ActivateToken a)
+            return reduce(oldState, a);
 
-        System.out.println("Unknown action");
+            System.out.println("Unknown action");
         return new DeferredState(oldState);
     }
 
@@ -467,7 +471,6 @@ public class KBReducer implements Reducer<KBState> {
         switch (a.turn.type) {
 
             case PLACE -> {
-                //game.placeSettlement(player, x, y);
                 oldState.client.placeSettlement(x, y);
                 //oldState.client.placeSettlement();
             }
@@ -528,10 +531,21 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, ReceiveTokenAction a){
+    private DeferredState reduce(KBState oldState, ReceiveTokenAction a) {
         DeferredState state = new DeferredState(oldState);
 
         state.setGame(oldState.game);
+
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ActivateToken a){
+        DeferredState state = new DeferredState(oldState);
+
+        final Game game = oldState.game;
+
+        game.selectedToken = a.getToken();
+        state.setGame(game);
 
         return state;
     }

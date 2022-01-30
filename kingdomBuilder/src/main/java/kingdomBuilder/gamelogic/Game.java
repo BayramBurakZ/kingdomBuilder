@@ -69,7 +69,15 @@ public class Game {
      */
     private Player[] players;
 
+    /**
+     * Current player on turn.
+     */
     public Player currentPlayer;
+
+    /**
+     * The currently selected token.
+     */
+    public TileType selectedToken;
 
     /**
      * A map of the players playing in the game.
@@ -934,7 +942,7 @@ public class Game {
      * @param toY    the y coordinate of target tile to put settlement.
      * @throws RuntimeException gets thrown when player can not use barn token.
      */
-    public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
+    private void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
 
         if (!canMoveSettlementOnTerrain(player, player.getTerrainCard(), fromX, fromY, toX, toY))
             throw new RuntimeException("can't use token paddock");

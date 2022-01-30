@@ -201,7 +201,7 @@ public class GameViewController extends Controller implements Initializable {
                 continue;
 
             Token token = new Token(entry.getKey(), entry.getValue(), this,
-                    areTokensDisabled, resourceBundle);
+                    areTokensDisabled, resourceBundle, store);
 
             tokens.add(token);
             gameview_hbox_tokens.getChildren().add(token);
@@ -317,7 +317,6 @@ public class GameViewController extends Controller implements Initializable {
                     gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
             }
         }, "gameStarted", "nextPlayer");
-
 
         // set the initial layout of the view
         setupLayout();
