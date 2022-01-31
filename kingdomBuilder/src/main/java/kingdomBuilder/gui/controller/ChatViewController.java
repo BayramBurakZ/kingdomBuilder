@@ -1,8 +1,6 @@
 package kingdomBuilder.gui.controller;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -20,7 +18,7 @@ import kingdomBuilder.network.protocol.Message;
 import kingdomBuilder.redux.Store;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Text;
+import org.w3c.dom.Node;
 
 import java.net.URL;
 import java.util.*;
@@ -30,6 +28,18 @@ import java.util.*;
  * containing data.
  */
 public class ChatViewController extends Controller implements Initializable {
+
+    /**
+     * Represents the path to the global.css file.
+     */
+    private final static String globalStylesheetPath = String.valueOf(
+            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/global.css"));
+
+    /**
+     * Represents the path to the game.css file.
+     */
+    private final static String gameStylesheetPath = String.valueOf(
+            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/game.css"));
 
     /**
      * Represents a List with Clients to compare with the one in the state so new clients or
@@ -111,6 +121,11 @@ public class ChatViewController extends Controller implements Initializable {
     //endregion FXML-Imports
 
     /**
+     * Represents the WebView used by the chat. Both global and game chat.
+     */
+    private WebView chatWebView;
+
+    /**
      * The body of the html file used for displaying the global chat.
      */
     private Element globalChatBody;
@@ -148,51 +163,11 @@ public class ChatViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         resourceBundle = resources;
 
-        // TODO: anywhere where Platform.runLater is called
-        //       any code in the GUI should be run by the JavaFX thread
-        //       JavaFX thread should therefore be notified by Redux
-
-        store.subscribe(kbState -> {
-            tableview_chat.getItems().setAll(kbState.clients.values());
-            onClientChanges();
-        }, "clients");
-
+        store.subscribe(this::onClientChanges, "clients");
         store.subscribe(this::onMessage, "message");
-
         store.subscribe(this::onTurn, "gameLastTurn");
-
-        store.subscribe(state -> {
-            if (state.game == null) {
-                tab_game.setDisable(true);
-                tab_log.setDisable(true);
-            } else {
-                tab_game.setDisable(false);
-                tab_log.setDisable(false);
-            }
-        }, "game");
-
-        store.subscribe(state -> {
-
-            if (state.isConnected && !isConnected) {
-                onConnect();
-                isConnected = true;
-            } else if (!state.isConnected && isConnected){
-                onDisconnect();
-                isConnected = false;
-            }
-
-            // Failed to connect
-            if (state.failedToConnect) {
-                // TODO: error message instead of Chat message (because the chat is not visible)
-                Platform.runLater(() -> {
-                    var elem = createHTMLElement(
-                            "<--- " + resourceBundle.getString("failedToConnect") + " --->",
-                            MessageStyle.WARNING);
-                    globalChatAppendElement(elem);
-                });
-            }
-        }, "isConnected");
-
+        store.subscribe(this::onGame, "game");
+        store.subscribe(this::onConnect, "isConnected");
         store.subscribe(this::onTurnStart, "nextTerrainCard");
 
         setupClientList();
@@ -202,7 +177,6 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Setup for the table that shows all connected clients.
      */
-    //Todo: update the list instead setting it only once
     private void setupClientList() {
         tableview_chat.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         column_id.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().clientId())));
@@ -210,28 +184,21 @@ public class ChatViewController extends Controller implements Initializable {
         column_gameid.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
     }
 
-    private static String globalStylesheetPath =
-            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/global.css").toString();
-    private static String gameStylesheetPath =
-            ChatViewController.class.getResource("/kingdomBuilder/gui/chatStylesheets/game.css").toString();
-
-    WebView webview_globalchat;
-
     /**
-     * Setup for the WebView that displays the Chat-Log.
+     * Setup for the WebView that displays the Chat-Log and Turn-Log.
      */
     private void setupWebView() {
 
         // Setup for chat log /////////////////////////
         // create Webview here instead of in the fxml-file because changing content in tabs has weird behavior.
-        webview_globalchat = new WebView();
-        VBox chatContent = new VBox(webview_globalchat);
-        VBox.setVgrow(webview_globalchat, Priority.ALWAYS);
+        chatWebView = new WebView();
+        VBox chatContent = new VBox(chatWebView);
+        VBox.setVgrow(chatWebView, Priority.ALWAYS);
 
         tab_global.setContent(chatContent);
 
-        webview_globalchat.setContextMenuEnabled(false);
-        WebEngine chatWebEngine = webview_globalchat.getEngine();
+        chatWebView.setContextMenuEnabled(false);
+        WebEngine chatWebEngine = chatWebView.getEngine();
         chatWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
         chatWebEngine.loadContent("<html><body></body></html>");
 
@@ -248,9 +215,8 @@ public class ChatViewController extends Controller implements Initializable {
             }
         });
 
-        chatWebEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
-            globalChatBody = (Element) chatWebEngine.getDocument().getElementsByTagName("body").item(0);
-        });
+        chatWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
+            globalChatBody = (Element) chatWebEngine.getDocument().getElementsByTagName("body").item(0));
 
         // Setup for turn log /////////////////////////
         webview_log.setContextMenuEnabled(false);
@@ -259,63 +225,42 @@ public class ChatViewController extends Controller implements Initializable {
         turnLogWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
         turnLogWebEngine.loadContent("<html><body></body></html>");
 
-        turnLogWebEngine.getLoadWorker().workDoneProperty().addListener((observable, oldValue, newValue) -> {
-            turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0);
-        });
+        turnLogWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
+            turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
     }
 
     /**
-     * Sets the functionality for the clear selection button.
-     * @param event contains the data from the event source.
+     * Updates the GUI when the client (dis-)connects to a server.
+     * @param state
      */
-    @FXML
-    private void onClearSelectionButtonPressed(Event event) {
-        tableview_chat.getSelectionModel().clearSelection();
-    }
+    private void onConnect(KBState state) {
+        if (state.isConnected && !isConnected) {
+            onConnect();
+            isConnected = true;
+        } else if (!state.isConnected && isConnected){
+            onDisconnect();
+            isConnected = false;
+        }
 
-    /**
-     * Sets the functionality for the send button.
-     * @param event contains the data from the event source.
-     */
-    @FXML
-    private void onSendButtonPressed(Event event) {
-        printAndSendMessage();
-    }
-
-    /**
-     * Sets the functionality for the whisper button.
-     * @param event contains the data from the event source.
-     */
-    @FXML
-    private void onWhisperButtonPressed(Event event) {
-        printAndSendWhisper();
-    }
-
-    /**
-     * Sets the functionality for KeyEvents.
-     * @param event contains the data from the event source.
-     */
-    public void onKeyPressed(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER) {
-            if (event.isShiftDown()) {
-                printAndSendWhisper();
-            } else {
-                printAndSendMessage();
-            }
+        // Failed to connect
+        if (state.failedToConnect) {
+            // TODO: error message instead of Chat message (because the chat is not visible)
+            var elem = createHTMLElement(
+                    "<--- " + resourceBundle.getString("failedToConnect") + " --->",
+                    MessageStyle.WARNING);
+            globalChatAppendElement(elem);
         }
     }
 
     /**
      * Updates the UI elements that are important when the client connects to a server.
      */
-    public void onConnect() {
+    private void onConnect() {
         if (!isConnected) {
-            Platform.runLater(() -> {
-                var elem = createHTMLElement(
-                        "<--- " + resourceBundle.getString("youAreConnected") + " --->",
-                        MessageStyle.SERVER);
-                globalChatAppendElement(elem);
-            });
+            var elem = createHTMLElement(
+                    "<--- " + resourceBundle.getString("youAreConnected") + " --->",
+                    MessageStyle.SERVER);
+            globalChatAppendElement(elem);
         }
 
         chatview_textarea_chatinput.setDisable(false);
@@ -326,14 +271,12 @@ public class ChatViewController extends Controller implements Initializable {
     /**
      * Updates the UI elements that are important when the client disconnects from a server.
      */
-    public void onDisconnect() {
+    private void onDisconnect() {
         if (isConnected) {
-            Platform.runLater(() -> {
-                var elem = createHTMLElement(
-                        "<--- " + resourceBundle.getString("disconnectFromServer") + " --->",
-                        MessageStyle.SERVER);
-                globalChatAppendElement(elem);
-            });
+            var elem = createHTMLElement(
+                    "<--- " + resourceBundle.getString("disconnectFromServer") + " --->",
+                    MessageStyle.SERVER);
+            globalChatAppendElement(elem);
         }
 
         chatview_textarea_chatinput.setDisable(true);
@@ -343,12 +286,14 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView with the specific incoming message.
+     * @param state the current state.
      */
-    public void onMessage(KBState state) {
+    private void onMessage(KBState state) {
         Message chatMsg = state.message;
         if (chatMsg == null)
             return;
 
+        //TODO: namings
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients.get(senderID).name();
         Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
@@ -373,7 +318,6 @@ public class ChatViewController extends Controller implements Initializable {
             if (state.clients.get(chatMsg.clientId()).gameId() == state.client.getGameId() &&
                             state.client.getGameId() != -1) {
                 // chat message
-                System.out.println("GameChat");
                 messageStyle = MessageStyle.GAME_CHAT;
             } else {
                 // global message
@@ -383,96 +327,70 @@ public class ChatViewController extends Controller implements Initializable {
             chatMessage = senderName + ": ";
         }
 
-        Element msg = createMessage(message, chatMessage, messageStyle);
-
-        globalChatAppendElement(msg);
+        globalChatAppendElement(
+                createMessage(messageStyle,
+                createHTMLElement(chatMessage, MessageStyle.BOLD),
+                createHTMLElement(message, null)));
     }
 
     /**
      * Updates the ChatView with the start of the next turn of the current game.
+     * @param state the current state.
      */
-    public void onTurnStart(KBState state) {
-        // TODO: lol
+    private void onTurnStart(KBState state) {
         if (state.gameStarted) {
             // game probably has the old player at this point lol
             var player = state.game.playerIDtoObject(state.nextPlayer);
             String context = " started their turn: ";
             String terrainName = player.getTerrainCard().name();
 
-            //String textContent = context + terrainName;
-            //turnLogAppendElement(createMessage(textContent, player.name, MessageStyle.GAME_CHAT));
+            turnLogAppendElement(createMessage(MessageStyle.GAME_CHAT,
+                    createHTMLElement(player.name, MessageStyle.BOLD),
+                    createHTMLElement(context, null),
+                    createHTMLElement(terrainName, MessageStyle.BOLD)));
+        }
+    }
 
-            // the main element containing the overall text style and the individual text components
-            Element main = createHTMLElement(MessageStyle.GAME_CHAT);
-
-            // the individual text components with their own highlighting
-            Element sender = createHTMLElement(player.name, MessageStyle.BOLD);
-            Text text = createHTMLText(context);
-            // TODO: fix enum names or write a method that prints them neatly
-            Element terrain = createHTMLElement(terrainName, MessageStyle.BOLD);
-
-            // assembling the final HTML element by ordering the text components
-            main.appendChild(sender);
-            main.appendChild(text);
-            main.appendChild(terrain);
-
-            turnLogAppendElement(main);
+    /**
+     * Updates the ChatView when joining a game.
+     * @param state the current state.
+     */
+    private void onGame(KBState state) {
+        if (state.game == null) {
+            tab_game.setDisable(true);
+            tab_log.setDisable(true);
+        } else {
+            tab_game.setDisable(false);
+            tab_log.setDisable(false);
         }
     }
 
     /**
      * Updates the ChatView with the settlement placement or movement of the current game.
+     * @param state the current state.
      */
-    public void onTurn(KBState state) {
+    private void onTurn(KBState state) {
         if (state.gameLastTurn instanceof ServerTurn a) {
             String textContent =  a.type == ServerTurn.TurnType.PLACE ?
                     " has placed a settlement at (" + a.x + "," + a.y + ")" :
                     " has moved a settlement from (" + a.x + "," + a.y + ") to (" + a.toX + "," + a.toY + ")";
-            turnLogAppendElement(createMessage(textContent, state.game.currentPlayer.name, MessageStyle.GAME_CHAT));
+
+            turnLogAppendElement(createMessage(MessageStyle.GAME_CHAT,
+                    createHTMLElement(state.game.currentPlayer.name, MessageStyle.BOLD),
+                    createHTMLElement(textContent, null)
+            ));
         }
-    }
-
-    /**
-     * Creates an element specifying a sender or cause and the following text.
-     * @param text the text content of the message.
-     * @param sender the sender of the message.
-     * @param messageStyle the style of the new element.
-     * @return the element.
-     */
-    private Element createMessage(String text, String sender, MessageStyle messageStyle ) {
-
-        Element senderElement = createHTMLElement(sender, MessageStyle.BOLD);
-        Text textElement = createHTMLText(text);
-
-        Element msg = createHTMLElement(messageStyle);
-        msg.appendChild(senderElement);
-        msg.appendChild(textElement);
-
-        return msg;
-    }
-
-    /**
-     * Creates an element for the turn log.
-     * @param messageStyle the style.
-     * @return the element.
-     */
-    private Element createTurn(String text, String sender, MessageStyle messageStyle) {
-
-        Element senderElement = createHTMLElement(sender, MessageStyle.BOLD);
-        Text textElement = createHTMLText(text);
-
-        Element msg = createHTMLElement(messageStyle);
-        msg.appendChild(senderElement);
-        msg.appendChild(textElement);
-
-        return msg;
     }
 
     /**
      * Sends a chat message when a client joined the server or left it.
      */
-    private void onClientChanges() {
-        List<ClientData> clientsState = new ArrayList<ClientData>(store.getState().clients.values());
+    private void onClientChanges(KBState state) {
+        // update client list ///////////////////////
+        tableview_chat.getItems().setAll(state.clients.values());
+
+        //send join/left-message ///////////////////
+        List<ClientData> clientsState = new ArrayList<>(store.getState().clients.values());
 
         List<ClientData> differences = new ArrayList<>();
 
@@ -506,12 +424,8 @@ public class ChatViewController extends Controller implements Initializable {
      * @param clientData the data of the client who left the server.
      */
     private void onClientLeft(ClientData clientData) {
-        Platform.runLater(() -> {
-            var elem = createHTMLElement(
-                    "<--- " + clientData.name() + " " + resourceBundle.getString("leftTheServer") + ". --->",
-                    MessageStyle.SERVER);
-            globalChatAppendElement(elem);
-        });
+        String text = "<--- " + clientData.name() + " " + resourceBundle.getString("leftTheServer") + ". --->";
+        globalChatAppendElement(createHTMLElement(text, MessageStyle.SERVER));
     }
 
     /**
@@ -519,26 +433,16 @@ public class ChatViewController extends Controller implements Initializable {
      * @param clientData the data of the client who joined the server.
      */
     private void onClientJoined(ClientData clientData) {
-        Platform.runLater(() -> {
-            var element = createHTMLElement(
-                    "<--- " + clientData.name() + " " + resourceBundle.getString("joinedTheServer") + ". --->",
-                    MessageStyle.SERVER
-            );
-            globalChatAppendElement(element);
-        });
+        String text = "<--- " + clientData.name() + " " + resourceBundle.getString("joinedTheServer") + ". --->";
+        globalChatAppendElement(createHTMLElement(text, MessageStyle.SERVER));
     }
 
     /**
      * Updates the UI when this client was kicked from the server.
      */
     public void onYouHaveBeenKicked() {
-        Platform.runLater(() -> {
-            var element = createHTMLElement(
-                    "<--- " + resourceBundle.getString("kickedFromServer") + " --->",
-                    MessageStyle.WARNING
-            );
-            globalChatAppendElement(element);
-        });
+        String text = "<--- " + resourceBundle.getString("kickedFromServer") + " --->";
+        globalChatAppendElement(createHTMLElement(text, MessageStyle.SERVER));
     }
 
     /**
@@ -546,30 +450,36 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
-        String chatMessage = message;
+        final String chatMessage = message;
         if (!message.isEmpty()) {
             List<Integer> receiverIds = new ArrayList<>();
 
-            for (var c : store.getState().clients.entrySet()) {
-                receiverIds.add(c.getKey());
+            if (tab_global.isSelected()) {
+                for (var c : store.getState().clients.entrySet()) {
+                    receiverIds.add(c.getKey());
+                }
+            } else {
+                for (var c : store.getState().clients.entrySet()) {
+                    if (c.getValue().gameId() == store.getState().client.getGameId())
+                        receiverIds.add(c.getKey());
+                }
             }
+
             // don't send message to ourselves
             receiverIds.remove((Integer) store.getState().client.getClientId());
 
-            String senderName = resourceBundle.getString("you").toString() + ": ";
-            Element senderElement = createHTMLElement(senderName, MessageStyle.BOLD);
-            Text textElement = createHTMLText(message);
+            String senderName = resourceBundle.getString("you") + ": ";
 
             if(tab_global.isSelected()) {
-                Element msg = createHTMLElement(MessageStyle.GLOBAL_CHAT);
-                msg.appendChild(senderElement);
-                msg.appendChild(textElement);
-                globalChatAppendElement(msg);
+                globalChatAppendElement(createMessage(MessageStyle.GLOBAL_CHAT,
+                        createHTMLElement(senderName, MessageStyle.BOLD),
+                        createHTMLElement(message, null)
+                        ));
             } else {
-                Element msg = createHTMLElement(MessageStyle.GAME_CHAT);
-                msg.appendChild(senderElement);
-                msg.appendChild(textElement);
-                globalChatAppendElement(msg);
+                globalChatAppendElement(createMessage(MessageStyle.GAME_CHAT,
+                        createHTMLElement(senderName, MessageStyle.BOLD),
+                        createHTMLElement(message, null)
+                ));
             }
 
             store.dispatch(new ChatSendAction(receiverIds, chatMessage));
@@ -582,7 +492,7 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private void printAndSendWhisper() {
         String message = chatview_textarea_chatinput.getText().trim();
-        String chatMessage = "";
+        String chatMessage;
         if (!message.isEmpty()) {
             List<Integer> receiverIds = new ArrayList<>();
 
@@ -606,20 +516,12 @@ public class ChatViewController extends Controller implements Initializable {
             }
             receiverIds.add(receivers.get(receivers.size()-1).clientId());
             chatMessage += "@" + receivers.get(receivers.size()-1).name() + ": ";
-            Element receiversElement = createHTMLElement(chatMessage, MessageStyle.BOLD);
-            Text textElement = createHTMLText(message);
 
-            if (tab_global.isSelected()) {
-                Element messageElement = createHTMLElement(MessageStyle.WHISPER);
-                messageElement.appendChild(receiversElement);
-                messageElement.appendChild(textElement);
-                globalChatAppendElement(messageElement);
-            } else {
-                Element messageElement = createHTMLElement(MessageStyle.WHISPER);
-                messageElement.appendChild(receiversElement);
-                messageElement.appendChild(textElement);
-                globalChatAppendElement(messageElement);
-            }
+            globalChatAppendElement(createMessage(
+                    MessageStyle.WHISPER,
+                    createHTMLElement(chatMessage, MessageStyle.BOLD),
+                    createHTMLElement(message, null)
+                    ));
 
             store.dispatch(new ChatSendAction(receiverIds, message));
         }
@@ -667,16 +569,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @return The Document used for the chat log.
      */
     private Document getChatDocument() {
-        return getDocument(webview_globalchat);
-    }
-
-    /**
-     * Returns the Document used for the turn log.
-     *
-     * @return The Document used for the turn log.
-     */
-    private Document getTurnLogDocument() {
-        return getDocument(webview_log);
+        return getDocument(chatWebView);
     }
 
     /**
@@ -698,28 +591,31 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Creates the HTML Text object with the specified text content.
+     * Creates a html-element with a main message style and other elements.
      *
-     * @param textContent the text content for that element.
-     * @return The HTML Text object.
+     * @param mainMessageStyle the style for the complete message.
+     * @param elements one or more elements that will be inside the message.
+     * @return the complete message.
      */
-    private Text createHTMLText(String textContent) {
-        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
-        return getChatDocument().createTextNode(textContent);
+    private Element createMessage(MessageStyle mainMessageStyle, Node... elements) {
+        Element main = createHTMLElement(mainMessageStyle);
+
+        for (Node e : elements) {
+            main.appendChild(e);
+        }
+
+        return main;
     }
 
-    /**
-     * Creates the HTML Element with the specified message highlighting style.
-     *
-     * @param textContent the text content for that element.
-     * @param style the style for highlighting the message.
-     * @return The HTML Element.
-     */
-    private Element createHTMLElement(String textContent, MessageStyle style) {
-
-        Element element = createHTMLElement(style);
-        element.setTextContent(textContent);
-        return element;
+    private Node createHTMLElement(String textContent, MessageStyle messageStyle) {
+        if (messageStyle == null) {
+            // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
+            return getChatDocument().createTextNode(textContent);
+        } else {
+            Element element = createHTMLElement(messageStyle);
+            element.setTextContent(textContent);
+            return element;
+        }
     }
 
     /**
@@ -755,15 +651,15 @@ public class ChatViewController extends Controller implements Initializable {
      * Appends the element with the specified tag name to the global chat HTML body.
      * @param element the HTML element to be appended to the chat log.
      */
-    private void globalChatAppendElement(Element element) {
-        appendElement(element, webview_globalchat, globalChatBody);
+    private void globalChatAppendElement(Node element) {
+        appendElement(element, chatWebView, globalChatBody);
     }
 
     /**
      * Appends the element with the specified tag name to the global chat HTML body.
      * @param element the HTML element to be appended to the turn log.
      */
-    private void turnLogAppendElement(Element element) {
+    private void turnLogAppendElement(Node element) {
         appendElement(element, webview_log, turnLogBody);
     }
 
@@ -773,7 +669,7 @@ public class ChatViewController extends Controller implements Initializable {
      * @param webView the WebView displaying the specified body.
      * @param body the body to append the element to.
      */
-    private void appendElement(Element element, WebView webView, Element body) {
+    private void appendElement(Node element, WebView webView, Element body) {
 
         if (body == null) {
             System.out.println("Body of " + webView + " was null while printing: \"" + element.toString() + "\"");
@@ -796,4 +692,46 @@ public class ChatViewController extends Controller implements Initializable {
             webEngine.executeScript("window.scrollTo(0, document.documentElement.scrollHeight);");
         }
     }
+
+    //region Button-functions
+
+    /**
+     * Sets the functionality for the clear selection button.
+     */
+    @FXML
+    private void onClearSelectionButtonPressed() {
+        tableview_chat.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * Sets the functionality for the send button.
+     */
+    @FXML
+    private void onSendButtonPressed() {
+        printAndSendMessage();
+    }
+
+    /**
+     * Sets the functionality for the whisper button.
+     */
+    @FXML
+    private void onWhisperButtonPressed() {
+        printAndSendWhisper();
+    }
+
+    /**
+     * Sets the functionality for KeyEvents.
+     * @param event contains the data from the event source.
+     */
+    public void onKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
+            if (event.isShiftDown()) {
+                printAndSendWhisper();
+            } else {
+                printAndSendMessage();
+            }
+        }
+    }
+
+    //endregion Button-functions
 }
