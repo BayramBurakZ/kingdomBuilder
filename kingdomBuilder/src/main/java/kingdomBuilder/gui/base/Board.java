@@ -4,7 +4,6 @@ import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Map;
-import kingdomBuilder.gamelogic.TileReadOnly;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;

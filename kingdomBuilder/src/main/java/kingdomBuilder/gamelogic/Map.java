@@ -27,6 +27,8 @@ public class Map implements Iterable<Tile> {
      */
     private final Tile[] tiles;
 
+    private final Set<Tile> tileSet;
+
     /**
      * Represents the width of a quadrant.
      */
@@ -101,6 +103,8 @@ public class Map implements Iterable<Tile> {
                         new Tile(x + quadrantWidth, y + quadrantWidth, bottomRight[x * quadrantWidth + y], startingTokenCount);
             }
         }
+
+        tileSet = Set.of(tiles);
     }
 
     /**
@@ -181,6 +185,22 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
+     * Calculates the x position for the tile that lies top left at the specified distance from the tile with the
+     * given coordinates.
+     *
+     * @param x        the x coordinate of the original tile.
+     * @param y        the y coordinate of the original tile.
+     * @param distance the distance from the original tile.
+     * @return The x coordinate of the tile that lies top left from the original tile.
+     */
+    protected static int topLeftX(int x, int y, int distance) {
+        // TODO: remove the loop and calculate this properly
+        for (int i = 0; i < distance; i++)
+            x = topLeftX(x, y + i);
+        return x;
+    }
+
+    /**
      * Calculates the x position for the tile that lies top right from the tile with the given coordinates.
      *
      * @param x the x coordinate of the original tile.
@@ -198,14 +218,46 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
+     * Calculates the x position for the tile that lies top right at the specified distance from the tile with the
+     * given coordinates.
+     *
+     * @param x        the x coordinate of the original tile.
+     * @param y        the y coordinate of the original tile.
+     * @param distance the distance from the original tile.
+     * @return The x coordinate of the tile that lies top right from the original tile.
+     */
+    protected static int topRightX(int x, int y, int distance) {
+        // TODO: remove the loop and calculate this properly
+        for (int i = 0; i < distance; i++)
+            x = topRightX(x, y + i);
+        return x;
+    }
+
+    /**
      * Calculates the x position for the tile that lies bottom left from the tile with the given coordinates.
      *
      * @param x the x coordinate of the original tile.
      * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom left from the original tile.
      */
-    protected int bottomLeftX(int x, int y) {
+    protected static int bottomLeftX(int x, int y) {
         return topLeftX(x, y);
+    }
+
+    /**
+     * Calculates the x position for the tile that lies bottom left at the specified distance from the tile with the
+     * given coordinates.
+     *
+     * @param x        the x coordinate of the original tile.
+     * @param y        the y coordinate of the original tile.
+     * @param distance the distance from the original tile.
+     * @return The x coordinate of the tile that lies bottom left from the original tile.
+     */
+    protected static int bottomLeftX(int x, int y, int distance) {
+        // TODO: remove the loop and calculate this properly
+        for (int i = 0; i < distance; i++)
+            x = bottomLeftX(x, y - i);
+        return x;
     }
 
     /**
@@ -215,8 +267,24 @@ public class Map implements Iterable<Tile> {
      * @param y the y coordinate of the original tile.
      * @return The x coordinate of the tile that lies bottom right from the original tile.
      */
-    protected int bottomRightX(int x, int y) {
+    protected static int bottomRightX(int x, int y) {
         return topRightX(x, y);
+    }
+
+    /**
+     * Calculates the x position for the tile that lies bottom right at the specified distance from the tile with the
+     * given coordinates.
+     *
+     * @param x        the x coordinate of the original tile.
+     * @param y        the y coordinate of the original tile.
+     * @param distance the distance from the original tile.
+     * @return The x coordinate of the tile that lies bottom right from the original tile.
+     */
+    protected static int bottomRightX(int x, int y, int distance) {
+        // TODO: remove the loop and calculate this properly
+        for (int i = 0; i < distance; i++)
+            x = bottomRightX(x, y - i);
+        return x;
     }
 
     /**
@@ -251,7 +319,7 @@ public class Map implements Iterable<Tile> {
      * @param y the y coordinate of the Tile.
      * @return All surrounding Tiles.
      */
-    public Iterator<Tile> surroundingTilesIterator(int x, int y) {
+    /*public Iterator<Tile> surroundingTilesIterator(int x, int y) {
 
         return new Iterator<Tile>() {
             int state = -1;
@@ -332,10 +400,11 @@ public class Map implements Iterable<Tile> {
                 }
             }
         };
-    }
+    }*/
 
     /**
      * Returns a stream of all the tiles of the map.
+     *
      * @return the stream of all the tiles of the map.
      */
     public Stream<Tile> stream() {
@@ -344,6 +413,7 @@ public class Map implements Iterable<Tile> {
 
     /**
      * Returns an iterator over all the tiles of the map.
+     *
      * @return the iterator over all the tiles of the map.
      */
     @NotNull
@@ -406,200 +476,11 @@ public class Map implements Iterable<Tile> {
     //}
 
     /**
-     * Check if settlement of a player has at least one neighbour.
-     *
-     * @param player the player to check-
-     * @param tile   tile to look for.
-     * @return True if player has a neighbouring settlement. False otherwise.
-     */
-    public boolean playerHasASettlementInSurrounding(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        // right tile
-        if (isWithinBounds(x + 1, y) && at(x + 1, y).isOccupiedByPlayer(player))
-            return true;
-
-        // left tile
-        if (isWithinBounds(x - 1, y) && at(x - 1, y).isOccupiedByPlayer(player))
-            return true;
-
-        // top right
-        if (isWithinBounds(topRightX(x, y), y + 1) && at(topRightX(x, y), y + 1).isOccupiedByPlayer(player))
-            return true;
-
-        // top left
-        if (isWithinBounds(topLeftX(x, y), y + 1) && at(topLeftX(x, y), y + 1).isOccupiedByPlayer(player))
-            return true;
-
-        // bottom right
-        if (isWithinBounds(bottomRightX(x, y), y - 1) && at(bottomRightX(x, y), y - 1).isOccupiedByPlayer(player))
-            return true;
-
-        // bottom left
-        return isWithinBounds(bottomLeftX(x, y), y - 1) && at(bottomLeftX(x, y), y - 1).isOccupiedByPlayer(player);
-    }
-
-    /**
-     * Check if player has a chain of settlements on top right diagonal of a tile.
-     *
-     * @param player the player to check for.
-     * @param tile   the origin tile.
-     * @return True if the next three tiles on top right diagonal are occupied by player. False otherwise.
-     */
-    private boolean topRightDiagonalIsAChain(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        for (int i = 0; i < 3; i++) {
-            if (!isWithinBounds(x, y))
-                return false;
-
-            x = topRightX(x, y);
-            y++;
-
-            if (!at(x, y).isOccupiedByPlayer(player))
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if player has a chain of settlements on top left diagonal of a tile.
-     *
-     * @param player the player to check for.
-     * @param tile   the origin tile.
-     * @return True if the next three tiles on top left diagonal are occupied by player. False otherwise.
-     */
-    private boolean topLeftDiagonalIsAChain(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        for (int i = 0; i < 3; i++) {
-            if (!isWithinBounds(x, y))
-                return false;
-
-            x = topLeftX(x, y);
-            y++;
-
-            if (!at(x, y).isOccupiedByPlayer(player))
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if player has a chain of settlements on bottom right diagonal of a tile.
-     *
-     * @param player the player to check for.
-     * @param tile   the origin tile.
-     * @return True if the next three tiles on bottom right diagonal are occupied by player. False otherwise.
-     */
-    private boolean bottomRightDiagonalIsAChain(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        for (int i = 0; i < 3; i++) {
-            if (!isWithinBounds(x, y))
-                return false;
-
-            x = bottomRightX(x, y);
-            y--;
-
-            if (!at(x, y).isOccupiedByPlayer(player))
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if player has a chain of settlements on bottom left diagonal of a tile.
-     *
-     * @param player the player to check for.
-     * @param tile   the origin tile.
-     * @return True if the next three tiles on bottom left diagonal are occupied by player. False otherwise.
-     */
-    private boolean bottomLeftDiagonalIsAChain(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        for (int i = 0; i < 3; i++) {
-            if (!isWithinBounds(x, y))
-                return false;
-
-            x = bottomLeftX(x, y);
-            y--;
-
-            if (!at(x, y).isOccupiedByPlayer(player))
-                return false;
-        }
-        return true;
-    }
-
-    /**
-     * Check if a tile is the front or back part of a chain that is occupied by a player.
-     *
-     * @param player the player to check for.
-     * @param tile   the origin tile.
-     * @return True if tile is a part of a chain. False otherwise.
-     */
-    public boolean tileIsInFrontOrBackOfAChain(Player player, Tile tile) {
-        int x = tile.x;
-        int y = tile.y;
-
-        if (!tile.isOccupied())
-            return false;
-
-        // Check if chain is on right side
-        if (isWithinBounds(x + 3, y)
-                && at(x + 1, y).isOccupiedByPlayer(player)
-                && at(x + 2, y).isOccupiedByPlayer(player)
-                && at(x + 3, y).isOccupiedByPlayer(player))
-            return true;
-
-        // Check if chain is on left side
-        if (isWithinBounds(x - 3, y)
-                && at(x - 1, y).isOccupiedByPlayer(player)
-                && at(x - 2, y).isOccupiedByPlayer(player)
-                && at(x - 3, y).isOccupiedByPlayer(player))
-            return true;
-
-        // Check if chain is on diagonals
-        return topRightDiagonalIsAChain(player, tile)
-                || topLeftDiagonalIsAChain(player, tile)
-                || bottomRightDiagonalIsAChain(player, tile)
-                || bottomLeftDiagonalIsAChain(player, tile);
-    }
-
-    /**
-     * Gets all free tiles that are in front or back of a chain of settlements that is occupied by the player.
-     *
-     * @param player the player to check for.
-     * @return All free tiles that are in front or back of a chain of settlements.
-     */
-    public Set<Tile> allFreeTilesInFrontOrBackOfAChain(Player player) {
-        Set<Tile> freeTiles = new HashSet<>();
-
-        for (int y = 0; y < mapWidth; y++) {
-            for (int x = 0; y < mapWidth; x++) {
-
-                if (at(x, y).tileType != TileType.WATER
-                        && at(x, y).isTilePlaceable()
-                        && playerHasASettlementInSurrounding(player, at(x, y))
-                        && tileIsInFrontOrBackOfAChain(player, at(x, y)))
-
-                    freeTiles.add(at(x, y));
-            }
-        }
-        return freeTiles;
-    }
-
-    /**
      * Gets all Tiles at border of map.
      *
      * @return all tiles that are at the border of the map.
      */
-    public Set<Tile> borderOfMap() {
+    public Set<Tile> getTilesAtBorder() {
         Set<Tile> border = new HashSet<>();
 
         for (int x = 0; x < mapWidth; x++) {
@@ -616,225 +497,25 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
-     * Gets all free tiles that are skipped from a given position.
+     * Gets all the tiles of the map.
      *
-     * @param x the x coordinate of a tile to skip.
-     * @param y the y coordinate of at tile to skip.
-     * @return all free tiles that can be placed on that skipped position.
+     * @return all tiles of the map.
      */
-    public Set<Tile> oneTileSkippedSurroundingTiles(int x, int y) {
-        Set<Tile> freeTiles = new HashSet<>();
-        int tempX, tempY;
-
-        // top left diagonal
-        tempX = topLeftX(topLeftX(x, y), y + 1);
-        tempY = y + 2;
-
-        if (isWithinBounds(tempX, tempY)
-                && at(tempX, tempY).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-
-            freeTiles.add(at(tempX, tempY));
-
-
-        // top right diagonal
-        tempX = topRightX(topRightX(x, y), y + 1);
-        tempY = y + 2;
-
-        if (isWithinBounds(tempX, tempY)
-                && at(tempX, tempY).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-            freeTiles.add(at(tempX, tempY));
-
-
-        // left
-        if (isWithinBounds(x - 2, y)
-                && at(x - 2, y).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-
-            freeTiles.add(at(x - 2, y));
-
-
-        // right
-        if (isWithinBounds(x + 2, y)
-                && at(x - 2, y).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-
-            freeTiles.add(at(x + 2, y));
-
-
-        // bottom left diagonal
-        tempX = bottomLeftX(bottomLeftX(x, y), y - 1);
-        tempY = y - 2;
-
-        if (isWithinBounds(tempX, tempY)
-                && at(tempX, tempY).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-
-            freeTiles.add(at(tempX, tempY));
-
-
-        // bottom right diagonal
-        tempX = bottomRightX(bottomRightX(x, y), y - 1);
-        tempY = y - 2;
-
-        if (isWithinBounds(tempX, tempY)
-                && at(tempX, tempY).isTilePlaceable()
-                && at(tempX, tempY).tileType != TileType.WATER)
-
-            freeTiles.add(at(tempX, tempY));
-
-        return freeTiles;
+    public Set<Tile> getTiles() {
+        return tileSet;
     }
 
     /**
-     * Get all surrounding tiles of a given target tile.
+     * Gets all the tiles of the map of the specified placeable terrain type.
      *
-     * @param x the x coordinate of the target tile.
-     * @param y the y coordinate of the target tile.
-     * @return All tiles that surrounding target tile.
-     */
-    public Set<Tile> surroundingTiles(int x, int y) {
-        if (!isWithinBounds(x, y)) {
-            return null;
-        }
-
-        Set<Tile> surroundingTiles = new HashSet<>();
-
-        // top left
-        if (topLeftX(x, y) >= 0 && y > 0)
-            surroundingTiles.add(at(topLeftX(x, y), y - 1));
-
-        // top right
-        if (topRightX(x, y) < mapWidth && y > 0)
-            surroundingTiles.add(at(topRightX(x, y), y - 1));
-
-        // left
-        if (x - 1 >= 0)
-            surroundingTiles.add(at(x - 1, y));
-
-        // right
-        if (x + 1 < mapWidth)
-            surroundingTiles.add(at(x + 1, y));
-
-        // bottom left
-        if (bottomLeftX(x, y) >= 0 && y + 1 < mapWidth)
-            surroundingTiles.add(at(bottomLeftX(x, y), y + 1));
-
-        // bottom right
-        if (bottomRightX(x, y) < mapWidth && y + 1 < mapWidth)
-            surroundingTiles.add(at(bottomRightX(x, y), y + 1));
-
-        return surroundingTiles;
-    }
-
-    /**
-     * Check if next to the tile is a token and return it.
-     *
-     * @param x the x coordinate of the tile.
-     * @param y the y coordinate of the tile.
-     * @return The Token that is next to the settlement or null if there is no token;
-     */
-    public Tile specialPlaceInSurrounding(int x, int y) {
-        for (Tile tile : surroundingTiles(x, y)) {
-            if (tokenType.contains(tile.tileType)) {
-                return tile;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Checks whether there is another settlement of the player on surrounding tiles.
-     *
-     * @param player the player that to check.
-     * @param x      the x coordinate of the Tile.
-     * @param y      the x coordinate of the Tile.
-     * @return True if the player has another settlement on surrounding tile. False otherwise.
-     */
-    public boolean settlementOfPlayerOnSurroundingTiles(Player player, int x, int y) {
-        if (!isWithinBounds(x, y))
-            return false;
-
-        for (Tile tile : surroundingTiles(x, y)) {
-            if (tile.isOccupiedByPlayer(player))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks whether there is another settlement of the player on surrounding tiles.
-     *
-     * @param player the player that to check.
-     * @param x      the x coordinate of the Tile.
-     * @param y      the x coordinate of the Tile.
-     * @return True if the player has another settlement on surrounding tile within same terrain. False otherwise.
-     */
-    public boolean settlementOfPlayerOnSurroundingTiles(Player player, TileType terrain, int x, int y) {
-        if (!isWithinBounds(x, y) && nonPlaceableTileTypes.contains(terrain))
-            return false;
-
-        for (Tile tile : surroundingTiles(x, y)) {
-            if (tile.isOccupiedByPlayer(player))
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Gets the entire terrain of a type.
-     *
-     * @param terrain the terrain to filter.
-     * @return All tiles of a type.
+     * @param terrain the placeable terrain type to filter by.
+     * @return all tiles of the given placeable terrain type.
      */
     public Set<Tile> getTiles(TileType terrain) {
         if (nonPlaceableTileTypes.contains(terrain))
-            throw new InvalidParameterException("not a landscape!");
+            throw new InvalidParameterException("The specified terrain is not a placeable terrain type!");
 
         return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
-    }
-
-    /**
-     * Get only the free tiles of a terrain.
-     *
-     * @param terrain the terrain to get.
-     * @return all free tiles of the terrain.
-     */
-    public Set<Tile> freeTilesOnTerrain(TileType terrain) {
-        if (nonPlaceableTileTypes.contains(terrain))
-            throw new InvalidParameterException("not a landscape!");
-
-        Set<Tile> freeTiles = new HashSet<>();
-
-        for (Tile tile : getTiles(terrain)) {
-
-            if (tile.isTilePlaceable())
-                freeTiles.add(tile);
-        }
-
-        return freeTiles;
-    }
-
-    /**
-     * Checks if there is only one settlement of a player next to a special place.
-     *
-     * @param player the player to check.
-     * @param x      the x position of the special place.
-     * @param y      the y position of the special place.
-     * @return true if player has only one settlement next to a speacial place.
-     */
-    public boolean playerHasOnlyOneSettlementNextToSpecialPlace(Player player, int x, int y) {
-        Tile token;
-        int counter = 0;
-
-        for (Tile tile : surroundingTiles(x, y)) {
-            token = tile;
-            if (at(token.x, token.y).occupiedBy() == player)
-                counter++;
-        }
-
-        return counter == 1;
     }
 
     /**
@@ -843,31 +524,8 @@ public class Map implements Iterable<Tile> {
      * @param player the player as the owner of the settlements.
      * @return all settlements of the player.
      */
-    public Set<Tile> allSettlementsOfPlayerOnMap(Player player) {
-        Set<Tile> allSettlements = new HashSet<>();
+    public Set<Tile> getSettlements(Player player) {
 
-        for (int y = 0; y < mapWidth; y++)
-            for (int x = 0; x < mapWidth; x++) {
-                if (at(x, y).occupiedBy == player)
-                    allSettlements.add(at(x, y));
-            }
-        return allSettlements;
-    }
-
-    /**
-     * Checks if terrain is filled with settlement and therefore has no placeable tiles.
-     *
-     * @param terrain the terrain to check for.
-     * @return true if terrain has no more free tiles. False otherwise.
-     */
-    public boolean terrainIsFull(TileType terrain) {
-
-        for (Tile tile : getTiles(terrain)) {
-            if (tile.isTilePlaceable()) {
-                return false;
-            }
-        }
-
-        return true;
+        return stream().filter(t -> t.occupiedBy == player).collect(Collectors.toSet());
     }
 }

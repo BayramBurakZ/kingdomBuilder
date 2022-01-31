@@ -104,7 +104,10 @@ public class Player {
         //if (token.originTiles.contains(originTile))
         //    throw new RuntimeException("The player already owns a token from this tile!");
 
-        token.originTiles.add(originTile);
+        if (originTile.hasTokens()) {
+            originTile.takeTokenFromSpecialPlace();
+            token.originTiles.add(originTile);
+        }
     }
 
     public boolean hasToken(Tile originTile) {
@@ -147,7 +150,7 @@ public class Player {
     /**
      * Check how many remaining Settlements a player has.
      *
-     * @return The amount of Settlements the player has.
+     * @return true if the player has settlements left for the basic turn.
      */
     public boolean hasRemainingSettlements() {
         return remainingSettlements > 0;
@@ -155,6 +158,8 @@ public class Player {
 
     /**
      * Represents the remaining settlements of this player.
+     *
+     * @return the amount of settlements the player needs to place for the basic turn.
      */
     public int getRemainingSettlements() {
         return remainingSettlements;
@@ -162,6 +167,8 @@ public class Player {
 
     /**
      * Represents the terrain card for this player.
+     *
+     * @return the TileType of the terrain card of the player.
      */
     public TileType getTerrainCard() {
         return terrainCard;
@@ -176,7 +183,6 @@ public class Player {
     public int getRemainingTokens(TileType tokenType) {
         return tokens.get(tokenType).remaining;
     }
-
 
     /**
      * Returns the amount of tokens from a type the player has.
@@ -217,5 +223,14 @@ public class Player {
                 TileType.PADDOCK, getRemainingTokens(TileType.PADDOCK),
                 TileType.BARN, getRemainingTokens(TileType.BARN)
         );
+    }
+
+    /**
+     * Get the remaining settlements of a turn.
+     *
+     * @return the remaining settlements.
+     */
+    public int getRemainingSettlementsOfTurn() {
+        return remainingSettlementsOfTurn;
     }
 }

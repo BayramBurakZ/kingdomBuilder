@@ -182,6 +182,21 @@ public class ChatViewController extends Controller implements Initializable {
         column_id.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().clientId())));
         column_name.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().name())));
         column_gameid.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
+
+        // highlight own client in table
+        tableview_chat.setRowFactory(param -> new TableRow<>() {
+            @Override
+            protected void updateItem(ClientData item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null) {
+                    setStyle("");
+                } else if (item.clientId() == store.getState().client.getClientId()) {
+                    setStyle("-fx-background-color: #ff9966;");
+                } else {
+                    setStyle("");
+                }
+            }
+        });
     }
 
     /**

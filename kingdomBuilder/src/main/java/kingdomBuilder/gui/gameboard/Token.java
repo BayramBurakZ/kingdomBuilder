@@ -15,6 +15,7 @@ import javafx.scene.shape.StrokeType;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.ActivateToken;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.gui.util.HexagonCalculator;
 import kingdomBuilder.redux.Store;
@@ -50,7 +51,7 @@ public class Token extends StackPane {
      * @param disable if the Token is at the beginning disabled.
      * @param resource the language support.
      */
-    public Token(Game.TileType tileType, int count, GameViewController gameViewController, boolean disable,
+    public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable,
                  ResourceBundle resource, Store<KBState> store) {
         super();
 
@@ -114,7 +115,7 @@ public class Token extends StackPane {
      * Set the rule for every generated special place to their rule.
      * @param tileType the type for recognizing the special place.
      */
-    private void setTokenTooltip(Game.TileType tileType) {
+    private void setTokenTooltip(TileType tileType) {
 
         // if not a token, return
         if (Game.regularTileTypes.contains(tileType)) {
@@ -174,7 +175,7 @@ public class Token extends StackPane {
          * @param tileType the type for the texture.
          * @param gameViewController the gameViewController.
          */
-        public Hexagon2D(Game.TileType tileType, GameViewController gameViewController, Store<KBState> store) {
+        public Hexagon2D(TileType tileType, GameViewController gameViewController, Store<KBState> store) {
             this.store = store;
             this.gameViewController = gameViewController;
 
@@ -196,7 +197,7 @@ public class Token extends StackPane {
          * Adds the Mouse listener for the hexagon.
          * @param tileType the type defines which action is triggered.
          */
-        private void addListener(Game.TileType tileType) {
+        private void addListener(TileType tileType) {
             setOnMouseClicked(event -> {
                 // if the tile is disabled: do nothing
                 if (isDisabled) {
@@ -220,13 +221,6 @@ public class Token extends StackPane {
                     store.dispatch(new ActivateToken(null));
                 }
             });
-        }
-
-        // TODO: remove
-        private void placeholder(Game.TileType tileType) {
-            if (isActivated) {
-                System.out.println("You activated your " + tileType + " -Token!");
-            }
         }
 
         /**

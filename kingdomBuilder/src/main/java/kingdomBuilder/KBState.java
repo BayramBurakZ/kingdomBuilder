@@ -101,14 +101,29 @@ public class KBState {
      */
     public int nextPlayer;
 
+    /**
+     * The state if a game is running.
+     */
     public boolean gameStarted;
 
+    /**
+     * Represents a list of players in the current game.
+     */
     public List<Player> players;
 
+    /**
+     * Represents the active token.
+     */
     public Game.TileType token;
 
+    /**
+     * Represents the scores message from the network.
+     */
     public Scores scores;
 
+    /**
+     * Represents an incoming chat-message.
+     */
     public Message message;
 
     public KBState(SceneLoader sceneLoader,

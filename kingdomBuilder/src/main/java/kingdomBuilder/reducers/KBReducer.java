@@ -10,6 +10,7 @@ import kingdomBuilder.actions.general.ConnectAction;
 import kingdomBuilder.actions.general.DisconnectAction;
 import kingdomBuilder.actions.general.LoggedInAction;
 import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.Game.WinCondition;
 import kingdomBuilder.gamelogic.Map;
 import kingdomBuilder.gamelogic.Player;
@@ -429,11 +430,11 @@ public class KBReducer implements Reducer<KBState> {
         final var game = oldState.game;
 
         if (oldState.players != null) {
-            game.startTurn(oldState.nextPlayer, Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+            game.startTurn(oldState.nextPlayer, TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
             state.setGame(game);
         }
 
-        state.setNextTerrainCard(Game.TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+        state.setNextTerrainCard(TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
 
         return state;
     }
@@ -456,11 +457,11 @@ public class KBReducer implements Reducer<KBState> {
                 ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
                         (ServerTurn) oldState.gameLastTurn : null;
                 if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.REMOVE) {
-                    game.moveSettlement(game.currentPlayer, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
+                    game.unsafeMoveSettlement(game.currentPlayer, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
-                    game.placeSettlementOnTerrain(game.currentPlayer, game.currentPlayer.getTerrainCard(), a.turn.y, a.turn.x);
+                    game.placeSettlement(game.currentPlayer, game.currentPlayer.getTerrainCard(), a.turn.y, a.turn.x);
                     //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
                     state.setGame(game);
@@ -487,39 +488,38 @@ public class KBReducer implements Reducer<KBState> {
 
             case PLACE -> {
                 oldState.client.placeSettlement(x, y);
-                //oldState.client.placeSettlement();
             }
 
             case ORACLE -> {
-                game.useToken(player, Game.TileType.ORACLE, x, y, toX, toY);
+                game.useTokenOracle(player, x, y);
                 //oldState.client.useTokenOracle();
             }
             case FARM -> {
-                game.useToken(player, Game.TileType.FARM, x, y, toX, toY);
+                game.useTokenFarm(player, x, y);
                 //oldState.client.useTokenFarm();
             }
             case TAVERN -> {
-                game.useToken(player, Game.TileType.TAVERN, x, y, toX, toY);
+                game.useTokenTavern(player, x, y);
                 //oldState.client.useTokenTavern();
             }
             case TOWER -> {
-                game.useToken(player, Game.TileType.TOWER, x, y, toX, toY);
+                game.useTokenTower(player, x, y);
                 //oldState.client.useTokenTower();
             }
             case HARBOR -> {
-                game.useToken(player, Game.TileType.HARBOR, x, y, toX, toY);
+                game.useTokenHarbor(player, x, y, toX, toY);
                 //oldState.client.useTokenHarbor();
             }
             case PADDOCK -> {
-                game.useToken(player, Game.TileType.PADDOCK, x, y, toX, toY);
+                game.useTokenPaddock(player, x, y, toX, toY);
                 //oldState.client.useTokenPaddock();
             }
             case BARN -> {
-                game.useToken(player, Game.TileType.BARN, x, y, toX, toY);
+                game.useTokenBarn(player, x, y, toX, toY);
                 //oldState.client.useTokenBarn();
             }
             case OASIS -> {
-                game.useToken(player, Game.TileType.OASIS, x, y, toX, toY);
+                game.useTokenOasis(player,x, y);
                 //oldState.client.useTokenOasis();
             }
         }

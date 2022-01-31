@@ -185,12 +185,18 @@ public class GameViewController extends Controller implements Initializable {
 
         // GAME
         store.subscribe(this::onGameChanged, "game");
+
         // TOKEN
         store.subscribe(this::onTokenActivated, "token");
+
         // TERRAIN CARD
         store.subscribe(this::onTerrainCardChanged, "nextTerrainCard");
+
         // LAST TURN (place/move settlement, highlight board for client)
         store.subscribe(this::onLastTurn, "gameLastTurn");
+
+        //NEXT PLAYER (whenever the current player changes)
+        store.subscribe(this::onNextPlayer, "nextPlayer");
 
         store.subscribe(state -> {
             if (store.getState().scores != null) {
@@ -209,9 +215,7 @@ public class GameViewController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
-        // - PlayerData settlements -> updateSettlementsForPlayer()
         // - PlayerData score -> updateScoreForPlayer()
-        // - Tokens from the current Player -> updateTokens()
         // - Token used -> updateTokens()
         // - In Basic turn -> disableTokens(false/true)
         // - if PlayersTurn -> disableTokens(false / true)
@@ -223,7 +227,7 @@ public class GameViewController extends Controller implements Initializable {
             if (kbState.nextPlayer >= 0 && kbState.gameStarted) {
                 // only preview for this client
                 if (kbState.nextPlayer == kbState.client.getClientId())
-                    gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+                    gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
             }
         }, "gameStarted", "nextPlayer");
 
@@ -250,6 +254,27 @@ public class GameViewController extends Controller implements Initializable {
         */
     }
 
+    /**
+     * Updates the GUI whenever the currentPlayer changes.
+     *
+     * @param kbState the current state.
+     */
+    private void onNextPlayer(KBState kbState) {
+        if (kbState.nextPlayer == -1)
+            return;
+
+        if (kbState.nextPlayer == kbState.client.getClientId() && !isSpectating) {
+            game_button_end.setDisable(false);
+        } else {
+            game_button_end.setDisable(true);
+        }
+    }
+
+    /**
+     * Updates the GUI whenever a turn is made.
+     *
+     * @param kbState the current state.
+     */
     private void onLastTurn(KBState kbState) {
         if (kbState.gameLastTurn == null)
             return;
@@ -266,27 +291,67 @@ public class GameViewController extends Controller implements Initializable {
         }
         // Highlight Terrain only for client
         if (kbState.nextPlayer == kbState.client.getClientId()) {
-            gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+            gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
         }
     }
 
+    /**
+     * Updates the GUI whenever a token is activated.
+     *
+     * @param state the current state.
+     */
     private void onTokenActivated(KBState state) {
-        if(state.game == null || state.game.currentPlayer == null)
+        if (state.game == null || state.game.currentPlayer == null)
             return;
 
         if (state.token == null) {
-            gameBoard.highlightTerrain(state.game.canPlaceSettlementsAll());
+            gameBoard.highlightTerrain(state.game.allBasicTurnTiles());
             return;
         }
 
+        // TODO: Replace "false" in switch with actual boolean
+        //   pass in correct parameters for two-stage/movement tokens
         TileType token = state.token;
         Game game = state.game;
-        gameBoard.highlightTerrain(game.previewToken(game.currentPlayer, token));
-        return;
+        switch (token) {
+
+            case ORACLE -> {
+                gameBoard.highlightTerrain(game.allTokenOracleTiles(game.currentPlayer));
+            }
+            case FARM -> {
+                gameBoard.highlightTerrain(game.allTokenFarmTiles(game.currentPlayer));
+            }
+            case TAVERN -> {
+                gameBoard.highlightTerrain(game.allTokenTavernTiles(game.currentPlayer));
+            }
+            case TOWER -> {
+                gameBoard.highlightTerrain(game.allTokenTowerTiles(game.currentPlayer));
+            }
+            case HARBOR -> {
+                gameBoard.highlightTerrain(game.allTokenHarborTiles(game.currentPlayer, false));
+            }
+            case PADDOCK -> {
+                gameBoard.highlightTerrain(game.allTokenPaddockTiles(game.currentPlayer));
+            }
+            case BARN -> {
+                gameBoard.highlightTerrain(game.allTokenBarnTiles(game.currentPlayer, false));
+            }
+            case OASIS -> {
+                gameBoard.highlightTerrain(game.allTokenOasisTiles(game.currentPlayer));
+            }
+            default -> {
+                throw new RuntimeException("Tile type is not a token!");
+            }
+        }
     }
 
+    /**
+     * Updates the GUI whenever the game changes in the state.
+     *
+     * @param state the current state.
+     */
     private void onGameChanged(KBState state) {
-        if(state.game == null || state.game.getPlayers() == null)
+        if (state.game == null || state.game.getPlayers() == null)
             return;
 
         // TOKENS
@@ -294,16 +359,16 @@ public class GameViewController extends Controller implements Initializable {
         gameview_hbox_tokens.getChildren().clear();
 
         if (state.game.currentPlayer != null && state.game.currentPlayer.ID == state.client.getClientId())
-        for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
-            if(entry.getValue() == 0)
-                continue;
+            for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
+                if (entry.getValue() == 0)
+                    continue;
 
-            Token token = new Token(entry.getKey(), entry.getValue(), this,
-                    areTokensDisabled, resourceBundle, store);
+                Token token = new Token(entry.getKey(), entry.getValue(), this,
+                        areTokensDisabled, resourceBundle, store);
 
-            tokens.add(token);
-            gameview_hbox_tokens.getChildren().add(token);
-        }
+                tokens.add(token);
+                gameview_hbox_tokens.getChildren().add(token);
+            }
 
         // MAP
         if (state.game.getMap() != null) {
@@ -369,6 +434,11 @@ public class GameViewController extends Controller implements Initializable {
         gameBoard.placeSettlement(x, y, color);
     }
 
+    /**
+     * Updates the terrain card when a new one is drawn.
+     *
+     * @param kbState the current state.
+     */
     private void onTerrainCardChanged(KBState kbState) {
         if (kbState.nextTerrainCard != null) {
             updateCardDescription(kbState.nextTerrainCard);
@@ -377,7 +447,7 @@ public class GameViewController extends Controller implements Initializable {
         // maybe bug?
         if (kbState.game != null && kbState.game.currentPlayer != null)
             if (kbState.nextPlayer == kbState.client.getClientId())
-                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+                gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
     }
 
     /**
@@ -697,7 +767,11 @@ public class GameViewController extends Controller implements Initializable {
      * @param actionEvent the triggered event.
      */
     private void onTurnEndButtonPressed(ActionEvent actionEvent) {
-        store.dispatch(new TurnEndAction());
+        // dispatch only if the basic turn is over
+        if (store.getState().game != null && store.getState().game.currentPlayer != null
+                && store.getState().game.currentPlayer.getRemainingSettlementsOfTurn() == 0) {
+            store.dispatch(new TurnEndAction());
+        }
     }
 
     /**
