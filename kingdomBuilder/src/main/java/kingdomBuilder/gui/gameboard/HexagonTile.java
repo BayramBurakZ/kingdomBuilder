@@ -53,8 +53,7 @@ public class HexagonTile extends Tile {
 
     private final Store<KBState> store;
 
-    private final int x;
-    private final int y;
+
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
@@ -64,10 +63,8 @@ public class HexagonTile extends Tile {
      * @param resource the ResourceBundle to translate text.
      */
     public HexagonTile(double xPos, double yPos, int x, int y, TileType tileType, ResourceBundle resource, Store<KBState> store) {
-        super(xPos, yPos, tileType, resource);
+        super(x, y, xPos, yPos, tileType, resource);
         this.store = store;
-        this.x = x;
-        this.y = y;
 
         // add settlement to this group
         getChildren().add(settlement);

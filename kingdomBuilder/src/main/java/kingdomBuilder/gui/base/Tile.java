@@ -26,16 +26,29 @@ public abstract class Tile extends Group {
     protected Game.TileType tileType;
 
     /**
+     * Represents the x-coordinate.
+     */
+    protected final int x;
+
+    /**
+     * Represents the y-coordinate.
+     */
+    protected final int y;
+
+    /**
      * Constructs a new Tile with the given parameters.
      * @param xPos the x position.
      * @param yPos the y position.
      * @param tileType the type of the hexagon.
      * @param resource the language support.
      */
-    protected Tile(double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
+    protected Tile(int x, int y, double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
         if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
+
+        this.x = x;
+        this.y = y;
 
         // create and add hexagon prism
         hexagon = new Hexagon(tileType);
@@ -63,5 +76,21 @@ public abstract class Tile extends Group {
      */
     public Game.TileType getTileType() {
         return tileType;
+    }
+
+    /**
+     * Gets the x-coordinate.
+     * @return the x-coordinate.
+     */
+    public int getX() {
+        return x;
+    }
+
+    /**
+     * Gets the y-coordinate.
+     * @return the y-coordinate.
+     */
+    public int getY() {
+        return y;
     }
 }

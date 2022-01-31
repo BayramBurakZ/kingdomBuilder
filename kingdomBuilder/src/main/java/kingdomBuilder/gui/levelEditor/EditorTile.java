@@ -17,9 +17,6 @@ public class EditorTile extends Tile {
      */
     private LevelEditorController levelEditorController;
 
-    private int x;
-    private int y;
-
     /**
      * Constructs a new Tile with the given parameters.
      *
@@ -31,7 +28,7 @@ public class EditorTile extends Tile {
      */
     protected EditorTile(int x, int y, double xPos, double yPos, Game.TileType tileType,
                          ResourceBundle resource, LevelEditorController controller) {
-        super(xPos, yPos, null, resource);
+        super(x, y, xPos, yPos, null, resource);
         levelEditorController = controller;
     }
 
@@ -48,17 +45,26 @@ public class EditorTile extends Tile {
             PhongMaterial mat = MaterialLoader.getMaterial(tmp);
             hexagon.setMaterial(mat);
         });
-    }
 
-    public Game.TileType getTileType() {
-        return tileType;
-    }
+        /*
+        // failed attempt to paint the terrain instead of clicking everytime
 
-    public int getX() {
-        return x;
-    }
+        setOnMouseEntered(event -> {
+            if (event.isPrimaryButtonDown())
+                System.out.println("links");
+            if (event.isSecondaryButtonDown())
+                System.out.println("rechts");
 
-    public int getY() {
-        return y;
+            if (event.isPrimaryButtonDown()) {
+                Game.TileType tmp = levelEditorController.getTileTypeFromCombobox();
+
+                tileType = tmp;
+
+                PhongMaterial mat = MaterialLoader.getMaterial(tmp);
+                hexagon.setMaterial(mat);
+            }
+        });
+        */
+
     }
 }
