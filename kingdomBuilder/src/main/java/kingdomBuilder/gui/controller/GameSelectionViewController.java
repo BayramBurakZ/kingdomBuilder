@@ -106,7 +106,7 @@ public class GameSelectionViewController extends Controller implements Initializ
     private void setupGameList() {
         gameselection_tableview.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         gameselection_column_id.setCellValueFactory(param -> new SimpleStringProperty(
-                String.valueOf(param.getValue().gameId())));;
+                String.valueOf(param.getValue().gameId())));
         gameselection_column_name.setCellValueFactory(param -> new SimpleStringProperty(
                 String.valueOf(param.getValue().gameName())));
         gameselection_column_players.setCellValueFactory(param -> new SimpleStringProperty(
@@ -123,6 +123,8 @@ public class GameSelectionViewController extends Controller implements Initializ
         gameselection_tableview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
 
+                if (newValue == null)
+                    return;
                 gameselection_label_gamename.setText(newValue.gameName());
                 ClientData host = store.getState().clients.get(newValue.clientId());
                 gameselection_label_hostname.setText(host != null ? host.name() : "???");

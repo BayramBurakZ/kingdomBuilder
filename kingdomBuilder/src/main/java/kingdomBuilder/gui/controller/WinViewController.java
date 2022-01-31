@@ -7,10 +7,11 @@ import javafx.scene.control.Label;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.network.protocol.Scores;
+import kingdomBuilder.network.protocol.ScoresData;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class WinViewController extends Controller implements Initializable {
 
@@ -86,24 +87,39 @@ public class WinViewController extends Controller implements Initializable {
      * @param scores the network message with all data.
      */
     public void setScoreWithName(Scores scores) {
-        Player[] players = store.getState().game.getPlayers();
+        HashMap<Integer, Player> players = store.getState().game.playersMap;
+        Collection<ScoresData> collection = new ArrayList<>();
+        collection.addAll(scores.scoresDataList());
 
-        for (Player p : players) {
-            if (p.ID == scores.scoresDataList().get(0).clientId()) {
-                win_label_name1.setText(p.name);
-                win_label_score1.setText(Integer.toString(scores.scoresDataList().get(0).score()));
-            }
-            if (p.ID == scores.scoresDataList().get(1).clientId()) {
-                win_label_name2.setText(p.name);
-                win_label_score2.setText(Integer.toString(scores.scoresDataList().get(1).score()));
-            }
-            if (p.ID == scores.scoresDataList().get(2).clientId()) {
-                win_label_name3.setText(p.name);
-                win_label_score3.setText(Integer.toString(scores.scoresDataList().get(2).score()));
-            }
-            if (p.ID == scores.scoresDataList().get(3).clientId()) {
-                win_label_name4.setText(p.name);
-                win_label_score4.setText(Integer.toString(scores.scoresDataList().get(3).score()));
+        ArrayList<ScoresData> score = (ArrayList<ScoresData>) collection;
+
+        // the message looks like this:
+        // [GAME_MESSAGE] [SCORES] <{[8;43],[7;44]}>')
+
+        score.sort(Comparator.comparing(ScoresData::score));
+
+        for (int i = 0; i < score.size(); i++) {
+            switch (i) {
+                case 0 -> {
+                    // Winner
+                    win_label_name1.setText(players.get(score.get(i).clientId()).name);
+                    win_label_score1.setText(Integer.toString(scores.scoresDataList().get(i).score()));
+                }
+                case 1 -> {
+                    // Winner
+                    win_label_name2.setText(players.get(score.get(i).clientId()).name);
+                    win_label_score2.setText(Integer.toString(scores.scoresDataList().get(i).score()));
+                }
+                case 2 -> {
+                    // Winner
+                    win_label_name3.setText(players.get(score.get(i).clientId()).name);
+                    win_label_score3.setText(Integer.toString(scores.scoresDataList().get(i).score()));
+                }
+                case 3 -> {
+                    // Winner
+                    win_label_name4.setText(players.get(score.get(i).clientId()).name);
+                    win_label_score4.setText(Integer.toString(scores.scoresDataList().get(i).score()));
+                }
             }
         }
     }
