@@ -184,7 +184,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      */
     @Override
     public void placeSettlement(int x, int y) {
-        //hack because server uses stupid row/column is y/x
+        //hack because server uses row/column is y/x
         final String command = ProtocolSerializer.serialize(new Place(y, x));
         trySendCommand(command);
     }
@@ -195,6 +195,87 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void endTurn() {
         final String command = ProtocolSerializer.serialize(new EndTurn());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useOracleToken(int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Oracle(y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useFarmToken(int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Farm(y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public void useTavernToken(int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Tavern(y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useTowerToken(int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Tower(y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useOasisToken(int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Oasis(y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useHarborToken(int fromX, int fromY, int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Harbor(fromY, fromX, y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void usePaddockToken(int fromX, int fromY, int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Paddock(fromY, fromX, y, x));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void useBarnToken(int fromX, int fromY, int x, int y) {
+        //hack because server uses row/column is y/x
+        final String command = ProtocolSerializer.serialize(new Barn(fromY, fromX, y, x));
         trySendCommand(command);
     }
 
@@ -307,7 +388,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void accept(GameHosted message) {
         onGameHosted.dispatch(message);
-    } // TODO: use GameData in network message
+    }
 
     @Override
     public void accept(YouAreRoot message) {

@@ -87,7 +87,7 @@ public class KBState {
     public Game game;
 
     /**
-     * Represents the last turns that was taken in the current game.
+     * Represents the last turn that was taken in the current game.
      */
     public Turn gameLastTurn;
 
@@ -101,7 +101,6 @@ public class KBState {
      */
     public int nextPlayer;
 
-    // lol
     public boolean gameStarted;
 
     public List<Player> players;

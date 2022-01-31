@@ -439,9 +439,71 @@ public abstract class Client {
     public abstract void placeSettlement(int x, int y);
 
     /**
-     * Send an EndTurn Message to the server.
+     * Sends an EndTurn Message to the server.
      */
     public abstract void endTurn();
+
+    /**
+     * Sends an Oracle message to the server.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public abstract void useOracleToken(int x, int y);
+
+    /**
+     * Sends a Farm message to the server.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public abstract void useFarmToken(int x, int y);
+
+    /**
+     * Sends a Tavern message to the server.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public abstract void useTavernToken(int x, int y);
+
+    /**
+     * Sends a Tower message to the server.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public abstract void useTowerToken(int x, int y);
+
+    /**
+     * Sends an Oasis message to the server.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
+    public abstract void useOasisToken(int x, int y);
+
+    /**
+     * Sends a Harbor message to the server.
+     * @param fromX the x-coordinate from which the settlement will be removed.
+     * @param fromY the y-coordinate from which the settlement will be removed.
+     * @param x the x-coordinate to which the settlement will be moved.
+     * @param y the y-coordinate to which the settlement will be moved.
+     */
+    public abstract void useHarborToken(int fromX, int fromY, int x, int y);
+
+    /**
+     * Sends a Paddock message to the server.
+     * @param fromX the x-coordinate from which the settlement will be removed.
+     * @param fromY the y-coordinate from which the settlement will be removed.
+     * @param x the x-coordinate to which the settlement will be moved.
+     * @param y the y-coordinate to which the settlement will be moved.
+     */
+    public abstract void usePaddockToken(int fromX, int fromY, int x, int y);
+
+    /**
+     * Sends a Barn message to the server.
+     * @param fromX the x-coordinate from which the settlement will be removed.
+     * @param fromY the y-coordinate from which the settlement will be removed.
+     * @param x the x-coordinate to which the settlement will be moved.
+     * @param y the y-coordinate to which the settlement will be moved.
+     */
+    public abstract void useBarnToken(int fromX, int fromY, int x, int y);
 
     /**
      * {@return whether the client has commands stored internally

@@ -615,7 +615,8 @@ public class Game {
      * @param terrain the terrain.
      * @return the set of Tiles where the player could place a settlement.
      */
-    public Set<Tile> updatePreviewWithTerrain(Player player, TileType terrain) {
+    public Set<Tile>
+    updatePreviewWithTerrain(Player player, TileType terrain) {
         //TODO: TileReadOnly
 
         if(player.remainingSettlementsOfTurn <=  0)
