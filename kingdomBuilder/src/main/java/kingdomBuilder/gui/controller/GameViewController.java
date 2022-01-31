@@ -16,8 +16,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.TurnEndAction;
@@ -30,7 +28,6 @@ import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
-import kingdomBuilder.network.protocol.PlayerData;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -191,13 +188,86 @@ public class GameViewController extends Controller implements Initializable {
         // TOKEN
         store.subscribe(this::onTokenActivated, "token");
         // TERRAIN CARD
-        store.subscribe(this::onGameLastTurnChanges, "nextTerrainCard");
+        store.subscribe(this::onTerrainCardChanged, "nextTerrainCard");
+        // LAST TURN (place/move settlement, highlight board for client)
+        store.subscribe(this::onLastTurn, "gameLastTurn");
 
         store.subscribe(state -> {
             if (store.getState().scores != null) {
                 sceneLoader.showWinView(state.scores);
             }
         }, "scores");
+    }
+
+    /**
+     * Called to initialize this controller after its root element has been completely processed.
+     *
+     * @param location  the location used to resolve relative paths for the root object,
+     *                  or null if the location is not known.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
+     */
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        //TODO: Subscribers:
+        // - PlayerData settlements -> updateSettlementsForPlayer()
+        // - PlayerData score -> updateScoreForPlayer()
+        // - Tokens from the current Player -> updateTokens()
+        // - Token used -> updateTokens()
+        // - In Basic turn -> disableTokens(false/true)
+        // - if PlayersTurn -> disableTokens(false / true)
+
+        resourceBundle = resources;
+
+        store.subscribe(kbState -> {
+            // START TURN
+            if (kbState.nextPlayer >= 0 && kbState.gameStarted) {
+                // only preview for this client
+                if (kbState.nextPlayer == kbState.client.getClientId())
+                    gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+            }
+        }, "gameStarted", "nextPlayer");
+
+        // set the initial layout of the view
+        setupLayout();
+
+        game_subscene.setFill(Color.LIGHTSKYBLUE);
+
+        // create a testBox
+        /*
+        Box box = new Box(100, 100, 100);
+        box.setMaterial(new PhongMaterial(
+                Color.WHITE, TextureLoader.getTileTexture(TileType.FARM), null, null, null)
+        );
+        box.translateXProperty().set(1500);
+        box.translateYProperty().set(1500);
+        box.setOnMouseEntered(e -> {
+            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.CHOCOLATE);
+        });
+        box.setOnMouseExited(e -> {
+            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.WHITE);
+        });
+        gameBoard_group.getChildren().add(box);
+        */
+    }
+
+    private void onLastTurn(KBState kbState) {
+        if (kbState.gameLastTurn == null)
+            return;
+
+        ServerTurn lastTurn = kbState.gameLastTurn instanceof ServerTurn ?
+                (ServerTurn) kbState.gameLastTurn : null;
+
+        if (lastTurn != null) {
+            PlayerColor color = kbState.game.playersMap.get(lastTurn.clientId).color;
+            switch (lastTurn.type) {
+                case PLACE -> setServerSettlement(lastTurn.x, lastTurn.y, color);
+                case MOVE -> moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
+            }
+        }
+        // Highlight Terrain only for client
+        if (kbState.nextPlayer == kbState.client.getClientId()) {
+            gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+        }
     }
 
     private void onTokenActivated(KBState state) {
@@ -288,76 +358,6 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     /**
-     * Called to initialize this controller after its root element has been completely processed.
-     *
-     * @param location  the location used to resolve relative paths for the root object,
-     *                  or null if the location is not known.
-     * @param resources the resources used to localize the root object, or null if the root object was not localized.
-     */
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        //TODO: Subscribers:
-        // - PlayerData settlements -> updateSettlementsForPlayer()
-        // - PlayerData score -> updateScoreForPlayer()
-        // - Tokens from the current Player -> updateTokens()
-        // - Token used -> updateTokens()
-        // - In Basic turn -> disableTokens(false/true)
-        // - if PlayersTurn -> disableTokens(false / true)
-
-        resourceBundle = resources;
-
-        // subscribe to the GAME_LAST_TURN object in the state
-        store.subscribe(kbState -> {
-            if (kbState.gameLastTurn == null)
-                return;
-
-            ServerTurn lastTurn = kbState.gameLastTurn instanceof ServerTurn ?
-                    (ServerTurn) kbState.gameLastTurn : null;
-
-            if (lastTurn != null) {
-                PlayerColor color = kbState.game.playersMap.get(lastTurn.clientId).color;
-                switch (lastTurn.type) {
-                    case PLACE -> setServerSettlement(lastTurn.x, lastTurn.y, color);
-                    case MOVE -> moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
-                }
-            }
-            // Highlight Terrain only for client
-            if (kbState.nextPlayer == kbState.client.getClientId()) {
-                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
-            }
-        }, "gameLastTurn");
-
-        store.subscribe(kbState -> {
-            // START TURN
-            if (kbState.nextPlayer >= 0 && kbState.gameStarted) {
-                // only preview for this client
-                if (kbState.nextPlayer == kbState.client.getClientId())
-                    gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
-            }
-        }, "gameStarted", "nextPlayer");
-
-        // set the initial layout of the view
-        setupLayout();
-
-        game_subscene.setFill(Color.LIGHTSKYBLUE);
-
-        // create a testBox
-        Box box = new Box(100, 100, 100);
-        box.setMaterial(new PhongMaterial(
-                Color.WHITE, TextureLoader.getTileTexture(TileType.FARM), null, null, null)
-        );
-        box.translateXProperty().set(1500);
-        box.translateYProperty().set(1500);
-        box.setOnMouseEntered(e -> {
-            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.CHOCOLATE);
-        });
-        box.setOnMouseExited(e -> {
-            ((PhongMaterial) box.getMaterial()).setDiffuseColor(Color.WHITE);
-        });
-        gameBoard_group.getChildren().add(box);
-    }
-
-    /**
      * Sets a settlement that comes from a server message.
      *
      * @param x     the x-coordinate.
@@ -369,14 +369,15 @@ public class GameViewController extends Controller implements Initializable {
         gameBoard.placeSettlement(x, y, color);
     }
 
-    private void onGameLastTurnChanges(KBState kbState) {
+    private void onTerrainCardChanged(KBState kbState) {
         if (kbState.nextTerrainCard != null) {
             updateCardDescription(kbState.nextTerrainCard);
         }
 
         // maybe bug?
         if (kbState.game != null && kbState.game.currentPlayer != null)
-            gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
+            if (kbState.nextPlayer == kbState.client.getClientId())
+                gameBoard.highlightTerrain(kbState.game.canPlaceSettlementsAll());
     }
 
     /**
