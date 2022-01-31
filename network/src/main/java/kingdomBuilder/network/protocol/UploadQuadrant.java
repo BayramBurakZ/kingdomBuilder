@@ -122,7 +122,7 @@ public record UploadQuadrant(
         String fieldType99,
         String fieldType100
 ) {
-    public UploadQuadrant fromString(String fields) {
+    public static UploadQuadrant fromString(String fields) {
         String[] fieldsArray = fields.split(";");
         return new UploadQuadrant(
                 fieldsArray[0],

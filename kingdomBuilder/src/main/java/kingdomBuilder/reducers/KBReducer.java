@@ -97,6 +97,8 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if( action instanceof ScoreAction a)
             return reduce(oldState, a);
+        else if( action instanceof UploadQuadrantAction a)
+            return reduce(oldState, a);
 
             System.out.println("Unknown action");
         return new DeferredState(oldState);
@@ -227,6 +229,11 @@ public class KBReducer implements Reducer<KBState> {
         client.login(oldState.clientPreferredName);
 
         client.onScores.subscribe(m -> store.dispatch(new ScoreAction(m)));
+
+        client.onQuadrantUploaded.subscribe(m ->{
+            // TODO: maybe make a chat message that someone has uploaded a new quadrant
+           client.quadrantRequest(m.quadrantId());
+        });
 
         state.setClient(client);
         state.setIsConnecting(true);
@@ -571,5 +578,11 @@ public class KBReducer implements Reducer<KBState> {
         state.setScores(a.scores);
 
         return state;
+    }
+
+    private DeferredState reduce(KBState oldState, UploadQuadrantAction a){
+
+        oldState.client.uploadQuadrant(a.quadrant);
+        return new DeferredState(oldState);
     }
 }

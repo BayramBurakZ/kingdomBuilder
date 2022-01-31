@@ -506,6 +506,12 @@ public abstract class Client {
     public abstract void useBarnToken(int fromX, int fromY, int x, int y);
 
     /**
+     * Uploads a quadrant to the server.
+     * @param quadrant the quadrant.
+     */
+    public abstract void uploadQuadrant(String quadrant);
+
+    /**
      * {@return whether the client has commands stored internally
      *  that were not transmitted successfully to the server yet.}
      */

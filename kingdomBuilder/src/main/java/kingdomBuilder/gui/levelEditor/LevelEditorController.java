@@ -9,9 +9,12 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import kingdomBuilder.KBState;
+import kingdomBuilder.actions.game.UploadQuadrantAction;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.security.InvalidParameterException;
@@ -31,6 +34,16 @@ public class LevelEditorController extends Controller implements Initializable {
      * Represents the angle for the camera.
      */
     private static final double VIEW_ANGLE = 30.0;
+
+    /**
+     * Represents the limit for castles in one quadrant defined by the server.
+     */
+    private static final int CASTLE_LIMIT = 3;
+
+    /**
+     * Represents the limit for special places in one quadrant defined by the server.
+     */
+    private static final int SPECIAL_LIMIT = 3;
 
     /**
      * Represents the root hBox.
@@ -88,6 +101,13 @@ public class LevelEditorController extends Controller implements Initializable {
      */
     private EditorTile[][] board;
 
+    /**
+     * Constructs a new LevelEditorController.
+     * @param store the reference to the store.
+     */
+    public LevelEditorController(Store<KBState> store) {
+        super.store = store;
+    }
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
@@ -195,9 +215,20 @@ public class LevelEditorController extends Controller implements Initializable {
      */
     private void uploadQuadrant() {
         System.out.println("Simulated upload complete!");
-        //TODO: implement
+        String types = "";
 
-        //TODO: Network: send Message "upload"
+        for (EditorTile[] row : editorBoard.board) {
+            for (EditorTile tile : row) {
+                if (tile.getX() == 9 && tile.getY() == 9)
+                    types += tile.getTileType();
+
+                types += tile.getTileType() + ";";
+            }
+        }
+
+        System.out.println(types);
+
+        store.dispatch(new UploadQuadrantAction(types));
     }
 
     /**
@@ -313,12 +344,35 @@ public class LevelEditorController extends Controller implements Initializable {
      * @return True if all tiles are placed. False otherwise.
      */
     public boolean allTilesArePlaced() {
+        int castles = 0;
+        int special = 0;
+
         for (EditorTile[] row : board) {
             for (EditorTile e : row) {
-                if(e.getTileType() == null)
+                if(e.getTileType() == null) {
+                    System.out.println("Not all Tiles are set!");
                     return false;
+                }
+
+                if(e.getTileType() == Game.TileType.CASTLE)
+                    castles++;
+
+                if(Game.tokenType.contains(e.getTileType()))
+                    special++;
             }
         }
+
+        // seems the server don't accept quadrants with more than 3 castles or more than 3 special places
+        if (castles > CASTLE_LIMIT) {
+            System.out.println("Castle Limit is 3!");
+            return false;
+        }
+
+        if (special > SPECIAL_LIMIT) {
+            System.out.println("Special Place Limit is 3!");
+            return false;
+        }
+
         return true;
     }
 }

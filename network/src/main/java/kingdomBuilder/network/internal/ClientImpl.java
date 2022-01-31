@@ -283,6 +283,15 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void uploadQuadrant(String quadrant) {
+        final String command = ProtocolSerializer.serialize(UploadQuadrant.fromString(quadrant));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean hasPendingCommands() {
         return ioHandler.hasPendingCommands();
     }

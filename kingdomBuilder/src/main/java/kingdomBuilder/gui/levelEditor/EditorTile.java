@@ -17,6 +17,9 @@ public class EditorTile extends Tile {
      */
     private LevelEditorController levelEditorController;
 
+    private int x;
+    private int y;
+
     /**
      * Constructs a new Tile with the given parameters.
      *
@@ -26,7 +29,7 @@ public class EditorTile extends Tile {
      * @param resource the language support.
      * @param controller the LevelEditorController.
      */
-    protected EditorTile(double xPos, double yPos, Game.TileType tileType,
+    protected EditorTile(int x, int y, double xPos, double yPos, Game.TileType tileType,
                          ResourceBundle resource, LevelEditorController controller) {
         super(xPos, yPos, null, resource);
         levelEditorController = controller;
@@ -45,5 +48,17 @@ public class EditorTile extends Tile {
             PhongMaterial mat = MaterialLoader.getMaterial(tmp);
             hexagon.setMaterial(mat);
         });
+    }
+
+    public Game.TileType getTileType() {
+        return tileType;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
     }
 }

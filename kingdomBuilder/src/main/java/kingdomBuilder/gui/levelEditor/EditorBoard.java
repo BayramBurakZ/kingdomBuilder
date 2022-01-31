@@ -53,7 +53,7 @@ public class EditorBoard extends Board {
     @Override
     public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
                                  Game.TileType tileType, ResourceBundle resource) {
-        EditorTile editorTile = new EditorTile(xPos, yPos, null, resource, editorController);
+        EditorTile editorTile = new EditorTile(x, y, xPos, yPos, null, resource, editorController);
         board[x][y] = editorTile;
 
         group.getChildren().add(editorTile);
