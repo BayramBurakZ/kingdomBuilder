@@ -4,6 +4,7 @@ import kingdomBuilder.network.protocol.MyGameReply;
 
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Contains all the information of a game hosted on the server.
@@ -291,14 +292,9 @@ public class Game {
 
     // TODO: JavaDoc
     public void startTurn(int clientId, TileType terrainCard) {
-        startTurn(playerIDtoObject(clientId), terrainCard);
-    }
-
-    // TODO: JavaDoc
-    private void startTurn(Player player, TileType terrainCard) {
-        currentPlayer = player;
-        player.remainingSettlementsOfTurn = 3;
-        player.startTurn(terrainCard);
+        var currentPlayer = playerIDtoObject(clientId);
+        currentPlayer.remainingSettlementsOfTurn = 3;
+        currentPlayer.startTurn(terrainCard);
     }
 
     // TODO: JavaDoc
@@ -563,7 +559,7 @@ public class Game {
     }
 
     /**
-     * Gets all free tiles that are next to a players settlement.
+     * Gets all free tiles that are next to a player's settlement.
      *
      * @param player the player of the settlements.
      * @return
@@ -571,7 +567,10 @@ public class Game {
     public Set<Tile> allPossibleSettlementPlacementsOnBorderOfMap(Player player) {
         Set<Tile> allPossiblePlacementsAtBorder = new HashSet<>();
 
-
+        Set<Tile> tilesOnBorder = map.borderOfMap();
+        tilesOnBorder.stream().filter(tile -> tile.isTilePlaceable() && tile.isOccupiedByPlayer(player));
+        // TODO:
+        /*
         for (Tile tile : map.allSettlementsOfPlayerOnBorderOfMap(player)) {
             if (tile.x == 0 || tile.x == map.mapWidth - 1) {
 
@@ -603,6 +602,7 @@ public class Game {
                     allPossiblePlacementsAtBorder.add(map.at(tile.x + 1, tile.y));
             }
         }
+        */
 
         return allPossiblePlacementsAtBorder;
     }
@@ -615,8 +615,7 @@ public class Game {
      * @param terrain the terrain.
      * @return the set of Tiles where the player could place a settlement.
      */
-    public Set<Tile>
-    updatePreviewWithTerrain(Player player, TileType terrain) {
+    public Set<Tile> updatePreviewWithTerrain(Player player, TileType terrain) {
         //TODO: TileReadOnly
 
         if(player.remainingSettlementsOfTurn <=  0)
@@ -693,29 +692,19 @@ public class Game {
         if (!player.playerHasTokenLeft(tokenType))
             return null;
 
-        switch (tokenType) {
-
-            case ORACLE:
-                return previewTokenOracle(player);
-            case FARM:
-                return previewTokenFarm(player);
-            case TAVERN:
-                return previewTokenTavern(player);
-            case TOWER:
-                return previewTokenTower(player);
-            case OASIS:
-                return previewTokenOasis(player);
+        return switch (tokenType) {
+            case ORACLE -> previewTokenOracle(player);
+            case FARM -> previewTokenFarm(player);
+            case TAVERN -> previewTokenTavern(player);
+            case TOWER -> previewTokenTower(player);
+            case OASIS -> previewTokenOasis(player);
 
             // Following three Tokens have one preview for selecting a token and one for placing one.
-            case HARBOR:
-                return previewAllPlayerSettlements(player);
-            case PADDOCK:
-                 return previewAllPlayerSettlements(player);
-            case BARN:
-                return previewAllPlayerSettlements(player);
-            default:
-                return null;
-        }
+            case HARBOR -> previewAllPlayerSettlements(player);
+            case PADDOCK -> previewAllPlayerSettlements(player);
+            case BARN -> previewAllPlayerSettlements(player);
+            default -> null;
+        };
     }
 
 
@@ -732,7 +721,6 @@ public class Game {
 
         if (!canPlaceSettlementOnTerrain(player, player.getTerrainCard(), x, y))
             throw new RuntimeException("can't use token oracle");
-
 
         //placeSettlement(player, x, y);
         player.useToken(TileType.ORACLE);
@@ -828,7 +816,7 @@ public class Game {
      */
     private Set<Tile> previewTokenTower(Player player) {
         //TODO: TileReadOnly
-
+        //return map.stream().filter(tile -> tile.isAtBorder(map) && tile.isOccupiedByPlayer(player)).collect(Collectors.toSet());
         return allPossibleSettlementPlacementsOnBorderOfMap(player);
     }
 
@@ -874,7 +862,7 @@ public class Game {
             throw new RuntimeException("can't use token harbor");
 
         //moveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY);
-        player.useToken(TileType.OASIS);
+        player.useToken(TileType.HARBOR);
     }
 
     /**

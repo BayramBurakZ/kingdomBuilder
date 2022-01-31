@@ -123,10 +123,10 @@ public class MapTest {
         Tile desert = map.at(0, 5);
         Tile forest = map.at(0, 1);
 
-        Iterator<Tile> allGrasTiles = map.getEntireTerrain(TileType.GRAS).iterator();
-        Iterator<Tile> allDesertTiles = map.getEntireTerrain(TileType.DESERT).iterator();
-        Iterator<Tile> allFlowerTiles = map.getEntireTerrain(TileType.FLOWER).iterator();
-        Iterator<Tile> allForestTiles = map.getEntireTerrain(TileType.FORREST).iterator();
+        Iterator<Tile> allGrasTiles = map.getTiles(TileType.GRAS).iterator();
+        Iterator<Tile> allDesertTiles = map.getTiles(TileType.DESERT).iterator();
+        Iterator<Tile> allFlowerTiles = map.getTiles(TileType.FLOWER).iterator();
+        Iterator<Tile> allForestTiles = map.getTiles(TileType.FORREST).iterator();
 
         Tile current;
         boolean foundTile = false;

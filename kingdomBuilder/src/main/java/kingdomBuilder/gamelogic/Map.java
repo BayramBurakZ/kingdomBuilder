@@ -7,11 +7,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static kingdomBuilder.gamelogic.Game.*;
 
@@ -28,7 +25,7 @@ public class Map implements Iterable<Tile> {
     /**
      * Represents the tiles of the map in a 1D array.
      */
-    protected final Tile[] tiles;
+    private final Tile[] tiles;
 
     /**
      * Represents the width of a quadrant.
@@ -337,12 +334,25 @@ public class Map implements Iterable<Tile> {
         };
     }
 
+    /**
+     * Returns a stream of all the tiles of the map.
+     * @return the stream of all the tiles of the map.
+     */
+    public Stream<Tile> stream() {
+        return Arrays.stream(tiles);
+    }
+
+    /**
+     * Returns an iterator over all the tiles of the map.
+     * @return the iterator over all the tiles of the map.
+     */
     @NotNull
     @Override
     public Iterator<Tile> iterator() {
         return Arrays.stream(tiles).iterator();
     }
 
+    /*
     private class SurroundingTilesCollector implements Collector<Tile, Set<Tile>, Set<Tile>> {
 
         private final Set<Tile> originalTiles;
@@ -385,11 +395,15 @@ public class Map implements Iterable<Tile> {
             return Set.of(Characteristics.CONCURRENT, Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
         }
     }
-
-    // TODO: JavaDoc!
-    public SurroundingTilesCollector toSurroundingTilesSet(Set<Tile> tiles) {
-        return new SurroundingTilesCollector(tiles);
-    }
+    */
+    ///**
+    // * Returns a set of all surrounding tiles of the given tiles.
+    // * @param tiles tiles of the map.
+    // * @return a set of all surrounding tiles of the given tiles.
+    // */
+    //public SurroundingTilesCollector toSurroundingTilesSet(Set<Tile> tiles) {
+    //    return new SurroundingTilesCollector(tiles);
+    //}
 
     /**
      * Check if settlement of a player has at least one neighbour.
@@ -581,43 +595,25 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
-     * Gets all settlements of a player at the border of the map.
+     * Gets all Tiles at border of map.
      *
-     * @param player the player to look for.
-     * @return all settlements of player at border of map.
+     * @return all tiles that are at the border of the map.
      */
-    public Set<Tile> allSettlementsOfPlayerOnBorderOfMap(Player player) {
-        Set<Tile> allSettlementsOfPlayerOnBorder = new HashSet<>();
+    public Set<Tile> borderOfMap() {
+        Set<Tile> border = new HashSet<>();
 
         for (int x = 0; x < mapWidth; x++) {
-
-            if (at(x, 0).isOccupiedByPlayer(player)) {
-                // top border
-                allSettlementsOfPlayerOnBorder.add(at(x, 0));
-            }
-
-            if (at(x, mapWidth - 1).isOccupiedByPlayer(player)) {
-                // bottom border
-                allSettlementsOfPlayerOnBorder.add(at(x, mapWidth - 1));
-            }
+            border.add(at(x, 0));
+            border.add(at(x, mapWidth - 1));
         }
 
         for (int y = 0; y < mapWidth; y++) {
-
-            if (at(0, y).isOccupiedByPlayer(player)) {
-                // left border
-                allSettlementsOfPlayerOnBorder.add(at(0, y));
-            }
-
-            if (at(mapWidth - 1, y).isOccupiedByPlayer(player)) {
-                // right border
-                allSettlementsOfPlayerOnBorder.add(at(mapWidth, y));
-            }
+            border.add(at(0, y));
+            border.add(at(mapWidth - 1, y));
         }
 
-        return allSettlementsOfPlayerOnBorder;
+        return border;
     }
-
 
     /**
      * Gets all free tiles that are skipped from a given position.
@@ -792,21 +788,11 @@ public class Map implements Iterable<Tile> {
      * @param terrain the terrain to filter.
      * @return All tiles of a type.
      */
-    public Set<Tile> getEntireTerrain(TileType terrain) {
+    public Set<Tile> getTiles(TileType terrain) {
         if (nonPlaceableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
-        Set<Tile> entireTerrain = new HashSet<>();
-
-        // return Arrays.stream(tiles).filter(t -> t.isTilePlaceable()).collect(Collectors.toSet());
-        for (int y = 0; y < mapWidth; y++) {
-            for (int x = 0; x < mapWidth; x++) {
-                if (at(x, y).tileType == terrain) {
-                    entireTerrain.add(at(x, y));
-                }
-            }
-        }
-        return entireTerrain;
+        return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
     }
 
     /**
@@ -821,7 +807,7 @@ public class Map implements Iterable<Tile> {
 
         Set<Tile> freeTiles = new HashSet<>();
 
-        for (Tile tile : getEntireTerrain(terrain)) {
+        for (Tile tile : getTiles(terrain)) {
 
             if (tile.isTilePlaceable())
                 freeTiles.add(tile);
@@ -874,10 +860,10 @@ public class Map implements Iterable<Tile> {
      * @param terrain the terrain to check for.
      * @return true if terrain has no more free tiles. False otherwise.
      */
-    public boolean terrainIsFull(TileType terrain){
+    public boolean terrainIsFull(TileType terrain) {
 
-        for(Tile tile : getEntireTerrain(terrain)){
-            if(tile.isTilePlaceable()){
+        for (Tile tile : getTiles(terrain)) {
+            if (tile.isTilePlaceable()) {
                 return false;
             }
         }

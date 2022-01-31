@@ -1,7 +1,6 @@
 package kingdomBuilder.gamelogic;
 
-import static kingdomBuilder.gamelogic.Game.nonPlaceableTileTypes;
-import static kingdomBuilder.gamelogic.Game.tokenType;
+import static kingdomBuilder.gamelogic.Game.*;
 
 /**
  * Contains the data of a tile.
@@ -98,24 +97,7 @@ public class TileReadOnly {
      */
     public boolean isTilePlaceable() {
 
-        if (tokenType.contains(tileType))
-            return false;
-        else if (isOccupied())
-            return false;
-        else return !nonPlaceableTileTypes.contains(tileType);
-    }
-
-    /**
-     * Checks if tile is placeable on water.
-     *
-     * @return True if placeable on water. False otherwise.
-     */
-    public boolean isTilePlaceableOnWater() {
-        if (tileType != Game.TileType.WATER)
-            return false;
-        else if (isOccupied())
-            return false;
-        else return !nonPlaceableTileTypes.contains(tileType);
+        return placeableTileTypes.contains(tileType);
     }
 
     /**
