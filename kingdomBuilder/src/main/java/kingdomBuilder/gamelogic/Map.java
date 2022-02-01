@@ -309,7 +309,7 @@ public class Map implements Iterable<Tile> {
      * @return Whether the coordinates are within the boundaries of the map.
      */
     public boolean isWithinBounds(int x, int y) {
-        return (x >= 0 || y >= 0 || x < mapWidth || y < mapWidth);
+        return (x >= 0 && y >= 0 && x < mapWidth && y < mapWidth);
     }
 
     /**

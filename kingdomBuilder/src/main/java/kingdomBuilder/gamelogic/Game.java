@@ -479,7 +479,8 @@ public class Game {
         Set<Tile> freeTiles = map.getTiles(terrain);
 
         for (Tile freeTile : freeTiles) {
-            if (map.at(freeTile.x, freeTile.y).hasSurroundingSettlement(map, player)) {
+            if (map.at(freeTile.x, freeTile.y).hasSurroundingSettlement(map, player) &&
+                    !map.at(freeTile.x, freeTile.y).isOccupied()) {
                 allowedTiles.add(freeTile);
             }
         }
@@ -497,6 +498,8 @@ public class Game {
      */
     protected Set<Tile> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
         Set<Tile> allPossiblePlacements = freeTilesNextToSettlements(player, terrain);
+        // TODO: remove occupied tiles from map.getTiles(terrain)
+        //  we won't highlight them ~Tom
         return (allPossiblePlacements.isEmpty()) ? map.getTiles(terrain) : allPossiblePlacements;
     }
 

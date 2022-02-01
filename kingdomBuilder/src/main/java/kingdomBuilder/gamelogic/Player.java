@@ -35,7 +35,7 @@ public class Player {
      */
     private final HashMap<TileType, Token> tokens;
 
-    // data of the placyer's current/next turn
+    // data of the player's current/next turn
     /**
      * Represents the terrain card for this player.
      */
