@@ -9,12 +9,9 @@ import kingdomBuilder.actions.general.ApplicationExitAction;
 import kingdomBuilder.actions.general.ConnectAction;
 import kingdomBuilder.actions.general.DisconnectAction;
 import kingdomBuilder.actions.general.LoggedInAction;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.Game.WinCondition;
-import kingdomBuilder.gamelogic.Map;
-import kingdomBuilder.gamelogic.Player;
-import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -430,7 +427,7 @@ public class KBReducer implements Reducer<KBState> {
         final var game = oldState.game;
 
         if (oldState.players != null) {
-            game.startTurn(oldState.nextPlayer, TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+            game.currentPlayer.setTerrainCard(TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
             state.setGame(game);
         }
 
@@ -442,6 +439,11 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, TurnStartAction a) {
         DeferredState state = new DeferredState(oldState);
         final var game = oldState.game;
+
+        if (oldState.players != null) {
+            game.startTurn(a.turnStart.clientId());
+            state.setGame(game);
+        }
 
         state.setNextPlayer(a.turnStart.clientId());
         return state;
@@ -542,7 +544,8 @@ public class KBReducer implements Reducer<KBState> {
         if (oldState.gameStarted == false && oldState.players != null &&
                 oldState.game.getMyGameReply().playerLimit() == oldState.players.size()
                 && oldState.nextPlayer >= 0 && oldState.nextTerrainCard != null) {
-            game.startTurn(oldState.nextPlayer, oldState.nextTerrainCard);
+            game.startTurn(oldState.nextPlayer);
+            game.currentPlayer.setTerrainCard(oldState.nextTerrainCard);
             state.setGameStarted(true);
             state.setGame(game);
         }
@@ -552,8 +555,11 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, ReceiveTokenAction a) {
         DeferredState state = new DeferredState(oldState);
 
-        state.setGame(oldState.game);
+        System.out.println(a.getPayload().column() + ", " + a.getPayload().row());
 
+        oldState.game.addToken(a.getPayload().column(), a.getPayload().row());
+
+        state.setGame(oldState.game);
         return state;
     }
 

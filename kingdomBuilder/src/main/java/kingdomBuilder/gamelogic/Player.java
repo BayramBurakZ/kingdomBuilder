@@ -49,11 +49,12 @@ public class Player {
     /**
      * Class that represents a token.
      */
-    private static class Token {
-        HashSet<Tile> originTiles = new HashSet<>();
-        int remaining;
+    public static class Token {
+        private final HashSet<Tile> originTiles = new HashSet<>();
+        private int remaining;
 
-        int total() {
+        public int getRemaining() { return remaining; }
+        public int getTotal() {
             return originTiles.size();
         }
     }
@@ -77,13 +78,16 @@ public class Player {
 
     /**
      * Updates the information for the player at the start of a turn.
-     *
-     * @param terrainCard the TileType of the terrain card of the turn.
      */
-    void startTurn(TileType terrainCard) {
-        this.terrainCard = terrainCard;
+    void startTurn() {
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
-        tokens.forEach((tileType, token) -> token.remaining = token.total());
+        tokens.forEach((tileType, token) -> token.remaining = token.getTotal());
+    }
+
+    // TODO: make it better
+    //  Problem here: more than one Terrain Card per Turn
+    public void setTerrainCard(TileType tileType) {
+        this.terrainCard = tileType;
     }
 
     void endTurn() {
@@ -96,21 +100,24 @@ public class Player {
      * @param originTile the tile whose token is given to the player.
      */
     void addToken(Tile originTile) {
+
         if (!tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
 
         Token token = tokens.get(originTile.tileType);
 
-        //if (token.originTiles.contains(originTile))
-        //    throw new RuntimeException("The player already owns a token from this tile!");
-
-        if (originTile.hasTokens()) {
-            originTile.takeTokenFromSpecialPlace();
+        if (originTile.hasTokens() && !token.originTiles.contains(originTile)) {
             token.originTiles.add(originTile);
+            originTile.takeTokenFromSpecialPlace();
         }
     }
 
-    public boolean hasToken(Tile originTile) {
+    /**
+     * Returns whether the player has a token from the specified special place.
+     * @param originTile the special place the player might own a token from.
+     * @return whether the player has a token from the specified special place.
+     */
+    public boolean hasTokenFrom(Tile originTile) {
         if (!tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
 
@@ -175,54 +182,13 @@ public class Player {
     }
 
     /**
-     * Returns the amount of tokens from a type the player has.
-     *
-     * @param tokenType the token type to check.
-     * @return The amount of that type.
-     */
-    public int getRemainingTokens(TileType tokenType) {
-        return tokens.get(tokenType).remaining;
-    }
-
-    /**
-     * Returns the amount of tokens from a type the player has.
-     *
-     * @param tokenType the token type to check.
-     * @return The amount of that type.
-     */
-    public int getTotalTokens(TileType tokenType) {
-        return tokens.get(tokenType).total();
-    }
-
-    /**
      * Check if player owns a specific type of token.
      *
      * @param tokenType the token type to check.
      * @return true if he owns at least one of that token.
      */
     public boolean playerHasTokenLeft(TileType tokenType) {
-        if (getRemainingTokens(tokenType) > 0)
-            return true;
-
-        return false;
-    }
-
-    /**
-     * Get the tokens of a player.
-     *
-     * @return the tokens of a player.
-     */
-    public java.util.Map<TileType, Integer> getPlayerToken() {
-        return java.util.Map.of(
-                TileType.ORACLE, getRemainingTokens(TileType.ORACLE),
-                TileType.FARM, getRemainingTokens(TileType.FARM),
-                TileType.TAVERN, getRemainingTokens(TileType.TAVERN),
-                TileType.TOWER, getRemainingTokens(TileType.TOWER),
-                TileType.OASIS, getRemainingTokens(TileType.OASIS),
-                TileType.HARBOR, getRemainingTokens(TileType.HARBOR),
-                TileType.PADDOCK, getRemainingTokens(TileType.PADDOCK),
-                TileType.BARN, getRemainingTokens(TileType.BARN)
-        );
+        return tokens.get(tokenType).getRemaining() > 0;
     }
 
     /**
@@ -232,5 +198,9 @@ public class Player {
      */
     public int getRemainingSettlementsOfTurn() {
         return remainingSettlementsOfTurn;
+    }
+
+    public HashMap<TileType, Token> getTokens() {
+        return tokens;
     }
 }

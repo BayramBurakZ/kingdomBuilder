@@ -224,12 +224,12 @@ public class GameViewController extends Controller implements Initializable {
 
         store.subscribe(kbState -> {
             // START TURN
-            if (kbState.nextPlayer >= 0 && kbState.gameStarted) {
+            if (kbState.nextPlayer >= 0 && kbState.gameStarted && kbState.nextTerrainCard != null) {
                 // only preview for this client
                 if (kbState.nextPlayer == kbState.client.getClientId())
                     gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
             }
-        }, "gameStarted", "nextPlayer");
+        }, "gameStarted", "nextPlayer", "nextTerrainCard");
 
         // set the initial layout of the view
         setupLayout();
@@ -359,11 +359,12 @@ public class GameViewController extends Controller implements Initializable {
         gameview_hbox_tokens.getChildren().clear();
 
         if (state.game.currentPlayer != null && state.game.currentPlayer.ID == state.client.getClientId())
-            for (var entry : state.game.currentPlayer.getPlayerToken().entrySet()) {
-                if (entry.getValue() == 0)
+            for (var entry : state.game.currentPlayer.getTokens().entrySet()) {
+                if (entry.getValue().getTotal() == 0)
                     continue;
 
-                Token token = new Token(entry.getKey(), entry.getValue(), this,
+                System.out.println(entry.getValue().getTotal());
+                Token token = new Token(entry.getKey(), entry.getValue().getTotal(), this,
                         areTokensDisabled, resourceBundle, store);
 
                 tokens.add(token);

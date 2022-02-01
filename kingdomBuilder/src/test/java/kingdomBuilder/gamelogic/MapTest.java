@@ -212,7 +212,7 @@ public class MapTest {
         // need instance of a game to test this.
 
         Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20 );
-        player.startTurn(TileType.FORREST);
+        //player.startTurn(TileType.FORREST);
         //player.addToken(TileType.ORACLE);
 
         //check if player has received that token

@@ -417,7 +417,7 @@ public class Tile {
      * @throws HasNoTokenException when tile is not a special place.
      */
     public TileType takeTokenFromSpecialPlace() throws HasNoTokenException {
-        if (Game.tokenType.contains(tileType))
+        if (!Game.tokenType.contains(tileType))
             throw new HasNoTokenException("Can't take a token from a non special place!");
         if (remainingTokens <= 0)
             throw new HasNoTokenException("No more tokens remaining!");

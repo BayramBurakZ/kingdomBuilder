@@ -63,12 +63,12 @@ public class Token extends StackPane {
         this.resource = resource;
 
         ObservableList<Node> contents = this.getChildren();
-        contents.add(countDisplay);
         contents.add(hexagon);
+        contents.add(countDisplay);
         setAlignment(countDisplay, Pos.BOTTOM_RIGHT);
 
-        if (count == 2) {
-            countDisplay.setText("2");
+        if (count >= 2) {
+            countDisplay.setText(String.valueOf(count));
 
             // TODO use a CSS Style Sheet
             // font green and bigger

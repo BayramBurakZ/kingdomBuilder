@@ -219,9 +219,6 @@ public class LevelEditorController extends Controller implements Initializable {
 
         for (EditorTile[] row : editorBoard.board) {
             for (EditorTile tile : row) {
-                if (tile.getX() == 9 && tile.getY() == 9)
-                    types += tile.getTileType();
-
                 types += tile.getTileType() + ";";
             }
         }

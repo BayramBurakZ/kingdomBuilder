@@ -4,6 +4,7 @@ import kingdomBuilder.network.protocol.MyGameReply;
 
 import java.security.InvalidParameterException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Contains all the information of a game hosted on the server.
@@ -293,21 +294,19 @@ public class Game {
      * Starts the next turn for the specified player.
      *
      * @param clientId    the client ID of the player.
-     * @param terrainCard the terrain card of the player's turn.
      */
-    public void startTurn(int clientId, TileType terrainCard) {
-        startTurn(playerIDtoObject(clientId), terrainCard);
+    public void startTurn(int clientId) {
+        startTurn(playerIDtoObject(clientId));
     }
 
     /**
      * Starts the next turn for the specified player.
      *
      * @param player      the player whose turn it is next.
-     * @param terrainCard the terrain card of the player's turn.
      */
-    public void startTurn(Player player, TileType terrainCard) {
+    public void startTurn(Player player) {
         currentPlayer = player;
-        player.startTurn(terrainCard);
+        player.startTurn();
     }
 
     // TODO: maybe use this later
@@ -461,6 +460,16 @@ public class Game {
          */
     }
 
+    public void addToken(int x, int y) {
+        Tile originTile = map.at(x, y);
+        Set<Tile> specialPlaces = originTile.surroundingSpecialPlaces(map);
+
+        // Player gets a token if settlement is next to special place
+        for (var specialPlace : specialPlaces) {
+            currentPlayer.addToken(specialPlace);
+        }
+    }
+
     // TODO: think about this tomorrow again
 
     /**
@@ -475,8 +484,13 @@ public class Game {
         if (!placeableTileTypes.contains(terrain))
             throw new InvalidParameterException("not a landscape!");
 
+        //return map.stream().filter(tile -> tile.isAtBorder(map) && tile.isOccupiedByPlayer(player)).collect(Collectors.toSet());
+
+        //Set<Tile> freeTiles = map.stream().filter(tile -> tile.tileType == terrain)
+
         Set<Tile> allowedTiles = new HashSet<>();
-        Set<Tile> freeTiles = map.getTiles(terrain);
+        Set<Tile> freeTiles = map.getTiles(terrain).stream().filter(
+                tile -> !tile.isOccupied()).collect(Collectors.toSet());
 
         for (Tile freeTile : freeTiles) {
             if (map.at(freeTile.x, freeTile.y).hasSurroundingSettlement(map, player) &&
@@ -496,10 +510,8 @@ public class Game {
      * @param terrain the terrain the player has.
      * @return A set of all positions a player can place a settlement.
      */
-    protected Set<Tile> allPossibleSettlementPlacementsOnTerrain(Player player, TileType terrain) {
+    protected Set<Tile> allPlaceableTiles(Player player, TileType terrain) {
         Set<Tile> allPossiblePlacements = freeTilesNextToSettlements(player, terrain);
-        // TODO: remove occupied tiles from map.getTiles(terrain)
-        //  we won't highlight them ~Tom
         return (allPossiblePlacements.isEmpty()) ? map.getTiles(terrain) : allPossiblePlacements;
     }
 
@@ -576,7 +588,9 @@ public class Game {
             return new HashSet<>();
 
         final Set<Tile> allPossiblePlacements = freeTilesNextToSettlements(player, terrain);
-        return (allPossiblePlacements.isEmpty()) ? map.getTiles(terrain) : allPossiblePlacements;
+        return (allPossiblePlacements.isEmpty()) ?
+                map.getTiles(terrain).stream().filter(t -> !t.isOccupied()).collect(Collectors.toSet()) :
+                allPossiblePlacements;
     }
 
     /**
@@ -656,7 +670,7 @@ public class Game {
     public Set<Tile> allTokenHarborTiles(Player player, boolean highlightDestination) {
         //TODO: Revisit all functions harbor is using
         return highlightDestination ?
-                allPossibleSettlementPlacementsOnTerrain(player, TileType.WATER) : map.getSettlements(player);
+                allPlaceableTiles(player, TileType.WATER) : map.getSettlements(player);
     }
 
     /**
@@ -693,7 +707,7 @@ public class Game {
      */
     public Set<Tile> allTokenBarnTiles(Player player, boolean highlightDestination) {
         return highlightDestination ?
-                allPossibleSettlementPlacementsOnTerrain(player, player.getTerrainCard()) : map.getSettlements(player);
+                allPlaceableTiles(player, player.getTerrainCard()) : map.getSettlements(player);
     }
 
     // TODO: think about this tomorrow again
