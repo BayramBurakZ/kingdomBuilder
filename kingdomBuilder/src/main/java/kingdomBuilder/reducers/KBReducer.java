@@ -568,11 +568,6 @@ public class KBReducer implements Reducer<KBState> {
 
         final Game game = oldState.game;
 
-        if (a.getToken() != null) {
-            game.selectedToken = a.getToken();
-            state.setGame(game);
-        }
-
         state.setToken(a.getToken());
 
         return state;

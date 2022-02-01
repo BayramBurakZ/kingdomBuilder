@@ -84,7 +84,7 @@ public class LevelEditorController extends Controller implements Initializable {
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
-    public EditorBoard editorBoard = new EditorBoard(store, this);
+    public EditorBoard editorBoard = new EditorBoard(this);
 
     /**
      * Represents the center of the gameboard as a Point3D.

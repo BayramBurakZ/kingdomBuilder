@@ -31,11 +31,9 @@ public class EditorBoard extends Board {
     /**
      * Constructs a board.
      *
-     * @param store the store of the application.
      * @param editorController the LevelEditor Controller
      */
-    public EditorBoard(Store<KBState> store, LevelEditorController editorController) {
-        super(store);
+    public EditorBoard(LevelEditorController editorController) {
         this.editorController = editorController;
     }
 

@@ -7,13 +7,9 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
-import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.ClientTurnAction;
-import kingdomBuilder.gamelogic.ClientTurn;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.base.Tile;
-import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
 
@@ -51,9 +47,7 @@ public class HexagonTile extends Tile {
      */
     private Settlement settlement = new Settlement();
 
-    private final Store<KBState> store;
-
-
+    private GameBoard gameBoard;
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
@@ -62,9 +56,11 @@ public class HexagonTile extends Tile {
      * @param tileType the TileType of the Hexagon.
      * @param resource the ResourceBundle to translate text.
      */
-    public HexagonTile(double xPos, double yPos, int x, int y, TileType tileType, ResourceBundle resource, Store<KBState> store) {
+    public HexagonTile(double xPos, double yPos, int x, int y, TileType tileType, ResourceBundle resource,
+                       GameBoard gameBoard) {
         super(x, y, xPos, yPos, tileType, resource);
-        this.store = store;
+
+        this.gameBoard = gameBoard;
 
         // add settlement to this group
         getChildren().add(settlement);
@@ -112,36 +108,22 @@ public class HexagonTile extends Tile {
     @Override
     protected void setMouseHandler() {
         setOnMouseClicked(event -> {
-
-
             // place settlement only if the tile is elevated/highlighted
             if (isElevated) {
-                ClientTurn turn;
-                if (store.getState().token != null) {
-                    turn = new ClientTurn(
-                            store.getState().client.getClientId(),
-                            ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
-                            x,
-                            y,
-                            -1,
-                            -1
-                    );
-                } else {
-                    turn = new ClientTurn(
-                            store.getState().client.getClientId(),
-                            ClientTurn.TurnType.PLACE,
-                            x,
-                            y,
-                            -1,
-                            -1
-                    );
-                }
-                store.dispatch(new ClientTurnAction(turn));
+                gameBoard.hexagonClicked(x, y);
             }
         });
 
         setOnMouseEntered(event -> setColorHighlighted());
         setOnMouseExited(event -> removeColorHighlighted());
+    }
+
+    public void setMarker() {
+        hexagon.setMaterial(MaterialLoader.MIDNIGHTBLUE);
+    }
+
+    public void removeMarker() {
+        removeColorHighlighted();
     }
 
     /**

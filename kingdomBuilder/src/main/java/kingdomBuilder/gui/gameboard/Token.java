@@ -67,14 +67,12 @@ public class Token extends StackPane {
         contents.add(countDisplay);
         setAlignment(countDisplay, Pos.BOTTOM_RIGHT);
 
-        if (count >= 2) {
-            countDisplay.setText(String.valueOf(count));
+        countDisplay.setText(String.valueOf(count));
 
-            // TODO use a CSS Style Sheet
-            // font green and bigger
-            countDisplay.setStyle(
-                    "-fx-font: 24 arial; -fx-text-fill: green;");
-        }
+        // TODO use a CSS Style Sheet
+        // font green and bigger
+        countDisplay.setStyle(
+                "-fx-font: 24 arial; -fx-text-fill: green;");
 
         if (disable) {
             this.disableToken();
@@ -179,9 +177,6 @@ public class Token extends StackPane {
             this.store = store;
             this.gameViewController = gameViewController;
 
-            setStrokeWidth(2.0);
-            setStrokeType(StrokeType.INSIDE);
-
             // add all corners of to the hexagon shape
             for (int i = 0; i < HexagonCalculator.NUMBER_OF_CORNERS; i++) {
                 getPoints().add(vertices.get(i).getX());
@@ -203,21 +198,13 @@ public class Token extends StackPane {
                 if (isDisabled) {
                     return;
                 }
-
                 // with click activate the token
                 activateToken();
 
-                // if this token is activated then run the gamelogic method ...
                 if (isActivated) {
-                    // ... and disable all other tokens first
-                    gameViewController.disableTokens(true);
-
-                    //TODO: store is null, so its not possible to use token.
-                    //return;
                     store.dispatch(new ActivateToken(tileType));
 
                 } else {
-                    gameViewController.disableTokens(false);
                     store.dispatch(new ActivateToken(null));
                 }
             });
@@ -239,6 +226,8 @@ public class Token extends StackPane {
 
             if (isActivated) {
                 setStroke(Color.RED);
+                setStrokeWidth(2.0);
+                setStrokeType(StrokeType.INSIDE);
             } else {
                 setStroke(null);
             }

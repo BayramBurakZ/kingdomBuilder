@@ -2,10 +2,13 @@ package kingdomBuilder.gui.gameboard;
 
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
+import kingdomBuilder.actions.game.ClientTurnAction;
+import kingdomBuilder.gamelogic.ClientTurn;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.Tile;
 import kingdomBuilder.gui.base.Board;
+import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -26,17 +29,15 @@ public class GameBoard extends Board {
      */
     protected HexagonTile[][] board = new HexagonTile[SIZE][SIZE];
 
+    private Store<KBState> store;
+
     /**
      * Constructor to instantiate the GameBoard.
      *
      * @param store the Store to access the state.
      */
-    public GameBoard(Store<KBState> store) {
-        // TODO: make constant
-        super(store);
-        // TODO: Subscribers:
-        //  - Token Enable/Disable -> highlightTerrain()
-        //  - Settlements from others -> updateBoard()
+    public GameBoard(Store store) {
+        this.store = store;
     }
 
     /**
@@ -53,10 +54,94 @@ public class GameBoard extends Board {
     @Override
     public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
                                  TileType tileType, ResourceBundle resource) {
-        HexagonTile hexagonTile = new HexagonTile(xPos, yPos, x, y, tileType, resource, store);
+        HexagonTile hexagonTile = new HexagonTile(xPos, yPos, x, y, tileType, resource, this);
         board[x][y] = hexagonTile;
 
         group.getChildren().add(hexagonTile);
+    }
+
+    // the marked hexagon
+    private HexagonTile markedHexagon;
+
+    // marks the hexagon and updates the highlight
+    public void markHexagonToMove(HexagonTile hexagon) {
+        markedHexagon = hexagon;
+        Game game = store.getState().game;
+
+        switch (store.getState().token) {
+            case BARN -> highlightTerrain(game.allTokenBarnTiles(game.currentPlayer, true));
+            case HARBOR -> highlightTerrain(game.allTokenHarborTiles(game.currentPlayer, true));
+            case PADDOCK -> highlightTerrain(
+                    game.allTokenPaddockTiles(game.currentPlayer, markedHexagon.getX(), markedHexagon.getY()));
+        }
+    }
+
+    //triggered when the user clicks on a hexagon
+    public void hexagonClicked(int x, int y) {
+        int playerID = store.getState().client.getClientId();
+        TileType token = store.getState().token;
+
+        if (token == null) {
+            sendClientTurn(playerID, x, y, -1, -1, false, false);
+            return;
+        }
+
+        if (token == TileType.BARN || token == TileType.HARBOR || token == TileType.PADDOCK) {
+            // TOKEN WITH MOVE
+            if (markedHexagon == null) {
+                // first hexagon
+                markHexagonToMove(board[x][y]);
+                markedHexagon.setMarker();
+            } else {
+                // second hexagon
+                sendClientTurn(playerID, x, y, markedHexagon.getX(), markedHexagon.getY(), true, true);
+                markedHexagon.removeMarker();
+                markedHexagon = null;
+            }
+
+        } else {
+            // TOKEN ONLY PLACE
+            sendClientTurn(playerID, x, y, -1, -1, true, false);
+        }
+    }
+
+    // sends the final turn message to the reducer
+    public void sendClientTurn(int id, int x, int y, int toX, int toY, boolean isToken, boolean isMove) {
+
+        ClientTurn turn;
+        if (!isToken) {
+            // PLACING BASIC TURN
+            turn = new ClientTurn(
+                    store.getState().client.getClientId(),
+                    ClientTurn.TurnType.PLACE,
+                    x,
+                    y,
+                    -1,
+                    -1
+            );
+        } else if (!isMove) {
+            // PLACING TOKEN
+            turn = new ClientTurn(
+                    store.getState().client.getClientId(),
+                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
+                    x,
+                    y,
+                    -1,
+                    -1
+            );
+        } else {
+            //MOVING TOKEN
+            turn = new ClientTurn(
+                    store.getState().client.getClientId(),
+                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
+                    x,
+                    y,
+                    toX,
+                    toY
+            );
+        }
+
+        store.dispatch(new ClientTurnAction(turn));
     }
 
     /**
@@ -71,13 +156,6 @@ public class GameBoard extends Board {
         for (Tile t : set) {
             board[t.x][t.y].setElevated();
         }
-    }
-
-    /**
-     * Updates the Board according to the state.
-     */
-    private void updateBoard() {
-        //TODO: implement
     }
 
     /**
@@ -101,10 +179,17 @@ public class GameBoard extends Board {
 
     /**
      * Gets the board.
-     *
-     * @return The Board.
+     * @return the Board.
      */
     public HexagonTile[][] getBoard() {
         return board;
+    }
+
+    /**
+     * Gets the marked hexagon.
+     * @return the marked hexagon.
+     */
+    public HexagonTile getMarkedHexagon() {
+        return markedHexagon;
     }
 }

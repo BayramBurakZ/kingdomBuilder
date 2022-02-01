@@ -216,9 +216,6 @@ public class GameViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Subscribers:
         // - PlayerData score -> updateScoreForPlayer()
-        // - Token used -> updateTokens()
-        // - In Basic turn -> disableTokens(false/true)
-        // - if PlayersTurn -> disableTokens(false / true)
 
         resourceBundle = resources;
 
@@ -304,14 +301,18 @@ public class GameViewController extends Controller implements Initializable {
         if (state.game == null || state.game.currentPlayer == null)
             return;
 
-        if (state.token == null) {
+        TileType token = state.token;
+        if (token == null) {
+            disableTokens(false);
             gameBoard.highlightTerrain(state.game.allBasicTurnTiles());
+            gameBoard.getMarkedHexagon().removeMarker();
             return;
+        } else {
+            disableTokens(true);
         }
 
         // TODO: Replace "false" in switch with actual boolean
         //   pass in correct parameters for two-stage/movement tokens
-        TileType token = state.token;
         Game game = state.game;
         switch (token) {
 
@@ -363,8 +364,7 @@ public class GameViewController extends Controller implements Initializable {
                 if (entry.getValue().getTotal() == 0)
                     continue;
 
-                System.out.println(entry.getValue().getTotal());
-                Token token = new Token(entry.getKey(), entry.getValue().getTotal(), this,
+                Token token = new Token(entry.getKey(), entry.getValue().getRemaining(), this,
                         areTokensDisabled, resourceBundle, store);
 
                 tokens.add(token);

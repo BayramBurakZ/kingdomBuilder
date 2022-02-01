@@ -117,6 +117,11 @@ public final class MaterialLoader {
     public static final PhongMaterial WHITE = new PhongMaterial(Color.WHITE);
 
     /**
+     * The material for the midnightblue highlight.
+     */
+    public static final PhongMaterial MIDNIGHTBLUE = new PhongMaterial(Color.MIDNIGHTBLUE);
+
+    /**
      * Constructor so this class never get instanced.
      */
     private MaterialLoader() {

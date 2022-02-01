@@ -12,23 +12,11 @@ import java.util.ResourceBundle;
  * Abstract class to generate a board.
  */
 public abstract class Board {
-    /**
-     * Represents the store of the application.
-     */
-    protected final Store<KBState> store;
 
     /**
      * Represents the resourceBundle that used for language support.
      */
     protected static ResourceBundle resourceBundle;
-
-    /**
-     * Constructs a board.
-     * @param store the store of the application.
-     */
-    public Board(Store<KBState> store) {
-        this.store = store;
-    }
 
     /**
      * Set the GameBoard with textured hexagons up.
