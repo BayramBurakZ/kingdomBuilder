@@ -123,7 +123,7 @@ public class HexagonTile extends Tile {
     }
 
     public void removeMarker() {
-        removeColorHighlighted();
+        resetMaterial();
     }
 
     /**

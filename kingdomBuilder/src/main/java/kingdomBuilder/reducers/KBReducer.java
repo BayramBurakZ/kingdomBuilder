@@ -459,15 +459,18 @@ public class KBReducer implements Reducer<KBState> {
                 ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
                         (ServerTurn) oldState.gameLastTurn : null;
                 if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.REMOVE) {
-                    game.unsafeMoveSettlement(game.currentPlayer, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y);
+                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
+                    game.unsafeMoveSettlement(game.currentPlayer, lastTurn.y, lastTurn.x, a.turn.y, a.turn.x);
+                    // this x,y doesn't need to be swapped since we're treating it as an incoming server message
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
+                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
                     game.unsafePlaceSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
-                    state.setGame(game);
                 }
+                state.setGame(game);
             }
             case REMOVE -> {
                 state.setGameLastTurn(a.turn);
@@ -527,6 +530,8 @@ public class KBReducer implements Reducer<KBState> {
             }
         }
 
+        state.setGame(game);
+        state.setToken(null);
         return state;
     }
 

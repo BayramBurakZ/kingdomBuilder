@@ -196,7 +196,7 @@ public class Map implements Iterable<Tile> {
     protected static int topLeftX(int x, int y, int distance) {
         // TODO: remove the loop and calculate this properly
         for (int i = 0; i < distance; i++)
-            x = topLeftX(x, y + i);
+            x = topLeftX(x, y - i);
         return x;
     }
 
@@ -229,7 +229,7 @@ public class Map implements Iterable<Tile> {
     protected static int topRightX(int x, int y, int distance) {
         // TODO: remove the loop and calculate this properly
         for (int i = 0; i < distance; i++)
-            x = topRightX(x, y + i);
+            x = topRightX(x, y - i);
         return x;
     }
 
@@ -256,7 +256,7 @@ public class Map implements Iterable<Tile> {
     protected static int bottomLeftX(int x, int y, int distance) {
         // TODO: remove the loop and calculate this properly
         for (int i = 0; i < distance; i++)
-            x = bottomLeftX(x, y - i);
+            x = bottomLeftX(x, y + i);
         return x;
     }
 
@@ -283,7 +283,7 @@ public class Map implements Iterable<Tile> {
     protected static int bottomRightX(int x, int y, int distance) {
         // TODO: remove the loop and calculate this properly
         for (int i = 0; i < distance; i++)
-            x = bottomRightX(x, y - i);
+            x = bottomRightX(x, y + i);
         return x;
     }
 

@@ -402,7 +402,9 @@ public class Game {
      * @param player the player that is using the token.
      */
     public Set<Tile> allTokenOracleTiles(Player player) {
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
+        return (player.remainingSettlementsOfTurn > 0
+                && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.ORACLE)) ?
                 new HashSet<>() : map.getAllPlaceableTiles(player, player.getTerrainCard());
     }
 
@@ -412,7 +414,9 @@ public class Game {
      * @param player the player.
      */
     public Set<Tile> allTokenFarmTiles(Player player) {
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
+        return (player.remainingSettlementsOfTurn > 0
+                && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN)
+                || !player.playerHasTokenLeft(TileType.FARM) ?
                 new HashSet<>() : map.getAllPlaceableTiles(player, TileType.GRAS);
     }
 
@@ -423,10 +427,11 @@ public class Game {
      * @return the set of tiles where the player could place a settlement.
      */
     public Set<Tile> allTokenTavernTiles(Player player) {
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
+        return (player.remainingSettlementsOfTurn > 0
+                && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.TAVERN)) ?
                 new HashSet<>()
                 : map.stream().filter(tile -> !tile.isBlocked()
-                //&& tile.hasSurroundingSettlement(map, player)
                 && tile.isAtEndOfAChain(map, player)).collect(Collectors.toSet());
     }
 
@@ -437,7 +442,8 @@ public class Game {
      * @return the set of tiles where the player could place a settlement.
      */
     public Set<Tile> allTokenTowerTiles(Player player) {
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
+        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.TOWER)) ?
                 new HashSet<>() : map.getPlaceableTilesAtBorder(player);
     }
 
@@ -447,7 +453,8 @@ public class Game {
      * @param player the player to update for.
      */
     public Set<Tile> allTokenOasisTiles(Player player) {
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
+        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.OASIS)) ?
                 new HashSet<>() : map.getAllPlaceableTiles(player, TileType.DESERT);
     }
 
@@ -458,11 +465,18 @@ public class Game {
      * @return all tiles that are placeable with token harbor.
      */
     public Set<Tile> allTokenHarborTiles(Player player, boolean highlightDestination) {
-        if (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN)
+        if (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.HARBOR))
             return new HashSet<>();
 
-        Set<Tile> allPlaceableTilesWater = map.getTiles(TileType.WATER).stream().filter(tile -> !tile.isBlocked()
+        Set<Tile> allPlaceableTilesWater = map.getTiles(TileType.WATER).stream().filter(
+                tile -> tile.tileType == TileType.WATER
+                        && tile.occupiedBy == null
                         && tile.hasSurroundingSettlement(map, player)).collect(Collectors.toSet());
+
+        allPlaceableTilesWater = allPlaceableTilesWater.isEmpty() ?
+                map.getTiles(TileType.WATER).stream().filter(t -> t.occupiedBy == null ).collect(Collectors.toSet())
+                : allPlaceableTilesWater;
 
         //TODO: Revisit all functions harbor is using
         return highlightDestination ? allPlaceableTilesWater : map.getSettlements(player);
@@ -475,7 +489,7 @@ public class Game {
      * @return all tiles that a paddock token can be used on.
      */
     public Set<Tile> allTokenPaddockTiles(Player player) {
-        return map.getSettlements(player);
+        return (!player.playerHasTokenLeft(TileType.PADDOCK)) ? new HashSet<>() : map.getSettlements(player);
     }
 
     /**
@@ -489,8 +503,9 @@ public class Game {
      */
     public Set<Tile> allTokenPaddockTiles(Player player, int fromX, int fromY) {
         // TODO: maybe throw or warning if the settlement at (fromX,fromY) doesn't match the specified player
-        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN) ?
-        new HashSet<>() : map.at(fromX, fromY).surroundingTilesPaddock(map);
+        return (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
+                new HashSet<>() : map.at(fromX, fromY).surroundingTilesPaddock(map);
     }
 
     /**
@@ -500,7 +515,8 @@ public class Game {
      * @return all tiles that are placeable with token barn.
      */
     public Set<Tile> allTokenBarnTiles(Player player, boolean highlightDestination) {
-        if (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN)
+        if (player.remainingSettlementsOfTurn > 0 && player.remainingSettlementsOfTurn < SETTLEMENTS_PER_TURN
+                || !player.playerHasTokenLeft(TileType.BARN))
             return new HashSet<>();
 
         return highlightDestination ?

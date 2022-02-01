@@ -94,7 +94,7 @@ public class GameBoard extends Board {
                 markedHexagon.setMarker();
             } else {
                 // second hexagon
-                sendClientTurn(playerID, x, y, markedHexagon.getX(), markedHexagon.getY(), true, true);
+                sendClientTurn(playerID, markedHexagon.getX(), markedHexagon.getY(), x, y, true, true);
                 markedHexagon.removeMarker();
                 markedHexagon = null;
             }

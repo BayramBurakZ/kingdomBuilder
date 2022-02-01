@@ -55,8 +55,7 @@ public class Tile {
      * @return True if it is occupied. False otherwise.
      */
     public boolean isBlocked() {
-        //TODO: does not check water.
-        return nonPlaceableTileTypes.contains(tileType) || (occupiedBy != null);
+        return !placeableTileTypes.contains(tileType) || (occupiedBy != null);
     }
 
     /**
@@ -143,10 +142,10 @@ public class Tile {
             return true;
 
         // top right
-        if (!map.isWithinBounds(Map.topRightX(x, y, 3), y + 3)) {
+        if (map.isWithinBounds(Map.topRightX(x, y, 3), y - 3)) {
             boolean chainFound = true;
-            for (int i = 0; i < 3; i++)
-                if (!(map.at(Map.topRightX(x, y, i), y + i).occupiedBy() == player)) {
+            for (int i = 1; i < 4; i++)
+                if (map.at(Map.topRightX(x, y, i), y - i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -154,10 +153,10 @@ public class Tile {
         }
 
         // top left
-        if (!map.isWithinBounds(Map.topLeftX(x, y, 3), y + 3)) {
+        if (map.isWithinBounds(Map.topLeftX(x, y, 3), y - 3)) {
             boolean chainFound = true;
-            for (int i = 0; i < 3; i++)
-                if (!(map.at(Map.topLeftX(x, y, i), y + i).occupiedBy() == player)) {
+            for (int i = 1; i < 4; i++)
+                if (map.at(Map.topLeftX(x, y, i), y - i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -165,10 +164,10 @@ public class Tile {
         }
 
         // bottom right
-        if (!map.isWithinBounds(Map.bottomRightX(x, y, 3), y - 3)) {
+        if (map.isWithinBounds(Map.bottomRightX(x, y, 3), y + 3)) {
             boolean chainFound = true;
-            for (int i = 0; i < 3; i++)
-                if (!(map.at(Map.bottomRightX(x, y, i), y - i).occupiedBy() == player)) {
+            for (int i = 1; i < 4; i++)
+                if (map.at(Map.bottomRightX(x, y, i), y + i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -176,10 +175,10 @@ public class Tile {
         }
 
         // bottom left
-        if (!map.isWithinBounds(Map.bottomLeftX(x, y, 3), y - 3)) {
+        if (map.isWithinBounds(Map.bottomLeftX(x, y, 3), y + 3)) {
             boolean chainFound = true;
-            for (int i = 0; i < 3; i++)
-                if (!(map.at(Map.bottomLeftX(x, y, i), y - i).occupiedBy() == player)) {
+            for (int i = 1; i < 4; i++)
+                if (map.at(Map.bottomLeftX(x, y, i), y + i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -242,14 +241,14 @@ public class Tile {
         // TODO: iterator
         // top left diagonal
         tempX = Map.topLeftX(x, y, 2);
-        tempY = y + 2;
+        tempY = y - 2;
 
         if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         // top right diagonal
         tempX = Map.topRightX(x, y, 2);
-        tempY = y + 2;
+        tempY = y - 2;
 
         if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
@@ -260,20 +259,20 @@ public class Tile {
 
 
         // right
-        if (map.isWithinBounds(x + 2, y) && !map.at(x - 2, y).isBlocked())
+        if (map.isWithinBounds(x + 2, y) && !map.at(x + 2, y).isBlocked())
             freeTiles.add(map.at(x + 2, y));
 
 
         // bottom left diagonal
         tempX = Map.bottomLeftX(x, y, 2);
-        tempY = y - 2;
+        tempY = y + 2;
 
         if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         // bottom right diagonal
         tempX = Map.bottomRightX(x, y, 2);
-        tempY = y - 2;
+        tempY = y + 2;
 
         if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
@@ -384,7 +383,7 @@ public class Tile {
      */
     public Player removeSettlement() {
         if (occupiedBy == null)
-            throw new RuntimeException("Tile is not occupied!");
+            throw new RuntimeException("Tile is not occupied at: " + x + "/" + y);
 
         Player previousPlayer = occupiedBy;
         occupiedBy = null;
