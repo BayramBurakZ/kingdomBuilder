@@ -1,0 +1,13 @@
+    /**
+     * Deserializes the {@code payload} into an instance of {@link <%= qualifiedPacketType %>} and returns it.
+     * Returns {@code null} on error.
+     */
+    private static <%= packetType %> deserialize<%= packetType %>(<%= deserializerParam %>) {
+        try {
+            <%= payloadPreprocessing %>
+            <%= constructionVariables %>
+            return new <%= packetType %>(<%= constructionArgs %>);
+        } catch(Exception e) {
+            return null;
+        }
+    }

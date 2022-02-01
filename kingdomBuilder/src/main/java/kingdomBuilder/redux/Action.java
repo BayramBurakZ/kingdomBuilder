@@ -1,4 +1,6 @@
 package kingdomBuilder.redux;
 
-public class Action {
-}
+/**
+ * Abstract class that represents the parent class for all actions.
+ */
+public abstract class Action {}

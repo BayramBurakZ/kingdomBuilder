@@ -2,9 +2,21 @@ package kingdomBuilder.gui;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.util.Pair;
+import kingdomBuilder.KBState;
+import kingdomBuilder.actions.SetSceneLoaderAction;
 import kingdomBuilder.gui.controller.*;
+import kingdomBuilder.gui.levelEditor.LevelEditorController;
+import kingdomBuilder.network.protocol.Scores;
+import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Class that is used for creating an object that contains every scene.
@@ -14,173 +26,451 @@ import java.io.IOException;
  * With the get_View() you get the specific view.
  */
 public class SceneLoader {
-    private FXMLLoader fxmlLoader;
 
+    //region Nodes for every View
+
+    /**
+     * Stores the current menuView.
+     */
     private Node menuView;
-    private Node gameLobbyView;
+    /**
+     * Stores the current gameSettingsView.
+     */
+    private Node gameSettingsView;
+    /**
+     * Stores the current gameView.
+     */
     private Node gameView;
+    /**
+     * Stores the current iAmView.
+     */
     private Node iAmView;
+    /**
+     * Stores the current chatView.
+     */
     private Node chatView;
+    /**
+     * Stores the current gameSelectionView.
+     */
     private Node gameSelectionView;
+    /**
+     * Stores the current settingsView.
+     */
+    private Node settingsView;
+    /**
+     * Stores the current serverConnectView.
+     */
+    private Node serverConnectView;
+    /**
+     * Stores the current levelEditorView.
+     */
+    private Node levelEditorView;
+    /**
+     * Stores the current winView.
+     */
+    private Node winView;
 
-    private Controller menuViewController;
-    private Controller gameLobbyViewController;
-    private Controller gameViewController;
-    private Controller iAmViewController;
-    private Controller chatViewController;
-    private Controller gameSelectionViewController;
+    //endregion Nodes
+
+    //region Controller for every View
 
     /**
-     * This method is used for generating a datastructure for returning two objects at the same time.
-     * Currently only used for returning a node and the controller at the same time
-     * @param <X> first object to save in the x-position of the tuple
-     * @param <Y> second object to save in the y-position of the tuple
+     * Stores the menuViewController.
      */
-    private class Tuple<X, Y> {
-        public final X x;
-        public final Y y;
-        public Tuple(X x, Y y) {
-            this.x = x;
-            this.y = y;
-        }
+    private MenuViewController menuViewController;
+    /**
+     * Stores the gameSettingsController.
+     */
+    private GameSettingsViewController gameSettingsViewController;
+    /**
+     * Stores the gameViewController.
+     */
+    private GameViewController gameViewController;
+    /**
+     * Stores the iAmViewController.
+     */
+    private IAmViewController iAmViewController;
+    /**
+     * Stores the chatViewController.
+     */
+    private ChatViewController chatViewController;
+    /**
+     * Stores the gameSelectionViewController.
+     */
+    private GameSelectionViewController gameSelectionViewController;
+    /**
+     * Stores the settingsViewController
+     */
+    private SettingsController settingsViewController;
+    /**
+     * Stores the serverConnectViewController.
+     */
+    private ServerConnectViewController serverConnectViewController;
+    /**
+     * Stores the levelEditorController.
+     */
+    private LevelEditorController levelEditorController;
+    /**
+     * Stores the winViewController.
+     */
+    private WinViewController winViewController;
+
+    //endregion Controller for every View
+
+    /**
+     * Represents the store of the application.
+     */
+    private final Store<KBState> store;
+
+    /**
+     * Represents the main scene of the application.
+     */
+    private Scene scene;
+    /**
+     * Represents the main layout of the application.
+     */
+    private BorderPane borderPane;
+
+    /**
+     * Represents the locale for language settings.
+     */
+    private Locale locale;
+
+    /**
+     * Constructor that initially loads every view.
+     * @param store the Store to have access to the state.
+     */
+    public SceneLoader(Store<KBState> store) {
+        this.store = store;
+        this.store.dispatch(new SetSceneLoaderAction(this));
+
+        Locale initialLocale = Locale.ENGLISH;
+        loadViews(initialLocale);
+
+        borderPane = new BorderPane();
+        borderPane.setCenter(iAmView);
+        scene = new Scene(borderPane, 1000, 650);
     }
 
     /**
-     * Constructor that initially loads every view
+     * loads every view with the given locale.
+     * @param locale the language in which the views are loaded.
      */
-    public SceneLoader() {
-        loadMenuView();
-        loadGameLobbyView();
-        loadGameView();
-        loadIAmView();
-        loadChatView();
-        loadGameSelectionView();
+    public void loadViews(Locale locale) {
+        // TODO: check which is still necessary
+        this.locale = locale;
+        loadMenuView(locale);
+        loadGameSettingsView(locale);
+        loadGameView(locale);
+        loadIAmView(locale);
+        loadChatView(locale);
+        loadGameSelectionView(locale);
+        loadSettingsView(locale);
+        loadServerConnectView(locale);
+        loadWinView(locale);
     }
+
+    /**
+     * Returns the main scene for the application.
+     * @return main scene.
+     */
+    public Scene getScene() {
+        return scene;
+    }
+
+    // show-methods
+
+    /**
+     * Loads the MenuView into the center of the main borderPane
+     * and loads the chat into the left side of the main borderPane.
+     */
+    public void showMenuView() {
+        // remove Chat
+        if (borderPane.getLeft() != null)
+            borderPane.setLeft(null);
+
+        // set main menu
+        borderPane.setCenter(menuView);
+    }
+
+    /**
+     * Loads the GameSettingsView into the center of the main borderPane.
+     * @param isOnlineGame if the game is online.
+     */
+    public void showGameSettingsView(boolean isOnlineGame) {
+        //reloads the view so its completely empty
+        loadGameSettingsView(locale);
+
+        borderPane.setCenter(gameSettingsView);
+        gameSettingsViewController.setIsOnlineGame(isOnlineGame);
+    }
+
+    /**
+     * Loads the gameView into the center of the main borderPane.
+     * @param isSpectating whether the user wants to spectate.
+     * @param isOnline whether the game is online.
+     */
+    public void showGameView(boolean isSpectating, boolean isOnline) {
+        // set Chat
+        if (borderPane.getLeft() == null)
+            borderPane.setLeft(chatView);
+
+
+        // reloads the view so its completely empty
+        loadGameView(locale);
+
+        // loads the gameView
+        borderPane.setCenter(gameView);
+        gameViewController.setSpectating(isSpectating);
+        gameViewController.setIsOnline(isOnline);
+
+        //TODO: Focus-management
+        gameViewController.getGame_subscene().getRoot().requestFocus();
+    }
+
+    /**
+     * Loads the iAmView into the center of the main borderPane.
+     */
+    public void showIAmView() {
+        borderPane.setCenter(iAmView);
+    }
+
+    /**
+     * Loads the gameSelectionView into the center of the main borderPane.
+     */
+    public void showGameSelectionView() {
+        // set Chat
+        if (borderPane.getLeft() == null)
+            borderPane.setLeft(chatView);
+
+        //reloads the view so its completely empty
+        loadGameSelectionView(locale);
+
+        borderPane.setCenter(gameSelectionView);
+    }
+
+    /**
+     * Loads the SettingsView into the center of the main borderPane.
+     */
+    public void showSettingsView() {
+        //reloads the view so its completely empty
+        loadSettingsView(locale);
+
+        borderPane.setCenter(settingsView);
+    }
+
+    /**
+     * Loads the ServerConnectView into the center of the main borderPane.
+     */
+    public void showServerConnectView() {
+        //reloads the view so its completely empty
+        loadServerConnectView(locale);
+
+        borderPane.setCenter(serverConnectView);
+    }
+
+    /**
+     * Loads the LevelEditorView into the center of the main borderPane.
+     */
+    public void showLevelEditorView() {
+        //reloads the view so its completely empty
+        loadLevelEditorView(locale);
+
+        borderPane.setCenter(levelEditorView);
+    }
+
+    /**
+     * Loads the WinView into the center of the main borderPane.
+     */
+    public void showWinView(Scores scores) {
+        //reloads the view so its completely empty
+        loadWinView(locale);
+        winViewController.setScoreWithName(scores);;
+
+        borderPane.setCenter(winView);
+    }
+
+    // load-methods
 
     /**
      * Loads the View at the specific location of the parameter and put the view on the x-position of the
-     * tuple and the corresponding controller at the  y-position of the tuple
+     * tuple and the corresponding controller at the  y-position of the tuple.
      *
-     * @param location String that contains the path to the location of the .fxml file
-     * @return Tuple x-position is the View as Node, y-position is the contoller
+     * @param location string that contains the path to the location of the .fxml file.
+     * @return Tuple x-position is the View as Node, y-position is the contoller.
      */
-    private Tuple<Node, Controller> loadView(String location) {
+    private Pair<Node, Controller> loadView(String location, Locale locale) {
         Node node = null;
         Controller controller = null;
 
-        fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource(location));
+        FXMLLoader loader = makeLoader(getClass().getResource(location));
+        loader.setResources(ResourceBundle.getBundle("kingdomBuilder/gui/gui", locale));
+
         try {
-            node = fxmlLoader.load();
-            controller =  fxmlLoader.getController();
+            node = loader.load();
+            controller = loader.getController();
+            controller.setSceneLoader(this);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return new Tuple<>(node, controller);
+        return new Pair<>(node, controller);
+    }
+
+    /**
+     * Creates a new loader, with a custom controller factory, which passes on custom parameters on controller
+     * construction.
+     * @param location the location to load the FXML file from.
+     * @return The newly created loader.
+     */
+    private FXMLLoader makeLoader(URL location) {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setControllerFactory(controllerType -> {
+            try {
+                for (Constructor<?> ctor: controllerType.getConstructors()) {
+                    if(ctor.getParameterCount() == 1
+                            && ctor.getParameterTypes()[0] == Store.class)
+                        return ctor.newInstance(store);
+                }
+
+                return controllerType.getConstructor().newInstance();
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        });
+
+        loader.setLocation(location);
+
+        return loader;
     }
 
     /**
      * Calls the loadView() method with the path of the MenuView.fxml and
      * sets the menuView and menuViewController fields.
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadMenuView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/MenuView.fxml");
-        menuView = tuple.x;
-        menuViewController = tuple.y;
+    public void loadMenuView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/MenuView.fxml", locale);
+        menuView = pair.getKey();
+        menuViewController = (MenuViewController) pair.getValue();
     }
 
     /**
-     * Calls the loadView() method with the path of the GameLobbyView.fxml and
-     * sets the gameLobbyView and gameLobbyViewController fields
+     * Calls the loadView() method with the path of the GameSettingsView.fxml and
+     * sets the gameSettingsView and gameSettingsViewController fields
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadGameLobbyView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameLobbyView.fxml");
-        gameLobbyView = tuple.x;
-        gameLobbyViewController = tuple.y;
+    public void loadGameSettingsView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameSettingsView.fxml", locale);
+        gameSettingsView = pair.getKey();
+        gameSettingsViewController = (GameSettingsViewController) pair.getValue();
     }
 
     /**
      * Calls the loadView() method with the path of the GameView.fxml and
      * sets the gameView and gameViewController fields
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadGameView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameView.fxml");
-        gameView = tuple.x;
-        gameViewController = tuple.y;
+    public void loadGameView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameView.fxml", locale);
+        gameView = pair.getKey();
+        gameViewController = (GameViewController) pair.getValue();
     }
 
     /**
      * Calls the loadView() method with the path of the IAmView.fxml and
      * sets the iAmView and iAmViewController fields
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadIAmView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/IAmView.fxml");
-        iAmView = tuple.x;
-        iAmViewController = tuple.y;
+    public void loadIAmView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/IAmView.fxml", locale);
+        iAmView = pair.getKey();
+        iAmViewController = (IAmViewController) pair.getValue();
     }
 
     /**
      * Calls the loadView() method with the path of the ChatView.fxml and
      * sets the chatView and chatViewController fields
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadChatView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/ChatView.fxml");
-        chatView = tuple.x;
-        chatViewController = tuple.y;
+    public void loadChatView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/ChatView.fxml", locale);
+        chatView = pair.getKey();
+        chatViewController = (ChatViewController) pair.getValue();
     }
 
     /**
      * Calls the loadView() method with the path of the GameSelectionView.fxml and
      * sets the gameSelectionView and gameSelectionViewController fields
      * Used for reloading this View.
+     * @param locale the locale for language support.
      */
-    public void loadGameSelectionView() {
-        Tuple<Node, Controller> tuple = loadView("/kingdomBuilder.gui/controller/GameSelectionView.fxml");
-        gameSelectionView = tuple.x;
-        gameSelectionViewController = tuple.y;
+    public void loadGameSelectionView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/GameSelectionView.fxml", locale);
+        gameSelectionView = pair.getKey();
+        gameSelectionViewController = (GameSelectionViewController) pair.getValue();
     }
 
-    public Node getMenuView() {
-        return menuView;
-    }
-    public Node getGameLobbyView() {
-        return gameLobbyView;
-    }
-    public Node getGameView() {
-        return gameView;
-    }
-    public Node getIAmView() {
-        return iAmView;
-    }
-    public Node getChatView() {
-        return chatView;
-    }
-    public Node getGameSelectionView() {
-        return gameSelectionView;
+    /**
+     * Calls the loadView() method with the path of the GameSelectionView.fxml and
+     * sets the gameSelectionView and gameSelectionViewController fields
+     * Used for reloading this View.
+     * @param locale the locale for language support.
+     */
+    public void loadSettingsView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/SettingsView.fxml", locale);
+        settingsView = pair.getKey();
+        settingsViewController = (SettingsController) pair.getValue();
     }
 
-    public MenuViewController getMenuViewController() {
-        return (MenuViewController) menuViewController;
+    /**
+     * Calls the loadView() method with the path of the ServerConnect.fxml and
+     * sets the serverConnectView and serverConnectViewController fields
+     * Used for reloading this View.
+     * @param locale the locale for language support.
+     */
+    public void loadServerConnectView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/ServerConnect.fxml", locale);
+        serverConnectView = pair.getKey();
+        serverConnectViewController = (ServerConnectViewController) pair.getValue();
     }
-    public GameLobbyViewController getGameLobbyViewController() {
-        return (GameLobbyViewController) gameLobbyViewController;
+
+    /**
+     * Calls the loadView() method with the path of the LevelEditor.fxml and
+     * sets the LevelEditorView and LevelEditorViewController fields
+     * Used for reloading this View.
+     * @param locale the locale for language support.
+     */
+    public void loadLevelEditorView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/LevelEditor.fxml", locale);
+        levelEditorView = pair.getKey();
+        levelEditorController = (LevelEditorController) pair.getValue();
     }
-    public GameViewController getGameViewController() {
-        return (GameViewController) gameViewController;
+
+    /**
+     * Calls the loadView() method with the path of the LevelEditor.fxml and
+     * sets the WinView and WinViewController fields
+     * Used for reloading this View.
+     * @param locale the locale for language support.
+     */
+    public void loadWinView(Locale locale) {
+        Pair<Node, Controller> pair = loadView("controller/WinView.fxml", locale);
+        winView = pair.getKey();
+        winViewController = (WinViewController) pair.getValue();
     }
-    public IAmViewController getIAmViewController() {
-        return (IAmViewController) iAmViewController;
-    }
+
+    // TODO: Remove
+    // getter
+    /**
+     * Returns the ChatViewController.
+     * @return The ChatViewController with all functionalities for the ChatView.
+     */
     public ChatViewController getChatViewController() {
-        return (ChatViewController) chatViewController;
-    }
-    public GameSelectionViewController getGameSelectionViewController() {
-        return (GameSelectionViewController) gameSelectionViewController;
+        return chatViewController;
     }
 }

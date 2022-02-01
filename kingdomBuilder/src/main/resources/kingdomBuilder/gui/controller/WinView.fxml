@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.WinViewController">
+   <children>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#cd7f32" height="50.0" layoutX="77.0" layoutY="302.0" stroke="BLACK" strokeType="INSIDE" width="110.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="GOLD" height="90.0" layoutX="186.0" layoutY="262.0" stroke="BLACK" strokeType="INSIDE" width="110.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="SILVER" height="70.0" layoutX="295.0" layoutY="282.0" stroke="BLACK" strokeType="INSIDE" width="110.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#b87333" height="30.0" layoutX="404.0" layoutY="322.0" stroke="BLACK" strokeType="INSIDE" width="110.0" />
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="225.0" layoutY="36.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../textures/icons/StageIcon.png" />
+         </image>
+      </ImageView>
+
+      <Label fx:id="win_label_score3" alignment="CENTER" layoutX="92.0" layoutY="319.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" />
+      <Label fx:id="win_label_score1" alignment="CENTER" layoutX="203.0" layoutY="282.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" />
+      <Label fx:id="win_label_score2" alignment="CENTER" layoutX="312.0" layoutY="299.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" />
+      <Label fx:id="win_label_score4" alignment="CENTER" layoutX="421.0" layoutY="329.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" />
+      <Label fx:id="win_label_name3" alignment="CENTER" layoutX="94.0" layoutY="282.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="win_label_name1" alignment="CENTER" layoutX="203.0" layoutY="241.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="win_label_name2" alignment="CENTER" layoutX="312.0" layoutY="262.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" wrapText="true" />
+      <Label fx:id="win_label_name4" alignment="CENTER" layoutX="421.0" layoutY="302.0" prefHeight="17.0" prefWidth="77.0" textAlignment="CENTER" wrapText="true" />
+      <Button layoutX="270.0" layoutY="361.0" mnemonicParsing="false" onAction="#onOKButtonPressed" text="OK" />
+   </children>
+</AnchorPane>

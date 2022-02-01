@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+
+<VBox fx:id="game_vbox" style="-fx-background-color: #383E42;" xmlns="http://javafx.com/javafx/11.0.2"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameViewController">
+
+    <HBox fx:id="game_hbox_statistic" alignment="CENTER" VBox.vgrow="ALWAYS">
+
+        <HBox fx:id="game_hbox_players" alignment="CENTER" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"/>
+
+
+        <Region HBox.hgrow="ALWAYS" />
+        <!-- Turn information of the game-->
+        <Label fx:id="game_label_turn" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </Label>
+
+        <!-- Time information of the game-->
+        <Label fx:id="game_label_time" text="00" textFill="WHITE">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </Label>
+        <!-- Hbox for win conditions-->
+        <HBox fx:id="game_hBox_windconditions" VBox.vgrow="ALWAYS" alignment="CENTER"/>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+    </HBox>
+
+    <!-- HBox that contains the Subscene with the gameboard-->
+    <HBox fx:id="game_hbox_subscene" alignment="CENTER" VBox.vgrow="ALWAYS">
+        <SubScene fx:id="game_subscene" depthBuffer="true" managed="false" pickOnBounds="true"
+                  BorderPane.alignment="CENTER">
+            <antiAliasing>
+                <SceneAntialiasing fx:constant="BALANCED" />
+            </antiAliasing>
+            <root>
+                <Group fx:id="gameBoard_group" />
+            </root>
+        </SubScene>
+    </HBox>
+
+    <!--HBox that displays the player specific information like the tokens.-->
+    <HBox fx:id="game_hbox_playerinformation" alignment="CENTER">
+
+
+        <!-- VBox that displays the information of the current card-->
+        <VBox fx:id="game_vbox_terraincard" alignment="CENTER" style="-fx-border-color: white;
+        -fx-background-color: ANTIQUEWHITE;">
+            <Rectangle fx:id="game_rectangle_card" stroke="BLACK" strokeType="INSIDE" />
+            <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Flower" />
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </VBox>
+
+        <!-- HBox for Tokens-->
+        <HBox fx:id="gameview_hbox_tokens" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+
+        <Button fx:id="game_button_end" text="end">
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
+        </Button>
+    </HBox>
+</VBox>

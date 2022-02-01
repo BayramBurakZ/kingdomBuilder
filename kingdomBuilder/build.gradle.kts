@@ -12,11 +12,14 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.8.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     implementation("org.jetbrains:annotations:16.0.2")
+    implementation(project(":network"))
+    implementation(project(":annotations"))
+    annotationProcessor(project(":annotationProcessors"))
 }
 
 javafx {
     version = "17"
-    modules("javafx.controls", "javafx.fxml")
+    modules("javafx.controls", "javafx.fxml", "javafx.web")
 }
 
 application {

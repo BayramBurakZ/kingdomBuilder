@@ -4,108 +4,131 @@ import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.redux.Store;
 import kingdomBuilder.KBState;
+import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+/**
+ * This Class controls the MenuViewController with all its functions.
+ */
 public class MenuViewController extends Controller implements Initializable {
 
-    private MainViewController mainViewController;
-    private Store<KBState> store;
-    private KBState state;
+    //region FXML-Imports
 
+    /**
+     * Represents the VBox that contains all buttons.
+     */
     @FXML
-    private BorderPane menuview_boarderpane;
+    private VBox menuview_vbox;
 
+    /**
+     * Represents the button to start a local game.
+     */
     @FXML
-    private Button menuview_localgame_button;
+    private Button menuview_button_localgame;
 
+    /**
+     * Represents the button to play an online game.
+     */
     @FXML
-    private Button menuview_onlinegame_button;
+    private Button menuview_button_onlinegame;
 
+    /**
+     * Represents the button to get to the settings.
+     */
     @FXML
-    private TextField menuview_textfield_address;
+    private Button menuview_button_settings;
 
+    /**
+     * Represents the button to exit the program.
+     */
     @FXML
-    private TextField menuview_textfield_port;
+    private Button menuview_button_exit;
 
-    @FXML
-    private Button menuview_connect_button;
+    //endregion FXML-Imports
 
+    /**
+     * Sets the store.
+     * @param store the store to set.
+     */
+    public MenuViewController(Store<KBState> store) {
+        super.store = store;
+    }
+
+    /**
+     * Called to initialize this controller after its root element has been completely processed.
+     * @param location the location used to resolve relative paths for the root object,
+     *                 or null if the location is not known.
+     * @param resources the resources used to localize the root object, or null if the root object was not localized.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        store = Store.get();
-        state = store.getState();
+        /*
+        store.subscribe(s -> {
+            state = s;
+            if(s.isConnected) onConnect();
+            else              onDisconnect();
+        }, "isConnected");
 
-        store.subscribe(newState -> {
-            // Client connection
-            if (newState.isConnected && !state.isConnected) {
-                onConnect();
-            } else if (!newState.isConnected && state.isConnected){
-                onDisconnect();
-            }
-            state = newState;
-        });
+        store.subscribe(s -> {
+            menuview_connect_button.setDisable(s.isConnecting);
+        }, "isConnecting");
+         */
+
+        //setupLayout();
     }
 
+    /**
+     * Initializes layout arrangement.
+     */
+    private void setupLayout() {
+        menuview_button_localgame.prefWidthProperty().bind(menuview_vbox.prefWidthProperty().multiply(0.5));
+        menuview_button_onlinegame.prefWidthProperty().bind(menuview_vbox.prefWidthProperty().multiply(0.5));
+        menuview_button_settings.prefWidthProperty().bind(menuview_vbox.prefWidthProperty().multiply(0.5));
+        menuview_button_exit.prefWidthProperty().bind(menuview_vbox.prefWidthProperty().multiply(0.5));
+    }
+
+    /**
+     * Sets the functionality for the LocalGame Button.
+     * @param event contains the data from the event source.
+     */
     @FXML
-    public void onLocalGameButtonPressed(Event event) {
-        mainViewController.showGameSelectionView();
+    private void onLocalGameButtonPressed(Event event) {
+        sceneLoader.showGameSettingsView(false);
     }
 
-    public void onExitButtonPressed() {
+    /**
+     * Sets the functionality for the OnlineGame Button.
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void onOnlineGameButtonPressed(Event event) {
+        sceneLoader.showServerConnectView();
+    }
+
+    /**
+     * Sets the functionality for the Settings Button.
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void onSettingsButtonPressed(Event event) {
+        sceneLoader.showSettingsView();
+    }
+
+    /**
+     * Sets the functionality for the Exit Button.
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void onExitButtonPressed(Event event) {
         // TODO: general application close mechanism
-        Stage stage = (Stage) menuview_boarderpane.getScene().getWindow();
+        Stage stage = (Stage) menuview_vbox.getScene().getWindow();
         stage.close();
-    }
-
-    //TODO: This is an awful solution to connect/disconnect
-    // send a "bye" message to a server and handle this method within an event.
-    // delete Client so we can reconnect -> Client state move to store
-    // and update Client list on disconnect
-    public void OnConnectButtonPressed() {
-
-        if (state.isConnected) {
-            // Disconnect from server
-            store.dispatch(new DisconnectAction());
-        } else {
-            // Connect to server
-            String address = menuview_textfield_address.getText().trim();
-            String port = menuview_textfield_port.getText().trim();
-
-            if (address.isEmpty() || port.isEmpty())
-                return;
-
-            // TODO: handle failed connection
-            store.dispatch(new ConnectAction(address, Integer.parseInt(port)));
-        }
-    }
-
-    private void onConnect() {
-        menuview_textfield_address.setDisable(true);
-        menuview_textfield_port.setDisable(true);
-        menuview_connect_button.setText("Disconnect");
-
-        menuview_localgame_button.setDisable(false);
-        menuview_onlinegame_button.setDisable(false);
-    }
-
-    private void onDisconnect() {
-        menuview_textfield_address.setDisable(false);
-        menuview_textfield_port.setDisable(false);
-        menuview_connect_button.setText("Connect");
-
-        menuview_localgame_button.setDisable(true);
-        menuview_onlinegame_button.setDisable(true);
-    }
-
-    public void setMainViewController(MainViewController mainViewController) {
-        this.mainViewController = mainViewController;
     }
 }

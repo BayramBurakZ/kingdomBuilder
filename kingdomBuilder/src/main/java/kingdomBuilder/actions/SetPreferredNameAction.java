@@ -21,7 +21,7 @@ public class SetPreferredNameAction extends Action {
 
     /**
      * Constructor that creates a new SetPreferredNameAction.
-     * @param clientName String that represents the PreferredName for the client
+     * @param clientName string that represents the PreferredName for the client
      */
     public SetPreferredNameAction(String clientName){
         this.clientName = clientName;

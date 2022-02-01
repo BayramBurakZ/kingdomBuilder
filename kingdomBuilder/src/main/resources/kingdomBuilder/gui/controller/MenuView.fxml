@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox fx:id="menuview_vbox" style="-fx-background-color: #383E42;"  xmlns="http://javafx.com/javafx/11.0.2"
+		xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.MenuViewController"
+	  alignment="CENTER" minWidth="400">
+
+	<Label alignment="CENTER" contentDisplay="CENTER" text="Kingdom Builder" textAlignment="CENTER"
+		   textFill="#f8efef" BorderPane.alignment="CENTER">
+		<font>
+			<Font size="41.0"/>
+		</font>
+		<padding>
+			<Insets top="30.0"/>
+		</padding>
+	</Label>
+
+	<Button fx:id="menuview_button_localgame" text="%localGame"
+			onAction="#onLocalGameButtonPressed" prefWidth="300.0"/>
+	<Button fx:id="menuview_button_onlinegame" text="%onlineGame"
+			onAction="#onOnlineGameButtonPressed" prefWidth="300.0"/>
+	<Button fx:id="menuview_button_settings" text="%settings"
+			onAction="#onSettingsButtonPressed" prefWidth="300.0"/>
+	<Button fx:id="menuview_button_exit" text="%exit"
+			onAction="#onExitButtonPressed" prefWidth="300.0"/>
+
+
+</VBox>
