@@ -224,7 +224,8 @@ public class GameViewController extends Controller implements Initializable {
             if (kbState.nextPlayer >= 0 && kbState.gameStarted && kbState.nextTerrainCard != null) {
                 // only preview for this client
                 if (kbState.nextPlayer == kbState.client.getClientId())
-                    gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
+                    gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles(
+                            kbState.game.playerIDtoObject(kbState.nextPlayer)));
             }
         }, "gameStarted", "nextPlayer", "nextTerrainCard");
 
@@ -288,7 +289,8 @@ public class GameViewController extends Controller implements Initializable {
         }
         // Highlight Terrain only for client
         if (kbState.nextPlayer == kbState.client.getClientId()) {
-            gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
+            gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles(
+                    kbState.game.playerIDtoObject(kbState.nextPlayer)));
         }
     }
 
@@ -304,8 +306,9 @@ public class GameViewController extends Controller implements Initializable {
         TileType token = state.token;
         if (token == null) {
             disableTokens(false);
-            gameBoard.highlightTerrain(state.game.allBasicTurnTiles());
-            gameBoard.getMarkedHexagon().removeMarker();
+            gameBoard.highlightTerrain(state.game.allBasicTurnTiles(state.game.playerIDtoObject(state.nextPlayer)));
+            if(gameBoard.getMarkedHexagon() != null)
+                gameBoard.getMarkedHexagon().removeMarker();
             return;
         } else {
             disableTokens(true);
@@ -448,7 +451,8 @@ public class GameViewController extends Controller implements Initializable {
         // maybe bug?
         if (kbState.game != null && kbState.game.currentPlayer != null)
             if (kbState.nextPlayer == kbState.client.getClientId())
-                gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles());
+                gameBoard.highlightTerrain(kbState.game.allBasicTurnTiles(
+                        kbState.game.playerIDtoObject(kbState.nextPlayer)));
     }
 
     /**

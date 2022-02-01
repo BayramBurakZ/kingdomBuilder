@@ -50,12 +50,13 @@ public class Tile {
     }
 
     /**
-     * Checks whether the tile is occupied by any player.
+     * Checks whether the tile is occupied by any player or obstructed due to terrain.
      *
      * @return True if it is occupied. False otherwise.
      */
-    public boolean isOccupied() {
-        return (occupiedBy != null);
+    public boolean isBlocked() {
+        //TODO: does not check water.
+        return nonPlaceableTileTypes.contains(tileType) || (occupiedBy != null);
     }
 
     /**
@@ -90,15 +91,6 @@ public class Tile {
     }
 
     /**
-     * Checks whether the tile type is placeable excluding water which is only placeable with a token.
-     *
-     * @return Whether the tile is placeable.
-     */
-    public boolean isTilePlaceable() {
-        return placeableTileTypes.contains(tileType);
-    }
-
-    /**
      * Checks if two tiles are neighbours in the hexagon map.
      *
      * @param other the second tile.
@@ -123,17 +115,17 @@ public class Tile {
     }
 
     /**
-     * Check if a tile is the front or back part of a chain that is occupied by a player.
+     * Check if a tile is at the front or back part of a chain of settlements that are owned by the specified player.
      *
      * @param map    the map containing the tile.
      * @param player the player to check for.
      * @return True if tile is a part of a chain. False otherwise.
      */
-    public boolean tileIsInFrontOrBackOfAChain(Map map, Player player) {
+    public boolean isAtEndOfAChain(Map map, Player player) {
 
         // TODO: iterator/stream
 
-        if (!isOccupied())
+        if (isBlocked())
             return false;
 
         // Check if chain is on right side
@@ -252,23 +244,23 @@ public class Tile {
         tempX = Map.topLeftX(x, y, 2);
         tempY = y + 2;
 
-        if (map.isWithinBounds(tempX, tempY) && map.at(tempX, tempY).isTilePlaceable())
+        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         // top right diagonal
         tempX = Map.topRightX(x, y, 2);
         tempY = y + 2;
 
-        if (map.isWithinBounds(tempX, tempY) && map.at(tempX, tempY).isTilePlaceable())
+        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         // left
-        if (map.isWithinBounds(x - 2, y) && map.at(x - 2, y).isTilePlaceable())
+        if (map.isWithinBounds(x - 2, y) && !map.at(x - 2, y).isBlocked())
             freeTiles.add(map.at(x - 2, y));
 
 
         // right
-        if (map.isWithinBounds(x + 2, y) && map.at(x - 2, y).isTilePlaceable())
+        if (map.isWithinBounds(x + 2, y) && !map.at(x - 2, y).isBlocked())
             freeTiles.add(map.at(x + 2, y));
 
 
@@ -276,14 +268,14 @@ public class Tile {
         tempX = Map.bottomLeftX(x, y, 2);
         tempY = y - 2;
 
-        if (map.isWithinBounds(tempX, tempY) && map.at(tempX, tempY).isTilePlaceable())
+        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         // bottom right diagonal
         tempX = Map.bottomRightX(x, y, 2);
         tempY = y - 2;
 
-        if (map.isWithinBounds(tempX, tempY) && map.at(tempX, tempY).isTilePlaceable())
+        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
             freeTiles.add(map.at(tempX, tempY));
 
         return freeTiles;

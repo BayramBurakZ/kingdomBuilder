@@ -463,7 +463,7 @@ public class KBReducer implements Reducer<KBState> {
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
-                    game.placeSettlement(game.currentPlayer, game.currentPlayer.getTerrainCard(), a.turn.y, a.turn.x);
+                    game.unsafePlaceSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
                     state.setGame(game);
@@ -489,40 +489,41 @@ public class KBReducer implements Reducer<KBState> {
         switch (a.turn.type) {
 
             case PLACE -> {
+                game.useBasicTurn(player, x, y);
                 oldState.client.placeSettlement(x, y);
             }
 
             case ORACLE -> {
                 game.useTokenOracle(player, x, y);
-                //oldState.client.useTokenOracle();
+                oldState.client.useTokenOracle(x, y);
             }
             case FARM -> {
                 game.useTokenFarm(player, x, y);
-                //oldState.client.useTokenFarm();
+                oldState.client.useTokenFarm(x, y);
             }
             case TAVERN -> {
                 game.useTokenTavern(player, x, y);
-                //oldState.client.useTokenTavern();
+                oldState.client.useTokenTavern(x, y);
             }
             case TOWER -> {
                 game.useTokenTower(player, x, y);
-                //oldState.client.useTokenTower();
+                oldState.client.useTokenTower(x, y);
             }
             case HARBOR -> {
                 game.useTokenHarbor(player, x, y, toX, toY);
-                //oldState.client.useTokenHarbor();
+                oldState.client.useTokenHarbor(x,y, toX, toY);
             }
             case PADDOCK -> {
                 game.useTokenPaddock(player, x, y, toX, toY);
-                //oldState.client.useTokenPaddock();
+                oldState.client.useTokenPaddock(x, y, toX, toY);
             }
             case BARN -> {
                 game.useTokenBarn(player, x, y, toX, toY);
-                //oldState.client.useTokenBarn();
+                oldState.client.useTokenBarn(x, y, toX, toY);
             }
             case OASIS -> {
                 game.useTokenOasis(player,x, y);
-                //oldState.client.useTokenOasis();
+                oldState.client.useTokenOasis(x, y);
             }
         }
 
@@ -557,7 +558,7 @@ public class KBReducer implements Reducer<KBState> {
 
         System.out.println(a.getPayload().column() + ", " + a.getPayload().row());
 
-        oldState.game.addToken(a.getPayload().column(), a.getPayload().row());
+        oldState.game.unsafeCheckForTokens(oldState.game.currentPlayer, a.getPayload().column(), a.getPayload().row());
 
         state.setGame(oldState.game);
         return state;

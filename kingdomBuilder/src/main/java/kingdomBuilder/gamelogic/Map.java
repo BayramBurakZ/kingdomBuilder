@@ -476,6 +476,28 @@ public class Map implements Iterable<Tile> {
     //}
 
     /**
+     * Gets all the tiles of the map.
+     *
+     * @return all tiles of the map.
+     */
+    public Set<Tile> getTiles() {
+        return tileSet;
+    }
+
+    /**
+     * Gets all the tiles of the map of the specified placeable terrain type.
+     *
+     * @param terrain the placeable terrain type to filter by.
+     * @return all tiles of the given placeable terrain type.
+     */
+    public Set<Tile> getTiles(TileType terrain) {
+        if (nonPlaceableTileTypes.contains(terrain))
+            throw new InvalidParameterException("The specified terrain is not a placeable terrain type!");
+
+        return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
+    }
+
+    /**
      * Gets all Tiles at border of map.
      *
      * @return all tiles that are at the border of the map.
@@ -497,25 +519,100 @@ public class Map implements Iterable<Tile> {
     }
 
     /**
-     * Gets all the tiles of the map.
+     * Gets all free tiles that are next to a player's settlement.
      *
-     * @return all tiles of the map.
+     * @param player the player of the settlements.
+     * @return
      */
-    public Set<Tile> getTiles() {
-        return tileSet;
+    public Set<Tile> getPlaceableTilesAtBorder(Player player) {
+        //Set<Tile> allPossiblePlacementsAtBorder = new HashSet<>();
+
+        Set<Tile> tilesOnBorder = getTilesAtBorder().stream().filter(tile -> !tile.isBlocked()
+                        && tile.hasSurroundingSettlement(this, player )).collect(Collectors.toSet());
+
+        return tilesOnBorder.isEmpty() ?
+                getTilesAtBorder().stream().filter(t -> !t.isBlocked()).collect(Collectors.toSet()) : tilesOnBorder;
+
+        // TODO:
+        /*
+        for (Tile tile : map.allSettlementsOfPlayerOnBorderOfMap(player)) {
+            if (tile.x == 0 || tile.x == map.mapWidth - 1) {
+
+                if (map.isWithinBounds(tile.x, tile.y - 1)
+                        && map.at(tile.x, tile.y - 1).isTilePlaceable()
+                        && map.at(tile.x, tile.y - 1).tileType != TileType.WATER)
+
+                    allPossiblePlacementsAtBorder.add(map.at(tile.x, tile.y - 1));
+
+                if (map.isWithinBounds(tile.x, tile.y + 1)
+                        && map.at(tile.x, tile.y + 1).isTilePlaceable()
+                        && map.at(tile.x, tile.y + 1).tileType != TileType.WATER)
+
+                    allPossiblePlacementsAtBorder.add(map.at(tile.x, tile.y + 1));
+            }
+
+            if (tile.y == 0 || tile.y == map.mapWidth - 1) {
+
+                if (map.isWithinBounds(tile.x - 1, tile.y)
+                        && map.at(tile.x + 1, tile.y).isTilePlaceable()
+                        && map.at(tile.x - 1, tile.y).tileType != TileType.WATER)
+
+                    allPossiblePlacementsAtBorder.add(map.at(tile.x - 1, tile.y));
+
+                if (map.isWithinBounds(tile.x + 1, tile.y)
+                        && map.at(tile.x + 1, tile.y).isTilePlaceable()
+                        && map.at(tile.x + 1, tile.y).tileType != TileType.WATER)
+
+                    allPossiblePlacementsAtBorder.add(map.at(tile.x + 1, tile.y));
+            }
+        }
+        */
+
+      //  return allPossiblePlacementsAtBorder;
     }
 
     /**
-     * Gets all the tiles of the map of the specified placeable terrain type.
+     * Gets all possible positions to place a settlement for a player on a given terrain next to
+     * other settlements.
      *
-     * @param terrain the placeable terrain type to filter by.
-     * @return all tiles of the given placeable terrain type.
+     * @param player  the player to check for.
+     * @param terrain the terrain to check for.
+     * @return All tiles that can be placed next to other settlements.
      */
-    public Set<Tile> getTiles(TileType terrain) {
-        if (nonPlaceableTileTypes.contains(terrain))
-            throw new InvalidParameterException("The specified terrain is not a placeable terrain type!");
+    protected Set<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
+        if (!placeableTileTypes.contains(terrain))
+            throw new InvalidParameterException("not a landscape!");
 
-        return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
+        //return map.stream().filter(tile -> tile.isAtBorder(map) && tile.isOccupiedByPlayer(player)).collect(Collectors.toSet());
+        //Set<Tile> freeTiles = map.stream().filter(tile -> tile.tileType == terrain)
+        //Set<Tile> allowedTiles = new HashSet<>();
+        return getTiles(terrain).stream().filter(tile ->
+                !tile.isBlocked()
+                && tile.hasSurroundingSettlement(this, player)).collect(Collectors.toSet());
+
+        /*
+        for (Tile freeTile : freeTiles) {
+            if (at(freeTile.x, freeTile.y).hasSurroundingSettlement(this, player) &&
+                    !at(freeTile.x, freeTile.y).isOccupied()) {
+                allowedTiles.add(freeTile);
+            }
+        }
+        return allowedTiles;
+         */
+    }
+
+    /**
+     * Gives a preview of all possible tiles to place a settlement.
+     *
+     * @param player  the player to check for.
+     * @param terrain the terrain the player has.
+     * @return A set of all positions a player can place a settlement.
+     */
+    protected Set<Tile> getAllPlaceableTiles(Player player, TileType terrain) {
+        Set<Tile> allPossiblePlacements = getAllPlaceableTilesNextToSettlements(player, terrain);
+        return (allPossiblePlacements.isEmpty()) ?
+                getTiles(terrain).stream().filter(t -> !t.isBlocked()).collect(Collectors.toSet())
+                : allPossiblePlacements;
     }
 
     /**

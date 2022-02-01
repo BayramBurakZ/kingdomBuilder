@@ -26,6 +26,51 @@ public class AIGame extends Game {
     }
 
     /**
+     * Moves a settlement to a new position within a given terrain.
+     *
+     * @param player  the player whose turn it is and who owns the settlement.
+     * @param terrain the terrain it is getting placed.
+     * @param fromX   the old horizontal position of the settlement on the map.
+     * @param fromY   the old vertical position of the settlement on the map.
+     * @param toX     the new horizontal position of the settlement on the map.
+     * @param toY     the new vertical position of the settlement on the map.
+     */
+    public void moveSettlement(Player player, TileType terrain, int fromX, int fromY, int toX, int toY) {
+
+        if (!canMoveSettlement(player, terrain, fromX, fromY, toX, toY))
+            throw new RuntimeException("can't move settlement on terrain");
+
+      /* we just read the message from the server, this is for AI later on
+        // Take token from player if settlement was last one on special place
+        map.at(fromX, fromY).surroundingSettlements(map, player).size() == 1
+        if (map.playerHasOnlyOneSettlementNextToSpecialPlace(player, fromX, fromY)) {
+            Tile token = map.specialPlaceInSurrounding(fromX, fromY);
+            player.removeToken(token);
+        }
+
+        // Take token from player if settlement was last one on special place
+        if (map.playerHasOnlyOneSettlementNextToSpecialPlace(player, fromX, fromY)) {
+
+            Tile token = map.specialPlaceInSurrounding(fromX, fromY);
+            player.removeToken(token);
+        }
+        */
+
+        map.at(fromX, fromY).moveSettlement(map.at(toX, toY));
+
+        /*
+        Tile token = map.specialPlaceInSurrounding(toX, toY);
+
+        // Player gets a token if settlement is next to special place
+        if (token != null) {
+            player.addToken(token);
+            map.at(toX, toY).takeTokenFromSpecialPlace();
+        }
+
+         */
+    }
+
+    /**
      * Places a settlement as a basic turn and throws if the move is not valid.
      *
      * @param x      the horizontal position of the settlement on the map.
@@ -34,7 +79,7 @@ public class AIGame extends Game {
      */
     @Override
     public void unsafePlaceSettlement(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, x, y))
+        if (!canUseBasicTurn(player, x, y))
             throw new RuntimeException("can't place settlement");
 
         map.at(x, y).placeSettlement(player);
@@ -96,7 +141,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenOracle(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, player.getTerrainCard(), x, y))
+        if (!canUseBasicTurn(player, player.getTerrainCard(), x, y))
             throw new RuntimeException("can't use token oracle");
 
         //placeSettlement(player, x, y);
@@ -113,7 +158,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenFarm(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, TileType.GRAS, x, y))
+        if (!canUseBasicTurn(player, TileType.GRAS, x, y))
             throw new RuntimeException("can't use token Farm");
 
         //placeSettlement(player, x, y);
@@ -131,7 +176,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenTavern(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, x, y) || !map.at(x,y).tileIsInFrontOrBackOfAChain(map, player))
+        if (!canUseBasicTurn(player, x, y) || !map.at(x,y).isAtEndOfAChain(map, player))
             throw new RuntimeException("can't use token tavern");
 
         //placeSettlement(player, x, y);
@@ -148,10 +193,11 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenTower(Player player, int x, int y) {
-        if (!canPlaceSettlement(player, x, y)
+        /*
+        if (!canUseBasicTurn(player, x, y)
                 || !allPossibleSettlementPlacementsOnBorderOfMap(player).contains(map.at(x, y)))
             throw new RuntimeException("can't use token tower");
-
+        */
         //placeSettlement(player, x, y);
         player.useToken(TileType.TOWER);
     }
@@ -166,7 +212,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenOasis(Player player, int x, int y) {
-        if (canPlaceSettlement(player, TileType.DESERT, x, y))
+        if (canUseBasicTurn(player, TileType.DESERT, x, y))
             throw new RuntimeException("can't use token oasis");
 
         //placeSettlement(player, x, y);
@@ -186,7 +232,7 @@ public class AIGame extends Game {
     @Override
     public void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
         //TODO: REVISIT THIS
-        if (canMoveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY))
+        if (canMoveSettlement(player, TileType.WATER, fromX, fromY, toX, toY))
             throw new RuntimeException("can't use token harbor");
 
         //moveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY);
@@ -206,7 +252,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
-        if (canPlaceSettlement(player, toX, toY))
+        if (canUseBasicTurn(player, toX, toY))
             throw new RuntimeException("can't use token paddock");
 
         //moveSettlement(player, fromX, fromY, toX, toY);
@@ -225,7 +271,7 @@ public class AIGame extends Game {
      */
     @Override
     public void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
-        if (!canMoveSettlementOnTerrain(player, player.getTerrainCard(), fromX, fromY, toX, toY))
+        if (!canMoveSettlement(player, player.getTerrainCard(), fromX, fromY, toX, toY))
             throw new RuntimeException("can't use token paddock");
 
         //moveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY);
