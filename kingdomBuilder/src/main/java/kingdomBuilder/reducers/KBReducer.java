@@ -97,6 +97,8 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if( action instanceof UploadQuadrantAction a)
             return reduce(oldState, a);
+        else if( action instanceof GameEndAction a)
+            return reduce(oldState, a);
 
             System.out.println("Unknown action");
         return new DeferredState(oldState);
@@ -591,5 +593,20 @@ public class KBReducer implements Reducer<KBState> {
 
         oldState.client.uploadQuadrant(a.quadrant);
         return new DeferredState(oldState);
+    }
+
+    private DeferredState reduce(KBState oldState, GameEndAction a){
+        DeferredState state = new DeferredState(oldState);
+
+        state.setPlayers(null);
+        state.setScores(null);
+        state.setToken(null);
+        state.setGame(null);
+        state.setGameLastTurn(null);
+        state.setNextTerrainCard(null);
+        state.setNextPlayer(-1);
+        state.setGameStarted(false);
+
+        return state;
     }
 }
