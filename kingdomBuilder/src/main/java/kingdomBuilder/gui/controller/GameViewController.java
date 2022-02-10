@@ -258,14 +258,15 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state.
      */
     private void onNextPlayer(KBState kbState) {
+        if(kbState.client != null) {
+            String msg = String.format("(%d) Called onNextPlayer", kbState.client.getClientId());
+            System.out.println(msg);
+        }
+
         if (kbState.nextPlayer == -1)
             return;
 
-        if (kbState.nextPlayer == kbState.client.getClientId() && !isSpectating) {
-            game_button_end.setDisable(false);
-        } else {
-            game_button_end.setDisable(true);
-        }
+        game_button_end.setDisable(kbState.nextPlayer != kbState.client.getClientId() || isSpectating);
     }
 
     /**

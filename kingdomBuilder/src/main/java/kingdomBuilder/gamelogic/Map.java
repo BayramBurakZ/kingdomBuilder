@@ -580,25 +580,12 @@ public class Map implements Iterable<Tile> {
      * @return All tiles that can be placed next to other settlements.
      */
     protected Set<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
-        if (!placeableTileTypes.contains(terrain))
+        if (!placeableTileTypes.contains(terrain) && terrain != null)
             throw new InvalidParameterException("not a landscape!");
 
-        //return map.stream().filter(tile -> tile.isAtBorder(map) && tile.isOccupiedByPlayer(player)).collect(Collectors.toSet());
-        //Set<Tile> freeTiles = map.stream().filter(tile -> tile.tileType == terrain)
-        //Set<Tile> allowedTiles = new HashSet<>();
         return getTiles(terrain).stream().filter(tile ->
                 !tile.isBlocked()
                 && tile.hasSurroundingSettlement(this, player)).collect(Collectors.toSet());
-
-        /*
-        for (Tile freeTile : freeTiles) {
-            if (at(freeTile.x, freeTile.y).hasSurroundingSettlement(this, player) &&
-                    !at(freeTile.x, freeTile.y).isOccupied()) {
-                allowedTiles.add(freeTile);
-            }
-        }
-        return allowedTiles;
-         */
     }
 
     /**
