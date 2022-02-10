@@ -29,7 +29,15 @@ public class GameBoard extends Board {
      */
     protected HexagonTile[][] board = new HexagonTile[SIZE][SIZE];
 
+    /**
+     * Represents the store of the application.
+     */
     private Store<KBState> store;
+
+    /**
+     * Represents the hexagon, that is marked to move.
+     */
+    private HexagonTile markedHexagon;
 
     /**
      * Constructor to instantiate the GameBoard.
@@ -60,13 +68,17 @@ public class GameBoard extends Board {
         group.getChildren().add(hexagonTile);
     }
 
-    // the marked hexagon
-    private HexagonTile markedHexagon;
 
-    // marks the hexagon and updates the highlight
+    /**
+     * Marks the hexagon and updates the highlight for the selected token. If the token is null, nothing will be
+     * highlighted.
+     * @param hexagon the hexagon to be marked.
+     */
     public void markHexagonToMove(HexagonTile hexagon) {
         markedHexagon = hexagon;
         Game game = store.getState().game;
+        if (store.getState().token == null)
+            return;
 
         switch (store.getState().token) {
             case BARN -> highlightTerrain(game.allTokenBarnTiles(game.currentPlayer, true));
@@ -76,7 +88,11 @@ public class GameBoard extends Board {
         }
     }
 
-    //triggered when the user clicks on a hexagon
+    /**
+     * triggered when the user clicks on a hexagon.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     */
     public void hexagonClicked(int x, int y) {
         int playerID = store.getState().client.getClientId();
         TileType token = store.getState().token;
@@ -105,7 +121,16 @@ public class GameBoard extends Board {
         }
     }
 
-    // sends the final turn message to the reducer
+    /**
+     * sends the final turn message to the reducer
+     * @param id the id of the player.
+     * @param x the x-coordinate to place a settlement.
+     * @param y the y-coordinate to place a settlement.
+     * @param toX the x-coordinate to move a settlement to.
+     * @param toY the y-coordinate to move a settlement to.
+     * @param isToken if the turn is a token.
+     * @param isMove if the turn is a turn to move a settlement.
+     */
     public void sendClientTurn(int id, int x, int y, int toX, int toY, boolean isToken, boolean isMove) {
 
         ClientTurn turn;

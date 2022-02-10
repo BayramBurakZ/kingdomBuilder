@@ -308,8 +308,10 @@ public class GameViewController extends Controller implements Initializable {
         if (token == null) {
             disableTokens(false);
             gameBoard.highlightTerrain(state.game.allBasicTurnTiles(state.game.playerIDtoObject(state.nextPlayer)));
-            if(gameBoard.getMarkedHexagon() != null)
+            if(gameBoard.getMarkedHexagon() != null) {
                 gameBoard.getMarkedHexagon().removeMarker();
+                gameBoard.markHexagonToMove(null);
+            }
             return;
         } else {
             disableTokens(true);
@@ -773,9 +775,11 @@ public class GameViewController extends Controller implements Initializable {
      * @param actionEvent the triggered event.
      */
     private void onTurnEndButtonPressed(ActionEvent actionEvent) {
+        // TODO: cancel token usage when we press this
         // dispatch only if the basic turn is over
         if (store.getState().game != null && store.getState().game.currentPlayer != null
-                && store.getState().game.currentPlayer.getRemainingSettlementsOfTurn() == 0) {
+                && store.getState().game.currentPlayer.getRemainingSettlementsOfTurn() == 0
+                && store.getState().token == null) {
             store.dispatch(new TurnEndAction());
         }
     }

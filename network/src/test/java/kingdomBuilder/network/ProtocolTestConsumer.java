@@ -193,6 +193,9 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
     }
 
     @Override
+    public void accept(TokenUsed message) { object = message; }
+
+    @Override
     public void accept(PlayerUsedLastSettlement message) {
         object = message;
     }

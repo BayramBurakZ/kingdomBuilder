@@ -47,6 +47,11 @@ public class Player {
     int remainingSettlementsOfTurn;
 
     /**
+     * Represents the settlements that the player needed to place at the start of their turn.
+     */
+    int remainingSettlementsAtStartOfTurn;
+
+    /**
      * Class that represents a token.
      */
     public static class Token {
@@ -81,6 +86,7 @@ public class Player {
      */
     void startTurn() {
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
+        remainingSettlementsAtStartOfTurn = remainingSettlementsOfTurn;
         tokens.forEach((tileType, token) -> token.remaining = token.getTotal());
     }
 

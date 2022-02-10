@@ -91,13 +91,15 @@ public class KBReducer implements Reducer<KBState> {
             return reduce(oldState, a);
         else if (action instanceof ReceiveTokenAction a)
             return reduce(oldState, a);
-        else if( action instanceof ActivateToken a)
+        else if( action instanceof ActivateTokenAction a)
             return reduce(oldState, a);
         else if( action instanceof ScoreAction a)
             return reduce(oldState, a);
         else if( action instanceof UploadQuadrantAction a)
             return reduce(oldState, a);
         else if( action instanceof GameEndAction a)
+            return reduce(oldState, a);
+        else if( action instanceof RemoveTokenAction a)
             return reduce(oldState, a);
 
             System.out.println("Unknown action");
@@ -222,6 +224,16 @@ public class KBReducer implements Reducer<KBState> {
                 new ServerTurnAction(new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))));
 
         client.onTokenReceived.subscribe(m -> store.dispatch(new ReceiveTokenAction(m)));
+
+        client.onTokenLost.subscribe(m -> store.dispatch(new RemoveTokenAction(m)));
+
+        client.onTokenUsed.subscribe(m -> {
+            Game.TileType token = Game.TileType.valueOf(m.tokenType());
+            if (token == TileType.PADDOCK || token == TileType.BARN || token == TileType.HARBOR) {
+                store.dispatch(new ServerTurnAction(
+                        new ServerTurn(m.clientId(), ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)));
+            }
+        });
 
         store.subscribe(kbState -> store.dispatch(new ReadyGameAction()),
                 "players", "nextTerrainCard", "nextPlayer");
@@ -460,12 +472,9 @@ public class KBReducer implements Reducer<KBState> {
             case PLACE -> {
                 ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
                         (ServerTurn) oldState.gameLastTurn : null;
-                if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.REMOVE) {
-                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
-                    game.unsafeMoveSettlement(game.currentPlayer, lastTurn.y, lastTurn.x, a.turn.y, a.turn.x);
-                    // this x,y doesn't need to be swapped since we're treating it as an incoming server message
+                if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.TOKEN_USED) {
                     state.setGameLastTurn(new ServerTurn(
-                            a.turn.clientId, ServerTurn.TurnType.MOVE, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
+                            a.turn.clientId, ServerTurn.TurnType.TOKEN_USED, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
                     // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
                     game.unsafePlaceSettlement(game.currentPlayer, a.turn.y, a.turn.x);
@@ -475,6 +484,17 @@ public class KBReducer implements Reducer<KBState> {
                 state.setGame(game);
             }
             case REMOVE -> {
+                ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
+                        (ServerTurn) oldState.gameLastTurn : null;
+                if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.TOKEN_USED) {
+                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
+                    game.unsafeMoveSettlement(game.currentPlayer, a.turn.y, a.turn.x, lastTurn.toY, lastTurn.toX);
+                    // this x,y doesn't need to be swapped since we're treating it as an incoming server message
+                    state.setGameLastTurn(new ServerTurn(
+                            a.turn.clientId, ServerTurn.TurnType.MOVE, a.turn.x, a.turn.y, lastTurn.toX, lastTurn.toY));
+                }
+            }
+            case TOKEN_USED -> {
                 state.setGameLastTurn(a.turn);
             }
         }
@@ -563,15 +583,22 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, ReceiveTokenAction a) {
         DeferredState state = new DeferredState(oldState);
 
-        System.out.println(a.getPayload().column() + ", " + a.getPayload().row());
-
         oldState.game.unsafeCheckForTokens(oldState.game.currentPlayer, a.getPayload().column(), a.getPayload().row());
 
         state.setGame(oldState.game);
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, ActivateToken a){
+    private DeferredState reduce(KBState oldState, RemoveTokenAction a){
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.game.unsafeRemoveToken(oldState.game.currentPlayer, a.getPayload().column(), a.getPayload().row());
+
+        state.setGame(oldState.game);
+        return state;
+    }
+
+    private DeferredState reduce(KBState oldState, ActivateTokenAction a){
         DeferredState state = new DeferredState(oldState);
 
         final Game game = oldState.game;
