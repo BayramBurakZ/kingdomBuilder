@@ -13,7 +13,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.ActivateToken;
+import kingdomBuilder.actions.game.ActivateTokenAction;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.controller.GameViewController;
@@ -202,10 +202,9 @@ public class Token extends StackPane {
                 activateToken();
 
                 if (isActivated) {
-                    store.dispatch(new ActivateToken(tileType));
-
+                    store.dispatch(new ActivateTokenAction(tileType));
                 } else {
-                    store.dispatch(new ActivateToken(null));
+                    store.dispatch(new ActivateTokenAction(null));
                 }
             });
         }

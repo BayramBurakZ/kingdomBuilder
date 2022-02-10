@@ -43,6 +43,10 @@ public final class ServerTurn extends Turn {
         /**
          * Represents the type to move a settlement.
          */
-        MOVE
+        MOVE,
+        /**
+         * Represents the type that a token has been used.
+         */
+        TOKEN_USED
     }
 }

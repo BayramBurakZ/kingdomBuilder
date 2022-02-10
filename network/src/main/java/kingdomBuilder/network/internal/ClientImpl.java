@@ -542,6 +542,11 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     }
 
     @Override
+    public void accept(TokenUsed message) {
+        onTokenUsed.dispatch(message);
+    }
+
+    @Override
     public void accept(PlayerUsedLastSettlement message) {
         onPlayerUsedLastSettlement.dispatch(message);
     }

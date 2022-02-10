@@ -225,6 +225,11 @@ public abstract class Client {
     public final Event<TokenLost> onTokenLost = new Event<>();
 
     /**
+     * Event that gets dispatched whenever a token has been used.
+     */
+    public final Event<TokenUsed> onTokenUsed = new Event<>();
+
+    /**
      * Event that gets dispatched whenever a player used his/her last settlement.
      */
     public final Event<PlayerUsedLastSettlement> onPlayerUsedLastSettlement = new Event<>();
