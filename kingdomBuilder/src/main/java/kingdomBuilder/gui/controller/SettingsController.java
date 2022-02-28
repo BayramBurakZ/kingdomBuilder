@@ -11,8 +11,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.BetterColorModeAction;
-import kingdomBuilder.actions.SetPreferredNameAction;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -127,15 +126,15 @@ public class SettingsController extends Controller implements Initializable {
     @FXML
     private void onApplyButtonPressed(Event event) {
         String preferredName = textField_name.getText().trim();
-        if (isNameValid(preferredName)) {
-            store.dispatch(new SetPreferredNameAction(preferredName));
-        } else {
-            // TODO: Error Message if Name is not valid!
-        }
+        if (isNameValid(preferredName))
+            store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
+        else
+            ; // TODO: Error Message if Name is not valid!
+
 
         // color mode
         if (store.getState().betterColorsActive != settings_checkBox_colors.isSelected()) {
-            store.dispatch(new BetterColorModeAction(settings_checkBox_colors.isSelected()));
+            store.dispatch(GameReducer.BETTER_COLOR_MODE, settings_checkBox_colors.isSelected());
         }
 
         sceneLoader.showMenuView();

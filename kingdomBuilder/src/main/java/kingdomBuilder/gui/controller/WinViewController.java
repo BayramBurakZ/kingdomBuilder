@@ -5,10 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.GameEndAction;
 import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.network.protocol.Scores;
 import kingdomBuilder.network.protocol.ScoresData;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -132,6 +132,6 @@ public class WinViewController extends Controller implements Initializable {
     @FXML
     private void onOKButtonPressed(Event event) {
         sceneLoader.showGameSelectionView();
-        store.dispatch(new GameEndAction());
+        store.dispatch(GameReducer.END_GAME, null);
     }
 }

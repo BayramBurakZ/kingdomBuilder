@@ -225,7 +225,7 @@ public class LevelEditorController extends Controller implements Initializable {
 
         System.out.println(types);
 
-        store.dispatch(new UploadQuadrantAction(types));
+        store.dispatchOld(new UploadQuadrantAction(types));
     }
 
     /**

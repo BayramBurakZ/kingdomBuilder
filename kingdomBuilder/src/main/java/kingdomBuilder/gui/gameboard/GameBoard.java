@@ -2,13 +2,12 @@ package kingdomBuilder.gui.gameboard;
 
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.ClientTurnAction;
 import kingdomBuilder.gamelogic.ClientTurn;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gamelogic.Tile;
 import kingdomBuilder.gui.base.Board;
-import kingdomBuilder.gui.controller.GameViewController;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -166,7 +165,7 @@ public class GameBoard extends Board {
             );
         }
 
-        store.dispatch(new ClientTurnAction(turn));
+        store.dispatch(GameReducer.CLIENT_TURN, turn);
     }
 
     /**

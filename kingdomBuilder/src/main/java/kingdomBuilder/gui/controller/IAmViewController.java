@@ -13,7 +13,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.SetPreferredNameAction;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -162,7 +162,7 @@ public class IAmViewController extends Controller implements Initializable {
         String preferredName = iAmViewTextField.getText().trim();
         if (isNameValid(preferredName)) {
             // TODO: could let dispatch throw in case the name isn't valid
-            store.dispatch(new SetPreferredNameAction(preferredName));
+            store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
             sceneLoader.showMenuView();
         }
     }

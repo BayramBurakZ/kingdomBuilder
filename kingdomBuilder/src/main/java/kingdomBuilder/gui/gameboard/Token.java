@@ -13,11 +13,11 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.ActivateTokenAction;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Game.TileType;
 import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.gui.util.HexagonCalculator;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.util.ArrayList;
@@ -195,16 +195,9 @@ public class Token extends StackPane {
         private void addListener(TileType tileType) {
             setOnMouseClicked(event -> {
                 // if the tile is disabled: do nothing
-                if (isDisabled) {
-                    return;
-                }
-                // with click activate the token
-                activateToken();
-
-                if (isActivated) {
-                    store.dispatch(new ActivateTokenAction(tileType));
-                } else {
-                    store.dispatch(new ActivateTokenAction(null));
+                if (!isDisabled) {
+                    activateToken();
+                    store.dispatch(GameReducer.ACTIVATE_TOKEN, isActivated ? tileType : null);
                 }
             });
         }

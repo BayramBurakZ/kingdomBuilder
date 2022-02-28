@@ -8,10 +8,10 @@ import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.*;
-import kingdomBuilder.actions.general.DisconnectAction;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.reducers.ApplicationReducer;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -171,7 +171,7 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     @FXML
     private void onReturnToMenuButtonPressed(Event event) {
-        store.dispatch(new DisconnectAction());
+        store.dispatch(ApplicationReducer.DISCONNECT, Boolean.FALSE);
         sceneLoader.showMenuView();
     }
 
@@ -183,7 +183,7 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private void onJoinGamePressed(Event event) {
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
-        store.dispatch(new JoinGameAction(id));
+        store.dispatch(GameReducer.JOIN_GAME, id);
         sceneLoader.showGameView(false, true);
     }
 

@@ -15,6 +15,7 @@ import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.Message;
+import kingdomBuilder.reducers.ChatReducer;
 import kingdomBuilder.redux.Store;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -497,7 +498,7 @@ public class ChatViewController extends Controller implements Initializable {
                 ));
             }
 
-            store.dispatch(new ChatSendAction(receiverIds, chatMessage));
+            store.dispatch(ChatReducer.SEND_MESSAGE, new ChatSendAction(receiverIds, chatMessage));
         }
         chatview_textarea_chatinput.clear();
     }
@@ -538,7 +539,7 @@ public class ChatViewController extends Controller implements Initializable {
                     createHTMLElement(message, null)
                     ));
 
-            store.dispatch(new ChatSendAction(receiverIds, message));
+            store.dispatch(ChatReducer.SEND_MESSAGE, new ChatSendAction(receiverIds, message));
         }
         chatview_textarea_chatinput.clear();
     }
