@@ -6,7 +6,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Polygon;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.WinCondition;
 import kingdomBuilder.gui.util.HexagonCalculator;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class Wincondition extends Polygon {
      * @param winCondition the wincondtion.
      * @param resourceBundle the language support.
      */
-    public Wincondition(Game.WinCondition winCondition, ResourceBundle resourceBundle) {
+    public Wincondition(WinCondition winCondition, ResourceBundle resourceBundle) {
         // add all corners for a hexagon shape
         for (int i = 0; i < HexagonCalculator.NUMBER_OF_CORNERS; i++) {
             getPoints().add(vertices.get(i).getX());

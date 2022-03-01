@@ -3,8 +3,6 @@ package kingdomBuilder.gamelogic;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static kingdomBuilder.gamelogic.Game.*;
-
 /**
  * Contains the data of a player.
  */
@@ -51,6 +49,7 @@ public class Player {
      */
     int remainingSettlementsAtStartOfTurn;
 
+    // TODO: maybe properly hide this class instead of moving it outside
     /**
      * Class that represents a token.
      */
@@ -77,8 +76,8 @@ public class Player {
         this.name = name;
         this.color = color;
         this.remainingSettlements = totalSettlements;
-        this.tokens = new HashMap<>(Game.tokenType.size());
-        tokenType.forEach(tileType -> tokens.put(tileType, new Token()));
+        this.tokens = new HashMap<>(TileType.tokenType.size());
+        TileType.tokenType.forEach(tileType -> tokens.put(tileType, new Token()));
     }
 
     /**
@@ -107,7 +106,7 @@ public class Player {
      */
     void addToken(Tile originTile) {
 
-        if (!tokenType.contains(originTile.tileType))
+        if (!TileType.tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
 
         Token token = tokens.get(originTile.tileType);
@@ -124,7 +123,7 @@ public class Player {
      * @return whether the player has a token from the specified special place.
      */
     public boolean hasTokenFrom(Tile originTile) {
-        if (!tokenType.contains(originTile.tileType))
+        if (!TileType.tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
 
         Token token = tokens.get(originTile.tileType);
@@ -137,7 +136,7 @@ public class Player {
      * @param originTile the tile whose token is taken from the player and returned to the tile.
      */
     void removeToken(Tile originTile) {
-        if (!tokenType.contains(originTile.tileType))
+        if (!TileType.tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
 
         Token token = tokens.get(originTile.tileType);
@@ -206,6 +205,7 @@ public class Player {
         return remainingSettlementsOfTurn;
     }
 
+    // TODO: read-only map or iterator
     public HashMap<TileType, Token> getTokens() {
         return tokens;
     }

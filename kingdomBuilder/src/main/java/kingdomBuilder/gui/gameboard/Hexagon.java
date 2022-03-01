@@ -3,7 +3,7 @@ package kingdomBuilder.gui.gameboard;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.util.PLYLoader;
 
 import java.net.URISyntaxException;
@@ -47,7 +47,7 @@ public class Hexagon extends MeshView {
      * Creates a hexagon prism with texture.
      * @param tileType selects a texture based on this type.
      */
-    public Hexagon(Game.TileType tileType) {
+    public Hexagon(TileType tileType) {
         super(hexagonMesh);
         setScaleX(HEXAGON_WIDTH);
         setScaleY(HEXAGON_HEIGHT);

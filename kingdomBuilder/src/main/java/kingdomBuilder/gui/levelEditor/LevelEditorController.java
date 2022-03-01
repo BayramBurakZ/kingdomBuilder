@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.UploadQuadrantAction;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
 import kingdomBuilder.redux.Store;
@@ -286,7 +286,7 @@ public class LevelEditorController extends Controller implements Initializable {
      *
      * @return The tile type from combo box.
      */
-    public Game.TileType getTileTypeFromCombobox() {
+    public TileType getTileTypeFromCombobox() {
         return stringToTileType(editor_comboBox.getSelectionModel().getSelectedItem());
     }
 
@@ -296,40 +296,40 @@ public class LevelEditorController extends Controller implements Initializable {
      * @param tileTypeString string to get translated into a tile type.
      * @return The tile type as enum.
      */
-    private Game.TileType stringToTileType(String tileTypeString) {
+    private TileType stringToTileType(String tileTypeString) {
         switch (tileTypeString) {
             case "Canyon":
-                return Game.TileType.CANYON;
+                return TileType.CANYON;
             case "Desert":
-                return Game.TileType.DESERT;
+                return TileType.DESERT;
             case "Flower":
-                return Game.TileType.FLOWER;
+                return TileType.FLOWER;
             case "Forest":
-                return Game.TileType.FORREST;
+                return TileType.FORREST;
             case "Gras":
-                return Game.TileType.GRAS;
+                return TileType.GRAS;
             case "Mountain":
-                return Game.TileType.MOUNTAIN;
+                return TileType.MOUNTAIN;
             case "Water":
-                return Game.TileType.WATER;
+                return TileType.WATER;
             case "Castle":
-                return Game.TileType.CASTLE;
+                return TileType.CASTLE;
             case "Barn":
-                return Game.TileType.BARN;
+                return TileType.BARN;
             case "Farm":
-                return Game.TileType.FARM;
+                return TileType.FARM;
             case "Harbor":
-                return Game.TileType.HARBOR;
+                return TileType.HARBOR;
             case "Oasis":
-                return Game.TileType.OASIS;
+                return TileType.OASIS;
             case "Oracle":
-                return Game.TileType.ORACLE;
+                return TileType.ORACLE;
             case "Paddock":
-                return Game.TileType.PADDOCK;
+                return TileType.PADDOCK;
             case "Tavern":
-                return Game.TileType.TAVERN;
+                return TileType.TAVERN;
             case "Tower":
-                return Game.TileType.TOWER;
+                return TileType.TOWER;
             default:
                 throw new InvalidParameterException("String doesn't match to Tile type.");
         }
@@ -351,10 +351,10 @@ public class LevelEditorController extends Controller implements Initializable {
                     return false;
                 }
 
-                if(e.getTileType() == Game.TileType.CASTLE)
+                if(e.getTileType() == TileType.CASTLE)
                     castles++;
 
-                if(Game.tokenType.contains(e.getTileType()))
+                if(TileType.tokenType.contains(e.getTileType()))
                     special++;
             }
         }

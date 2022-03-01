@@ -3,12 +3,8 @@ package kingdomBuilder.gui.gameboard;
 import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.ClientTurnAction;
-import kingdomBuilder.gamelogic.ClientTurn;
-import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.Game.TileType;
-import kingdomBuilder.gamelogic.Tile;
+import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gui.base.Board;
-import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -189,7 +185,7 @@ public class GameBoard extends Board {
      * @param y the y-coordinate.
      * @param color the player color.
      */
-    public void placeSettlement(int x, int y, Game.PlayerColor color) {
+    public void placeSettlement(int x, int y, PlayerColor color) {
         board[y][x].placeSettlement(color);
     }
 

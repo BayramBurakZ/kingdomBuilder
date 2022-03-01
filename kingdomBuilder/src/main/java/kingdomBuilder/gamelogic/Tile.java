@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static kingdomBuilder.gamelogic.Game.*;
-
 /**
  * Contains the data of a tile.
  */
@@ -19,7 +17,7 @@ public class Tile {
     /**
      * The tile type of the tile.
      */
-    public final Game.TileType tileType;
+    public final TileType tileType;
 
     /**
      * The player whose settlement is occupying the tile.
@@ -39,7 +37,7 @@ public class Tile {
      * @param tileType        the tileType.
      * @param remainingTokens the amount of tokens that remains on that tile.
      */
-    public Tile(int x, int y, Game.TileType tileType, int remainingTokens) {
+    public Tile(int x, int y, TileType tileType, int remainingTokens) {
 
         this.x = x;
         this.y = y;
@@ -55,7 +53,7 @@ public class Tile {
      * @return True if it is occupied. False otherwise.
      */
     public boolean isBlocked() {
-        return !placeableTileTypes.contains(tileType) || (occupiedBy != null);
+        return !TileType.placeableTileTypes.contains(tileType) || (occupiedBy != null);
     }
 
     /**
@@ -83,7 +81,7 @@ public class Tile {
      * @return True if it has tokens left. False otherwise.
      */
     public boolean hasTokens() {
-        if (!tokenType.contains(tileType))
+        if (!TileType.tokenType.contains(tileType))
             throw new RuntimeException("The tile is not a special place!");
 
         return (remainingTokens > 0);
@@ -317,7 +315,7 @@ public class Tile {
         }
         return surroundingSpecialPlaces;
         */
-        return surroundingTiles(map).stream().filter(tile -> tokenType.contains(tile.tileType))
+        return surroundingTiles(map).stream().filter(tile -> TileType.tokenType.contains(tile.tileType))
                 .collect(Collectors.toSet());
     }
 
@@ -408,7 +406,7 @@ public class Tile {
      * @throws HasNoTokenException when tile is not a special place.
      */
     public TileType takeTokenFromSpecialPlace() throws HasNoTokenException {
-        if (!Game.tokenType.contains(tileType))
+        if (!TileType.tokenType.contains(tileType))
             throw new HasNoTokenException("Can't take a token from a non special place!");
         if (remainingTokens <= 0)
             throw new HasNoTokenException("No more tokens remaining!");

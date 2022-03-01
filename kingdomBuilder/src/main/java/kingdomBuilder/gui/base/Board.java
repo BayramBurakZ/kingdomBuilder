@@ -1,10 +1,8 @@
 package kingdomBuilder.gui.base;
 
 import javafx.scene.Group;
-import kingdomBuilder.KBState;
-import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Map;
-import kingdomBuilder.redux.Store;
+import kingdomBuilder.gamelogic.TileType;
 
 import java.util.ResourceBundle;
 
@@ -49,7 +47,7 @@ public abstract class Board {
      * @param map the map with all information.
      * @param resource the ResourceBundle for translating text.
      */
-    public void setupBoard(Group group, Game.TileType[][] map, ResourceBundle resource) {
+    public void setupBoard(Group group, TileType[][] map, ResourceBundle resource) {
         int width = map.length;
 
         for (int y = 0; y < width; y++) {
@@ -80,5 +78,5 @@ public abstract class Board {
      * @param resource the language support.
      */
     public abstract void placeTileOnBoard(Group group, int x, int y,
-                                          int xPos, int yPos, Game.TileType tileType, ResourceBundle resource);
+                                          int xPos, int yPos, TileType tileType, ResourceBundle resource);
 }

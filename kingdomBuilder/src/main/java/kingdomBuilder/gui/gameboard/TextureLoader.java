@@ -4,7 +4,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gamelogic.WinCondition;
 
 /**
  * Class to load all relevant textures.
@@ -149,7 +150,7 @@ public final class TextureLoader {
      * @param type the Tile for requesting the Image.
      * @return The Image for the requested Tile.
      */
-    public static Image getTileTexture(Game.TileType type) {
+    public static Image getTileTexture(TileType type) {
         return switch (type) {
             case CANYON -> CANYON;
             case DESERT -> DESERT;
@@ -178,7 +179,7 @@ public final class TextureLoader {
      * @param wincondition the WinCondition for requesting the Image.
      * @return The Image for the requested WinCondition.
      */
-    public static Image getWinConditionTexture(Game.WinCondition wincondition) {
+    public static Image getWinConditionTexture(WinCondition wincondition) {
         return switch (wincondition) {
             case ANCHORITE -> ANCHORITE;
             case CITIZEN -> CITIZEN;

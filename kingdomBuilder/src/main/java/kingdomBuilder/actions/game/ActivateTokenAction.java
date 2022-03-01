@@ -1,16 +1,16 @@
 package kingdomBuilder.actions.game;
 
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.redux.Action;
 
 public class ActivateTokenAction extends Action {
-    private Game.TileType token;
+    private TileType token;
 
-    public Game.TileType getToken() {
+    public TileType getToken() {
         return token;
     }
 
-    public ActivateTokenAction(Game.TileType token) {
+    public ActivateTokenAction(TileType token) {
         this.token = token;
     }
 }

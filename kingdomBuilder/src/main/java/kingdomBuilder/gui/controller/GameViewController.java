@@ -19,12 +19,9 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.TurnEndAction;
-import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.Game.PlayerColor;
-import kingdomBuilder.gamelogic.Game.TileType;
-import kingdomBuilder.gamelogic.Map;
-import kingdomBuilder.gamelogic.Player;
-import kingdomBuilder.gamelogic.ServerTurn;
+import kingdomBuilder.gamelogic.*;
+import kingdomBuilder.gamelogic.PlayerColor;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
@@ -753,7 +750,7 @@ public class GameViewController extends Controller implements Initializable {
         // should be empty but safe is safe
         game_hBox_windconditions.getChildren().clear();
 
-        Game.WinCondition[] winConditions = store.getState().game.getWinConditions();
+        WinCondition[] winConditions = store.getState().game.getWinConditions();
 
         for (int i = 0; i < 3; i++) {
             game_hBox_windconditions.getChildren().add(new Wincondition(winConditions[i], resourceBundle));

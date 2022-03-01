@@ -1,6 +1,5 @@
 package kingdomBuilder.gamelogic;
 
-import static kingdomBuilder.gamelogic.Game.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;

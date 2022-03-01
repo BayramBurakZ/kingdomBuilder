@@ -10,8 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static kingdomBuilder.gamelogic.Game.*;
-
 /**
  * Contains the data of a map.
  */
@@ -56,10 +54,10 @@ public class Map implements Iterable<Tile> {
      *                                   quadrants are not the same or if quadrant is not a square.
      */
     public Map(int startingTokenCount,
-               Game.TileType[] topLeft,
-               Game.TileType[] topRight,
-               Game.TileType[] bottomLeft,
-               Game.TileType[] bottomRight)
+               TileType[] topLeft,
+               TileType[] topRight,
+               TileType[] bottomLeft,
+               TileType[] bottomRight)
             throws InvalidParameterException {
 
         this.startingTokenCount = startingTokenCount;
@@ -491,7 +489,7 @@ public class Map implements Iterable<Tile> {
      * @return all tiles of the given placeable terrain type.
      */
     public Set<Tile> getTiles(TileType terrain) {
-        if (nonPlaceableTileTypes.contains(terrain))
+        if (TileType.nonPlaceableTileTypes.contains(terrain))
             throw new InvalidParameterException("The specified terrain is not a placeable terrain type!");
 
         return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
@@ -580,7 +578,7 @@ public class Map implements Iterable<Tile> {
      * @return All tiles that can be placed next to other settlements.
      */
     protected Set<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
-        if (!placeableTileTypes.contains(terrain) && terrain != null)
+        if (!TileType.placeableTileTypes.contains(terrain) && terrain != null)
             throw new InvalidParameterException("not a landscape!");
 
         return getTiles(terrain).stream().filter(tile ->

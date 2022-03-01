@@ -108,189 +108,6 @@ public class Game {
     }
 
     /**
-     * Win conditions for the game.
-     */
-    public enum WinCondition {
-        /**
-         * Score for every settlement next to water.
-         */
-        FISHER,
-
-        /**
-         * Score for settlement next to a single mountain.
-         */
-        LORDS,
-
-        /**
-         * Score for every connection between two special places.
-         */
-        MINER,
-
-        /**
-         * Score for every settlement next to a special place.
-         */
-        ANCHORITE,
-
-        /**
-         * Score for every horizontal line with min. one settlement.
-         */
-        FARMER,
-
-        /**
-         * Score for every settlement on the horizontal line with the most settlements of your own.
-         */
-        MERCHANT,
-
-        /**
-         * Score for every separate group of settlements.
-         */
-        KNIGHT,
-
-        /**
-         * Score per quadrant for the player with the most settlements (second gets +6 score).
-         */
-        EXPLORER,
-
-        /**
-         * Score per settlement in the biggest group of settlements.
-         */
-        CITIZEN,
-
-        /**
-         * Score per quadrant for the player with the least settlements (second gets +6 score).
-         */
-        WORKER
-    }
-
-    /**
-     * Tiles that represent a hexagon in game board.
-     */
-    public enum TileType {
-        /**
-         * Represents the grass type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes.
-         */
-        GRAS,
-        /**
-         * Represents the flower type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
-         */
-        FLOWER,
-        /**
-         * Represents the forest type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
-         */
-        FORREST,
-        /**
-         * Represents the canyon type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
-         */
-        CANYON,
-        /**
-         * Represents the desert type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
-         */
-        DESERT,
-        /**
-         * Represents the water type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes, placeableTileTypes.
-         */
-        WATER,
-        /**
-         * Represents the mountain type. It is a normal type.
-         * Is part of following enum sets: regularTileTypes.
-         */
-        MOUNTAIN,
-        /**
-         * Represents the castle type. It is a normal type.
-         * Is part of following enum sets: nonPlaceableTileTypes.
-         */
-        CASTLE,
-        /**
-         * Represents the oracle type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes.
-         */
-        ORACLE,
-        /**
-         * Represents the farm type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        FARM,
-        /**
-         * Represents the tavern type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        TAVERN,
-        /**
-         * Represents the tower type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        TOWER,
-        /**
-         * Represents the harbor type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        HARBOR,
-        /**
-         * Represents the paddock type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        PADDOCK,
-        /**
-         * Represents the barn type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        BARN,
-        /**
-         * Represents the oasis type. It is a token type.
-         * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
-         */
-        OASIS
-    }
-
-    /**
-     * Types of regular tiles.
-     */
-    public static EnumSet<TileType> regularTileTypes = EnumSet.range(TileType.GRAS, TileType.MOUNTAIN);
-
-    /**
-     * Types of tiles where the settlement can be placed without a token.
-     */
-    public static EnumSet<TileType> placeableTileTypes = EnumSet.range(TileType.GRAS, TileType.DESERT);
-
-    /**
-     * Types of tiles where a settlement can never be placed.
-     */
-    public static EnumSet<TileType> nonPlaceableTileTypes = EnumSet.range(TileType.MOUNTAIN, TileType.OASIS);
-
-    /**
-     * Types of token that can be acquired.
-     */
-    public static EnumSet<TileType> tokenType = EnumSet.range(TileType.ORACLE, TileType.OASIS);
-
-    /**
-     * Colors for each player that are assign in order of joining the game.
-     */
-    public enum PlayerColor {
-        /**
-         * Represents the RED-Color for the first player that joined.
-         */
-        RED,
-        /**
-         * Represents the BLUE-Color for the second player that joined.
-         */
-        BLUE,
-        /**
-         * Represents the BLACK-Color for the third player that joined.
-         */
-        BLACK,
-        /**
-         * Represents the WHITE-Color for the fourth player that joined.
-         */
-        WHITE
-    }
-
-    /**
      * Starts the next turn for the specified player.
      *
      * @param clientId the client ID of the player.
@@ -796,6 +613,66 @@ public class Game {
         // simply read server message
         //moveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY);
         player.useToken(TileType.BARN);
+    }
+
+    // TODO: JavaDoc
+    public int scoreWorker(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreFisher(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreMiner(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreAnchorite(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreCitizen(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreExplorer(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreKnight(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreMerchant(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreLord(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
+    }
+
+    // TODO: JavaDoc
+    public int scoreFarmer(Player player)
+    {
+        return map.getSettlements(player).size(); // TODO: Implementation
     }
 
     /**

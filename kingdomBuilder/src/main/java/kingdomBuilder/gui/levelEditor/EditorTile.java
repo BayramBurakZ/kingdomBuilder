@@ -1,7 +1,7 @@
 package kingdomBuilder.gui.levelEditor;
 
 import javafx.scene.paint.PhongMaterial;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.base.Tile;
 import kingdomBuilder.gui.gameboard.MaterialLoader;
 
@@ -26,7 +26,7 @@ public class EditorTile extends Tile {
      * @param resource the language support.
      * @param controller the LevelEditorController.
      */
-    protected EditorTile(int x, int y, double xPos, double yPos, Game.TileType tileType,
+    protected EditorTile(int x, int y, double xPos, double yPos, TileType tileType,
                          ResourceBundle resource, LevelEditorController controller) {
         super(x, y, xPos, yPos, null, resource);
         levelEditorController = controller;
@@ -38,7 +38,7 @@ public class EditorTile extends Tile {
     @Override
     protected void setMouseHandler() {
         setOnMouseClicked(event -> {
-            Game.TileType tmp = levelEditorController.getTileTypeFromCombobox();
+            TileType tmp = levelEditorController.getTileTypeFromCombobox();
 
             tileType = tmp;
 

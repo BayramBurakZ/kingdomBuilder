@@ -7,8 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
-import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.Game.TileType;
+import kingdomBuilder.gamelogic.PlayerColor;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.base.Tile;
 
 import java.util.ResourceBundle;
@@ -68,7 +68,7 @@ public class HexagonTile extends Tile {
         // set up animation for elevating
         setupAnimation();
 
-        if (Game.tokenType.contains(tileType)) {
+        if (TileType.tokenType.contains(tileType)) {
             setTokenTooltip(tileType);
         }
     }
@@ -130,7 +130,7 @@ public class HexagonTile extends Tile {
      * Places a house with the given color.
      * @param color the color.
      */
-    public void placeSettlement(Game.PlayerColor color) {
+    public void placeSettlement(PlayerColor color) {
         switch (color) {
             case RED -> {
                 Image img = TextureLoader.generateImage(1,0,0);

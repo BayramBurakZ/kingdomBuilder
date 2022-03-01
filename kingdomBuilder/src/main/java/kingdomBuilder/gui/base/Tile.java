@@ -1,7 +1,7 @@
 package kingdomBuilder.gui.base;
 
 import javafx.scene.Group;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.gameboard.Hexagon;
 
 import java.util.ResourceBundle;
@@ -23,7 +23,7 @@ public abstract class Tile extends Group {
     /**
      * Represents the tileType of the hexagon.
      */
-    protected Game.TileType tileType;
+    protected TileType tileType;
 
     /**
      * Represents the x-coordinate.
@@ -42,7 +42,7 @@ public abstract class Tile extends Group {
      * @param tileType the type of the hexagon.
      * @param resource the language support.
      */
-    protected Tile(int x, int y, double xPos, double yPos, Game.TileType tileType, ResourceBundle resource) {
+    protected Tile(int x, int y, double xPos, double yPos, TileType tileType, ResourceBundle resource) {
         if (resourceBundle == null || !resourceBundle.equals(resource) || resourceBundle != resource) {
             resourceBundle = resource;
         }
@@ -74,7 +74,7 @@ public abstract class Tile extends Group {
      * Gets the type of this Tile.
      * @return The type.
      */
-    public Game.TileType getTileType() {
+    public TileType getTileType() {
         return tileType;
     }
 

@@ -2,6 +2,7 @@ package kingdomBuilder;
 
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.Player;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gamelogic.Turn;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
@@ -79,7 +80,7 @@ public class KBState {
     /**
      * Represents a Map with all the available quadrants on the server;
      */
-    public final Map<Integer, Game.TileType[]> quadrants;
+    public final Map<Integer, TileType[]> quadrants;
 
     /**
      * Represents the game.
@@ -94,7 +95,7 @@ public class KBState {
     /**
      * The terrain card of the next player's turn.
      */
-    public Game.TileType nextTerrainCard;
+    public TileType nextTerrainCard;
 
     /**
      * The player whose turn it is next.
@@ -114,7 +115,7 @@ public class KBState {
     /**
      * Represents the active token.
      */
-    public Game.TileType token;
+    public TileType token;
 
     /**
      * Represents the scores message from the network.
@@ -137,14 +138,14 @@ public class KBState {
                    boolean isConnected,
                    boolean failedToConnect,
                    boolean betterColorsActive,
-                   Map<Integer, Game.TileType[]> quadrants,
+                   Map<Integer, TileType[]> quadrants,
                    Game game,
                    Turn gameLastTurn,
-                   Game.TileType nextTerrainCard,
+                   TileType nextTerrainCard,
                    int nextPlayer,
                    boolean gameStarted,
                    List<Player> players,
-                   Game.TileType token,
+                   TileType token,
                    Scores scores,
                    Message message) {
         this.sceneLoader = sceneLoader;

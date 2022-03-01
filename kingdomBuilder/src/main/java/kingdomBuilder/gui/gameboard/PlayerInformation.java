@@ -5,7 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.PlayerColor;
 
 /**
  * Class to create an information panel for a player.
@@ -31,7 +31,7 @@ public class PlayerInformation extends HBox{
      * @param color the color for the Player.
      * @param colorMode defines which colors should be used.
      */
-    public PlayerInformation(String playerName, Game.PlayerColor color, boolean colorMode) {
+    public PlayerInformation(String playerName, PlayerColor color, boolean colorMode) {
         super();
 
         // set the players name

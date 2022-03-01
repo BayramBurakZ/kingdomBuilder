@@ -10,8 +10,8 @@ import kingdomBuilder.actions.general.ConnectAction;
 import kingdomBuilder.actions.general.DisconnectAction;
 import kingdomBuilder.actions.general.LoggedInAction;
 import kingdomBuilder.gamelogic.*;
-import kingdomBuilder.gamelogic.Game.TileType;
-import kingdomBuilder.gamelogic.Game.WinCondition;
+import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gamelogic.WinCondition;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -228,7 +228,7 @@ public class KBReducer implements Reducer<KBState> {
         client.onTokenLost.subscribe(m -> store.dispatch(new RemoveTokenAction(m)));
 
         client.onTokenUsed.subscribe(m -> {
-            Game.TileType token = Game.TileType.valueOf(m.tokenType());
+            TileType token = TileType.valueOf(m.tokenType());
             if (token == TileType.PADDOCK || token == TileType.BARN || token == TileType.HARBOR) {
                 store.dispatch(new ServerTurnAction(
                         new ServerTurn(m.clientId(), ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)));
@@ -385,7 +385,7 @@ public class KBReducer implements Reducer<KBState> {
             ClientData cd = oldState.clients.get(pd.clientId());
 
             // TODO: remove constant
-            player[i++] = new Player(pd.clientId(), cd.name(), Game.PlayerColor.valueOf(pd.color()), 40);
+            player[i++] = new Player(pd.clientId(), cd.name(), PlayerColor.valueOf(pd.color()), 40);
         }
 
         game.setPlayers(player);

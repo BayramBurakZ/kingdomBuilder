@@ -1,10 +1,8 @@
 package kingdomBuilder.gui.levelEditor;
 
 import javafx.scene.Group;
-import kingdomBuilder.KBState;
-import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.base.Board;
-import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
 
@@ -50,7 +48,7 @@ public class EditorBoard extends Board {
      */
     @Override
     public void placeTileOnBoard(Group group, int x, int y, int xPos, int yPos,
-                                 Game.TileType tileType, ResourceBundle resource) {
+                                 TileType tileType, ResourceBundle resource) {
         EditorTile editorTile = new EditorTile(x, y, xPos, yPos, null, resource, editorController);
         board[x][y] = editorTile;
 
@@ -63,7 +61,7 @@ public class EditorBoard extends Board {
      * @param resource the language support.
      */
     public void setupEmptyQuadrant(Group group, ResourceBundle resource) {
-        Game.TileType[][] empty = new Game.TileType[SIZE][SIZE];
+        TileType[][] empty = new TileType[SIZE][SIZE];
         setupBoard(group, empty, resource);
     }
 

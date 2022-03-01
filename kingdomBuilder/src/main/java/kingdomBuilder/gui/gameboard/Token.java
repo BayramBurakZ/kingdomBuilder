@@ -14,8 +14,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeType;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.ActivateTokenAction;
-import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.Game.TileType;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.controller.GameViewController;
 import kingdomBuilder.gui.util.HexagonCalculator;
 import kingdomBuilder.redux.Store;
@@ -116,7 +115,7 @@ public class Token extends StackPane {
     private void setTokenTooltip(TileType tileType) {
 
         // if not a token, return
-        if (Game.regularTileTypes.contains(tileType)) {
+        if (TileType.regularTileTypes.contains(tileType)) {
             return;
         }
 
