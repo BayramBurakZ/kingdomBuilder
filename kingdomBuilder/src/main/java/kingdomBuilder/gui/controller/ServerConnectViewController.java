@@ -5,9 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextField;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.general.ConnectAction;
+import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.redux.Store;
 
+import java.net.InetSocketAddress;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -65,7 +66,7 @@ public class ServerConnectViewController extends Controller implements Initializ
         if (address.isEmpty() || port.isEmpty())
             return;
 
-        store.dispatch(new ConnectAction(address, Integer.parseInt(port)));
+        store.dispatch(ApplicationReducer.CONNECT, new InetSocketAddress(address, Integer.parseInt(port)));
     }
 
     /**

@@ -18,13 +18,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.game.TurnEndAction;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gamelogic.PlayerColor;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -783,7 +783,7 @@ public class GameViewController extends Controller implements Initializable {
         if (store.getState().currentPlayer() != null
                 && store.getState().currentPlayer().getRemainingSettlementsOfTurn() == 0
                 && store.getState().token() == null) {
-            store.dispatch(new TurnEndAction());
+            store.dispatch(GameReducer.END_TURN, null);
         }
     }
 

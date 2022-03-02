@@ -3,6 +3,7 @@ package kingdomBuilder.redux;
 import javafx.application.Platform;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 /**
  * Represents the store of the application.
@@ -38,6 +39,18 @@ public class Store<State> {
     }
 
     /**
+     * Creates a new Store object with the given state and combines the reducers.
+     * @param state
+     * @param reducers
+     */
+    @SafeVarargs
+    public Store(State state, Reducer<State>... reducers) {
+        this.state = state;
+        this.reducer = combineReducers(reducers);
+        this.subscribers = new HashMap<>();
+    }
+
+    /**
      * Gets the state of the application.
      * @return the state of application.
      */
@@ -49,9 +62,24 @@ public class Store<State> {
      * Calls the reducer to get the new state and notifies all subscribers.
      * @param action changes the state.
      */
-    public synchronized void dispatch(Action action) {
+    public synchronized void dispatchOld(Action action) {
         Platform.runLater(() -> {
-            final DeferredState<State> state = reducer.reduce(this, this.state, action);
+            final DeferredState<State> state = reducer.reduce(this, action.getClass().getSimpleName(), action);
+            if(state.getChangedAttributes().isEmpty()) return;
+
+            Set<Subscriber<State>> subscribers = new HashSet<>();
+            subscribers.addAll(getSubscriberSet(ATTRIBUTE_WILDCARD));
+            for(String attribute: state.getChangedAttributes())
+                subscribers.addAll(getSubscriberSet(attribute));
+
+            this.state = state.withChanges();
+            subscribers.forEach(s -> s.onChange(this.state));
+        });
+    }
+
+    public synchronized void dispatch(String action, Object payload) {
+        Platform.runLater(() -> {
+            final DeferredState<State> state = reducer.reduce(this, action, payload);
             if(state.getChangedAttributes().isEmpty()) return;
 
             Set<Subscriber<State>> subscribers = new HashSet<>();
@@ -94,5 +122,14 @@ public class Store<State> {
             name,
             (String unused) -> new HashSet<>()
         );
+    }
+
+    @SafeVarargs
+    private Reducer<State> combineReducers(Reducer<State>... reducers) {
+        HashMap<String, BiFunction<Store<State>, Object, DeferredState<State>>> map = new HashMap<>();
+        for(var reducer: reducers)
+            map.putAll(reducer.getReducers());
+
+        return new Reducer<>(map);
     }
 }

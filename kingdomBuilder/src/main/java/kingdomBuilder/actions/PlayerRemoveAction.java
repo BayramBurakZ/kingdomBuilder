@@ -5,7 +5,7 @@ import kingdomBuilder.network.protocol.PlayerLeft;
 import kingdomBuilder.redux.Action;
 
 /**
- * Represents the PlayerRemoveAction. Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
+ * Represents the PlayerRemoveAction. Used for the {@link kingdomBuilder.redux.Store#dispatchOld(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he need to run.
  * Contains a field that stores the boolean and a constructor that sets the boolean.
  */

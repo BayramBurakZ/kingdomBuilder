@@ -4,7 +4,7 @@ import kingdomBuilder.redux.Action;
 
 /**
  * Represents the HostGameAction.
- * Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
+ * Used for the {@link kingdomBuilder.redux.Store#dispatchOld(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */
 public class HostGameAction extends Action {

@@ -6,10 +6,10 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.util.Pair;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.SetSceneLoaderAction;
 import kingdomBuilder.gui.controller.*;
 import kingdomBuilder.gui.levelEditor.LevelEditorController;
 import kingdomBuilder.network.protocol.Scores;
+import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
@@ -142,7 +142,7 @@ public class SceneLoader {
      */
     public SceneLoader(Store<KBState> store) {
         this.store = store;
-        this.store.dispatch(new SetSceneLoaderAction(this));
+        this.store.dispatch(ApplicationReducer.SET_SCENELOADER, this);
 
         Locale initialLocale = Locale.ENGLISH;
         loadViews(initialLocale);

@@ -4,9 +4,10 @@ import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
-import kingdomBuilder.actions.general.ApplicationExitAction;
+import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
-import kingdomBuilder.reducers.KBReducer;
+import kingdomBuilder.reducers.ChatReducer;
+import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
@@ -34,7 +35,12 @@ public class KingdomBuilderApplication extends Application {
      * @throws IOException if something goes wrong.
      */
     public KingdomBuilderApplication() throws IOException {
-        store = new Store<KBState>(new KBState(), new KBReducer());
+        store = new Store<KBState>(
+                new KBState(),
+                new ApplicationReducer(),
+                new ChatReducer(),
+                new GameReducer()
+        );
     }
 
     /**
@@ -66,8 +72,8 @@ public class KingdomBuilderApplication extends Application {
     // TODO: general closing mechanism
     @Override
     public void stop() throws Exception {
-        store.dispatch(new ApplicationExitAction());
-
+        store.dispatch(ApplicationReducer.EXIT_APPLICATION, null);
         super.stop();
     }
+
 }

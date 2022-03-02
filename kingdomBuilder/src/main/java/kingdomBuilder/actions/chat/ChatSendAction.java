@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * <p>
  * Represents the ChatSendAction.
- * Used for the {@link kingdomBuilder.redux.Store#dispatch(Action) dispatch()}-method
+ * Used for the {@link kingdomBuilder.redux.Store#dispatchOld(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he need to run.
  * Contains two fields. One for saving the receiverIds in a List and one for the String that represents the
  * chat message.

@@ -1,9 +1,6 @@
 package kingdomBuilder.gui.controller;
 
-import com.sun.javafx.collections.ObservableListWrapper;
-import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,7 +8,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
-import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -499,7 +495,7 @@ public class GameSettingsViewController extends Controller implements Initializa
                 "QBR: " + quadrantBottomRight + "\n"
         );
 
-        store.dispatch(new HostGameAction(gameName, gameDesc, playerLimit, timeLimit, turnLimit,
+        store.dispatchOld(new HostGameAction(gameName, gameDesc, playerLimit, timeLimit, turnLimit,
                 quadrantUpperLeft, quadrantUpperRight, quadrantBottomLeft, quadrantBottomRight));
 
         return false;
