@@ -127,11 +127,10 @@ public class Game {
      * @return the set of tiles where the player could place a settlement using the oracle token.
      */
     public static Set<Tile> allTokenOracleTiles(GameMap gameMap, Player player) {
-        if (player.remainingSettlements <= 0)
+        if (player.getRemainingSettlements() <= 0)
             return new HashSet<>();
 
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.ORACLE)) ?
                 new HashSet<>() : gameMap.getAllPlaceableTiles(player, player.getTerrainCard());
     }
@@ -145,13 +144,12 @@ public class Game {
      * @return the set of tiles where the player could place a settlement with using the farm token.
      */
     public static Set<Tile> allTokenFarmTiles(GameMap gameMap, Player player) {
-        if (player.remainingSettlements <= 0)
+        if (player.getRemainingSettlements() <= 0)
             return new HashSet<>();
 
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn)
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.FARM) ?
-                new HashSet<>() : gameMap.getAllPlaceableTiles(player, TileType.GRAS);
+                new HashSet<>() : gameMap.getAllPlaceableTiles(player, TileType.GRAS));
     }
 
     /**
@@ -163,11 +161,10 @@ public class Game {
      * @return the set of tiles where the player could place a settlement with using the tavern token.
      */
     public static Set<Tile> allTokenTavernTiles(GameMap gameMap, Player player) {
-        if (player.remainingSettlements <= 0)
+        if (player.getRemainingSettlements() <= 0)
             return new HashSet<>();
 
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.TAVERN)) ?
                 new HashSet<>()
                 : gameMap.stream().filter(tile -> !tile.isBlocked()
@@ -183,11 +180,10 @@ public class Game {
      * @return the set of tiles where the player could place a settlement with using the tower token.
      */
     public static Set<Tile> allTokenTowerTiles(GameMap gameMap, Player player) {
-        if (player.remainingSettlements <= 0)
+        if (player.getRemainingSettlements() <= 0)
             return new HashSet<>();
 
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.TOWER)) ?
                 new HashSet<>() : gameMap.getPlaceableTilesAtBorder(player);
     }
@@ -201,11 +197,10 @@ public class Game {
      * @return the set of tiles where the player could place a settlement with using the Oasis Token.
      */
     public static Set<Tile> allTokenOasisTiles(GameMap gameMap, Player player) {
-        if (player.remainingSettlements <= 0)
+        if (player.getRemainingSettlements() <= 0)
             return new HashSet<>();
 
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.OASIS)) ?
                 new HashSet<>() : gameMap.getAllPlaceableTiles(player, TileType.DESERT);
     }
@@ -219,8 +214,7 @@ public class Game {
      * @return all tiles that are placeable with token harbor.
      */
     public static Set<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
-        if (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.HARBOR))
             return new HashSet<>();
 
@@ -245,7 +239,9 @@ public class Game {
      * @return all tiles that a paddock token can be used on.
      */
     public static Set<Tile> allTokenPaddockTiles(GameMap gameMap, Player player) {
-        return (!player.playerHasTokenLeft(TileType.PADDOCK)) ? new HashSet<>() : gameMap.getSettlements(player);
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
+                || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
+                new HashSet<>() : gameMap.getSettlements(player);
     }
 
     /**
@@ -260,8 +256,7 @@ public class Game {
      */
     public static Set<Tile> allTokenPaddockTiles(GameMap gameMap, Player player, int fromX, int fromY) {
         // TODO: maybe throw or warning if the settlement at (fromX,fromY) doesn't match the specified player
-        return (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
                 new HashSet<>() : gameMap.at(fromX, fromY).surroundingTilesPaddock(gameMap);
     }
@@ -275,8 +270,7 @@ public class Game {
      * @return all tiles that are placeable with token barn.
      */
     public static Set<Tile> allTokenBarnTiles(GameMap gameMap, Player player, boolean highlightDestination) {
-        if (player.remainingSettlementsOfTurn > 0
-                && player.remainingSettlementsOfTurn < player.remainingSettlementsAtStartOfTurn
+        if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.BARN))
             return new HashSet<>();
 
@@ -326,7 +320,7 @@ public class Game {
      */
     public static void unsafePlaceSettlement(GameMap gameMap, Player player, int x, int y) {
         gameMap.at(x, y).placeSettlement(player);
-        player.remainingSettlements--;
+        player.decrementRemainingSettlements();
     }
 
     /**
@@ -360,8 +354,7 @@ public class Game {
 
         // simply read server message
         //unsafePlaceSettlement(player, x, y);
-        player.remainingSettlementsOfTurn--; // do not subtract with token
-
+        player.useBasicTurn();
     }
 
     /**

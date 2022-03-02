@@ -256,7 +256,7 @@ public class GameViewController extends Controller implements Initializable {
         if (kbState.nextPlayer() == -1 || kbState.client() == null)
             return;
 
-        game_button_end.setDisable(kbState.nextPlayer() != kbState.client().getClientId() || isSpectating);
+        game_button_end.setDisable(true);
     }
 
     /**
@@ -314,6 +314,10 @@ public class GameViewController extends Controller implements Initializable {
         for (int i = 0; i < kbState.players().size(); i++) {
             if (players.get(i) != null)
                 updateSettlementsForPlayer(i, players.get(i).getRemainingSettlements());
+        }
+
+        if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN) {
+            game_button_end.setDisable(false);
         }
     }
 
@@ -781,7 +785,7 @@ public class GameViewController extends Controller implements Initializable {
         // TODO: cancel token usage when we press this
         // dispatch only if the basic turn is over
         if (store.getState().currentPlayer() != null
-                && store.getState().currentPlayer().getRemainingSettlementsOfTurn() == 0
+                && store.getState().currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN
                 && store.getState().token() == null) {
             store.dispatch(GameReducer.END_TURN, null);
         }

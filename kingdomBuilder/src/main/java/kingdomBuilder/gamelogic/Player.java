@@ -26,7 +26,7 @@ public class Player {
     /**
      * Represents the total remaining settlements of this player for the rest of the game.
      */
-    int remainingSettlements;
+    private int remainingSettlements;
 
     /**
      * Represents the tokens that this player has.
@@ -45,9 +45,9 @@ public class Player {
     int remainingSettlementsOfTurn;
 
     /**
-     * Represents the settlements that the player needed to place at the start of their turn.
+     * Represents the current state of the turn. Whether it is at the start, end or in the middle of the basic turn.
      */
-    int remainingSettlementsAtStartOfTurn;
+    private TurnState currentTurnState;
 
     // TODO: maybe properly hide this class instead of moving it outside
     /**
@@ -85,7 +85,7 @@ public class Player {
      */
     public void startTurn() {
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
-        remainingSettlementsAtStartOfTurn = remainingSettlementsOfTurn;
+        currentTurnState = TurnState.START_OF_TURN;
         tokens.forEach((tileType, token) -> token.remaining = token.getTotal());
     }
 
@@ -160,6 +160,36 @@ public class Player {
     }
 
     /**
+     * Decrements the remaining settlements of the current turn and changes the state of the turn.
+     */
+    public void useBasicTurn() {
+        switch (currentTurnState) {
+            case START_OF_TURN:
+                remainingSettlementsOfTurn--;
+                currentTurnState = TurnState.BASIC_TURN;
+                break;
+            case BASIC_TURN:
+                remainingSettlementsOfTurn--;
+                if (remainingSettlementsOfTurn <= 0)
+                    currentTurnState = TurnState.END_OF_TURN;
+                break;
+            case END_OF_TURN:
+                break;
+        }
+    }
+
+    /**
+     * Decrements the amount of remaining settlements of this player.
+     */
+    void decrementRemainingSettlements() {
+        remainingSettlements--;
+        remainingSettlementsOfTurn = Math.min(remainingSettlements, remainingSettlementsOfTurn);
+        if (remainingSettlements <= 0) {
+            currentTurnState = TurnState.END_OF_TURN;
+        }
+    }
+
+    /**
      * Check how many remaining Settlements a player has.
      *
      * @return true if the player has settlements left for the basic turn.
@@ -208,5 +238,9 @@ public class Player {
     // TODO: read-only map or iterator
     public HashMap<TileType, Token> getTokens() {
         return tokens;
+    }
+
+    public TurnState getCurrentTurnState() {
+        return currentTurnState;
     }
 }

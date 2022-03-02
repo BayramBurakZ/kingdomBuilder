@@ -63,6 +63,7 @@ public class Store<State> {
      * @param action changes the state.
      */
     public synchronized void dispatchOld(Action action) {
+        System.out.println("Reducer Log Old: " + action.getClass().getSimpleName());
         Platform.runLater(() -> {
             final DeferredState<State> state = reducer.reduce(this, action.getClass().getSimpleName(), action);
             if(state.getChangedAttributes().isEmpty()) return;
@@ -78,6 +79,7 @@ public class Store<State> {
     }
 
     public synchronized void dispatch(String action, Object payload) {
+        System.out.println("Reducer Log: " + action);
         Platform.runLater(() -> {
             final DeferredState<State> state = reducer.reduce(this, action, payload);
             if(state.getChangedAttributes().isEmpty()) return;

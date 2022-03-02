@@ -93,35 +93,17 @@ public class WinViewController extends Controller implements Initializable {
         collection.addAll(scores.scoresDataList());
 
         ArrayList<ScoresData> score = (ArrayList<ScoresData>) collection;
+        score.sort(Comparator.comparing(ScoresData::score).reversed());
 
         // the message looks like this:
         // [GAME_MESSAGE] [SCORES] <{[8;43],[7;44]}>')
 
-        score.sort(Comparator.comparing(ScoresData::score));
+        final Label[] nameLabels = {win_label_name1, win_label_name2, win_label_name3, win_label_name4};
+        final Label[] scoreLabels = {win_label_score1, win_label_score2, win_label_score3, win_label_score4};
 
         for (int i = 0; i < score.size(); i++) {
-            switch (i) {
-                case 0 -> {
-                    // Winner
-                    win_label_name1.setText(players.get(score.get(i).clientId()).name);
-                    win_label_score1.setText(Integer.toString(scores.scoresDataList().get(i).score()));
-                }
-                case 1 -> {
-                    // Winner
-                    win_label_name2.setText(players.get(score.get(i).clientId()).name);
-                    win_label_score2.setText(Integer.toString(scores.scoresDataList().get(i).score()));
-                }
-                case 2 -> {
-                    // Winner
-                    win_label_name3.setText(players.get(score.get(i).clientId()).name);
-                    win_label_score3.setText(Integer.toString(scores.scoresDataList().get(i).score()));
-                }
-                case 3 -> {
-                    // Winner
-                    win_label_name4.setText(players.get(score.get(i).clientId()).name);
-                    win_label_score4.setText(Integer.toString(scores.scoresDataList().get(i).score()));
-                }
-            }
+            nameLabels[i].setText(players.get(score.get(i).clientId()).name);
+            scoreLabels[i].setText(Integer.toString(score.get(i).score()));
         }
     }
 
