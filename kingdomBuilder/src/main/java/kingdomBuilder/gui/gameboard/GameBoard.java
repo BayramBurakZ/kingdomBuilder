@@ -5,6 +5,7 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.ClientTurnAction;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gui.base.Board;
+import kingdomBuilder.reducers.KBReducer;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
@@ -72,15 +73,18 @@ public class GameBoard extends Board {
      */
     public void markHexagonToMove(HexagonTile hexagon) {
         markedHexagon = hexagon;
-        Game game = store.getState().game;
-        if (store.getState().token == null)
+        if (store.getState().token() == null)
             return;
 
-        switch (store.getState().token) {
-            case BARN -> highlightTerrain(game.allTokenBarnTiles(game.currentPlayer, true));
-            case HARBOR -> highlightTerrain(game.allTokenHarborTiles(game.currentPlayer, true));
+        KBState kbState = store.getState();
+        switch (kbState.token()) {
+            case BARN -> highlightTerrain(
+                    Game.allTokenBarnTiles(kbState.gameMap(), kbState.currentPlayer(), true));
+            case HARBOR -> highlightTerrain(
+                    Game.allTokenHarborTiles(kbState.gameMap(), kbState.currentPlayer(), true));
             case PADDOCK -> highlightTerrain(
-                    game.allTokenPaddockTiles(game.currentPlayer, markedHexagon.getX(), markedHexagon.getY()));
+                    Game.allTokenPaddockTiles(kbState.gameMap(), kbState.currentPlayer(),
+                            markedHexagon.getX(), markedHexagon.getY()));
         }
     }
 
@@ -90,8 +94,8 @@ public class GameBoard extends Board {
      * @param y the y-coordinate.
      */
     public void hexagonClicked(int x, int y) {
-        int playerID = store.getState().client.getClientId();
-        TileType token = store.getState().token;
+        int playerID = store.getState().client().getClientId();
+        TileType token = store.getState().token();
 
         if (token == null) {
             sendClientTurn(playerID, x, y, -1, -1, false, false);
@@ -133,7 +137,7 @@ public class GameBoard extends Board {
         if (!isToken) {
             // PLACING BASIC TURN
             turn = new ClientTurn(
-                    store.getState().client.getClientId(),
+                    store.getState().client().getClientId(),
                     ClientTurn.TurnType.PLACE,
                     x,
                     y,
@@ -143,8 +147,8 @@ public class GameBoard extends Board {
         } else if (!isMove) {
             // PLACING TOKEN
             turn = new ClientTurn(
-                    store.getState().client.getClientId(),
-                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
+                    store.getState().client().getClientId(),
+                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token())),
                     x,
                     y,
                     -1,
@@ -153,8 +157,8 @@ public class GameBoard extends Board {
         } else {
             //MOVING TOKEN
             turn = new ClientTurn(
-                    store.getState().client.getClientId(),
-                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token)),
+                    store.getState().client().getClientId(),
+                    ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token())),
                     x,
                     y,
                     toX,

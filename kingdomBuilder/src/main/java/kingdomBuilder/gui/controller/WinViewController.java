@@ -88,7 +88,7 @@ public class WinViewController extends Controller implements Initializable {
      * @param scores the network message with all data.
      */
     public void setScoreWithName(Scores scores) {
-        HashMap<Integer, Player> players = store.getState().game.playersMap;
+        HashMap<Integer, Player> players = store.getState().playersMap();
         Collection<ScoresData> collection = new ArrayList<>();
         collection.addAll(scores.scoresDataList());
 

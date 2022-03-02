@@ -53,7 +53,7 @@ public class SettingsController extends Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupCheckBox(resources);
-        settings_checkBox_colors.setSelected(store.getState().betterColorsActive);
+        settings_checkBox_colors.setSelected(store.getState().betterColorsActive());
     }
 
     /**
@@ -134,7 +134,7 @@ public class SettingsController extends Controller implements Initializable {
         }
 
         // color mode
-        if (store.getState().betterColorsActive != settings_checkBox_colors.isSelected()) {
+        if (store.getState().betterColorsActive() != settings_checkBox_colors.isSelected()) {
             store.dispatch(new BetterColorModeAction(settings_checkBox_colors.isSelected()));
         }
 

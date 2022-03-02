@@ -96,7 +96,7 @@ public class GameSelectionViewController extends Controller implements Initializ
         setupGameList();
 
         // updates the TableView
-        store.subscribe(kbState -> gameselection_tableview.getItems().setAll(kbState.games.values()), "games");
+        store.subscribe(kbState -> gameselection_tableview.getItems().setAll(kbState.games().values()), "games");
         updateGameInformation();
     }
 
@@ -126,7 +126,7 @@ public class GameSelectionViewController extends Controller implements Initializ
                 if (newValue == null)
                     return;
                 gameselection_label_gamename.setText(newValue.gameName());
-                ClientData host = store.getState().clients.get(newValue.clientId());
+                ClientData host = store.getState().clients().get(newValue.clientId());
                 gameselection_label_hostname.setText(host != null ? host.name() : "???");
                 // TODO?
                 //gameselection_label_timelimit;
@@ -195,6 +195,6 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private void onRefreshButtonPressed(Event event) {
         //TODO: maybe use an Action instead
-        store.getState().client.gamesRequest();
+        store.getState().client().gamesRequest();
     }
 }

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class MapTest {
+public class GameMapTest {
 
     // quadrants that are stored in the server
     String first = "FORREST;FORREST;FLOWER;DESERT;DESERT;DESERT;DESERT;CANYON;DESERT;DESERT;" +
@@ -63,7 +63,7 @@ public class MapTest {
     TileType quadrant3[];
     TileType quadrant4[];
 
-    Map map;
+    GameMap gameMap;
 
     private final int QUADRANT_WIDTH = 10;
 
@@ -74,7 +74,7 @@ public class MapTest {
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
 
-        map = new Map(2, quadrant1, quadrant2, quadrant3, quadrant4);
+        gameMap = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
     }
 
     @Test
@@ -83,33 +83,33 @@ public class MapTest {
 
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x, y).tileType, quadrant1[x * QUADRANT_WIDTH + y]);
-                assertEquals(x, map.at(x, y).x);
-                assertEquals(y, map.at(x, y).y);
+                assertEquals(gameMap.at(x, y).tileType, quadrant1[x * QUADRANT_WIDTH + y]);
+                assertEquals(x, gameMap.at(x, y).x);
+                assertEquals(y, gameMap.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[x * QUADRANT_WIDTH + y]);
-                assertEquals(x, map.at(x, y).x);
-                assertEquals(y, map.at(x, y).y);
+                assertEquals(gameMap.at(x + QUADRANT_WIDTH, y).tileType, quadrant2[x * QUADRANT_WIDTH + y]);
+                assertEquals(x, gameMap.at(x, y).x);
+                assertEquals(y, gameMap.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
-                assertEquals(map.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[x * QUADRANT_WIDTH + y]);
-                assertEquals(x, map.at(x, y).x);
-                assertEquals(y, map.at(x, y).y);
+                assertEquals(gameMap.at(x, y + QUADRANT_WIDTH).tileType, quadrant3[x * QUADRANT_WIDTH + y]);
+                assertEquals(x, gameMap.at(x, y).x);
+                assertEquals(y, gameMap.at(x, y).y);
             }
         }
         for (int y = 0; y < QUADRANT_WIDTH; y++) {
             for (int x = 0; x < QUADRANT_WIDTH; x++) {
                 assertEquals(
-                        map.at(x + QUADRANT_WIDTH, y + QUADRANT_WIDTH).tileType,
+                        gameMap.at(x + QUADRANT_WIDTH, y + QUADRANT_WIDTH).tileType,
                         quadrant4[x * QUADRANT_WIDTH + y]
                 );
-                assertEquals(x, map.at(x, y).x);
-                assertEquals(y, map.at(x, y).y);
+                assertEquals(x, gameMap.at(x, y).x);
+                assertEquals(y, gameMap.at(x, y).y);
             }
         }
     }
@@ -117,24 +117,24 @@ public class MapTest {
     @Test
     public void testGetEntireTerrainPlaceableTiles() {
 
-        Tile gras = map.at(5, 1);
-        Tile flower = map.at(1, 2);
-        Tile desert = map.at(0, 5);
-        Tile forest = map.at(0, 1);
+        Tile gras = gameMap.at(5, 1);
+        Tile flower = gameMap.at(1, 2);
+        Tile desert = gameMap.at(0, 5);
+        Tile forest = gameMap.at(0, 1);
 
-        Iterator<Tile> allGrasTiles = map.getTiles(TileType.GRAS).iterator();
-        Iterator<Tile> allDesertTiles = map.getTiles(TileType.DESERT).iterator();
-        Iterator<Tile> allFlowerTiles = map.getTiles(TileType.FLOWER).iterator();
-        Iterator<Tile> allForestTiles = map.getTiles(TileType.FORREST).iterator();
+        Iterator<Tile> allGrasTiles = gameMap.getTiles(TileType.GRAS).iterator();
+        Iterator<Tile> allDesertTiles = gameMap.getTiles(TileType.DESERT).iterator();
+        Iterator<Tile> allFlowerTiles = gameMap.getTiles(TileType.FLOWER).iterator();
+        Iterator<Tile> allForestTiles = gameMap.getTiles(TileType.FORREST).iterator();
 
         Tile current;
         boolean foundTile = false;
 
         // check if types correct
-        assertEquals(TileType.GRAS, map.at(gras.x, gras.y).tileType, "Type is not gras");
-        assertEquals(TileType.FLOWER, map.at(flower.x, flower.y).tileType, "Type is not flower");
-        assertEquals(TileType.DESERT, map.at(desert.x, desert.y).tileType, "Type is not desert");
-        assertEquals(TileType.FORREST, map.at(forest.x, forest.y).tileType, "Type is not forest");
+        assertEquals(TileType.GRAS, gameMap.at(gras.x, gras.y).tileType, "Type is not gras");
+        assertEquals(TileType.FLOWER, gameMap.at(flower.x, flower.y).tileType, "Type is not flower");
+        assertEquals(TileType.DESERT, gameMap.at(desert.x, desert.y).tileType, "Type is not desert");
+        assertEquals(TileType.FORREST, gameMap.at(forest.x, forest.y).tileType, "Type is not forest");
 
         // Gras
         while( allGrasTiles.hasNext()){
@@ -196,8 +196,8 @@ public class MapTest {
     @Test
     public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
 
-        Tile tower = map.at(5, 3);
-        assertEquals(TileType.TOWER, map.at(5, 3).tileType, "not a tower.");
+        Tile tower = gameMap.at(5, 3);
+        assertEquals(TileType.TOWER, gameMap.at(5, 3).tileType, "not a tower.");
 
         // Testing with tile that is on bottom left (after mirroring diagonally) of tower
         //Tile tokenToTest =  map.specialPlaceInSurrounding(5, 4);

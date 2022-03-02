@@ -68,11 +68,11 @@ public class Tile {
     /**
      * Check whether the tile at given index is at the border of the map.
      *
-     * @param map the map containing the tile.
+     * @param gameMap the map containing the tile.
      * @return Whether the tile is at the border.
      */
-    public boolean isAtBorder(Map map) {
-        return (x == 0 || y == 0 || x == map.mapWidth - 1 || y == map.mapWidth - 1);
+    public boolean isAtBorder(GameMap gameMap) {
+        return (x == 0 || y == 0 || x == gameMap.mapWidth - 1 || y == gameMap.mapWidth - 1);
     }
 
     /**
@@ -114,11 +114,11 @@ public class Tile {
     /**
      * Check if a tile is at the front or back part of a chain of settlements that are owned by the specified player.
      *
-     * @param map    the map containing the tile.
+     * @param gameMap    the map containing the tile.
      * @param player the player to check for.
      * @return True if tile is a part of a chain. False otherwise.
      */
-    public boolean isAtEndOfAChain(Map map, Player player) {
+    public boolean isAtEndOfAChain(GameMap gameMap, Player player) {
 
         // TODO: iterator/stream
 
@@ -126,24 +126,24 @@ public class Tile {
             return false;
 
         // Check if chain is on right side
-        if (map.isWithinBounds(x + 3, y)
-                && (map.at(x + 1, y).occupiedBy() == player)
-                && (map.at(x + 2, y).occupiedBy() == player)
-                && (map.at(x + 3, y).occupiedBy() == player))
+        if (gameMap.isWithinBounds(x + 3, y)
+                && (gameMap.at(x + 1, y).occupiedBy() == player)
+                && (gameMap.at(x + 2, y).occupiedBy() == player)
+                && (gameMap.at(x + 3, y).occupiedBy() == player))
             return true;
 
         // Check if chain is on left side
-        if (map.isWithinBounds(x - 3, y)
-                && (map.at(x - 1, y).occupiedBy() == player)
-                && (map.at(x - 2, y).occupiedBy() == player)
-                && (map.at(x - 3, y).occupiedBy() == player))
+        if (gameMap.isWithinBounds(x - 3, y)
+                && (gameMap.at(x - 1, y).occupiedBy() == player)
+                && (gameMap.at(x - 2, y).occupiedBy() == player)
+                && (gameMap.at(x - 3, y).occupiedBy() == player))
             return true;
 
         // top right
-        if (map.isWithinBounds(Map.topRightX(x, y, 3), y - 3)) {
+        if (gameMap.isWithinBounds(GameMap.topRightX(x, y, 3), y - 3)) {
             boolean chainFound = true;
             for (int i = 1; i < 4; i++)
-                if (map.at(Map.topRightX(x, y, i), y - i).occupiedBy() != player) {
+                if (gameMap.at(GameMap.topRightX(x, y, i), y - i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -151,10 +151,10 @@ public class Tile {
         }
 
         // top left
-        if (map.isWithinBounds(Map.topLeftX(x, y, 3), y - 3)) {
+        if (gameMap.isWithinBounds(GameMap.topLeftX(x, y, 3), y - 3)) {
             boolean chainFound = true;
             for (int i = 1; i < 4; i++)
-                if (map.at(Map.topLeftX(x, y, i), y - i).occupiedBy() != player) {
+                if (gameMap.at(GameMap.topLeftX(x, y, i), y - i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -162,10 +162,10 @@ public class Tile {
         }
 
         // bottom right
-        if (map.isWithinBounds(Map.bottomRightX(x, y, 3), y + 3)) {
+        if (gameMap.isWithinBounds(GameMap.bottomRightX(x, y, 3), y + 3)) {
             boolean chainFound = true;
             for (int i = 1; i < 4; i++)
-                if (map.at(Map.bottomRightX(x, y, i), y + i).occupiedBy() != player) {
+                if (gameMap.at(GameMap.bottomRightX(x, y, i), y + i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -173,10 +173,10 @@ public class Tile {
         }
 
         // bottom left
-        if (map.isWithinBounds(Map.bottomLeftX(x, y, 3), y + 3)) {
+        if (gameMap.isWithinBounds(GameMap.bottomLeftX(x, y, 3), y + 3)) {
             boolean chainFound = true;
             for (int i = 1; i < 4; i++)
-                if (map.at(Map.bottomLeftX(x, y, i), y + i).occupiedBy() != player) {
+                if (gameMap.at(GameMap.bottomLeftX(x, y, i), y + i).occupiedBy() != player) {
                     chainFound = false;
                     break;
                 }
@@ -191,36 +191,36 @@ public class Tile {
      *
      * @return all surrounding tiles of the specified tile.
      */
-    public Set<Tile> surroundingTiles(Map map) {
-        if (!map.isWithinBounds(x, y)) {
+    public Set<Tile> surroundingTiles(GameMap gameMap) {
+        if (!gameMap.isWithinBounds(x, y)) {
             return null;
         }
 
         Set<Tile> surroundingTiles = new HashSet<>();
 
         // top left
-        if (map.topLeftX(x, y) >= 0 && y > 0)
-            surroundingTiles.add(map.at(Map.topLeftX(x, y), y - 1));
+        if (gameMap.topLeftX(x, y) >= 0 && y > 0)
+            surroundingTiles.add(gameMap.at(GameMap.topLeftX(x, y), y - 1));
 
         // top right
-        if (Map.topRightX(x, y) < map.mapWidth && y > 0)
-            surroundingTiles.add(map.at(Map.topRightX(x, y), y - 1));
+        if (GameMap.topRightX(x, y) < gameMap.mapWidth && y > 0)
+            surroundingTiles.add(gameMap.at(GameMap.topRightX(x, y), y - 1));
 
         // left
         if (x - 1 >= 0)
-            surroundingTiles.add(map.at(x - 1, y));
+            surroundingTiles.add(gameMap.at(x - 1, y));
 
         // right
-        if (x + 1 < map.mapWidth)
-            surroundingTiles.add(map.at(x + 1, y));
+        if (x + 1 < gameMap.mapWidth)
+            surroundingTiles.add(gameMap.at(x + 1, y));
 
         // bottom left
-        if (Map.bottomLeftX(x, y) >= 0 && y + 1 < map.mapWidth)
-            surroundingTiles.add(map.at(Map.bottomLeftX(x, y), y + 1));
+        if (GameMap.bottomLeftX(x, y) >= 0 && y + 1 < gameMap.mapWidth)
+            surroundingTiles.add(gameMap.at(GameMap.bottomLeftX(x, y), y + 1));
 
         // bottom right
-        if (Map.bottomRightX(x, y) < map.mapWidth && y + 1 < map.mapWidth)
-            surroundingTiles.add(map.at(Map.bottomRightX(x, y), y + 1));
+        if (GameMap.bottomRightX(x, y) < gameMap.mapWidth && y + 1 < gameMap.mapWidth)
+            surroundingTiles.add(gameMap.at(GameMap.bottomRightX(x, y), y + 1));
 
         // TODO: eventually return streams everywhere
         return surroundingTiles;
@@ -229,51 +229,51 @@ public class Tile {
     /**
      * Gets all free tiles that are skipped from a given position.
      *
-     * @param map the map containing the tile.
+     * @param gameMap the map containing the tile.
      * @return all free tiles that can be placed on that skipped position.
      */
-    public Set<Tile> surroundingTilesPaddock(Map map) {
+    public Set<Tile> surroundingTilesPaddock(GameMap gameMap) {
         Set<Tile> freeTiles = new HashSet<>();
         int tempX, tempY;
 
         // TODO: iterator
         // top left diagonal
-        tempX = Map.topLeftX(x, y, 2);
+        tempX = GameMap.topLeftX(x, y, 2);
         tempY = y - 2;
 
-        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
-            freeTiles.add(map.at(tempX, tempY));
+        if (gameMap.isWithinBounds(tempX, tempY) && !gameMap.at(tempX, tempY).isBlocked())
+            freeTiles.add(gameMap.at(tempX, tempY));
 
         // top right diagonal
-        tempX = Map.topRightX(x, y, 2);
+        tempX = GameMap.topRightX(x, y, 2);
         tempY = y - 2;
 
-        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
-            freeTiles.add(map.at(tempX, tempY));
+        if (gameMap.isWithinBounds(tempX, tempY) && !gameMap.at(tempX, tempY).isBlocked())
+            freeTiles.add(gameMap.at(tempX, tempY));
 
         // left
-        if (map.isWithinBounds(x - 2, y) && !map.at(x - 2, y).isBlocked())
-            freeTiles.add(map.at(x - 2, y));
+        if (gameMap.isWithinBounds(x - 2, y) && !gameMap.at(x - 2, y).isBlocked())
+            freeTiles.add(gameMap.at(x - 2, y));
 
 
         // right
-        if (map.isWithinBounds(x + 2, y) && !map.at(x + 2, y).isBlocked())
-            freeTiles.add(map.at(x + 2, y));
+        if (gameMap.isWithinBounds(x + 2, y) && !gameMap.at(x + 2, y).isBlocked())
+            freeTiles.add(gameMap.at(x + 2, y));
 
 
         // bottom left diagonal
-        tempX = Map.bottomLeftX(x, y, 2);
+        tempX = GameMap.bottomLeftX(x, y, 2);
         tempY = y + 2;
 
-        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
-            freeTiles.add(map.at(tempX, tempY));
+        if (gameMap.isWithinBounds(tempX, tempY) && !gameMap.at(tempX, tempY).isBlocked())
+            freeTiles.add(gameMap.at(tempX, tempY));
 
         // bottom right diagonal
-        tempX = Map.bottomRightX(x, y, 2);
+        tempX = GameMap.bottomRightX(x, y, 2);
         tempY = y + 2;
 
-        if (map.isWithinBounds(tempX, tempY) && !map.at(tempX, tempY).isBlocked())
-            freeTiles.add(map.at(tempX, tempY));
+        if (gameMap.isWithinBounds(tempX, tempY) && !gameMap.at(tempX, tempY).isBlocked())
+            freeTiles.add(gameMap.at(tempX, tempY));
 
         return freeTiles;
     }
@@ -281,11 +281,11 @@ public class Tile {
     /**
      * Returns the surrounding settlements owned by the specified player.
      *
-     * @param map    the map containing the tile.
+     * @param gameMap    the map containing the tile.
      * @param player the player whose settlements to look for.
      * @return all tiles with a settlement of the specified player.
      */
-    public Set<Tile> surroundingSettlements(Map map, Player player) {
+    public Set<Tile> surroundingSettlements(GameMap gameMap, Player player) {
         /*
         HashSet<Tile> tilesWithSettlements = new HashSet<>();
         for (Tile tile : surroundingTiles(map)) {
@@ -294,17 +294,17 @@ public class Tile {
         }
         return tilesWithSettlements;
         */
-        return surroundingTiles(map).stream().filter(tile -> tile.occupiedBy == player)
+        return surroundingTiles(gameMap).stream().filter(tile -> tile.occupiedBy == player)
                 .collect(Collectors.toSet());
     }
 
     /**
      * Returns the surrounding special places.
      *
-     * @param map the map containing the tile.
+     * @param gameMap the map containing the tile.
      * @return all surrounding tiles that are special places.
      */
-    public Set<Tile> surroundingSpecialPlaces(Map map) {
+    public Set<Tile> surroundingSpecialPlaces(GameMap gameMap) {
         //TODO: check for each one if the player has only one settlement on it
         /*
         Set<Tile> surroundingSpecialPlaces = new HashSet<>();
@@ -315,48 +315,48 @@ public class Tile {
         }
         return surroundingSpecialPlaces;
         */
-        return surroundingTiles(map).stream().filter(tile -> TileType.tokenType.contains(tile.tileType))
+        return surroundingTiles(gameMap).stream().filter(tile -> TileType.tokenType.contains(tile.tileType))
                 .collect(Collectors.toSet());
     }
 
     /**
      * Check if settlement of a player has at least one neighbour.
      *
-     * @param map    the map containing the tile.
+     * @param gameMap    the map containing the tile.
      * @param player the player to check.
      * @return True if player has a neighbouring settlement. False otherwise.
      */
-    public boolean hasSurroundingSettlement(Map map, Player player) {
+    public boolean hasSurroundingSettlement(GameMap gameMap, Player player) {
 
         // TODO: iterator/stream
         //for (var tile : surroundingTiles())
 
         // right tile
-        if (map.isWithinBounds(x + 1, y) && (map.at(x + 1, y).occupiedBy() == player))
+        if (gameMap.isWithinBounds(x + 1, y) && (gameMap.at(x + 1, y).occupiedBy() == player))
             return true;
 
         // left tile
-        if (map.isWithinBounds(x - 1, y) && (map.at(x - 1, y).occupiedBy() == player))
+        if (gameMap.isWithinBounds(x - 1, y) && (gameMap.at(x - 1, y).occupiedBy() == player))
             return true;
 
         // top right
-        if (map.isWithinBounds(Map.topRightX(x, y), y + 1)
-                && (map.at(Map.topRightX(x, y), y + 1).occupiedBy() == player))
+        if (gameMap.isWithinBounds(GameMap.topRightX(x, y), y + 1)
+                && (gameMap.at(GameMap.topRightX(x, y), y + 1).occupiedBy() == player))
             return true;
 
         // top left
-        if (map.isWithinBounds(Map.topLeftX(x, y), y + 1)
-                && (map.at(Map.topLeftX(x, y), y + 1).occupiedBy() == player))
+        if (gameMap.isWithinBounds(GameMap.topLeftX(x, y), y + 1)
+                && (gameMap.at(GameMap.topLeftX(x, y), y + 1).occupiedBy() == player))
             return true;
 
         // bottom right
-        if (map.isWithinBounds(Map.bottomRightX(x, y), y - 1)
-                && (map.at(Map.bottomRightX(x, y), y - 1).occupiedBy() == player))
+        if (gameMap.isWithinBounds(GameMap.bottomRightX(x, y), y - 1)
+                && (gameMap.at(GameMap.bottomRightX(x, y), y - 1).occupiedBy() == player))
             return true;
 
         // bottom left
-        return map.isWithinBounds(Map.bottomLeftX(x, y), y - 1)
-                && (map.at(Map.bottomLeftX(x, y), y - 1).occupiedBy() == player);
+        return gameMap.isWithinBounds(GameMap.bottomLeftX(x, y), y - 1)
+                && (gameMap.at(GameMap.bottomLeftX(x, y), y - 1).occupiedBy() == player);
     }
 
     ////////////////////////////////////////////////

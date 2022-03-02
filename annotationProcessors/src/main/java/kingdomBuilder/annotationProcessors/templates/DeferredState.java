@@ -67,7 +67,7 @@ public class DeferredState {
     public String getConstructionVariableInitialization() {
         return attributes
             .stream()
-            .map(encl -> String.format("%s = oldState.%s;", encl.getSimpleName(), encl.getSimpleName()))
+            .map(encl -> String.format("%s = oldState.%s();", encl.getSimpleName(), encl.getSimpleName()))
             .collect(Collectors.joining("\n        "));
     }
 

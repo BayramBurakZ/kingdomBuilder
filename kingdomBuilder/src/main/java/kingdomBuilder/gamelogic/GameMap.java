@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 /**
  * Contains the data of a map.
  */
-public class Map implements Iterable<Tile> {
+public class GameMap implements Iterable<Tile> {
 
     /**
      * Represents the amount of Tokens that a special place has at the start of the game.
@@ -53,11 +53,11 @@ public class Map implements Iterable<Tile> {
      * @throws InvalidParameterException Throws an InvalidParameterException when the sizes between
      *                                   quadrants are not the same or if quadrant is not a square.
      */
-    public Map(int startingTokenCount,
-               TileType[] topLeft,
-               TileType[] topRight,
-               TileType[] bottomLeft,
-               TileType[] bottomRight)
+    public GameMap(int startingTokenCount,
+                   TileType[] topLeft,
+                   TileType[] topRight,
+                   TileType[] bottomLeft,
+                   TileType[] bottomRight)
             throws InvalidParameterException {
 
         this.startingTokenCount = startingTokenCount;

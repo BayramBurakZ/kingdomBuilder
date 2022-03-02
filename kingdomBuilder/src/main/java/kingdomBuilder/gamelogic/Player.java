@@ -83,7 +83,7 @@ public class Player {
     /**
      * Updates the information for the player at the start of a turn.
      */
-    void startTurn() {
+    public void startTurn() {
         remainingSettlementsOfTurn = Math.min(remainingSettlements, Game.SETTLEMENTS_PER_TURN);
         remainingSettlementsAtStartOfTurn = remainingSettlementsOfTurn;
         tokens.forEach((tileType, token) -> token.remaining = token.getTotal());

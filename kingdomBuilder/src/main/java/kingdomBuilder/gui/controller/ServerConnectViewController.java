@@ -45,7 +45,7 @@ public class ServerConnectViewController extends Controller implements Initializ
     public void initialize(URL location, ResourceBundle resources) {
         //TODO: Substates!
         store.subscribe(state -> {
-            if (state.isConnected) {
+            if (state.isConnected()) {
                 System.out.println("Changes to GameSelection");
                 sceneLoader.showGameSelectionView();
             }

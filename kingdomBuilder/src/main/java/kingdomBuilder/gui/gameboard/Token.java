@@ -30,17 +30,17 @@ public class Token extends StackPane {
     /**
      * The Label for the number of Tokens.
      */
-    private Label countDisplay = new Label();
+    private final Label countDisplay = new Label();
 
     /**
      * The hexagon shape with the texture.
      */
-    private Hexagon2D hexagon;
+    private final Hexagon2D hexagon;
 
     /**
      * Represents the resourceBundle that used for language support.
      */
-    protected static ResourceBundle resource;
+    private static ResourceBundle resource;
 
     /**
      * Constructs a new Token, with given type, count.
@@ -101,6 +101,14 @@ public class Token extends StackPane {
     }
 
     /**
+     * Deactivates the token if it is active.
+     */
+    public void cancelTokenSelection() {
+        if (hexagon.isActivated)
+            hexagon.activateToken();
+    }
+
+    /**
      * Checks if the token is currently activated and ready to use.
      * @return if the Token is ready to use.
      */
@@ -145,7 +153,7 @@ public class Token extends StackPane {
         /**
          * Represents the six corners of a hexagon.
          */
-        private static ArrayList<Point2D> vertices = HexagonCalculator.calculateCorners(RADIUS);;
+        private static final ArrayList<Point2D> vertices = HexagonCalculator.calculateCorners(RADIUS);;
 
         /**
          * Indicates if the token is ready to use (true).
@@ -165,7 +173,7 @@ public class Token extends StackPane {
         /**
          * Represents the store.
          */
-        private Store<KBState> store;
+        private final Store<KBState> store;
 
         /**
          * Constructs a new 2D hexagon with the given type.
@@ -181,6 +189,9 @@ public class Token extends StackPane {
                 getPoints().add(vertices.get(i).getX());
                 getPoints().add(vertices.get(i).getY());
             }
+
+            setStrokeWidth(2.0);
+            setStrokeType(StrokeType.INSIDE);
 
             addListener(tileType);
             Image texture = TextureLoader.getTileTexture(tileType);
@@ -224,8 +235,6 @@ public class Token extends StackPane {
 
             if (isActivated) {
                 setStroke(Color.RED);
-                setStrokeWidth(2.0);
-                setStrokeType(StrokeType.INSIDE);
             } else {
                 setStroke(null);
             }

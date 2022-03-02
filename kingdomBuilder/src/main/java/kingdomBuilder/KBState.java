@@ -1,197 +1,109 @@
 package kingdomBuilder;
 
-import kingdomBuilder.gamelogic.Game;
-import kingdomBuilder.gamelogic.Player;
-import kingdomBuilder.gamelogic.TileType;
-import kingdomBuilder.gamelogic.Turn;
+import kingdomBuilder.annotations.State;
+import kingdomBuilder.gamelogic.WinCondition;
+import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
-import kingdomBuilder.annotations.State;
-import kingdomBuilder.network.protocol.ClientData;
-import kingdomBuilder.network.protocol.GameData;
-import kingdomBuilder.network.protocol.Message;
-import kingdomBuilder.network.protocol.Scores;
+import kingdomBuilder.network.protocol.*;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents the state of the Kingdom Builder application.
+ *
+ * @param sceneLoader represents the SceneLoader.
+ * @param clients maps client id to the client info of connected clients.
+ * @param games maps game id to the game info of created games.
+ * @param selector stores the selector, which handles network IO.
+ * @param selectorThread stores the thread, which runs the selector.
+ * @param client represents the main client.
+ * @param clientPreferredName represents the login name entered by the player.
+ * @param isConnecting shows whether the client is currently connecting or not.
+ * @param isConnected shows whether the client is connected to the server.
+ * @param failedToConnect shows whether the connection to the server failed.
+ * @param betterColorsActive shows whether the better color mode is active.
+ * @param quadrants represents a map with all the available quadrants on the server.
+ * @param gameLastTurn represents the last turn that was taken in the current game.
+ * @param nextTerrainCard represents the terrain card of the current player's turn.
+ * @param nextPlayer shows the player whose turn it is next.
+ * @param gameStarted represents the state if a game is running.
+ * @param players represents a list of players in the current game.
+ * @param token represents the active token.
+ * @param scores represents the scores message from the network.
+ * @param message represents an incoming chat-message.
+ * @param gameMap represents the internal data of the map.
+ * @param myGameReply represents the network message with all information about the current game.
+ * @param winConditions  represents a list of the three win conditions of the current game.
+ * @param playersMap represents a map of the players playing in the game.
+ *                   The Key represents the client ID.
+ * @param currentPlayer represents the current player on turn.
+ * @param joinedGame shows whether the client has joined a game.
  */
 @State
-public class KBState {
-    /**
-     * Represents the SceneLoader.
-     */
-    public SceneLoader sceneLoader;
-
-    /**
-     * Maps client id to the client info of connected clients.
-     */
-    public final Map<Integer, ClientData> clients;
-
-    /**
-     * Maps game id to the game info of created games.
-     */
-    public final Map<Integer, GameData> games;
-
-    /**
-     * Stores the selector, which handles network IO.
-     */
-    public final ClientSelector selector;
-
-    /**
-     * Stores the thread, which runs the selector.
-     */
-    public Thread selectorThread;
-
-    /**
-     * Represents the main client.
-     */
-    public Client client;
-
-    /**
-     * Represents the login name entered by the player.
-     */
-    public String clientPreferredName;
-
-    /**
-     * Whether the client is currently connecting or not.
-     */
-    public boolean isConnecting;
-
-    /**
-     * Shows whether the client is connected to the server.
-     */
-    public boolean isConnected;
-
-    /**
-     * Shows whether the connection to the server failed.
-     */
-    public boolean failedToConnect = false;
-
-    /**
-     * Represents if the better color mode is active.
-     */
-    public boolean betterColorsActive = false;
-
-    /**
-     * Represents a Map with all the available quadrants on the server;
-     */
-    public final Map<Integer, TileType[]> quadrants;
-
-    /**
-     * Represents the game.
-     */
-    public Game game;
-
-    /**
-     * Represents the last turn that was taken in the current game.
-     */
-    public Turn gameLastTurn;
-
-    /**
-     * The terrain card of the next player's turn.
-     */
-    public TileType nextTerrainCard;
-
-    /**
-     * The player whose turn it is next.
-     */
-    public int nextPlayer;
-
-    /**
-     * The state if a game is running.
-     */
-    public boolean gameStarted;
-
-    /**
-     * Represents a list of players in the current game.
-     */
-    public List<Player> players;
-
-    /**
-     * Represents the active token.
-     */
-    public TileType token;
-
-    /**
-     * Represents the scores message from the network.
-     */
-    public Scores scores;
-
-    /**
-     * Represents an incoming chat-message.
-     */
-    public Message message;
-
-    public KBState(SceneLoader sceneLoader,
-                   Map<Integer, ClientData> clients,
-                   Map<Integer, GameData> games,
-                   ClientSelector selector,
-                   Thread selectorThread,
-                   Client client,
-                   String clientPreferredName,
-                   boolean isConnecting,
-                   boolean isConnected,
-                   boolean failedToConnect,
-                   boolean betterColorsActive,
-                   Map<Integer, TileType[]> quadrants,
-                   Game game,
-                   Turn gameLastTurn,
-                   TileType nextTerrainCard,
-                   int nextPlayer,
-                   boolean gameStarted,
-                   List<Player> players,
-                   TileType token,
-                   Scores scores,
-                   Message message) {
-        this.sceneLoader = sceneLoader;
-        this.clients = clients;
-        this.games = games;
-        this.selector = selector;
-        this.selectorThread = selectorThread;
-        this.client = client;
-        this.clientPreferredName = clientPreferredName;
-        this.isConnecting = isConnecting;
-        this.isConnected = isConnected;
-        this.failedToConnect = failedToConnect;
-        this.betterColorsActive = betterColorsActive;
-        this.quadrants = quadrants;
-        this.game = game;
-        this.gameLastTurn = gameLastTurn;
-        this.nextTerrainCard = nextTerrainCard;
-        this.nextPlayer = nextPlayer;
-        this.gameStarted = gameStarted;
-        this.players = players;
-        this.token = token;
-        this.scores = scores;
-        this.message = message;
-    }
+public record KBState(SceneLoader sceneLoader,
+                      Map<Integer, ClientData> clients,
+                      Map<Integer, GameData> games,
+                      ClientSelector selector,
+                      Thread selectorThread,
+                      Client client,
+                      String clientPreferredName,
+                      boolean isConnecting,
+                      boolean isConnected,
+                      boolean failedToConnect,
+                      boolean betterColorsActive,
+                      Map<Integer, TileType[]> quadrants,
+                      Turn gameLastTurn,
+                      TileType nextTerrainCard,
+                      int nextPlayer,
+                      boolean gameStarted,
+                      ArrayList<Player> players,
+                      TileType token,
+                      Scores scores,
+                      Message message,
+                      GameMap gameMap,
+                      MyGameReply myGameReply,
+                      ArrayList<WinCondition> winConditions,
+                      HashMap<Integer, Player> playersMap,
+                      Player currentPlayer,
+                      boolean joinedGame
+                      ) {
 
     //TODO: JavaDoc!
     /**
      * Initializes the state with initial value.
-     *
-     * @throws IOException if the selector has troubles.
      */
     public KBState() throws IOException {
-        clients = new HashMap<>();
-        games = new HashMap<>();
-        quadrants = new HashMap<>();
-        selector = new ClientSelectorImpl();
-        isConnecting = false;
-        isConnected = false;
-        failedToConnect = false;
-        game = null;
-        gameLastTurn = null;
-        nextTerrainCard = null;
-        nextPlayer = -1;
-        gameStarted = false;
-        token = null;
-        scores = null;
-        message = null;
+        this(null,
+                new HashMap<>(),
+                new HashMap<>(),
+                new ClientSelectorImpl(),
+                null,
+                null,
+                null,
+                false,
+                false,
+                false,
+                false,
+                new HashMap<>(),
+                null,
+                null,
+                -1,
+                false,
+                new ArrayList<>(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                new ArrayList<>(),
+                new HashMap<>(),
+                null,
+                false);
     }
 }

@@ -1,7 +1,7 @@
 package kingdomBuilder.gui.base;
 
 import javafx.scene.Group;
-import kingdomBuilder.gamelogic.Map;
+import kingdomBuilder.gamelogic.GameMap;
 import kingdomBuilder.gamelogic.TileType;
 
 import java.util.ResourceBundle;
@@ -19,11 +19,11 @@ public abstract class Board {
     /**
      * Set the GameBoard with textured hexagons up.
      * @param group the pane on which the hexagons are drawn.
-     * @param map the map with all information.
+     * @param gameMap the map with all information.
      * @param resource the ResourceBundle for translating text.
      */
-    public void setupBoard(Group group, Map map, ResourceBundle resource) {
-        int width = map.mapWidth;
+    public void setupBoard(Group group, GameMap gameMap, ResourceBundle resource) {
+        int width = gameMap.mapWidth;
 
         for (int y = 0; y < width; y++) {
             for (int x = 0; x < width; x++) {
@@ -36,7 +36,7 @@ public abstract class Board {
 
                 int yPos = y * 60;
                 // TODO: this cast was necessary cause IntelliJ bugged out, remove
-                placeTileOnBoard(group, x, y, xPos, yPos, map.at(x, y).tileType, resource);
+                placeTileOnBoard(group, x, y, xPos, yPos, gameMap.at(x, y).tileType, resource);
             }
         }
     }

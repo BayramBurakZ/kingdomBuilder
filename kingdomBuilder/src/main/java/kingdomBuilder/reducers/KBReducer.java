@@ -2,13 +2,9 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
-import kingdomBuilder.actions.chat.ChatReceiveAction;
-import kingdomBuilder.actions.chat.ChatSendAction;
+import kingdomBuilder.actions.chat.*;
 import kingdomBuilder.actions.game.*;
-import kingdomBuilder.actions.general.ApplicationExitAction;
-import kingdomBuilder.actions.general.ConnectAction;
-import kingdomBuilder.actions.general.DisconnectAction;
-import kingdomBuilder.actions.general.LoggedInAction;
+import kingdomBuilder.actions.general.*;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gamelogic.WinCondition;
@@ -17,13 +13,13 @@ import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.network.protocol.PlayerData;
-import kingdomBuilder.redux.Action;
-import kingdomBuilder.redux.Reducer;
-import kingdomBuilder.redux.Store;
+import kingdomBuilder.redux.*;
 
 import kingdomBuilder.generated.DeferredState;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class KBReducer implements Reducer<KBState> {
@@ -84,7 +80,7 @@ public class KBReducer implements Reducer<KBState> {
         else if (action instanceof ServerTurnAction a)
             return reduce(oldState, a);
         else if (action instanceof ClientTurnAction a)
-            return reduce(oldState, a);
+            return reduce(store, oldState, a);
         else if (action instanceof TurnEndAction a)
             return reduce(oldState, a);
         else if (action instanceof ReadyGameAction a)
@@ -108,7 +104,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, ClientAddAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         clients.put(a.clientData.clientId(), a.clientData);
         state.setClients(clients);
 
@@ -117,7 +113,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, ClientRemoveAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         clients.remove(a.clientData.clientId());
         state.setClients(clients);
 
@@ -131,7 +127,7 @@ public class KBReducer implements Reducer<KBState> {
     }
 
     private DeferredState reduce(KBState oldState, ChatSendAction a) {
-        oldState.client.chat(a.receiverIds, a.message);
+        oldState.client().chat(a.receiverIds, a.message);
         return new DeferredState(oldState);
     }
 
@@ -148,17 +144,17 @@ public class KBReducer implements Reducer<KBState> {
 
         Client client;
         try {
-            client = oldState.selector.connect(a.address);
+            client = oldState.selector().connect(a.address);
         } catch (IOException exc) {
             state.setFailedToConnect(true);
             return state;
         }
 
-        Thread selectorThread = oldState.selectorThread;
+        Thread selectorThread = oldState.selectorThread();
         if (selectorThread == null || !selectorThread.isAlive()) {
-            assert !oldState.selector.isRunning();
+            assert !oldState.selector().isRunning();
 
-            selectorThread = new Thread(oldState.selector);
+            selectorThread = new Thread(oldState.selector());
             selectorThread.setName("SelectorThread");
             selectorThread.start();
 
@@ -238,7 +234,7 @@ public class KBReducer implements Reducer<KBState> {
         store.subscribe(kbState -> store.dispatch(new ReadyGameAction()),
                 "players", "nextTerrainCard", "nextPlayer");
 
-        client.login(oldState.clientPreferredName);
+        client.login(oldState.clientPreferredName());
 
         client.onScores.subscribe(m -> store.dispatch(new ScoreAction(m)));
 
@@ -254,10 +250,10 @@ public class KBReducer implements Reducer<KBState> {
     }
 
     private DeferredState reduce(KBState state, ApplicationExitAction a) {
-        ClientSelector selector = state.selector;
+        ClientSelector selector = state.selector();
         if (selector != null && selector.isRunning()) selector.stop();
 
-        Thread selectorThread = state.selectorThread;
+        Thread selectorThread = state.selectorThread();
         if (selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
 
         // Return old state, so that no other subscribers are called.
@@ -270,10 +266,10 @@ public class KBReducer implements Reducer<KBState> {
         state.setIsConnected(true);
         System.out.println("Is connected.");
 
-        oldState.client.loadNamespace();
-        oldState.client.clientsRequest();
-        oldState.client.gamesRequest();
-        oldState.client.quadrantsRequest();
+        oldState.client().loadNamespace();
+        oldState.client().clientsRequest();
+        oldState.client().gamesRequest();
+        oldState.client().quadrantsRequest();
 
         return state;
     }
@@ -283,19 +279,19 @@ public class KBReducer implements Reducer<KBState> {
 
         // TODO: remove sceneloader/controller
         if (a.wasKicked) {
-            var sceneLoader = oldState.sceneLoader;
+            var sceneLoader = oldState.sceneLoader();
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
 
-        oldState.client.disconnect();
+        oldState.client().disconnect();
         state.setClient(null);
         state.setIsConnected(false);
 
-        oldState.clients.clear();
-        state.setClients(oldState.clients);
+        oldState.clients().clear();
+        state.setClients(oldState.clients());
 
-        oldState.games.clear();
-        state.setGames(oldState.games);
+        oldState.games().clear();
+        state.setGames(oldState.games());
 
         return state;
     }
@@ -314,21 +310,21 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, PlayerAddAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         var clientData = clients.get(a.clientId);
         clients.put(a.clientId, new ClientData(a.clientId, clientData.name(), a.gameId));
         state.setClients(clients);
 
-        if (a.gameId == oldState.client.getGameId()) {
+        if (a.gameId == oldState.client().getGameId()) {
             // for some reason you only get the color of a player via ?players
-            oldState.client.playersRequest();
+            oldState.client().playersRequest();
         }
         return state;
     }
 
     private DeferredState reduce(KBState oldState, PlayerRemoveAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         var client = clients.get(a.clientId);
         clients.put(a.clientId, new ClientData(a.clientId, client.name(), Client.NO_ID));
         state.setClients(clients);
@@ -337,14 +333,14 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, HostGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        oldState.client.hostGame(a.gameName, a.gameDescription, a.playerLimit, a.timeLimit, a.turnLimit,
+        oldState.client().hostGame(a.gameName, a.gameDescription, a.playerLimit, a.timeLimit, a.turnLimit,
                 a.quadrantId1, a.quadrantId2, a.quadrantId3, a.quadrantId4);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, GameAddAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var games = oldState.games;
+        final var games = oldState.games();
         games.put(a.gameData.gameId(), a.gameData);
         state.setGames(games);
         return state;
@@ -352,7 +348,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, QuadrantAddAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var quadrants = oldState.quadrants;
+        final var quadrants = oldState.quadrants();
         quadrants.put(a.quadrantId, a.fieldTypes);
         state.setQuadrants(quadrants);
         return state;
@@ -360,62 +356,56 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, JoinGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
-        var clientData = clients.get(oldState.client.getClientId());
+        final var clients = oldState.clients();
+        var clientData = clients.get(oldState.client().getClientId());
         clients.put(clientData.clientId(), new ClientData(clientData.clientId(), clientData.name(), a.gameId));
         state.setClients(clients);
 
-        oldState.client.joinGame(a.gameId);
-        Game game = new Game();
-        state.setClient(oldState.client);
-        state.setGame(game);
+        oldState.client().joinGame(a.gameId);
+        state.setClient(oldState.client());
+        state.setJoinedGame(true);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, SetPlayersAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
         List<PlayerData> playersList = a.playersReply.playerDataList();
 
-        Player[] player = new Player[playersList.size()];
+        ArrayList<Player> playerGame = new ArrayList<>();
+        HashMap<Integer, Player> playerMap = new HashMap<>();
 
-        int i = 0;
         for (PlayerData pd : playersList) {
-            ClientData cd = oldState.clients.get(pd.clientId());
+            ClientData cd = oldState.clients().get(pd.clientId());
 
-            // TODO: remove constant
-            player[i++] = new Player(pd.clientId(), cd.name(), PlayerColor.valueOf(pd.color()), 40);
+            Player p = new Player(pd.clientId(), cd.name(), PlayerColor.valueOf(pd.color()),
+                    Game.DEFAULT_STARTING_SETTLEMENTS);
+            playerGame.add(p);
+            playerMap.put(cd.clientId(), p);
         }
 
-        game.setPlayers(player);
-
-        state.setGame(game);
-        state.setPlayers(List.of(player));
+        state.setPlayers(playerGame);
+        state.setPlayersMap(playerMap);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, MyGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
-        Map map = new Map(
-                Map.DEFAULT_STARTING_TOKEN_COUNT,
-                oldState.quadrants.get(a.myGameReply.boardData().quadrantId1()),
-                oldState.quadrants.get(a.myGameReply.boardData().quadrantId2()),
-                oldState.quadrants.get(a.myGameReply.boardData().quadrantId3()),
-                oldState.quadrants.get(a.myGameReply.boardData().quadrantId4()));
+        GameMap gameMap = new GameMap(
+                GameMap.DEFAULT_STARTING_TOKEN_COUNT,
+                oldState.quadrants().get(a.myGameReply.boardData().quadrantId1()),
+                oldState.quadrants().get(a.myGameReply.boardData().quadrantId2()),
+                oldState.quadrants().get(a.myGameReply.boardData().quadrantId3()),
+                oldState.quadrants().get(a.myGameReply.boardData().quadrantId4()));
 
-        game.setMap(map);
-        game.setGameInfo(a.myGameReply);
-
-        state.setGame(game);
+        state.setMyGameReply(a.myGameReply);
+        state.setGameMap(gameMap);
         return state;
     }
 
     private DeferredState reduce(KBState oldState, WinConditionsAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
         // TODO: remove debug messages
         System.out.println(
@@ -423,40 +413,35 @@ public class KBReducer implements Reducer<KBState> {
                         a.winConditionReply.winCondition2() + " " +
                         a.winConditionReply.winCondition3());
 
-        WinCondition[] winConditions = {
-                WinCondition.valueOf(a.winConditionReply.winCondition1()),
-                WinCondition.valueOf(a.winConditionReply.winCondition2()),
-                WinCondition.valueOf(a.winConditionReply.winCondition3())
-        };
+        ArrayList<WinCondition> wc = new ArrayList<>();
+        wc.add(WinCondition.valueOf(a.winConditionReply.winCondition1()));
+        wc.add(WinCondition.valueOf(a.winConditionReply.winCondition2()));
+        wc.add(WinCondition.valueOf(a.winConditionReply.winCondition3()));
 
-        game.setWinConditions(winConditions);
-
-        state.setGame(game);
+        state.setWinConditions(wc);
 
         return state;
     }
 
     private DeferredState reduce(KBState oldState, TerrainOfTurnAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
-        if (oldState.players != null) {
-            game.currentPlayer.setTerrainCard(TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
-            state.setGame(game);
+        if (oldState.players() != null && oldState.currentPlayer() != null) {
+            oldState.currentPlayer().setTerrainCard(TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
+            state.setCurrentPlayer(oldState.currentPlayer());
         }
 
         state.setNextTerrainCard(TileType.valueOf(a.terrainTypeOfTurn.terrainType()));
-
         return state;
     }
 
     private DeferredState reduce(KBState oldState, TurnStartAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
-        if (oldState.players != null) {
-            game.startTurn(a.turnStart.clientId());
-            state.setGame(game);
+        if (oldState.players() != null && !oldState.playersMap().isEmpty()) {
+
+            oldState.playersMap().get(a.turnStart.clientId()).startTurn();
+            state.setCurrentPlayer(oldState.playersMap().get(a.turnStart.clientId()));
         }
 
         state.setNextPlayer(a.turnStart.clientId());
@@ -465,31 +450,32 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, ServerTurnAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
         switch (a.turn.type) {
 
             case PLACE -> {
-                ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
-                        (ServerTurn) oldState.gameLastTurn : null;
+                ServerTurn lastTurn = oldState.gameLastTurn() instanceof ServerTurn ?
+                        (ServerTurn) oldState.gameLastTurn() : null;
+
                 if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.TOKEN_USED) {
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.TOKEN_USED, lastTurn.x, lastTurn.y, a.turn.x, a.turn.y));
                 } else {
-                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
-                    game.unsafePlaceSettlement(game.currentPlayer, a.turn.y, a.turn.x);
+                    // this x,y needs to be swapped because game-logic uses swapped coordinates internally
+                    Game.unsafePlaceSettlement(oldState.gameMap(), oldState.currentPlayer(), a.turn.y, a.turn.x);
                     //game.placeSettlement(game.currentPlayer, a.turn.y, a.turn.x);
                     state.setGameLastTurn(a.turn);
                 }
-                state.setGame(game);
+                state.setGameMap(oldState.gameMap());
             }
             case REMOVE -> {
-                ServerTurn lastTurn = oldState.gameLastTurn instanceof ServerTurn ?
-                        (ServerTurn) oldState.gameLastTurn : null;
+                ServerTurn lastTurn = oldState.gameLastTurn() instanceof ServerTurn ?
+                        (ServerTurn) oldState.gameLastTurn() : null;
                 if (lastTurn != null && lastTurn.type == ServerTurn.TurnType.TOKEN_USED) {
-                    // this x,y needs to be swapped because gamelogic uses swapped coordinates internally
-                    game.unsafeMoveSettlement(game.currentPlayer, a.turn.y, a.turn.x, lastTurn.toY, lastTurn.toX);
+                    // this x,y needs to be swapped because game-logic uses swapped coordinates internally
+                    Game.unsafeMoveSettlement(oldState.gameMap(), oldState.currentPlayer(), a.turn.y, a.turn.x, lastTurn.toY, lastTurn.toX);
                     // this x,y doesn't need to be swapped since we're treating it as an incoming server message
+                    state.setGameMap(oldState.gameMap());
                     state.setGameLastTurn(new ServerTurn(
                             a.turn.clientId, ServerTurn.TurnType.MOVE, a.turn.x, a.turn.y, lastTurn.toX, lastTurn.toY));
                 }
@@ -501,81 +487,102 @@ public class KBReducer implements Reducer<KBState> {
         return state;
     }
 
-    private DeferredState reduce(KBState oldState, ClientTurnAction a) {
+    private DeferredState reduce(Store<KBState> store, KBState oldState, ClientTurnAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
 
-        Player player = game.playersMap.get(a.turn.clientId);
+        Player player = oldState.playersMap().get(a.turn.clientId);
         int x = a.turn.x;
         int y = a.turn.y;
         int toX = a.turn.toX;
         int toY = a.turn.toY;
-        // TODO: use enums from gamelogic I guess
-        switch (a.turn.type) {
 
+        switch (a.turn.type) {
             case PLACE -> {
-                game.useBasicTurn(player, x, y);
-                oldState.client.placeSettlement(x, y);
+                Game.useBasicTurn(oldState.gameMap(), player, x, y);
+                oldState.client().placeSettlement(x, y);
             }
 
             case ORACLE -> {
-                game.useTokenOracle(player, x, y);
-                oldState.client.useTokenOracle(x, y);
+                Game.useTokenOracle(player, x, y);
+                oldState.client().useTokenOracle(x, y);
+                state.setToken(null);
             }
             case FARM -> {
-                game.useTokenFarm(player, x, y);
-                oldState.client.useTokenFarm(x, y);
+                Game.useTokenFarm(player, x, y);
+                oldState.client().useTokenFarm(x, y);
+                state.setToken(null);
             }
             case TAVERN -> {
-                game.useTokenTavern(player, x, y);
-                oldState.client.useTokenTavern(x, y);
+                Game.useTokenTavern(player, x, y);
+                oldState.client().useTokenTavern(x, y);
+                state.setToken(null);
             }
             case TOWER -> {
-                game.useTokenTower(player, x, y);
-                oldState.client.useTokenTower(x, y);
+                Game.useTokenTower(player, x, y);
+                oldState.client().useTokenTower(x, y);
+                state.setToken(null);
             }
             case HARBOR -> {
-                game.useTokenHarbor(player, x, y, toX, toY);
-                oldState.client.useTokenHarbor(x,y, toX, toY);
+                Game.useTokenHarbor(player, x, y, toX, toY);
+                oldState.client().useTokenHarbor(x,y, toX, toY);
+                store.dispatch(new ServerTurnAction(
+                        new ServerTurn(oldState.client().getClientId(),
+                                ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)));
+                state.setToken(null);
             }
             case PADDOCK -> {
-                game.useTokenPaddock(player, x, y, toX, toY);
-                oldState.client.useTokenPaddock(x, y, toX, toY);
+                Game.useTokenPaddock(player, x, y, toX, toY);
+                oldState.client().useTokenPaddock(x, y, toX, toY);
+                store.dispatch(new ServerTurnAction(
+                        new ServerTurn(oldState.client().getClientId(),
+                                ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)));
+                state.setToken(null);
             }
             case BARN -> {
-                game.useTokenBarn(player, x, y, toX, toY);
-                oldState.client.useTokenBarn(x, y, toX, toY);
+                Game.useTokenBarn(player, x, y, toX, toY);
+                oldState.client().useTokenBarn(x, y, toX, toY);
+                store.dispatch(new ServerTurnAction(
+                        new ServerTurn(oldState.client().getClientId(),
+                                ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)));
+                state.setToken(null);
             }
             case OASIS -> {
-                game.useTokenOasis(player,x, y);
-                oldState.client.useTokenOasis(x, y);
+                Game.useTokenOasis(player, x, y);
+                oldState.client().useTokenOasis(x, y);
+                state.setToken(null);
             }
         }
 
-        state.setGame(game);
-        state.setToken(null);
+        state.setGameMap(oldState.gameMap());
         return state;
     }
 
     private DeferredState reduce(KBState oldState, TurnEndAction a) {
         DeferredState state = new DeferredState(oldState);
 
-        oldState.client.endTurn();
+        oldState.client().endTurn();
         //TODO: end turn in gamelogic
         return state;
     }
 
     private DeferredState reduce(KBState oldState, ReadyGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        final var game = oldState.game;
-        // super mario hack
-        if (oldState.gameStarted == false && oldState.players != null &&
-                oldState.game.getMyGameReply().playerLimit() == oldState.players.size()
-                && oldState.nextPlayer >= 0 && oldState.nextTerrainCard != null) {
-            game.startTurn(oldState.nextPlayer);
-            game.currentPlayer.setTerrainCard(oldState.nextTerrainCard);
+
+        if (oldState.myGameReply() == null) {
+            return state;
+        }
+
+        if (oldState.gameStarted() == false && oldState.players() != null &&
+                oldState.myGameReply().playerLimit() == oldState.players().size()
+                && oldState.nextPlayer() >= 0 && oldState.nextTerrainCard() != null) {
+
+            Player currentPlayer = oldState.playersMap().get(oldState.nextPlayer());
+
+            currentPlayer.setTerrainCard(oldState.nextTerrainCard());
+            currentPlayer.startTurn();
+
+            state.setCurrentPlayer(currentPlayer);
             state.setGameStarted(true);
-            state.setGame(game);
         }
         return state;
     }
@@ -583,25 +590,23 @@ public class KBReducer implements Reducer<KBState> {
     private DeferredState reduce(KBState oldState, ReceiveTokenAction a) {
         DeferredState state = new DeferredState(oldState);
 
-        oldState.game.unsafeCheckForTokens(oldState.game.currentPlayer, a.getPayload().column(), a.getPayload().row());
+        Game.unsafeCheckForTokens(oldState.gameMap(), oldState.currentPlayer(), a.getPayload().column(), a.getPayload().row());
 
-        state.setGame(oldState.game);
+        state.setGameMap(oldState.gameMap());
         return state;
     }
 
     private DeferredState reduce(KBState oldState, RemoveTokenAction a){
         DeferredState state = new DeferredState(oldState);
 
-        oldState.game.unsafeRemoveToken(oldState.game.currentPlayer, a.getPayload().column(), a.getPayload().row());
+        Game.unsafeRemoveToken(oldState.gameMap(), oldState.currentPlayer(), a.getPayload().column(), a.getPayload().row());
 
-        state.setGame(oldState.game);
+        state.setGameMap(oldState.gameMap());
         return state;
     }
 
     private DeferredState reduce(KBState oldState, ActivateTokenAction a){
         DeferredState state = new DeferredState(oldState);
-
-        final Game game = oldState.game;
 
         state.setToken(a.getToken());
 
@@ -618,7 +623,7 @@ public class KBReducer implements Reducer<KBState> {
 
     private DeferredState reduce(KBState oldState, UploadQuadrantAction a){
 
-        oldState.client.uploadQuadrant(a.quadrant);
+        oldState.client().uploadQuadrant(a.quadrant);
         return new DeferredState(oldState);
     }
 
@@ -628,11 +633,15 @@ public class KBReducer implements Reducer<KBState> {
         state.setPlayers(null);
         state.setScores(null);
         state.setToken(null);
-        state.setGame(null);
         state.setGameLastTurn(null);
         state.setNextTerrainCard(null);
         state.setNextPlayer(-1);
         state.setGameStarted(false);
+        state.setGameMap(null);
+        state.setMyGameReply(null);
+        state.setPlayersMap(null);
+        state.setCurrentPlayer(null);
+        state.setJoinedGame(false);
 
         return state;
     }

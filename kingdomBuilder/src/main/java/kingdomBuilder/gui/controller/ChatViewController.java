@@ -164,11 +164,11 @@ public class ChatViewController extends Controller implements Initializable {
         resourceBundle = resources;
 
         store.subscribe(this::onClientChanges, "clients");
-        store.subscribe(this::onMessage, "message");
+        store.subscribe(this::onMessageChanged, "message");
         store.subscribe(this::onTurn, "gameLastTurn");
-        store.subscribe(this::onGame, "game");
+        store.subscribe(this::onJoinedGameChanged, "joinedGame");
         store.subscribe(this::onConnect, "isConnected");
-        store.subscribe(this::onTurnStart, "nextTerrainCard");
+        store.subscribe(this::onTurnStartChanged, "nextTerrainCard");
 
         setupClientList();
         setupWebView();
@@ -190,7 +190,7 @@ public class ChatViewController extends Controller implements Initializable {
                 super.updateItem(item, empty);
                 if (item == null) {
                     setStyle("");
-                } else if (item.clientId() == store.getState().client.getClientId()) {
+                } else if (item.clientId() == store.getState().client().getClientId()) {
                     setStyle("-fx-background-color: #ff9966;");
                 } else {
                     setStyle("");
@@ -246,19 +246,19 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the GUI when the client (dis-)connects to a server.
-     * @param state
+     * @param state the current state.
      */
     private void onConnect(KBState state) {
-        if (state.isConnected && !isConnected) {
+        if (state.isConnected() && !isConnected) {
             onConnect();
             isConnected = true;
-        } else if (!state.isConnected && isConnected){
+        } else if (!state.isConnected() && isConnected){
             onDisconnect();
             isConnected = false;
         }
 
         // Failed to connect
-        if (state.failedToConnect) {
+        if (state.failedToConnect()) {
             // TODO: error message instead of Chat message (because the chat is not visible)
             var elem = createHTMLElement(
                     "<--- " + resourceBundle.getString("failedToConnect") + " --->",
@@ -303,35 +303,35 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the ChatView with the specific incoming message.
      * @param state the current state.
      */
-    private void onMessage(KBState state) {
-        Message chatMsg = state.message;
+    private void onMessageChanged(KBState state) {
+        Message chatMsg = state.message();
         if (chatMsg == null)
             return;
 
         //TODO: namings
         int senderID = chatMsg.clientId();
-        String senderName = store.getState().clients.get(senderID).name();
+        String senderName = store.getState().clients().get(senderID).name();
         Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
         String message = chatMsg.message();
         String chatMessage;
         MessageStyle messageStyle;
 
-        if (receivers.length < store.getState().clients.size() - 1) {
+        if (receivers.length < store.getState().clients().size() - 1) {
             // whisper message
             messageStyle = MessageStyle.WHISPER;
             chatMessage = senderName + " " + resourceBundle.getString("whisperToYou");
-            for (int i = 0; i < receivers.length; i++) {
-                if (receivers[i].equals(store.getState().client.getClientId())) {
+            for (Integer receiver : receivers) {
+                if (receiver.equals(store.getState().client().getClientId())) {
                     continue;
                 }
 
-                chatMessage += ", @" + store.getState().clients.get(receivers[i]).name();
+                chatMessage += ", @" + store.getState().clients().get(receiver).name();
             }
             chatMessage += ": ";
         } else {
 
-            if (state.clients.get(chatMsg.clientId()).gameId() == state.client.getGameId() &&
-                            state.client.getGameId() != -1) {
+            if (state.clients().get(chatMsg.clientId()).gameId() == state.client().getGameId() &&
+                            state.client().getGameId() != -1) {
                 // chat message
                 messageStyle = MessageStyle.GAME_CHAT;
             } else {
@@ -352,10 +352,10 @@ public class ChatViewController extends Controller implements Initializable {
      * Updates the ChatView with the start of the next turn of the current game.
      * @param state the current state.
      */
-    private void onTurnStart(KBState state) {
-        if (state.gameStarted) {
+    private void onTurnStartChanged(KBState state) {
+        if (state.gameStarted()) {
             // game probably has the old player at this point lol
-            var player = state.game.playerIDtoObject(state.nextPlayer);
+            var player = state.playersMap().get(state.nextPlayer());
             String context = " started their turn: ";
             String terrainName = player.getTerrainCard().name();
 
@@ -368,15 +368,15 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView when joining a game.
-     * @param state the current state.
+     * @param kbState the current state.
      */
-    private void onGame(KBState state) {
-        if (state.game == null) {
-            tab_game.setDisable(true);
-            tab_log.setDisable(true);
-        } else {
+    private void onJoinedGameChanged(KBState kbState) {
+        if (kbState.joinedGame()) {
             tab_game.setDisable(false);
             tab_log.setDisable(false);
+        } else {
+            tab_game.setDisable(true);
+            tab_log.setDisable(true);
         }
     }
 
@@ -385,13 +385,13 @@ public class ChatViewController extends Controller implements Initializable {
      * @param state the current state.
      */
     private void onTurn(KBState state) {
-        if (state.gameLastTurn instanceof ServerTurn a) {
+        if (state.gameLastTurn() instanceof ServerTurn a) {
             String textContent =  a.type == ServerTurn.TurnType.PLACE ?
                     " has placed a settlement at (" + a.x + "," + a.y + ")" :
                     " has moved a settlement from (" + a.x + "," + a.y + ") to (" + a.toX + "," + a.toY + ")";
 
             turnLogAppendElement(createMessage(MessageStyle.GAME_CHAT,
-                    createHTMLElement(state.game.currentPlayer.name, MessageStyle.BOLD),
+                    createHTMLElement(state.currentPlayer().name, MessageStyle.BOLD),
                     createHTMLElement(textContent, null)
             ));
         }
@@ -402,10 +402,10 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private void onClientChanges(KBState state) {
         // update client list ///////////////////////
-        tableview_chat.getItems().setAll(state.clients.values());
+        tableview_chat.getItems().setAll(state.clients().values());
 
         //send join/left-message ///////////////////
-        List<ClientData> clientsState = new ArrayList<>(store.getState().clients.values());
+        List<ClientData> clientsState = new ArrayList<>(store.getState().clients().values());
 
         List<ClientData> differences = new ArrayList<>();
 
@@ -418,7 +418,7 @@ public class ChatViewController extends Controller implements Initializable {
             differences.addAll(clientsState);
             differences.removeAll(clients);
 
-            if (differences.get(0).clientId() == store.getState().client.getClientId()) {
+            if (differences.get(0).clientId() == store.getState().client().getClientId()) {
                 return;
             }
             onClientJoined(differences.get(0));
@@ -470,18 +470,18 @@ public class ChatViewController extends Controller implements Initializable {
             List<Integer> receiverIds = new ArrayList<>();
 
             if (tab_global.isSelected()) {
-                for (var c : store.getState().clients.entrySet()) {
+                for (var c : store.getState().clients().entrySet()) {
                     receiverIds.add(c.getKey());
                 }
             } else {
-                for (var c : store.getState().clients.entrySet()) {
-                    if (c.getValue().gameId() == store.getState().client.getGameId())
+                for (var c : store.getState().clients().entrySet()) {
+                    if (c.getValue().gameId() == store.getState().client().getGameId())
                         receiverIds.add(c.getKey());
                 }
             }
 
             // don't send message to ourselves
-            receiverIds.remove((Integer) store.getState().client.getClientId());
+            receiverIds.remove((Integer) store.getState().client().getClientId());
 
             String senderName = resourceBundle.getString("you") + ": ";
 
@@ -513,7 +513,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientData -> clientData.clientId() != store.getState().client.getClientId());
+                    .filtered(clientData -> clientData.clientId() != store.getState().client().getClientId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -523,7 +523,7 @@ public class ChatViewController extends Controller implements Initializable {
             // creates message for the chat textarea
             chatMessage = resourceBundle.getString("youWhisper") + " ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).clientId() == store.getState().client.getClientId()) {
+                if (receivers.get(i).clientId() == store.getState().client().getClientId()) {
                     continue;
                 }
                 receiverIds.add(receivers.get(i).clientId());

@@ -237,10 +237,10 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Initializes the ChoiceBoxes for the quadrant id selection.
      */
     private void initializeChoiceBox() {
-        gamesettings_choicebox_upperleft.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
-        gamesettings_choicebox_upperright.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
-        gamesettings_choicebox_bottomleft.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
-        gamesettings_choicebox_bottomright.setItems(FXCollections.observableList(store.getState().quadrants.keySet().stream().toList()));
+        gamesettings_choicebox_upperleft.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
+        gamesettings_choicebox_upperright.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
+        gamesettings_choicebox_bottomleft.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
+        gamesettings_choicebox_bottomright.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
     }
 
     /**
