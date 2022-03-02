@@ -22,7 +22,7 @@ public class ChatReducer extends Reducer<KBState> {
 
     @Reduce(action = SEND_MESSAGE)
     public DeferredState reduce(Store<KBState> unused, KBState oldState, ChatSendAction a) {
-        oldState.client.chat(a.receiverIds, a.message);
+        oldState.client().chat(a.receiverIds, a.message);
         return new DeferredState(oldState);
     }
 

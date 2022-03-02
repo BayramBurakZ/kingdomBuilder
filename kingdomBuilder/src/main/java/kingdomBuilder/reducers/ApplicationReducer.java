@@ -2,9 +2,9 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
-import kingdomBuilder.actions.game.*;
 import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.ServerTurn;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.generated.DeferredState;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.network.Client;
@@ -35,10 +35,10 @@ public class ApplicationReducer extends Reducer<KBState> {
     @Reduce(action = EXIT_APPLICATION)
     public DeferredState onExitApplication(Store<KBState> unused, KBState state, Object unused2) {
         System.out.println("Exiting application!");
-        ClientSelector selector = state.selector;
+        ClientSelector selector = state.selector();
         if (selector != null && selector.isRunning()) selector.stop();
 
-        Thread selectorThread = state.selectorThread;
+        Thread selectorThread = state.selectorThread();
         if (selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
 
         // Return old state, so that no other subscribers are called.
@@ -51,17 +51,17 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         Client client;
         try {
-            client = oldState.selector.connect(address);
+            client = oldState.selector().connect(address);
         } catch (IOException exc) {
             state.setFailedToConnect(true);
             return state;
         }
 
-        Thread selectorThread = oldState.selectorThread;
+        Thread selectorThread = oldState.selectorThread();
         if (selectorThread == null || !selectorThread.isAlive()) {
-            assert !oldState.selector.isRunning();
+            assert !oldState.selector().isRunning();
 
-            selectorThread = new Thread(oldState.selector);
+            selectorThread = new Thread(oldState.selector());
             selectorThread.setName("SelectorThread");
             selectorThread.start();
 
@@ -121,8 +121,8 @@ public class ApplicationReducer extends Reducer<KBState> {
         client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
 
         client.onTokenUsed.subscribe(m -> {
-            Game.TileType token = Game.TileType.valueOf(m.tokenType());
-            if (token == Game.TileType.PADDOCK || token == Game.TileType.BARN || token == Game.TileType.HARBOR) {
+            TileType token = TileType.valueOf(m.tokenType());
+            if (token == TileType.PADDOCK || token == TileType.BARN || token == TileType.HARBOR) {
                 store.dispatch(
                     GameReducer.SERVER_TURN,
                     new ServerTurn(m.clientId(), ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)
@@ -133,7 +133,7 @@ public class ApplicationReducer extends Reducer<KBState> {
         store.subscribe(kbState -> store.dispatch(GameReducer.READY_GAME, null),
                 "players", "nextTerrainCard", "nextPlayer");
 
-        client.login(oldState.clientPreferredName);
+        client.login(oldState.clientPreferredName());
 
         client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
 
@@ -154,19 +154,19 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         // TODO: remove sceneloader/controller
         if (wasKicked) {
-            var sceneLoader = oldState.sceneLoader;
+            var sceneLoader = oldState.sceneLoader();
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
 
-        oldState.client.disconnect();
+        oldState.client().disconnect();
         state.setClient(null);
         state.setIsConnected(false);
 
-        oldState.clients.clear();
-        state.setClients(oldState.clients);
+        oldState.clients().clear();
+        state.setClients(oldState.clients());
 
-        oldState.games.clear();
-        state.setGames(oldState.games);
+        oldState.games().clear();
+        state.setGames(oldState.games());
 
         return state;
     }
@@ -178,17 +178,17 @@ public class ApplicationReducer extends Reducer<KBState> {
         state.setIsConnected(true);
         System.out.println("Is connected.");
 
-        oldState.client.loadNamespace();
-        oldState.client.clientsRequest();
-        oldState.client.gamesRequest();
-        oldState.client.quadrantsRequest();
+        oldState.client().loadNamespace();
+        oldState.client().clientsRequest();
+        oldState.client().gamesRequest();
+        oldState.client().quadrantsRequest();
         return state;
     }
 
     @Reduce(action = ADD_CLIENT)
     public DeferredState onAddClient(Store<KBState> unused, KBState oldState, ClientData payload) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         clients.put(payload.clientId(), payload);
         state.setClients(clients);
 
@@ -198,7 +198,7 @@ public class ApplicationReducer extends Reducer<KBState> {
     @Reduce(action = REMOVE_CLIENT)
     public DeferredState onRemoveClient(Store<KBState> unused, KBState oldState, ClientData payload) {
         DeferredState state = new DeferredState(oldState);
-        final var clients = oldState.clients;
+        final var clients = oldState.clients();
         clients.remove(payload.clientId());
         state.setClients(clients);
 
