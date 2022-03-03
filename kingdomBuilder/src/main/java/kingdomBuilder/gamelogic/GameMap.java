@@ -610,4 +610,31 @@ public class GameMap implements Iterable<Tile> {
 
         return stream().filter(t -> t.occupiedBy == player).collect(Collectors.toSet());
     }
+
+    /**
+     * Adds all settlements of a group of settlements into the given Set of Tiles.
+     *
+     * @param tiles the result.
+     * @param player the player of the group.
+     * @param x the x-coordinate of the beginning settlement.
+     * @param y the y-coordinate of the beginning settlement.
+     */
+    public void getSettlementGroup(Set<Tile> tiles, Player player, int x, int y) {
+        Set<Tile> surroundings = at(x,y).surroundingSettlements(this, player);
+
+        tiles.add(at(x,y));
+
+        // remove all checked tiles
+        surroundings.removeAll(tiles);
+
+        if (surroundings.isEmpty())
+            return;
+
+        // check surrounding of new tiles
+        for (Tile t : surroundings) {
+            getSettlementGroup(tiles, player, t.x, t.y);
+        }
+
+        return;
+    }
 }

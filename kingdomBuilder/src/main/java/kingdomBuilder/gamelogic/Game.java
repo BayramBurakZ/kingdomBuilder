@@ -488,82 +488,228 @@ public class Game {
      */
     // TODO: Call the method
     public static int calculateScore(GameMap gameMap, Player player, List<WinCondition> winConditions) {
+        // TODO: remove debug messages when everything works fine
         int score = 0;
         for (WinCondition c : winConditions) {
             switch(c) {
-                case LORDS -> score += scoreLord(gameMap, player);
-                case MINER -> score += scoreMiner(gameMap, player);
-                case FARMER -> score += scoreFarmer(gameMap, player);
-                case FISHER -> score += scoreFisher(gameMap, player);
-                case KNIGHT -> score += scoreKnight(gameMap, player);
-                case WORKER -> score += scoreWorker(gameMap, player);
-                case CITIZEN -> score += scoreCitizen(gameMap, player);
-                case EXPLORER -> score += scoreExplorer(gameMap, player);
-                case MERCHANT -> score += scoreMerchant(gameMap, player);
-                case ANCHORITE -> score += scoreAnchorite(gameMap, player);
+                case LORDS -> {
+                    int tmp = scoreLord(gameMap, player);
+                    System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case MINER -> {
+                    int tmp = scoreMiner(gameMap, player);
+                    System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case FARMER -> {
+                    int tmp =  scoreFarmer(gameMap, player);
+                    System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case FISHER -> {
+                    int tmp = scoreFisher(gameMap, player);
+                    System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case KNIGHT -> {
+                    int tmp = scoreKnight(gameMap, player);
+                    System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case WORKER -> {
+                    int tmp = scoreWorker(gameMap, player);
+                    System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case CITIZEN -> {
+                    int tmp = scoreCitizen(gameMap, player);
+                    System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case EXPLORER -> {
+                    int tmp = scoreExplorer(gameMap, player);
+                    System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case MERCHANT -> {
+                    int tmp = scoreMerchant(gameMap, player);
+                    System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
+                case ANCHORITE -> {
+                    int tmp = scoreAnchorite(gameMap, player);
+                    System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
+                    score += tmp;
+                }
             }
         }
 
-        // TODO: Points for Settlements next to Castles
+        return score + scoreCastles(gameMap, player);
+    }
+
+    static int scoreCastles(GameMap gameMap, Player player) {
+        Set<Tile> castles = gameMap.stream().filter(t -> t.tileType == TileType.CASTLE).collect(Collectors.toSet());
+
+        int castleScore = 0;
+        for (Tile castle : castles) {
+            if (castle.hasSurroundingSettlement(gameMap, player)) {
+                castleScore += 3;
+            }
+        }
+        System.out.println("Points for Castles: " + castleScore);
+
+        return castleScore;
+    }
+
+    /**
+     * Calculates the score for the given player on the given map with the win condition "anchorite".
+     * This win conditions gives one point for every group of settlements.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     *
+     * @return the score for the win condition "anchorite".
+     */
+    static int scoreAnchorite(GameMap gameMap, Player player)
+    {
+        List<Tile> settlements = gameMap.getSettlements(player).stream().toList();
+
+        int score = 0;
+
+        Set<Tile> group = new HashSet<>();
+
+        for (Tile t : settlements) {
+            if (group.contains(t)) {
+                continue;
+            }
+            gameMap.getSettlementGroup(group, player, t.x, t.y);
+            score++;
+        }
+
         return score;
     }
 
+    /**
+     * Calculates the score for the given player on the given map with the win condition "citizen".
+     * This win conditions gives one point for two settlements in the biggest group of settlements.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     *
+     * @return the score for the win condition "citizen".
+     */
+    static int scoreCitizen(GameMap gameMap, Player player)
+    {
+        List<Tile> settlements = gameMap.getSettlements(player).stream().toList();
+
+        int biggestSettlementSize = -1;
+
+        Set<Tile> group = new HashSet<>();
+        int prevGroupSize = group.size();
+
+        for (Tile t : settlements) {
+            if (group.contains(t)) {
+                continue;
+            }
+            gameMap.getSettlementGroup(group, player, t.x, t.y);
+            if ((group.size() - prevGroupSize) > biggestSettlementSize)
+                biggestSettlementSize = group.size() - prevGroupSize;
+
+            prevGroupSize = group.size();
+        }
+
+        int score = (int) (biggestSettlementSize/2);
+
+        return score;
+    }
+
+    /**
+     * Calculates the score for the given player on the given map with the win condition "explorer".
+     * This win conditions gives one point for every horizontal line with at least one settlement.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     *
+     * @return the score for the win condition "explorer".
+     */
+    static int scoreExplorer(GameMap gameMap, Player player)
+    {
+        int score = 0;
+
+        for (int y = 0; y < gameMap.mapWidth; y++) {
+            for (int x = 0; x < gameMap.mapWidth; x++) {
+                if (gameMap.at(x, y).occupiedBy == player) {
+                    score++;
+                    break;
+                }
+            }
+        }
+        return score;
+    }
+
+    /**
+     * Calculates the score for the given player on the given map with the win condition "knight".
+     * This win conditions gives two points for the every settlement on the horizontal line with the
+     * most settlement of your own.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     *
+     * @return the score for the win condition "knight".
+     */
+    static int scoreKnight(GameMap gameMap, Player player)
+    {
+        int highestAmount = -1;
+
+        for (int y = 0; y < gameMap.mapWidth; y++) {
+            int settlementsPerLine = 0;
+            for (int x = 0; x < gameMap.mapWidth; x++) {
+                if (gameMap.at(x, y).occupiedBy == player) {
+                    settlementsPerLine++;
+                }
+            }
+
+            if(settlementsPerLine > highestAmount) {
+                highestAmount = settlementsPerLine;
+            }
+        }
+
+        return highestAmount *2;
+    }
+
     // TODO: JavaDoc
-    public static int scoreWorker(GameMap gameMap, Player player)
+    static int scoreMerchant(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    public static int scoreFisher(GameMap gameMap, Player player)
+    static int scoreLord(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    public static int scoreMiner(GameMap gameMap, Player player)
+    static int scoreFarmer(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    public static int scoreAnchorite(GameMap gameMap, Player player)
+    static int scoreWorker(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    public static int scoreCitizen(GameMap gameMap, Player player)
+    static int scoreFisher(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    public static int scoreExplorer(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
-    }
-
-    // TODO: JavaDoc
-    public static int scoreKnight(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
-    }
-
-    // TODO: JavaDoc
-    public static int scoreMerchant(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
-    }
-
-    // TODO: JavaDoc
-    public static int scoreLord(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
-    }
-
-    // TODO: JavaDoc
-    public static int scoreFarmer(GameMap gameMap, Player player)
+    static int scoreMiner(GameMap gameMap, Player player)
     {
         return 0; // TODO: Implementation
     }

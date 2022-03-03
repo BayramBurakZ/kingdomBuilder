@@ -319,6 +319,12 @@ public class GameViewController extends Controller implements Initializable {
         if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN) {
             game_button_end.setDisable(false);
         }
+
+        // SCORE
+        for (int i = 0; i < kbState.players().size(); i++) {
+            int score = Game.calculateScore(kbState.gameMap(), kbState.players().get(i), kbState.winConditions());
+            updateScoreForPlayer(i, score);
+        }
     }
 
     /**

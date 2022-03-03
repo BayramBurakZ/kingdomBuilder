@@ -182,6 +182,10 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     @FXML
     private void onJoinGamePressed(Event event) {
+        if (gameselection_tableview.getSelectionModel().getSelectedItem() == null) {
+            // TODO: error message
+            return;
+        }
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
         store.dispatch(GameReducer.JOIN_GAME, id);
         sceneLoader.showGameView(false, true);
