@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GameMapTest {
 
@@ -230,14 +231,14 @@ public class GameMapTest {
 
         //place a tile next to water and mountain and check if the result is the correct neighbouring tile
         gameMap.at(2,9).placeSettlement(playerOne);
-        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON);
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON).collect(Collectors.toSet());
 
         assertEquals(1, result.size());
         assertTrue(result.contains(gameMap.at(1,9)));
         result.clear();
 
         // no neighbouring tile with type forest
-        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.FORREST);
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.FORREST).collect(Collectors.toSet());
         assertEquals(0, result.size());
         result.clear();
 
@@ -246,7 +247,7 @@ public class GameMapTest {
 
         // multiple neighbouring tiles with type canyon
         gameMap.at(9,15).placeSettlement(playerOne);
-        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON);
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON).collect(Collectors.toSet());
         assertEquals(5, result.size());
         result.clear();
     }
@@ -258,13 +259,13 @@ public class GameMapTest {
         Set<Tile> result;
 
         //no settlement placed
-        result = gameMap.getSettlements(playerOne);
+        result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(0, result.size());
         result.clear();
 
         //one settlement placed
         gameMap.at(4,5).placeSettlement(playerOne);
-        result = gameMap.getSettlements(playerOne);
+        result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
 
         assertEquals(1, result.size());
         assertTrue(result.contains(gameMap.at(4, 5)));
@@ -274,7 +275,7 @@ public class GameMapTest {
         gameMap.at(19,19).placeSettlement(playerOne);
         gameMap.at(19,0).placeSettlement(playerOne);
 
-        result = gameMap.getSettlements(playerOne);
+        result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(3, result.size());
         assertTrue(result.contains(gameMap.at(4, 5)));
         result.clear();
@@ -288,14 +289,14 @@ public class GameMapTest {
         gameMap.at(2,5).placeSettlement(playerOne);
         gameMap.at(3,4).placeSettlement(playerOne);
 
-        result = gameMap.getSettlements(playerOne);
+        result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(4, result.size());
         result.clear();
 
         //another player places one settlement (nothing should be changed)
         gameMap.at(19,19).placeSettlement(playerTwo);
 
-        result = gameMap.getSettlements(playerOne);
+        result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(4, result.size());
         result.clear();
     }

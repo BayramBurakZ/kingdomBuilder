@@ -1,6 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -342,7 +343,7 @@ class GameTest {
 
     }
 
-    @Test
+    @Test @Disabled
     void testScoreLord() {
 
         Player playerThird = new Player(3, "TestPlayer3", PlayerColor.BLACK, 40);

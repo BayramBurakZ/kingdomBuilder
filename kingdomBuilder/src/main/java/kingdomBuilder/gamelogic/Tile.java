@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Contains the data of a tile.
@@ -280,11 +282,15 @@ public class Tile {
      * @param gameMap the map containing the tile.
      * @return all surrounding tiles of the specified tile.
      */
-    public Set<Tile> surroundingTiles(GameMap gameMap) {
+    public Stream<Tile> surroundingTiles(GameMap gameMap) {
         if (!gameMap.isWithinBounds(x, y)) {
-            return null;
+            return Stream.empty();
         }
 
+        Iterable<Tile> iterable = () -> surroundingTilesIterator(gameMap);
+        return StreamSupport.stream(iterable.spliterator(), false);
+
+        /*
         Set<Tile> surroundingTiles = new HashSet<>();
 
         // top left
@@ -311,8 +317,8 @@ public class Tile {
         if (GameMap.bottomRightX(x, y) < gameMap.mapWidth && y + 1 < gameMap.mapWidth)
             surroundingTiles.add(gameMap.at(GameMap.bottomRightX(x, y), y + 1));
 
-        // TODO: eventually return streams everywhere
         return surroundingTiles;
+        */
     }
 
     /**
@@ -321,7 +327,7 @@ public class Tile {
      * @param gameMap the map containing the tile.
      * @return all free tiles that can be placed on that skipped position.
      */
-    public Set<Tile> surroundingTilesPaddock(GameMap gameMap) {
+    public Stream<Tile> surroundingTilesPaddock(GameMap gameMap) {
         Set<Tile> freeTiles = new HashSet<>();
         int tempX, tempY;
 
@@ -343,11 +349,9 @@ public class Tile {
         if (gameMap.isWithinBounds(x - 2, y) && !gameMap.at(x - 2, y).isBlocked())
             freeTiles.add(gameMap.at(x - 2, y));
 
-
         // right
         if (gameMap.isWithinBounds(x + 2, y) && !gameMap.at(x + 2, y).isBlocked())
             freeTiles.add(gameMap.at(x + 2, y));
-
 
         // bottom left diagonal
         tempX = GameMap.bottomLeftX(x, y, 2);
@@ -363,7 +367,7 @@ public class Tile {
         if (gameMap.isWithinBounds(tempX, tempY) && !gameMap.at(tempX, tempY).isBlocked())
             freeTiles.add(gameMap.at(tempX, tempY));
 
-        return freeTiles;
+        return freeTiles.stream();
     }
 
     /**
@@ -373,9 +377,8 @@ public class Tile {
      * @param player the player whose settlements to look for.
      * @return all tiles with a settlement of the specified player.
      */
-    public Set<Tile> surroundingSettlements(GameMap gameMap, Player player) {
-        return surroundingTiles(gameMap).stream().filter(tile -> tile.occupiedBy == player)
-                .collect(Collectors.toSet());
+    public Stream<Tile> surroundingSettlements(GameMap gameMap, Player player) {
+        return surroundingTiles(gameMap).filter(tile -> tile.occupiedBy == player);
     }
 
     /**
@@ -384,9 +387,8 @@ public class Tile {
      * @param gameMap the map containing the tile.
      * @return all surrounding tiles that are special places.
      */
-    public Set<Tile> surroundingSpecialPlaces(GameMap gameMap) {
-        return surroundingTiles(gameMap).stream().filter(tile -> TileType.tokenType.contains(tile.tileType))
-                .collect(Collectors.toSet());
+    public Stream<Tile> surroundingSpecialPlaces(GameMap gameMap) {
+        return surroundingTiles(gameMap).filter(tile -> TileType.tokenType.contains(tile.tileType));
     }
 
     /**

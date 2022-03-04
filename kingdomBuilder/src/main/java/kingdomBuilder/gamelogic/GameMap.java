@@ -12,8 +12,8 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * Contains the data of a map.
@@ -395,8 +395,8 @@ public class GameMap implements Iterable<Tile> {
      *
      * @return all tiles of the map.
      */
-    public Set<Tile> getTiles() {
-        return tileSet;
+    public Stream<Tile> getTiles() {
+        return stream();
     }
 
     /**
@@ -405,11 +405,51 @@ public class GameMap implements Iterable<Tile> {
      * @param terrain the placeable terrain type to filter by.
      * @return all tiles of the given placeable terrain type.
      */
-    public Set<Tile> getTiles(TileType terrain) {
+    public Stream<Tile> getTiles(TileType terrain) {
         if (TileType.nonPlaceableTileTypes.contains(terrain))
             throw new InvalidParameterException("The specified terrain is not a placeable terrain type!");
 
-        return stream().filter(t -> t.tileType == terrain).collect(Collectors.toSet());
+        return stream().filter(t -> t.tileType == terrain);
+    }
+
+    public @NotNull Iterator<Tile> getTilesAtBorderIterator() {
+        return new Iterator<Tile>() {
+
+            int border = 0;
+            int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                while (true) {
+                    if (border > 3)
+                        return false;
+
+                    if (index < mapWidth)
+                        return true;
+                    index = 0;
+                    border++;
+                }
+            }
+
+            @Override
+            public Tile next() {
+                return switch (border) {
+                    case 0 ->
+                            // top border
+                            at(index++, 0);
+                    case 1 ->
+                            // left border
+                            at(0, index++);
+                    case 2 ->
+                            // right border
+                            at(mapWidth - 1, index++);
+                    case 3 ->
+                            // bottom border
+                            at(index++, mapWidth - 1);
+                    default -> null;
+                };
+            }
+        };
     }
 
     /**
@@ -417,7 +457,11 @@ public class GameMap implements Iterable<Tile> {
      *
      * @return all tiles that are at the border of the map.
      */
-    public Set<Tile> getTilesAtBorder() {
+    public Stream<Tile> getTilesAtBorder() {
+
+        Iterable<Tile> iterable = this::getTilesAtBorderIterator;
+        return StreamSupport.stream(iterable.spliterator(), false);
+        /*
         Set<Tile> border = new HashSet<>();
 
         for (int x = 0; x < mapWidth; x++) {
@@ -431,6 +475,7 @@ public class GameMap implements Iterable<Tile> {
         }
 
         return border;
+         */
     }
 
     /**
@@ -439,12 +484,12 @@ public class GameMap implements Iterable<Tile> {
      * @param player the player of the settlements.
      * @return all free tiles that are next to a player's settlement.
      */
-    public Set<Tile> getPlaceableTilesAtBorder(Player player) {
-        Set<Tile> tilesOnBorder = getTilesAtBorder().stream().filter(tile -> !tile.isBlocked()
-                        && tile.hasSurroundingSettlement(this, player )).collect(Collectors.toSet());
+    public Stream<Tile> getPlaceableTilesAtBorder(Player player) {
+        Supplier<Stream<Tile>> tilesOnBorder = () -> getTilesAtBorder().filter(tile -> !tile.isBlocked()
+                        && tile.hasSurroundingSettlement(this, player ));
 
-        return tilesOnBorder.isEmpty() ?
-                getTilesAtBorder().stream().filter(t -> !t.isBlocked()).collect(Collectors.toSet()) : tilesOnBorder;
+        return tilesOnBorder.get().findAny().isEmpty() ?
+                getTilesAtBorder().filter(t -> !t.isBlocked()) : tilesOnBorder.get();
     }
 
     /**
@@ -455,13 +500,13 @@ public class GameMap implements Iterable<Tile> {
      * @param terrain the terrain to check for.
      * @return all tiles that can be placed next to other settlements.
      */
-    protected Set<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
+    protected Stream<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
         if (!TileType.placeableTileTypes.contains(terrain) && terrain != null)
             throw new InvalidParameterException("not a landscape!");
 
-        return getTiles(terrain).stream().filter(tile ->
+        return getTiles(terrain).filter(tile ->
                 !tile.isBlocked()
-                && tile.hasSurroundingSettlement(this, player)).collect(Collectors.toSet());
+                && tile.hasSurroundingSettlement(this, player));
     }
 
     /**
@@ -471,11 +516,13 @@ public class GameMap implements Iterable<Tile> {
      * @param terrain the terrain the player has.
      * @return a set of all positions a player can place a settlement.
      */
-    protected Set<Tile> getAllPlaceableTiles(Player player, TileType terrain) {
-        Set<Tile> allPossiblePlacements = getAllPlaceableTilesNextToSettlements(player, terrain);
-        return (allPossiblePlacements.isEmpty()) ?
-                getTiles(terrain).stream().filter(t -> !t.isBlocked()).collect(Collectors.toSet())
-                : allPossiblePlacements;
+    protected Stream<Tile> getAllPlaceableTiles(Player player, TileType terrain) {
+        Supplier<Stream<Tile>> allPossiblePlacements = () -> getAllPlaceableTilesNextToSettlements(player, terrain);
+
+
+        return (allPossiblePlacements.get().findAny().isEmpty()) ?
+                getTiles(terrain).filter(t -> !t.isBlocked())
+                : allPossiblePlacements.get();
     }
 
     /**
@@ -484,8 +531,8 @@ public class GameMap implements Iterable<Tile> {
      * @param player the player as the owner of the settlements.
      * @return all settlements of the player.
      */
-    public Set<Tile> getSettlements(Player player) {
-        return stream().filter(t -> t.occupiedBy == player).collect(Collectors.toSet());
+    public Stream<Tile> getSettlements(Player player) {
+        return stream().filter(t -> t.occupiedBy == player);
     }
 
     /**
@@ -500,19 +547,14 @@ public class GameMap implements Iterable<Tile> {
         if (at(x,y).occupiedBy == null)
             throw new InvalidParameterException("Not an occupied tile!");
 
-        Set<Tile> surroundings = at(x,y).surroundingSettlements(this, player);
+        Stream<Tile> surroundings = at(x,y).surroundingSettlements(this, player);
 
         tiles.add(at(x,y));
 
         // remove all checked tiles
-        surroundings.removeAll(tiles);
-
-        if (surroundings.isEmpty())
-            return;
-
-        // check surrounding of new tiles
-        for (Tile t : surroundings) {
+        surroundings.filter(o -> !tiles.contains(o)).forEach(t -> {
+            // check surroundings of new tiles
             getSettlementGroup(tiles, player, t.x, t.y);
-        }
+        });
     }
 }

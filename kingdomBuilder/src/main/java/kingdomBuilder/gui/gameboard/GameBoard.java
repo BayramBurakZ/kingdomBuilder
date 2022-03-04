@@ -9,6 +9,7 @@ import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * This class is used to contain all functions in terms of the boards gui.
@@ -170,16 +171,16 @@ public class GameBoard extends Board {
 
     /**
      * Highlights Hexagons on the map which matches the given type.
-     * @param set the tiles to highlight
+     * @param tiles the tiles to highlight
      */
-    public void highlightTerrain(Set<Tile> set) {
+    public void highlightTerrain(Stream<Tile> tiles) {
         for (HexagonTile[] o : board)
             for (HexagonTile h : o) {
                 h.removeElevated();
             }
-        for (Tile t : set) {
+        tiles.forEach(t -> {
             board[t.x][t.y].setElevated();
-        }
+        });
     }
 
     /**

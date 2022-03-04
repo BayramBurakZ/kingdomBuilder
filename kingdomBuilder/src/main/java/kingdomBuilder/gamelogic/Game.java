@@ -4,7 +4,10 @@ import java.security.InvalidParameterException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Contains all the information of a game hosted on the server.
@@ -71,7 +74,7 @@ public class Game {
                 && player.hasRemainingSettlements()
                 && gameMap.at(x, y).tileType == terrain
                 && (gameMap.at(x, y).hasSurroundingSettlement(gameMap, player)
-                || gameMap.getAllPlaceableTilesNextToSettlements(player, terrain).isEmpty());
+                || gameMap.getAllPlaceableTilesNextToSettlements(player, terrain).findAny().isEmpty());
     }
 
     /**
@@ -113,9 +116,9 @@ public class Game {
      *
      * @return all possible tiles at the start of the game.
      */
-    public static Set<Tile> allBasicTurnTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allBasicTurnTiles(GameMap gameMap, Player player) {
         return (player.remainingSettlementsOfTurn <= 0) ?
-                new HashSet<>() : gameMap.getAllPlaceableTiles(player, player.getTerrainCard());
+                Stream.empty() : gameMap.getAllPlaceableTiles(player, player.getTerrainCard());
     }
 
     /**
@@ -126,13 +129,13 @@ public class Game {
      *
      * @return the set of tiles where the player could place a settlement using the oracle token.
      */
-    public static Set<Tile> allTokenOracleTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenOracleTiles(GameMap gameMap, Player player) {
         if (player.getRemainingSettlements() <= 0)
-            return new HashSet<>();
+            return Stream.empty();
 
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.ORACLE)) ?
-                new HashSet<>() : gameMap.getAllPlaceableTiles(player, player.getTerrainCard());
+                Stream.empty() : gameMap.getAllPlaceableTiles(player, player.getTerrainCard());
     }
 
     /**
@@ -143,13 +146,13 @@ public class Game {
      *
      * @return the set of tiles where the player could place a settlement with using the farm token.
      */
-    public static Set<Tile> allTokenFarmTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenFarmTiles(GameMap gameMap, Player player) {
         if (player.getRemainingSettlements() <= 0)
-            return new HashSet<>();
+            return Stream.empty();
 
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.FARM) ?
-                new HashSet<>() : gameMap.getAllPlaceableTiles(player, TileType.GRAS));
+                Stream.empty() : gameMap.getAllPlaceableTiles(player, TileType.GRAS));
     }
 
     /**
@@ -160,15 +163,15 @@ public class Game {
      *
      * @return the set of tiles where the player could place a settlement with using the tavern token.
      */
-    public static Set<Tile> allTokenTavernTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenTavernTiles(GameMap gameMap, Player player) {
         if (player.getRemainingSettlements() <= 0)
-            return new HashSet<>();
+            return Stream.empty();
 
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.TAVERN)) ?
-                new HashSet<>()
+                Stream.empty()
                 : gameMap.stream().filter(tile -> !tile.isBlocked()
-                && tile.isAtEndOfAChain(gameMap, player)).collect(Collectors.toSet());
+                && tile.isAtEndOfAChain(gameMap, player));
     }
 
     /**
@@ -179,13 +182,13 @@ public class Game {
      *
      * @return the set of tiles where the player could place a settlement with using the tower token.
      */
-    public static Set<Tile> allTokenTowerTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenTowerTiles(GameMap gameMap, Player player) {
         if (player.getRemainingSettlements() <= 0)
-            return new HashSet<>();
+            return Stream.empty();
 
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.TOWER)) ?
-                new HashSet<>() : gameMap.getPlaceableTilesAtBorder(player);
+                Stream.empty() : gameMap.getPlaceableTilesAtBorder(player);
     }
 
     /**
@@ -196,13 +199,13 @@ public class Game {
      *
      * @return the set of tiles where the player could place a settlement with using the Oasis Token.
      */
-    public static Set<Tile> allTokenOasisTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenOasisTiles(GameMap gameMap, Player player) {
         if (player.getRemainingSettlements() <= 0)
-            return new HashSet<>();
+            return Stream.empty();
 
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.OASIS)) ?
-                new HashSet<>() : gameMap.getAllPlaceableTiles(player, TileType.DESERT);
+                Stream.empty() : gameMap.getAllPlaceableTiles(player, TileType.DESERT);
     }
 
     /**
@@ -213,22 +216,22 @@ public class Game {
      *
      * @return all tiles that are placeable with token harbor.
      */
-    public static Set<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
+    public static Stream<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
         if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.HARBOR))
-            return new HashSet<>();
+            return Stream.empty();
 
-        Set<Tile> allPlaceableTilesWater = gameMap.getTiles(TileType.WATER).stream().filter(
+        Supplier<Stream<Tile>> allPlaceableTilesWater = () -> gameMap.getTiles(TileType.WATER).filter(
                 tile -> tile.tileType == TileType.WATER
                         && tile.occupiedBy == null
-                        && tile.hasSurroundingSettlement(gameMap, player)).collect(Collectors.toSet());
+                        && tile.hasSurroundingSettlement(gameMap, player));
 
-        allPlaceableTilesWater = allPlaceableTilesWater.isEmpty() ?
-                gameMap.getTiles(TileType.WATER).stream().filter(t -> t.occupiedBy == null ).collect(Collectors.toSet())
+        allPlaceableTilesWater = allPlaceableTilesWater.get().findAny().isEmpty() ?
+                () -> gameMap.getTiles(TileType.WATER).filter(t -> t.occupiedBy == null)
                 : allPlaceableTilesWater;
 
         //TODO: Revisit all functions harbor is using
-        return highlightDestination ? allPlaceableTilesWater : gameMap.getSettlements(player);
+        return highlightDestination ? allPlaceableTilesWater.get() : gameMap.getSettlements(player);
     }
 
     /**
@@ -238,10 +241,10 @@ public class Game {
      * @param player the player whose turn it is.
      * @return all tiles that a paddock token can be used on.
      */
-    public static Set<Tile> allTokenPaddockTiles(GameMap gameMap, Player player) {
+    public static Stream<Tile> allTokenPaddockTiles(GameMap gameMap, Player player) {
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
-                new HashSet<>() : gameMap.getSettlements(player);
+                Stream.empty() : gameMap.getSettlements(player);
     }
 
     /**
@@ -254,11 +257,11 @@ public class Game {
      * @return all tiles that are placeable with token paddock.
      * @throws InvalidParameterException when player does not own a settlement at given position.
      */
-    public static Set<Tile> allTokenPaddockTiles(GameMap gameMap, Player player, int fromX, int fromY) {
+    public static Stream<Tile> allTokenPaddockTiles(GameMap gameMap, Player player, int fromX, int fromY) {
         // TODO: maybe throw or warning if the settlement at (fromX,fromY) doesn't match the specified player
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
-                new HashSet<>() : gameMap.at(fromX, fromY).surroundingTilesPaddock(gameMap);
+                Stream.empty() : gameMap.at(fromX, fromY).surroundingTilesPaddock(gameMap);
     }
 
     /**
@@ -269,10 +272,10 @@ public class Game {
      *
      * @return all tiles that are placeable with token barn.
      */
-    public static Set<Tile> allTokenBarnTiles(GameMap gameMap, Player player, boolean highlightDestination) {
+    public static Stream<Tile> allTokenBarnTiles(GameMap gameMap, Player player, boolean highlightDestination) {
         if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.BARN))
-            return new HashSet<>();
+            return Stream.empty();
 
         return highlightDestination ?
                 gameMap.getAllPlaceableTiles(player, player.getTerrainCard()) : gameMap.getSettlements(player);
@@ -289,12 +292,10 @@ public class Game {
      */
     public static void unsafeCheckForTokens(GameMap gameMap, Player player, int x, int y) {
         Tile originTile = gameMap.at(x, y);
-        Set<Tile> specialPlaces = originTile.surroundingSpecialPlaces(gameMap);
+        Stream<Tile> specialPlaces = originTile.surroundingSpecialPlaces(gameMap);
 
         // Player gets a token if settlement is next to special place
-        for (var specialPlace : specialPlaces) {
-            player.addToken(specialPlace);
-        }
+        specialPlaces.forEach(player::addToken);
     }
 
     /**
@@ -573,21 +574,20 @@ public class Game {
      */
     static int scoreAnchorite(GameMap gameMap, Player player)
     {
-        Set<Tile> settlements = gameMap.getSettlements(player);
+        Stream<Tile> settlements = gameMap.getSettlements(player);
 
-        int score = 0;
+        AtomicInteger score = new AtomicInteger();
 
         Set<Tile> group = new HashSet<>();
 
-        for (Tile t : settlements) {
-            if (group.contains(t)) {
-                continue;
+        settlements.forEach(t -> {
+            if (!group.contains(t)) {
+                gameMap.getSettlementGroup(group, player, t.x, t.y);
+                score.addAndGet(1);
             }
-            gameMap.getSettlementGroup(group, player, t.x, t.y);
-            score++;
-        }
+        });
 
-        return score;
+        return score.get();
     }
 
     /**
@@ -601,25 +601,26 @@ public class Game {
      */
     static int scoreCitizen(GameMap gameMap, Player player)
     {
-        Set<Tile> settlements = gameMap.getSettlements(player);
+        Stream<Tile> settlements = gameMap.getSettlements(player);
 
-        int biggestSettlementSize = -1;
+        var ref = new Object() {
+            int biggestGroupSize = 0;
+            int prevCheckedCount = 0;
+        };
 
-        Set<Tile> group = new HashSet<>();
-        int prevGroupSize = group.size();
+        Set<Tile> checkedSettlements = new HashSet<>();
 
-        for (Tile t : settlements) {
-            if (group.contains(t)) {
-                continue;
+        settlements.forEach(t -> {
+            if (!checkedSettlements.contains(t)) {
+                gameMap.getSettlementGroup(checkedSettlements, player, t.x, t.y);
+                if ((checkedSettlements.size() - ref.prevCheckedCount) > ref.biggestGroupSize)
+                    ref.biggestGroupSize = checkedSettlements.size() - ref.prevCheckedCount;
+
+                ref.prevCheckedCount = checkedSettlements.size();
             }
-            gameMap.getSettlementGroup(group, player, t.x, t.y);
-            if ((group.size() - prevGroupSize) > biggestSettlementSize)
-                biggestSettlementSize = group.size() - prevGroupSize;
+        });
 
-            prevGroupSize = group.size();
-        }
-
-        int score = (int) (biggestSettlementSize/2);
+        int score = (int) (ref.biggestGroupSize /2);
 
         return score;
     }
