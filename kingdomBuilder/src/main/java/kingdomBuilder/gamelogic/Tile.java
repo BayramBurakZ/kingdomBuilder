@@ -1,6 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -120,8 +121,6 @@ public class Tile {
      */
     public boolean isAtEndOfAChain(GameMap gameMap, Player player) {
 
-        // TODO: iterator/stream
-
         if (isBlocked())
             return false;
 
@@ -187,8 +186,98 @@ public class Tile {
     }
 
     /**
+     * Returns an iterator that contains all surrounding tiles of a given hexagon.
+     *
+     * @param gameMap the map containing the tile.
+     * @return All surrounding Tiles.
+     */
+    public Iterator<Tile> surroundingTilesIterator(GameMap gameMap) {
+
+        return new Iterator<Tile>() {
+            int state = -1;
+
+            @Override
+            public boolean hasNext() {
+                switch (state) {
+                    case -1:
+                        // check given coordinates
+                        if (!gameMap.isWithinBounds(x, y)) {
+                            return false;
+                        }
+                    case 0:
+                        // top left
+                        if (GameMap.topLeftX(x, y) >= 0 && y > 0) {
+                            state = 0;
+                            return true;
+                        }
+                    case 1:
+                        // top right
+                        if (GameMap.topRightX(x, y) < gameMap.mapWidth && y > 0) {
+                            state = 1;
+                            return true;
+                        }
+                    case 2:
+                        // left
+                        if (x - 1 >= 0) {
+                            state = 2;
+                            return true;
+                        }
+                    case 3:
+                        // right
+                        if (x + 1 < gameMap.mapWidth) {
+                            state = 3;
+                            return true;
+                        }
+                    case 4:
+                        // bottom left
+                        if (GameMap.bottomLeftX(x, y) >= 0 && y + 1 < gameMap.mapWidth) {
+                            state = 4;
+                            return true;
+                        }
+                    case 5:
+                        // bottom right
+                        if (GameMap.bottomRightX(x, y) < gameMap.mapWidth && y + 1 < gameMap.mapWidth) {
+                            state = 5;
+                            return true;
+                        }
+                    default:
+                        // all tiles checked
+                        return false;
+                }
+            }
+
+            @Override
+            public Tile next() {
+                switch (state) {
+                    case 0:
+                        state++;
+                        return gameMap.at(GameMap.topLeftX(x, y), y - 1);
+                    case 1:
+                        state++;
+                        return gameMap.at(GameMap.topRightX(x, y), y - 1);
+                    case 2:
+                        state++;
+                        return gameMap.at(x - 1, y);
+                    case 3:
+                        state++;
+                        return gameMap.at(x + 1, y);
+                    case 4:
+                        state++;
+                        return gameMap.at(GameMap.bottomLeftX(x, y), y + 1);
+                    case 5:
+                        state++;
+                        return gameMap.at(GameMap.bottomRightX(x, y), y + 1);
+                    default:
+                        return null;
+                }
+            }
+        };
+    }
+
+    /**
      * Get all the surrounding tiles of the specified tile.
      *
+     * @param gameMap the map containing the tile.
      * @return all surrounding tiles of the specified tile.
      */
     public Set<Tile> surroundingTiles(GameMap gameMap) {
@@ -199,7 +288,7 @@ public class Tile {
         Set<Tile> surroundingTiles = new HashSet<>();
 
         // top left
-        if (gameMap.topLeftX(x, y) >= 0 && y > 0)
+        if (GameMap.topLeftX(x, y) >= 0 && y > 0)
             surroundingTiles.add(gameMap.at(GameMap.topLeftX(x, y), y - 1));
 
         // top right
@@ -236,7 +325,6 @@ public class Tile {
         Set<Tile> freeTiles = new HashSet<>();
         int tempX, tempY;
 
-        // TODO: iterator
         // top left diagonal
         tempX = GameMap.topLeftX(x, y, 2);
         tempY = y - 2;
@@ -281,19 +369,11 @@ public class Tile {
     /**
      * Returns the surrounding settlements owned by the specified player.
      *
-     * @param gameMap    the map containing the tile.
+     * @param gameMap the map containing the tile.
      * @param player the player whose settlements to look for.
      * @return all tiles with a settlement of the specified player.
      */
     public Set<Tile> surroundingSettlements(GameMap gameMap, Player player) {
-        /*
-        HashSet<Tile> tilesWithSettlements = new HashSet<>();
-        for (Tile tile : surroundingTiles(map)) {
-            if (tile.occupiedBy() == player)
-                tilesWithSettlements.add(tile);
-        }
-        return tilesWithSettlements;
-        */
         return surroundingTiles(gameMap).stream().filter(tile -> tile.occupiedBy == player)
                 .collect(Collectors.toSet());
     }
@@ -305,16 +385,6 @@ public class Tile {
      * @return all surrounding tiles that are special places.
      */
     public Set<Tile> surroundingSpecialPlaces(GameMap gameMap) {
-        //TODO: check for each one if the player has only one settlement on it
-        /*
-        Set<Tile> surroundingSpecialPlaces = new HashSet<>();
-        for (Tile tile : surroundingTiles(map)) {
-            if (tokenType.contains(tile.tileType)) {
-                surroundingSpecialPlaces.add(tile);
-            }
-        }
-        return surroundingSpecialPlaces;
-        */
         return surroundingTiles(gameMap).stream().filter(tile -> TileType.tokenType.contains(tile.tileType))
                 .collect(Collectors.toSet());
     }
@@ -327,9 +397,6 @@ public class Tile {
      * @return True if player has a neighbouring settlement. False otherwise.
      */
     public boolean hasSurroundingSettlement(GameMap gameMap, Player player) {
-
-        // TODO: iterator/stream
-        //for (var tile : surroundingTiles())
 
         // right tile
         if (gameMap.isWithinBounds(x + 1, y) && (gameMap.at(x + 1, y).occupiedBy() == player))

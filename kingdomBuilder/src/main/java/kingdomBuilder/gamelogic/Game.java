@@ -573,7 +573,7 @@ public class Game {
      */
     static int scoreAnchorite(GameMap gameMap, Player player)
     {
-        List<Tile> settlements = gameMap.getSettlements(player).stream().toList();
+        Set<Tile> settlements = gameMap.getSettlements(player);
 
         int score = 0;
 
@@ -601,7 +601,7 @@ public class Game {
      */
     static int scoreCitizen(GameMap gameMap, Player player)
     {
-        List<Tile> settlements = gameMap.getSettlements(player).stream().toList();
+        Set<Tile> settlements = gameMap.getSettlements(player);
 
         int biggestSettlementSize = -1;
 

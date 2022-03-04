@@ -7,6 +7,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -195,10 +200,12 @@ public class GameMap implements Iterable<Tile> {
      * @return The x coordinate of the tile that lies top left from the original tile.
      */
     protected static int topLeftX(int x, int y, int distance) {
-        // TODO: remove the loop and calculate this properly
-        for (int i = 0; i < distance; i++)
-            x = topLeftX(x, y - i);
-        return x;
+        int evenMoves = distance / 2;
+        if (distance % 2 != 0 && y % 2 == 0) {
+            // even row
+            evenMoves++;
+        }
+        return x - evenMoves;
     }
 
     /**
@@ -228,10 +235,12 @@ public class GameMap implements Iterable<Tile> {
      * @return The x coordinate of the tile that lies top right from the original tile.
      */
     protected static int topRightX(int x, int y, int distance) {
-        // TODO: remove the loop and calculate this properly
-        for (int i = 0; i < distance; i++)
-            x = topRightX(x, y - i);
-        return x;
+        int oddMoves = distance / 2;
+        if (distance % 2 != 0 && y % 2 != 0) {
+            // odd row
+            oddMoves++;
+        }
+        return x + oddMoves;
     }
 
     /**
@@ -255,10 +264,7 @@ public class GameMap implements Iterable<Tile> {
      * @return The x coordinate of the tile that lies bottom left from the original tile.
      */
     protected static int bottomLeftX(int x, int y, int distance) {
-        // TODO: remove the loop and calculate this properly
-        for (int i = 0; i < distance; i++)
-            x = bottomLeftX(x, y + i);
-        return x;
+        return topLeftX(x, y, distance);
     }
 
     /**
@@ -282,10 +288,7 @@ public class GameMap implements Iterable<Tile> {
      * @return The x coordinate of the tile that lies bottom right from the original tile.
      */
     protected static int bottomRightX(int x, int y, int distance) {
-        // TODO: remove the loop and calculate this properly
-        for (int i = 0; i < distance; i++)
-            x = bottomRightX(x, y + i);
-        return x;
+        return topRightX(x, y, distance);
     }
 
     /**
@@ -314,96 +317,6 @@ public class GameMap implements Iterable<Tile> {
     }
 
     /**
-     * Returns an iterator that contains all surrounding tiles from a given hexagon.
-     *
-     * @param x the x coordinate of the Tile.
-     * @param y the y coordinate of the Tile.
-     * @return All surrounding Tiles.
-     */
-    /*public Iterator<Tile> surroundingTilesIterator(int x, int y) {
-
-        return new Iterator<Tile>() {
-            int state = -1;
-
-            @Override
-            public boolean hasNext() {
-                switch (state) {
-                    case -1:
-                        // check given coordinates
-                        if (!isWithinBounds(x, y)) {
-                            return false;
-                        }
-                    case 0:
-                        // top left
-                        if (topLeftX(x, y) >= 0 && y > 0) {
-                            state = 0;
-                            return true;
-                        }
-                    case 1:
-                        // top right
-                        if (topRightX(x, y) < mapWidth && y > 0) {
-                            state = 1;
-                            return true;
-                        }
-                    case 2:
-                        // left
-                        if (x - 1 >= 0) {
-                            state = 2;
-                            return true;
-                        }
-                    case 3:
-                        // right
-                        if (x + 1 < mapWidth) {
-                            state = 3;
-                            return true;
-                        }
-                    case 4:
-                        // bottom left
-                        if (bottomLeftX(x, y) >= 0 && y + 1 < mapWidth) {
-                            state = 4;
-                            return true;
-                        }
-                    case 5:
-                        // bottom right
-                        if (bottomRightX(x, y) < mapWidth && y + 1 < mapWidth) {
-                            state = 5;
-                            return true;
-                        }
-                    default:
-                        // all tiles checked
-                        return false;
-                }
-            }
-
-            @Override
-            public Tile next() {
-                switch (state) {
-                    case 0:
-                        state++;
-                        return at(topLeftX(x, y), y - 1);
-                    case 1:
-                        state++;
-                        return at(topRightX(x, y), y - 1);
-                    case 2:
-                        state++;
-                        return at(x - 1, y);
-                    case 3:
-                        state++;
-                        return at(x + 1, y);
-                    case 4:
-                        state++;
-                        return at(bottomLeftX(x, y), y + 1);
-                    case 5:
-                        state++;
-                        return at(bottomRightX(x, y), y + 1);
-                    default:
-                        return null;
-                }
-            }
-        };
-    }*/
-
-    /**
      * Returns a stream of all the tiles of the map.
      *
      * @return the stream of all the tiles of the map.
@@ -423,13 +336,14 @@ public class GameMap implements Iterable<Tile> {
         return Arrays.stream(tiles).iterator();
     }
 
-    /*
     private class SurroundingTilesCollector implements Collector<Tile, Set<Tile>, Set<Tile>> {
 
+        private final GameMap gameMap;
         private final Set<Tile> originalTiles;
 
-        private SurroundingTilesCollector(Set<Tile> tiles) {
+        private SurroundingTilesCollector(GameMap gameMap, Set<Tile> tiles) {
             super();
+            this.gameMap = gameMap;
             this.originalTiles = tiles;
         }
 
@@ -441,7 +355,7 @@ public class GameMap implements Iterable<Tile> {
         @Override
         public BiConsumer<Set<Tile>, Tile> accumulator() {
             return (set, tile) -> {
-                for (var it = surroundingTilesIterator(tile.x, tile.y); it.hasNext(); ) {
+                for (var it = tile.surroundingTilesIterator(gameMap); it.hasNext(); ) {
                     var surroundingTile = it.next();
                     if (!originalTiles.contains(surroundingTile)) set.add(surroundingTile);
                 }
@@ -466,15 +380,15 @@ public class GameMap implements Iterable<Tile> {
             return Set.of(Characteristics.CONCURRENT, Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
         }
     }
-    */
-    ///**
-    // * Returns a set of all surrounding tiles of the given tiles.
-    // * @param tiles tiles of the map.
-    // * @return a set of all surrounding tiles of the given tiles.
-    // */
-    //public SurroundingTilesCollector toSurroundingTilesSet(Set<Tile> tiles) {
-    //    return new SurroundingTilesCollector(tiles);
-    //}
+
+    /**
+     * Returns a set of all surrounding tiles of the given tiles.
+     * @param tiles tiles of the map.
+     * @return a set of all surrounding tiles of the given tiles.
+     */
+    public SurroundingTilesCollector toSurroundingTilesSet(Set<Tile> tiles) {
+        return new SurroundingTilesCollector(this, tiles);
+    }
 
     /**
      * Gets all the tiles of the map.
@@ -523,53 +437,14 @@ public class GameMap implements Iterable<Tile> {
      * Gets all free tiles that are next to a player's settlement.
      *
      * @param player the player of the settlements.
-     * @return
+     * @return all free tiles that are next to a player's settlement.
      */
     public Set<Tile> getPlaceableTilesAtBorder(Player player) {
-        //Set<Tile> allPossiblePlacementsAtBorder = new HashSet<>();
-
         Set<Tile> tilesOnBorder = getTilesAtBorder().stream().filter(tile -> !tile.isBlocked()
                         && tile.hasSurroundingSettlement(this, player )).collect(Collectors.toSet());
 
         return tilesOnBorder.isEmpty() ?
                 getTilesAtBorder().stream().filter(t -> !t.isBlocked()).collect(Collectors.toSet()) : tilesOnBorder;
-
-        // TODO:
-        /*
-        for (Tile tile : map.allSettlementsOfPlayerOnBorderOfMap(player)) {
-            if (tile.x == 0 || tile.x == map.mapWidth - 1) {
-
-                if (map.isWithinBounds(tile.x, tile.y - 1)
-                        && map.at(tile.x, tile.y - 1).isTilePlaceable()
-                        && map.at(tile.x, tile.y - 1).tileType != TileType.WATER)
-
-                    allPossiblePlacementsAtBorder.add(map.at(tile.x, tile.y - 1));
-
-                if (map.isWithinBounds(tile.x, tile.y + 1)
-                        && map.at(tile.x, tile.y + 1).isTilePlaceable()
-                        && map.at(tile.x, tile.y + 1).tileType != TileType.WATER)
-
-                    allPossiblePlacementsAtBorder.add(map.at(tile.x, tile.y + 1));
-            }
-
-            if (tile.y == 0 || tile.y == map.mapWidth - 1) {
-
-                if (map.isWithinBounds(tile.x - 1, tile.y)
-                        && map.at(tile.x + 1, tile.y).isTilePlaceable()
-                        && map.at(tile.x - 1, tile.y).tileType != TileType.WATER)
-
-                    allPossiblePlacementsAtBorder.add(map.at(tile.x - 1, tile.y));
-
-                if (map.isWithinBounds(tile.x + 1, tile.y)
-                        && map.at(tile.x + 1, tile.y).isTilePlaceable()
-                        && map.at(tile.x + 1, tile.y).tileType != TileType.WATER)
-
-                    allPossiblePlacementsAtBorder.add(map.at(tile.x + 1, tile.y));
-            }
-        }
-        */
-
-      //  return allPossiblePlacementsAtBorder;
     }
 
     /**
@@ -578,7 +453,7 @@ public class GameMap implements Iterable<Tile> {
      *
      * @param player  the player to check for.
      * @param terrain the terrain to check for.
-     * @return All tiles that can be placed next to other settlements.
+     * @return all tiles that can be placed next to other settlements.
      */
     protected Set<Tile> getAllPlaceableTilesNextToSettlements(Player player, TileType terrain) {
         if (!TileType.placeableTileTypes.contains(terrain) && terrain != null)
@@ -594,7 +469,7 @@ public class GameMap implements Iterable<Tile> {
      *
      * @param player  the player to check for.
      * @param terrain the terrain the player has.
-     * @return A set of all positions a player can place a settlement.
+     * @return a set of all positions a player can place a settlement.
      */
     protected Set<Tile> getAllPlaceableTiles(Player player, TileType terrain) {
         Set<Tile> allPossiblePlacements = getAllPlaceableTilesNextToSettlements(player, terrain);

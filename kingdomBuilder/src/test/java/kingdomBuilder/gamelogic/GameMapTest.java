@@ -338,4 +338,76 @@ public class GameMapTest {
         gameMap.at(3,4).removeSettlement();
         gameMap.at(1,5).removeSettlement();
     }
+
+    @Test
+    void testTopLeftX() {
+        int x = 7, y = 8;
+        // odd distance
+        int distance = 3;
+
+        // test on even row
+        int correctX = x;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topLeftX(correctX, y - i);
+        assertEquals(correctX, GameMap.topLeftX(x, y, distance));
+
+        // test on odd row
+        correctX = x;
+        y = 9;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topLeftX(correctX, y - i);
+        assertEquals(correctX, GameMap.topLeftX(x, y, distance));
+
+        // even distance
+        distance = 4;
+
+        // test on even row
+        correctX = x;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topLeftX(correctX, y - i);
+        assertEquals(correctX, GameMap.topLeftX(x, y, distance));
+
+        // test on odd row
+        correctX = x;
+        y = 9;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topLeftX(correctX, y - i);
+        assertEquals(correctX, GameMap.topLeftX(x, y, distance));
+    }
+
+    @Test
+    void testTopRightX() {
+        int x = 7, y = 8;
+        // odd distance
+        int distance = 3;
+
+        // test on even row
+        int correctX = x;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topRightX(correctX, y - i);
+        assertEquals(correctX, GameMap.topRightX(x, y, distance));
+
+        // test on odd row
+        correctX = x;
+        y = 9;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topRightX(correctX, y - i);
+        assertEquals(correctX, GameMap.topRightX(x, y, distance));
+
+        // even distance
+        distance = 4;
+
+        // test on even row
+        correctX = x;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topRightX(correctX, y - i);
+        assertEquals(correctX, GameMap.topRightX(x, y, distance));
+
+        // test on odd row
+        correctX = x;
+        y = 9;
+        for (int i = 0; i < distance; i++)
+            correctX = GameMap.topRightX(correctX, y - i);
+        assertEquals(correctX, GameMap.topRightX(x, y, distance));
+    }
 }
