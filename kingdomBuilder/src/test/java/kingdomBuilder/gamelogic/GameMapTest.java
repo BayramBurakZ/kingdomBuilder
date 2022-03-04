@@ -6,8 +6,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.security.InvalidParameterException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class GameMapTest {
 
@@ -195,7 +198,7 @@ public class GameMapTest {
 
     @Test
     public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
-
+        //TODO: clean up and finish it (maybe?)
         Tile tower = gameMap.at(5, 3);
         assertEquals(TileType.TOWER, gameMap.at(5, 3).tileType, "not a tower.");
 
@@ -208,7 +211,8 @@ public class GameMapTest {
     @Test
     @Disabled
     public void testUseTokenOraclePlayerUsingToken(){
-        // need instance of a game to test this.
+        //TODO: clean up and finish it (maybe?)
+        //need instance of a game to test this.
 
         Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20 );
         //player.startTurn(TileType.FORREST);
@@ -217,5 +221,121 @@ public class GameMapTest {
         //check if player has received that token
         assertTrue(player.playerHasTokenLeft(TileType.ORACLE), "failed to add Oracle token");
        // assertEquals(1, player.getRemainingTokens(TileType.ORACLE), "Player doesn't have one Oracle token");
+    }
+
+    @Test
+    void testGetAllPlaceableTilesNextToSettlements() {
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
+        Set<Tile> result;
+
+        //place a tile next to water and mountain and check if the result is the correct neighbouring tile
+        gameMap.at(2,9).placeSettlement(playerOne);
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON);
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains(gameMap.at(1,9)));
+        result.clear();
+
+        // no neighbouring tile with type forest
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.FORREST);
+        assertEquals(0, result.size());
+        result.clear();
+
+        //reset placements
+        gameMap.at(2,9).removeSettlement();
+
+        // multiple neighbouring tiles with type canyon
+        gameMap.at(9,15).placeSettlement(playerOne);
+        result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON);
+        assertEquals(5, result.size());
+        result.clear();
+    }
+
+    @Test
+    void testGetSettlements() {
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
+        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20 );
+        Set<Tile> result;
+
+        //no settlement placed
+        result = gameMap.getSettlements(playerOne);
+        assertEquals(0, result.size());
+        result.clear();
+
+        //one settlement placed
+        gameMap.at(4,5).placeSettlement(playerOne);
+        result = gameMap.getSettlements(playerOne);
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //single settlements all over the map
+        gameMap.at(19,19).placeSettlement(playerOne);
+        gameMap.at(19,0).placeSettlement(playerOne);
+
+        result = gameMap.getSettlements(playerOne);
+        assertEquals(3, result.size());
+        assertTrue(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //remove these settlements for next part
+        gameMap.at(19,19).removeSettlement();
+        gameMap.at(19,0).removeSettlement();
+
+        //small group
+        gameMap.at(3,5).placeSettlement(playerOne);
+        gameMap.at(2,5).placeSettlement(playerOne);
+        gameMap.at(3,4).placeSettlement(playerOne);
+
+        result = gameMap.getSettlements(playerOne);
+        assertEquals(4, result.size());
+        result.clear();
+
+        //another player places one settlement (nothing should be changed)
+        gameMap.at(19,19).placeSettlement(playerTwo);
+
+        result = gameMap.getSettlements(playerOne);
+        assertEquals(4, result.size());
+        result.clear();
+    }
+
+    @Test
+    void testGetSettlementGroup() {
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
+        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20 );
+        Set<Tile> result = new HashSet<>();
+
+        // group with one settlement
+        gameMap.at(4,5).placeSettlement(playerOne);
+        gameMap.getSettlementGroup(result, playerOne, 4, 5);
+
+        assertEquals(1, result.size());
+        result.clear();
+
+        // expand the group
+        gameMap.at(3,5).placeSettlement(playerOne);
+        gameMap.at(2,5).placeSettlement(playerOne);
+        gameMap.at(3,4).placeSettlement(playerOne);
+
+        gameMap.getSettlementGroup(result, playerOne, 4, 5);
+
+        assertEquals(4, result.size());
+        result.clear();
+
+        // different player settlement next to it
+        gameMap.at(1,5).placeSettlement(playerTwo);
+
+        gameMap.getSettlementGroup(result, playerOne, 4, 5);
+
+        assertEquals(4, result.size());
+        result.clear();
+
+        // clear Map for maybe further use
+        gameMap.at(4,5).removeSettlement();
+        gameMap.at(3,5).removeSettlement();
+        gameMap.at(2,5).removeSettlement();
+        gameMap.at(3,4).removeSettlement();
+        gameMap.at(1,5).removeSettlement();
     }
 }

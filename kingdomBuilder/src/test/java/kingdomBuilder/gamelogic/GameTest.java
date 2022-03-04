@@ -99,7 +99,6 @@ class GameTest {
         assertSame(TileType.CASTLE, gameMap.at(7, 6).tileType);
         assertSame(TileType.CASTLE, gameMap.at(11, 7).tileType);
 
-
         //no settlement placed for playerOne
         assertEquals(0, Game.scoreCastles(gameMap, playerOne));
 
@@ -333,5 +332,81 @@ class GameTest {
         gameMap.at(8,6).removeSettlement();
         gameMap.at(9,6).removeSettlement();
 
+        //first one line with 1 settlement
+        //after another line with 1 settlements
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(8,6).placeSettlement(playerOne);
+        assertEquals(2, Game.scoreKnight(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(8,6).removeSettlement();
+
+    }
+
+    @Test
+    void testScoreLord() {
+
+        Player playerThird = new Player(3, "TestPlayer3", PlayerColor.BLACK, 40);
+
+        //Test#1: no settlement placed
+        assertEquals(0, Game.scoreLord(gameMap, playerOne));
+
+        //Test#2: one settlement in upper left quadrant (largest group)
+        gameMap.at(0,0).placeSettlement(playerOne);
+        assertEquals(12, Game.scoreLord(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+
+        //Test#3: biggest group in upper left quadrant and biggest in bottom right quadrant
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(19,19).placeSettlement(playerOne);
+
+        assertEquals(24, Game.scoreLord(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(19,19).removeSettlement();
+
+        //Test#4: second-largest group in upper left quadrant for playerOne
+        gameMap.at(0,0).placeSettlement(playerTwo);
+        gameMap.at(1,0).placeSettlement(playerTwo);
+        gameMap.at(0,1).placeSettlement(playerOne);
+
+        assertEquals(6, Game.scoreLord(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(1,0).removeSettlement();
+        gameMap.at(0,1).removeSettlement();
+
+        //Test#5: at quadrant border
+        //upper left is the biggest
+        //upper right is second biggest
+        gameMap.at(9,0).placeSettlement(playerOne);
+        gameMap.at(10,0).placeSettlement(playerOne);
+
+        gameMap.at(19,0).placeSettlement(playerTwo);
+        gameMap.at(19,1).placeSettlement(playerTwo);
+
+        assertEquals(18, Game.scoreLord(gameMap, playerOne));
+
+        //Test#6: third-largest group
+        //(same map as #5)
+        gameMap.at(15,0).placeSettlement(playerThird);
+        assertEquals(0, Game.scoreLord(gameMap, playerThird));
+
+        gameMap.at(9,0).removeSettlement();
+        gameMap.at(10,0).removeSettlement();
+        gameMap.at(19,0).removeSettlement();
+        gameMap.at(19,1).removeSettlement();
+        gameMap.at(15,0).removeSettlement();
+
+        //Test#7: two players with same amount of settlements
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(1,0).placeSettlement(playerOne);
+        gameMap.at(19,0).placeSettlement(playerTwo);
+        gameMap.at(19,1).placeSettlement(playerTwo);
+
+        assertEquals(12, Game.scoreLord(gameMap, playerOne));
+        assertEquals(12, Game.scoreLord(gameMap, playerTwo));
+
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(1,0).removeSettlement();
+        gameMap.at(19,0).removeSettlement();
+        gameMap.at(19,1).removeSettlement();
     }
 }

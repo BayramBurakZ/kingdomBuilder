@@ -25,6 +25,9 @@ public class GameMap implements Iterable<Tile> {
      */
     private final Tile[] tiles;
 
+    /**
+     * Represents all tiles of the map.
+     */
     private final Set<Tile> tileSet;
 
     /**
@@ -607,7 +610,6 @@ public class GameMap implements Iterable<Tile> {
      * @return all settlements of the player.
      */
     public Set<Tile> getSettlements(Player player) {
-
         return stream().filter(t -> t.occupiedBy == player).collect(Collectors.toSet());
     }
 
@@ -620,6 +622,9 @@ public class GameMap implements Iterable<Tile> {
      * @param y the y-coordinate of the beginning settlement.
      */
     public void getSettlementGroup(Set<Tile> tiles, Player player, int x, int y) {
+        if (at(x,y).occupiedBy == null)
+            throw new InvalidParameterException("Not an occupied tile!");
+
         Set<Tile> surroundings = at(x,y).surroundingSettlements(this, player);
 
         tiles.add(at(x,y));
@@ -634,7 +639,5 @@ public class GameMap implements Iterable<Tile> {
         for (Tile t : surroundings) {
             getSettlementGroup(tiles, player, t.x, t.y);
         }
-
-        return;
     }
 }
