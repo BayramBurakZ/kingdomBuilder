@@ -45,9 +45,12 @@ public class HexagonTile extends Tile {
     /**
      * Represents the settlement on the hexagon.
      */
-    private Settlement settlement = new Settlement();
+    private final Settlement settlement = new Settlement();
 
-    private GameBoard gameBoard;
+    /**
+     * Represents the gameBoard with all 3D tiles.
+     */
+    private final GameBoard gameBoard;
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
@@ -118,10 +121,16 @@ public class HexagonTile extends Tile {
         setOnMouseExited(event -> removeColorHighlighted());
     }
 
+    /**
+     * Sets the color of this hexagon to dark blue to show it is marked for moving.
+     */
     public void setMarker() {
         hexagon.setMaterial(MaterialLoader.MIDNIGHTBLUE);
     }
 
+    /**
+     * Removes the blue highlight fpr the marker.
+     */
     public void removeMarker() {
         resetMaterial();
     }
@@ -130,31 +139,51 @@ public class HexagonTile extends Tile {
      * Places a house with the given color.
      * @param color the color.
      */
-    public void placeSettlement(PlayerColor color) {
+    public void placeSettlement(PlayerColor color, boolean betterColors) {
         switch (color) {
             case RED -> {
-                Image img = TextureLoader.generateImage(1,0,0);
+                Image img;
+                if (betterColors) {
+                    img = TextureLoader.generateImage(1, 0.54, 0);
+                } else {
+                    img = TextureLoader.generateImage(1, 0, 0);
+                }
                 PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
                 settlement.setMaterial(mat);
             }
 
             case BLUE -> {
-                Image img = TextureLoader.generateImage(0,0,1);
+                Image img;
+                if (betterColors) {
+                    img = TextureLoader.generateImage(0.612, 0.52, 0.816);
+                } else {
+                    img = TextureLoader.generateImage(0, 0, 1);
+                }
                 PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
                 settlement.setMaterial(mat);
             }
 
             case BLACK -> {
-                Image img = TextureLoader.generateImage(0,0,0);
+                Image img;
+                if (betterColors) {
+                    img = TextureLoader.generateImage(0.616, 0.82, 0.2);
+                } else {
+                    img = TextureLoader.generateImage(0, 0, 0);
+                }
                 PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
                 settlement.setMaterial(mat);
             }
 
             case WHITE -> {
-                Image img = TextureLoader.generateImage(1,1,1);
+                Image img;
+                if (betterColors) {
+                    img = TextureLoader.generateImage(0.28, 0.52, 0.72);
+                } else {
+                    img = TextureLoader.generateImage(1, 1, 1);
+                }
                 PhongMaterial mat = new PhongMaterial(Color.WHITE, img, null, null, null);
 
                 settlement.setMaterial(mat);

@@ -69,6 +69,7 @@ public class GameBoard extends Board {
     /**
      * Marks the hexagon and updates the highlight for the selected token. If the token is null, nothing will be
      * highlighted.
+     *
      * @param hexagon the hexagon to be marked.
      */
     public void markHexagonToMove(HexagonTile hexagon) {
@@ -89,7 +90,8 @@ public class GameBoard extends Board {
     }
 
     /**
-     * triggered when the user clicks on a hexagon.
+     * Triggered when the user clicks on a hexagon.
+     *
      * @param x the x-coordinate.
      * @param y the y-coordinate.
      */
@@ -122,7 +124,8 @@ public class GameBoard extends Board {
     }
 
     /**
-     * sends the final turn message to the reducer
+     * Sends the final turn message to the reducer.
+     *
      * @param id the id of the player.
      * @param x the x-coordinate to place a settlement.
      * @param y the y-coordinate to place a settlement.
@@ -190,7 +193,7 @@ public class GameBoard extends Board {
      * @param color the player color.
      */
     public void placeSettlement(int x, int y, PlayerColor color) {
-        board[y][x].placeSettlement(color);
+        board[y][x].placeSettlement(color, store.getState().betterColorsActive());
     }
 
     /**

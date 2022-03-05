@@ -3,7 +3,9 @@ package kingdomBuilder.gui.gameboard;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import kingdomBuilder.gamelogic.PlayerColor;
 
@@ -15,18 +17,19 @@ public class PlayerInformation extends HBox{
     /**
      * Represents the Label for the players name.
      */
-    private Label name;
+    private final Label name;
     /**
      * Represents the settlement which the player has left.
      */
-    private Label settlements = new Label("40");
+    private final Label settlements = new Label("40");
     /**
      * Represents the score of the player.
      */
-    private Label score = new Label("00");
+    private final Label score = new Label("00");
 
     /**
      * Constructs a new PlayerInformation Element which contains the name, the settlements left and the score.
+     *
      * @param playerName the name of the player.
      * @param color the color for the Player.
      * @param colorMode defines which colors should be used.
@@ -42,6 +45,9 @@ public class PlayerInformation extends HBox{
         settlements.setTextFill(Color.WHITE);
         score.setTextFill(Color.WHITE);
 
+        //default value (overwritten when white is the background color)
+        Image houseImage = new Image("kingdomBuilder/gui/textures/icons/HouseIconWhite.png");
+
         setAlignment(Pos.CENTER);
         getChildren().addAll(name, settlements, score);
 
@@ -55,6 +61,7 @@ public class PlayerInformation extends HBox{
                     name.setTextFill(Color.BLACK);
                     settlements.setTextFill(Color.BLACK);
                     score.setTextFill(Color.BLACK);
+                    houseImage = new Image("kingdomBuilder/gui/textures/icons/HouseIconBlack.png");
                 }
             }
         } else {
@@ -66,8 +73,15 @@ public class PlayerInformation extends HBox{
             }
         }
 
-        settlements.setMinWidth(35);
-        score.setMinWidth(35);
+        ImageView house = new ImageView(houseImage);
+        settlements.setGraphic(house);
+
+        Image goldIngotImage = new Image("kingdomBuilder/gui/textures/icons/GoldIngot.png");
+        ImageView goldIngot = new ImageView(goldIngotImage);
+        score.setGraphic(goldIngot);
+
+        settlements.setMinWidth(50);
+        score.setMinWidth(50);
 
         setPadding();
     }
@@ -79,6 +93,19 @@ public class PlayerInformation extends HBox{
         name.setPadding(new Insets(5,5,5,5));
         settlements.setPadding(new Insets(5,5,5,5));
         score.setPadding(new Insets(5,5,5,5));
+    }
+
+    /**
+     * Sets the border to show whether it is the player's turn.
+     * @param active set to true to activate the highlight.
+     */
+    public void setHighlight(boolean active) {
+        if (active) {
+            setBorder(new Border(
+                    new BorderStroke(Color.LIME, BorderStrokeStyle.SOLID, null, new BorderWidths(2.5))));
+        } else {
+            setBorder(null);
+        }
     }
 
     /**

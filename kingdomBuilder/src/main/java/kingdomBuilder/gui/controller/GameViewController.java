@@ -257,6 +257,9 @@ public class GameViewController extends Controller implements Initializable {
             return;
 
         game_button_end.setDisable(true);
+
+        // Highlight whose turn it is
+        setCurrentPlayerHighlight(kbState.players(), kbState.currentPlayer());
     }
 
     /**
@@ -737,6 +740,24 @@ public class GameViewController extends Controller implements Initializable {
         HBox.setHgrow(region, Priority.ALWAYS);
 
         players.add(player);
+    }
+
+    /**
+     * Highlights which players turn is it.
+     *
+     * @param playerList the list of all players in the game.
+     * @param current the current player.
+     */
+    private void setCurrentPlayerHighlight(ArrayList<Player> playerList, Player current) {
+        for (var p : players) {
+            p.setHighlight(false);
+        }
+
+        for (int i = 0; i < playerList.size(); i++) {
+            if (playerList.get(i) == current)
+                players.get(i).setHighlight(true);
+        }
+
     }
 
     /**
