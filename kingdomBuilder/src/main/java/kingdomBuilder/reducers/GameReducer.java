@@ -348,6 +348,8 @@ public class GameReducer extends Reducer<KBState> {
             currentPlayer.setTerrainCard(oldState.nextTerrainCard());
             currentPlayer.startTurn();
 
+            state.setNextTerrainCard(oldState.nextTerrainCard());
+            state.setNextPlayer(currentPlayer.ID);
             state.setCurrentPlayer(currentPlayer);
             state.setGameStarted(true);
         }
