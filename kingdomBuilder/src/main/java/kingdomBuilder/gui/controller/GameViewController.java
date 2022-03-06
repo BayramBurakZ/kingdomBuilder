@@ -175,7 +175,10 @@ public class GameViewController extends Controller implements Initializable {
      */
     boolean hasMap = false;
 
-    boolean isSubscribed = false;
+    /**
+     * Shows if the controller is already subscribed to the redux system.
+     */
+    private boolean isSubscribed = false;
 
     /**
      * Constructs the GameView with the given store.

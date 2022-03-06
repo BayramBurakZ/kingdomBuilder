@@ -11,6 +11,7 @@ import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
+import kingdomBuilder.network.protocol.QuadrantUploaded;
 import kingdomBuilder.redux.Reduce;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
@@ -29,6 +30,8 @@ public class ApplicationReducer extends Reducer<KBState> {
     public static final String REMOVE_CLIENT = "REMOVE_CLIENT";
     public static final String LOGIN = "LOGIN";
     public static final String SET_SCENELOADER = "SET_SCENELOADER";
+    public static final String NEW_QUADRANT_UPLOADED = "NEW_QUADRANT_UPLOADED";
+
 
     public ApplicationReducer() { registerReducers(this);}
 
@@ -69,10 +72,21 @@ public class ApplicationReducer extends Reducer<KBState> {
         }
 
         client.onLoggedIn.subscribe(m -> store.dispatch(LOGIN, m));
-
         client.onClientsReply.subscribe(m -> m.clients().forEach(c -> store.dispatch(ADD_CLIENT, c)));
         client.onClientJoined.subscribe(m -> store.dispatch(ADD_CLIENT, m.clientData()));
         client.onClientLeft.subscribe(m -> store.dispatch(REMOVE_CLIENT, m.clientData()));
+        client.onQuadrantReply.subscribe(m -> store.dispatchOld(new QuadrantAddAction(m)));
+        client.onPlayerJoined.subscribe(m -> store.dispatchOld(new PlayerAddAction(m)));
+        client.onPlayerLeft.subscribe(m -> store.dispatchOld(new PlayerRemoveAction(m)));
+        client.onGameHosted.subscribe(m -> store.dispatch(GameReducer.ADD_GAME, m.gameData()));
+        client.onPlayersReply.subscribe(m -> store.dispatch(GameReducer.SET_PLAYERS, m));
+        client.onMyGameReply.subscribe(m -> store.dispatch(GameReducer.MY_GAME, m));
+        client.onWinCondition.subscribe(m -> store.dispatch(GameReducer.SET_WIN_CONDITION, m));
+        client.onTurnStart.subscribe(m -> store.dispatch(GameReducer.START_TURN, m));
+        client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(GameReducer.TERRAIN_OF_TURN, m));
+        client.onTokenReceived.subscribe(m -> store.dispatch(GameReducer.GRANT_TOKEN, m));
+        client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
+        client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
 
         client.onGamesReply.subscribe(m -> {
             for (GameData g : m.games()) {
@@ -90,22 +104,10 @@ public class ApplicationReducer extends Reducer<KBState> {
             }
         });
 
-        client.onMessageReceived.subscribe(m -> store.dispatch(ChatReducer.RECEIVE_MESSAGE, m));
-        client.onQuadrantReply.subscribe(m -> store.dispatchOld(new QuadrantAddAction(m)));
-        client.onPlayerJoined.subscribe(m -> store.dispatchOld(new PlayerAddAction(m)));
-        client.onPlayerLeft.subscribe(m -> store.dispatchOld(new PlayerRemoveAction(m)));
-        client.onGameHosted.subscribe(m -> store.dispatch(GameReducer.ADD_GAME, m.gameData()));
-
         client.onWelcomeToGame.subscribe(m -> {
             client.myGameRequest();
             client.playersRequest();
         });
-
-        client.onPlayersReply.subscribe(m -> store.dispatch(GameReducer.SET_PLAYERS, m));
-        client.onMyGameReply.subscribe(m -> store.dispatch(GameReducer.MY_GAME, m));
-        client.onWinCondition.subscribe(m -> store.dispatch(GameReducer.SET_WIN_CONDITION, m));
-        client.onTurnStart.subscribe(m -> store.dispatch(GameReducer.START_TURN, m));
-        client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(GameReducer.TERRAIN_OF_TURN, m));
 
         client.onSettlementPlaced.subscribe(m -> store.dispatch(
                 GameReducer.SERVER_TURN,
@@ -116,9 +118,6 @@ public class ApplicationReducer extends Reducer<KBState> {
                 GameReducer.SERVER_TURN,
                 new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))
         );
-
-        client.onTokenReceived.subscribe(m -> store.dispatch(GameReducer.GRANT_TOKEN, m));
-        client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
 
         client.onTokenUsed.subscribe(m -> {
             TileType token = TileType.valueOf(m.tokenType());
@@ -135,13 +134,13 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         client.login(oldState.clientPreferredName());
 
-        client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
-
         client.onQuadrantUploaded.subscribe(m ->{
+            store.dispatch(NEW_QUADRANT_UPLOADED, m);
             // TODO: maybe make a chat message that someone has uploaded a new quadrant
             client.quadrantRequest(m.quadrantId());
         });
 
+        client.onMessageReceived.subscribe(m -> store.dispatch(ChatReducer.RECEIVE_MESSAGE, m));
         state.setClient(client);
         state.setIsConnecting(true);
 
@@ -212,4 +211,10 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    @Reduce(action = NEW_QUADRANT_UPLOADED)
+    public DeferredState onNewQuadrantUploaded(Store<KBState> unused, KBState oldState, QuadrantUploaded playload) {
+        DeferredState state = new DeferredState(oldState);
+        state.setQuadrantUploaded(playload);
+        return state;
+    }
 }

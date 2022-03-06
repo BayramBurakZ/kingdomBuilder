@@ -32,6 +32,7 @@ import java.util.Map;
  * @param gameLastTurn represents the last turn that was taken in the current game.
  * @param nextTerrainCard represents the terrain card of the current player's turn.
  * @param nextPlayer shows the player whose turn it is next.
+ *                   It represents the ClientID.
  * @param gameStarted represents the state if a game is running.
  * @param players represents a list of players in the current game.
  * @param token represents the active token.
@@ -71,7 +72,8 @@ public record KBState(SceneLoader sceneLoader,
                       ArrayList<WinCondition> winConditions,
                       HashMap<Integer, Player> playersMap,
                       Player currentPlayer,
-                      boolean joinedGame
+                      boolean joinedGame,
+                      QuadrantUploaded quadrantUploaded
                       ) {
 
     //TODO: JavaDoc!
@@ -104,6 +106,7 @@ public record KBState(SceneLoader sceneLoader,
                 new ArrayList<>(),
                 new HashMap<>(),
                 null,
-                false);
+                false,
+                null);
     }
 }

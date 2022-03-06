@@ -13,8 +13,7 @@ import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
-import kingdomBuilder.network.protocol.ClientData;
-import kingdomBuilder.network.protocol.Message;
+import kingdomBuilder.network.protocol.*;
 import kingdomBuilder.reducers.ChatReducer;
 import kingdomBuilder.redux.Store;
 import org.w3c.dom.Document;
@@ -74,6 +73,9 @@ public class ChatViewController extends Controller implements Initializable {
     @FXML
     private TableColumn<ClientData, String> column_gameid;
 
+    /**
+     * Represents the TabPane.
+     */
     @FXML
     private TabPane tab;
 
@@ -170,6 +172,8 @@ public class ChatViewController extends Controller implements Initializable {
         store.subscribe(this::onJoinedGameChanged, "joinedGame");
         store.subscribe(this::onConnect, "isConnected");
         store.subscribe(this::onTurnStartChanged, "nextTerrainCard");
+        store.subscribe(this::onQuadrantsUploadedChanged, "quadrantUploaded");
+        store.subscribe(this::onScoresChanged, "scores");
 
         setupClientList();
         setupWebView();
@@ -243,6 +247,51 @@ public class ChatViewController extends Controller implements Initializable {
 
         turnLogWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
             turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
+    }
+
+    /**
+     * Sends chat message when the data structure for the quadrants has changed.
+     * @param kbState the current state.
+     */
+    private void onQuadrantsUploadedChanged(KBState kbState) {
+        if (kbState.quadrants() != null && kbState.quadrants().size() > 5) {
+
+            QuadrantUploaded m = kbState.quadrantUploaded();
+            String clientName = kbState.clients().get(m.clientId()).name();
+
+            String chatMessage = clientName + " " + resourceBundle.getString("hasUploadedNewQuadrant") +
+                    " " + m.quadrantId();
+
+            globalChatAppendElement(
+                    createMessage(MessageStyle.SERVER,
+                            createHTMLElement(chatMessage, null)
+                    ));
+        }
+    }
+
+    /**
+     * Prints the scores for each player in the Log.
+     * @param kbState the current State.
+     */
+    private void onScoresChanged(KBState kbState) {
+        if (kbState.scores() == null) return;
+
+        //get the score and sort it
+        ArrayList<ScoresData> scores = new ArrayList<>(kbState.scores().scoresDataList());
+        scores.sort(Comparator.comparing(ScoresData::score).reversed());
+
+        //print the score into LOG
+        for (int i = 0; i < scores.size(); i++) {
+            ScoresData x = scores.get(i);
+            String clientName = kbState.clients().get(x.clientId()).name();
+            String chatMessage = i+1 + ". " + clientName;
+
+            turnLogAppendElement(
+                    //whisper because its orange - no further reason
+                    createMessage(MessageStyle.WHISPER,
+                            createHTMLElement(chatMessage, null)
+                    ));
+        }
     }
 
     /**
@@ -377,7 +426,7 @@ public class ChatViewController extends Controller implements Initializable {
             tab_log.setDisable(false);
         } else {
             tab_game.setDisable(true);
-            tab_log.setDisable(true);
+            //tab_log.setDisable(true);
         }
     }
 

@@ -12,6 +12,8 @@ public class ChatReducer extends Reducer<KBState> {
     public static final String RECEIVE_MESSAGE = "RECEIVE_MESSAGE";
     public static final String SEND_MESSAGE = "SEND_MESSAGE";
 
+    public ChatReducer() { registerReducers(this);}
+
     @Reduce(action = RECEIVE_MESSAGE)
     public DeferredState onReceiveMessage(Store<KBState> unused, KBState oldState, Message message) {
         DeferredState state = new DeferredState(oldState);
@@ -21,8 +23,10 @@ public class ChatReducer extends Reducer<KBState> {
     }
 
     @Reduce(action = SEND_MESSAGE)
-    public DeferredState reduce(Store<KBState> unused, KBState oldState, ChatSendAction a) {
+    public DeferredState onSendMessage(Store<KBState> unused, KBState oldState, ChatSendAction a) {
         oldState.client().chat(a.receiverIds, a.message);
+
+        System.out.println("SEND");
         return new DeferredState(oldState);
     }
 

@@ -345,7 +345,6 @@ class GameTest {
 
     @Test @Disabled
     void testScoreLord() {
-
         Player playerThird = new Player(3, "TestPlayer3", PlayerColor.BLACK, 40);
 
         //Test#1: no settlement placed
@@ -409,5 +408,101 @@ class GameTest {
         gameMap.at(1,0).removeSettlement();
         gameMap.at(19,0).removeSettlement();
         gameMap.at(19,1).removeSettlement();
+    }
+
+    @Test @Disabled
+    void testScoreFarmer() {
+        //Test#1: no settlement placed
+        assertEquals(0, Game.scoreFarmer(gameMap, playerOne));
+
+        //Test#2: one settlement in upper left quadrant (largest group)
+        gameMap.at(0,0).placeSettlement(playerOne);
+        assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+
+        //Test#3: settlements in different quadrants with different size
+        // one settlement upper left, 2 settlement bottom right
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(19,19).placeSettlement(playerOne);
+        gameMap.at(18,19).placeSettlement(playerOne);
+        assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(19,19).removeSettlement();
+        gameMap.at(18,19).removeSettlement();
+
+        //Test#4: same amount of settlements in different quadrants
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(19,19).placeSettlement(playerOne);
+        assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
+        gameMap.at(0,0).removeSettlement();
+        gameMap.at(18,19).removeSettlement();
+
+        //Test#5: more than one as the least settlement count (not connected)
+        gameMap.at(0,0).placeSettlement(playerOne);
+        gameMap.at(9,9).placeSettlement(playerOne);
+        assertEquals(6, Game.scoreFarmer(gameMap, playerOne));
+        gameMap.at(9,9).removeSettlement();
+        gameMap.at(0,0).removeSettlement();
+
+        //Test#6: quadrant border
+        gameMap.at(9,0).placeSettlement(playerOne);
+        gameMap.at(10,0).placeSettlement(playerOne);
+        gameMap.at(19,0).placeSettlement(playerOne);
+        assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
+        gameMap.at(9,0).removeSettlement();
+        gameMap.at(10,0).removeSettlement();
+        gameMap.at(19,0).removeSettlement();
+    }
+
+    @Test @Disabled
+    void testScoreMerchant() {
+        //Test#1: no settlement placed
+        assertEquals(0, Game.scoreMerchant(gameMap, playerOne));
+
+        //Test#2: two connected places (2,16) and (7,16)
+        gameMap.at(3, 16).placeSettlement(playerOne);
+        gameMap.at(4, 16).placeSettlement(playerOne);
+        gameMap.at(5, 16).placeSettlement(playerOne);
+        gameMap.at(6, 16).placeSettlement(playerOne);
+        assertEquals(8, Game.scoreMerchant(gameMap, playerOne));
+        gameMap.at(3, 16).removeSettlement();
+        gameMap.at(4, 16).removeSettlement();
+        gameMap.at(5, 16).removeSettlement();
+        gameMap.at(6, 16).removeSettlement();
+
+        //Test#3: three connected Places (2,16) and (7,16) and (3,13)
+        gameMap.at(3, 16).placeSettlement(playerOne);
+        gameMap.at(4, 16).placeSettlement(playerOne);
+        gameMap.at(5, 16).placeSettlement(playerOne);
+        gameMap.at(6, 16).placeSettlement(playerOne);
+        gameMap.at(3, 14).placeSettlement(playerOne);
+        gameMap.at(3, 15).placeSettlement(playerOne);
+        assertEquals(12, Game.scoreMerchant(gameMap, playerOne));
+        gameMap.at(3, 16).removeSettlement();
+        gameMap.at(4, 16).removeSettlement();
+        gameMap.at(5, 16).removeSettlement();
+        gameMap.at(6, 16).removeSettlement();
+        gameMap.at(3, 14).removeSettlement();
+        gameMap.at(3, 15).removeSettlement();
+
+        //Test#4: three connected Places (2,16) and (7,16) and (11,16) + break a connection
+        // special case because (7,17) is not placed, but it counts as connected
+        gameMap.at(3, 16).placeSettlement(playerOne);
+        gameMap.at(4, 16).placeSettlement(playerOne);
+        gameMap.at(5, 16).placeSettlement(playerOne);
+        gameMap.at(6, 16).placeSettlement(playerOne);
+        gameMap.at(8, 16).placeSettlement(playerOne);
+        gameMap.at(9, 16).placeSettlement(playerOne);
+        gameMap.at(10, 16).placeSettlement(playerOne);
+        assertEquals(12, Game.scoreMerchant(gameMap, playerOne));
+        gameMap.at(9, 16).removeSettlement();
+        // break an existing connection
+        assertEquals(8, Game.scoreMerchant(gameMap, playerOne));
+        gameMap.at(3, 16).removeSettlement();
+        gameMap.at(4, 16).removeSettlement();
+        gameMap.at(5, 16).removeSettlement();
+        gameMap.at(6, 16).removeSettlement();
+        gameMap.at(8, 16).removeSettlement();
+        gameMap.at(10, 16).removeSettlement();
     }
 }
