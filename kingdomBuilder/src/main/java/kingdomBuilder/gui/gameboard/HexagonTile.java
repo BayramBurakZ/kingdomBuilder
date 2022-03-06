@@ -193,10 +193,46 @@ public class HexagonTile extends Tile {
     }
 
     /**
-     * Removes the settlement from this Tile.
+     * Moves a settlement from one Tile to another one.
+     * @param toX the x position where the settlement is moved to.
+     * @param toY the y position where the settlement is moved to.
+     * @param toXCoord the x-coordinate for the new placed settlement.
+     * @param toYCoord the y-coordinate for the new placed settlememt.
+     * @param color the player color for the new settlement.
      */
-    public void removeSettlement() {
-        settlement.setOpacity(0.0);
+    public void moveAnimation(double toX, double toY, int toXCoord, int toYCoord, PlayerColor color) {
+
+        // calculate the delta between the positions for the movement path
+        double deltaX =  toX - xPos;
+        double deltaY =  toY - yPos;
+
+        // set up the move animation
+        Duration moveDuration = new Duration(1000);
+        TranslateTransition moveAnimation = new TranslateTransition(moveDuration);
+
+        moveAnimation.setFromX(0);
+        moveAnimation.setFromZ(settlement.getTranslateZ()-HIGHLIGHT_DISTANCE);
+        moveAnimation.setFromY(0);
+
+        moveAnimation.setToX(deltaX);
+        moveAnimation.setToY(deltaY);
+
+        moveAnimation.setInterpolator(Interpolator.EASE_BOTH);
+        moveAnimation.setNode(settlement);
+
+        moveAnimation.setRate(1);
+        moveAnimation.play();
+
+        // wait for the movement to be finished
+        moveAnimation.setOnFinished(event -> {
+            settlement.setOpacity(0.0);
+            settlement.setTranslateX(0);
+            settlement.setTranslateY(0);
+            settlement.setTranslateZ(- Hexagon.HEXAGON_DEPTH - Settlement.SETTLEMENT_DEPTH);
+            System.out.println("Finished Moving");
+
+            gameBoard.placeSettlement(toXCoord, toYCoord, color);
+        });
     }
 
     /**

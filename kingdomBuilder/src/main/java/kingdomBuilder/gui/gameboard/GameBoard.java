@@ -197,12 +197,16 @@ public class GameBoard extends Board {
     }
 
     /**
-     * Removes a settlement in the gui.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
+     * Moves a settlement from one position to a new one with a smooth animation.
+     * @param x the x-coordinate from where the settlement is moved from.
+     * @param y the y-coordinate from where the settlement is moved from.
+     * @param toX the x-coordinate from where the settlement is moved to.
+     * @param toY the y-coordinate from where the settlement is moved to.
+     * @param color the player's color.
      */
-    public void removeSettlement(int x, int y) {
-        board[y][x].removeSettlement();
+    public void moveAnimation(int x, int y, int toX, int toY, PlayerColor color) {
+        HexagonTile to = board[toY][toX];
+        board[y][x].moveAnimation(to.getXPos(), to.getYPos(), toX, toY, color);
     }
 
     /**

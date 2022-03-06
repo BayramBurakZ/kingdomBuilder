@@ -36,6 +36,16 @@ public abstract class Tile extends Group {
     protected final int y;
 
     /**
+     * Represents the x position.
+     */
+    protected final double xPos;
+
+    /**
+     * Represents the y position.
+     */
+    protected final double yPos;
+
+    /**
      * Constructs a new Tile with the given parameters.
      * @param xPos the x position.
      * @param yPos the y position.
@@ -49,6 +59,9 @@ public abstract class Tile extends Group {
 
         this.x = x;
         this.y = y;
+
+        this.xPos = xPos;
+        this.yPos = yPos;
 
         // create and add hexagon prism
         hexagon = new Hexagon(tileType);
@@ -92,5 +105,21 @@ public abstract class Tile extends Group {
      */
     public int getY() {
         return y;
+    }
+
+    /**
+     * Gets the x position.
+     * @return the x position.
+     */
+    public double getXPos() {
+        return xPos;
+    }
+
+    /**
+     * Gets the y position.
+     * @return the y position.
+     */
+    public double getYPos() {
+        return yPos;
     }
 }

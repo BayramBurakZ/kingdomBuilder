@@ -199,44 +199,38 @@ public class GameViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //TODO: Subscribers:
-        // - PlayerData score -> updateScoreForPlayer()
-
         resourceBundle = resources;
 
         //region subscribe methods
 
-        if (!isSubscribed) {
-            isSubscribed = true;
+        // START TURN
+        store.subscribe(kbState -> {
+            if (kbState.nextPlayer() >= 0 && kbState.gameStarted() && kbState.nextTerrainCard() != null) {
+                // only preview for this client
+                if (kbState.nextPlayer() == kbState.client().getClientId())
+                    gameBoard.highlightTerrain(Game.allBasicTurnTiles(
+                            kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
+            }
+        }, "gameStarted", "nextPlayer", "nextTerrainCard");
 
-            // START TURN
-            store.subscribe(kbState -> {
-                if (kbState.nextPlayer() >= 0 && kbState.gameStarted() && kbState.nextTerrainCard() != null) {
-                    // only preview for this client
-                    if (kbState.nextPlayer() == kbState.client().getClientId())
-                        gameBoard.highlightTerrain(Game.allBasicTurnTiles(
-                                kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
-                }
-            }, "gameStarted", "nextPlayer", "nextTerrainCard");
+        store.subscribe(this::onMyGameReplyChanged, "myGameReply");
+        store.subscribe(this::onGameMapChanged, "gameMap");
+        store.subscribe(this::onPlayersChanged, "players");
+        store.subscribe(this::onTokenChanged, "token");
+        store.subscribe(this::onWinConditionsChanged, "winConditions");
+        store.subscribe(this::onTerrainCardChanged, "nextTerrainCard");
+        store.subscribe(this::onLastTurnChanged, "gameLastTurn");
+        store.subscribe(this::onNextPlayer, "nextPlayer");
+        store.subscribe(this::onCurrentPlayerChanged, "currentPlayer");
 
-            store.subscribe(this::onMyGameReplyChanged, "myGameReply");
-            store.subscribe(this::onGameMapChanged, "gameMap");
-            store.subscribe(this::onPlayersChanged, "players");
-            store.subscribe(this::onTokenChanged, "token");
-            store.subscribe(this::onWinConditionsChanged, "winConditions");
-            store.subscribe(this::onTerrainCardChanged, "nextTerrainCard");
-            store.subscribe(this::onLastTurnChanged, "gameLastTurn");
-            store.subscribe(this::onNextPlayer, "nextPlayer");
-            store.subscribe(this::onCurrentPlayerChanged, "currentPlayer");
+        // WIN SITUATION
+        store.subscribe(state -> {
+            if (store.getState().scores() != null) {
+                sceneLoader.showWinView(state.scores());
+                hasMap = false;
+            }
+        }, "scores");
 
-            // WIN SITUATION
-            store.subscribe(state -> {
-                if (store.getState().scores() != null) {
-                    sceneLoader.showWinView(state.scores());
-                    hasMap = false;
-                }
-            }, "scores");
-        }
         // endregion
 
         // set the initial layout of the view
@@ -251,7 +245,7 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state.
      */
     private void onNextPlayer(KBState kbState) {
-        if(kbState.client() != null) {
+        if (kbState.client() != null) {
             String msg = String.format("(%d) Called onNextPlayer", kbState.client().getClientId());
             System.out.println(msg);
         }
@@ -291,17 +285,8 @@ public class GameViewController extends Controller implements Initializable {
             PlayerColor color = kbState.playersMap().get(lastTurn.clientId).color;
 
             switch (lastTurn.type) {
-                case PADDOCK: case BARN: case HARBOR: {
-                    moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
-                    break;
-                }
-
-                default: {
-                    /* case PLACE:
-                    case OASIS: case FARM: case TOWER: case ORACLE: case TAVERN:*/
-                    setServerSettlement(lastTurn.x, lastTurn.y, color);
-                    break;
-                }
+                case PADDOCK, BARN, HARBOR -> moveServerSettlement(lastTurn.x, lastTurn.y, lastTurn.toX, lastTurn.toY, color);
+                default -> setServerSettlement(lastTurn.x, lastTurn.y, color);
             }
         }
         // Highlight Terrain only for client
@@ -349,7 +334,7 @@ public class GameViewController extends Controller implements Initializable {
             disableTokens(false);
             gameBoard.highlightTerrain(Game.allBasicTurnTiles(
                     kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
-            if(gameBoard.getMarkedHexagon() != null) {
+            if (gameBoard.getMarkedHexagon() != null) {
                 gameBoard.getMarkedHexagon().removeMarker();
                 gameBoard.markHexagonToMove(null);
             }
@@ -364,12 +349,9 @@ public class GameViewController extends Controller implements Initializable {
             case FARM -> gameBoard.highlightTerrain(Game.allTokenFarmTiles(kbState.gameMap(), kbState.currentPlayer()));
             case TAVERN -> gameBoard.highlightTerrain(Game.allTokenTavernTiles(kbState.gameMap(), kbState.currentPlayer()));
             case TOWER -> gameBoard.highlightTerrain(Game.allTokenTowerTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case HARBOR ->
-                    gameBoard.highlightTerrain(Game.allTokenHarborTiles(kbState.gameMap(), kbState.currentPlayer(), false));
-            case PADDOCK ->
-                    gameBoard.highlightTerrain(Game.allTokenPaddockTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case BARN ->
-                    gameBoard.highlightTerrain(Game.allTokenBarnTiles(kbState.gameMap(), kbState.currentPlayer(), false));
+            case HARBOR -> gameBoard.highlightTerrain(Game.allTokenHarborTiles(kbState.gameMap(), kbState.currentPlayer(), false));
+            case PADDOCK -> gameBoard.highlightTerrain(Game.allTokenPaddockTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case BARN -> gameBoard.highlightTerrain(Game.allTokenBarnTiles(kbState.gameMap(), kbState.currentPlayer(), false));
             case OASIS -> gameBoard.highlightTerrain(Game.allTokenOasisTiles(kbState.gameMap(), kbState.currentPlayer()));
             default -> throw new RuntimeException("Tile type is not a token!");
         }
@@ -452,6 +434,7 @@ public class GameViewController extends Controller implements Initializable {
 
     /**
      * Updates the Token Inventory for the current player.
+     *
      * @param kbState the current state.
      */
     private void updateTokens(KBState kbState) {
@@ -512,9 +495,10 @@ public class GameViewController extends Controller implements Initializable {
      * @param color the player color.
      */
     private void moveServerSettlement(int fromX, int fromY, int toX, int toY, PlayerColor color) {
-        gameBoard.removeSettlement(fromX, fromY);
+        //gameBoard.removeSettlement(fromX, fromY);
+        gameBoard.moveAnimation(fromX, fromY, toX, toY, color);
         //TODO: animation
-        gameBoard.placeSettlement(toX, toY, color);
+        //gameBoard.placeSettlement(toX, toY, color);
     }
 
     /**
@@ -749,7 +733,7 @@ public class GameViewController extends Controller implements Initializable {
      * Highlights which players turn is it.
      *
      * @param playerList the list of all players in the game.
-     * @param current the current player.
+     * @param current    the current player.
      */
     private void setCurrentPlayerHighlight(ArrayList<Player> playerList, Player current) {
         for (var p : players) {
