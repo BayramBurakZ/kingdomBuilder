@@ -505,4 +505,145 @@ class GameTest {
         gameMap.at(8, 16).removeSettlement();
         gameMap.at(10, 16).removeSettlement();
     }
+
+    @Test
+    void testScoreWorker(){
+
+        //Test#1: add 6 settlements next to tavern token at (7,16).
+        //total points = 6.
+        gameMap.at(6, 15).placeSettlement(playerOne);
+        gameMap.at(7, 15).placeSettlement(playerOne);
+        gameMap.at(6, 16).placeSettlement(playerOne);
+        gameMap.at(8, 16).placeSettlement(playerOne);
+        gameMap.at(6, 17).placeSettlement(playerOne);
+        gameMap.at(7, 17).placeSettlement(playerOne);
+
+        assertEquals(6, Game.scoreWorker(gameMap, playerOne));
+        assertEquals(TileType.TAVERN, gameMap.at(7,16).tileType);
+
+        //Test#2: add 5 settlements next to oasis token at (15,7).
+        //total points = 11.
+        gameMap.at(14, 7).placeSettlement(playerOne);
+        gameMap.at(15, 6).placeSettlement(playerOne);
+        gameMap.at(16, 6).placeSettlement(playerOne);
+        gameMap.at(16, 7).placeSettlement(playerOne);
+        gameMap.at(16, 8).placeSettlement(playerOne);
+
+        assertEquals(11, Game.scoreWorker(gameMap, playerOne));
+        assertEquals(TileType.OASIS, gameMap.at(15,7).tileType);
+
+        //Test#3: add 3 settlements next to castle at (13,3).
+        //total points = 14.
+        gameMap.at(3, 12).placeSettlement(playerOne);
+        gameMap.at(3, 14).placeSettlement(playerOne);
+        gameMap.at(4, 13).placeSettlement(playerOne);
+
+        assertEquals(14, Game.scoreWorker(gameMap, playerOne));
+        assertEquals(TileType.CASTLE, gameMap.at(3,13).tileType);
+
+        //Test#4: remove a settlement at (8,16).
+        //total points = 13.
+        gameMap.at(8,16).removeSettlement();
+        assertEquals(13, Game.scoreWorker(gameMap, playerOne));
+
+        //Test#5: add settlements on the map that are not next to special places.
+        //total points = 13.
+        gameMap.at(0, 0).placeSettlement(playerOne);
+        gameMap.at(9, 10).placeSettlement(playerOne);
+        gameMap.at(7, 0).placeSettlement(playerOne);
+        gameMap.at(2, 14).placeSettlement(playerOne);
+        gameMap.at(9, 15).placeSettlement(playerOne);
+        gameMap.at(17, 0).placeSettlement(playerOne);
+        gameMap.at(15, 19).placeSettlement(playerOne);
+        gameMap.at(16, 19).placeSettlement(playerOne);
+
+        assertEquals(13, Game.scoreWorker(gameMap, playerOne));
+
+    }
+
+    @Test
+    void testScoreFisher(){
+
+        //Test#1: add 6 settlements next to water.
+        //total points = 6.
+        gameMap.at(9, 3).placeSettlement(playerOne);
+        gameMap.at(9, 4).placeSettlement(playerOne);
+        gameMap.at(9, 5).placeSettlement(playerOne);
+        gameMap.at(9, 6).placeSettlement(playerOne);
+        gameMap.at(9, 7).placeSettlement(playerOne);
+        gameMap.at(9, 8).placeSettlement(playerOne);
+
+        assertEquals(6, Game.scoreFisher(gameMap, playerOne));
+
+        //Test#2: add 4 settlements next to water on each quadrant;
+        //total points = 10.
+        gameMap.at(15, 6).placeSettlement(playerOne);
+        gameMap.at(14, 17).placeSettlement(playerOne);
+        gameMap.at(4, 14).placeSettlement(playerOne);
+        gameMap.at(3, 7).placeSettlement(playerOne);
+
+        assertEquals(10, Game.scoreFisher(gameMap, playerOne));
+
+        //Test#3: add 4 settlements on water.
+        //total points = 10.
+        gameMap.at(15, 8).placeSettlement(playerOne);
+        gameMap.at(16, 8).placeSettlement(playerOne);
+        gameMap.at(14, 19).placeSettlement(playerOne);
+        gameMap.at(3, 14).placeSettlement(playerOne);
+
+        assertEquals(10, Game.scoreFisher(gameMap, playerOne));
+
+        //Test#3: add 4 settlements on random places not next to water.
+        //total points = 10.
+        gameMap.at(5, 12).placeSettlement(playerOne);
+        gameMap.at(18, 18).placeSettlement(playerOne);
+        gameMap.at(19, 18).placeSettlement(playerOne);
+        gameMap.at(9, 15).placeSettlement(playerOne);
+
+        assertEquals(10, Game.scoreFisher(gameMap, playerOne));
+    }
+
+    @Test
+    void testScoreMiner(){
+
+        //Test#1: add 8 settlements next to Mountain.
+        //total points = 8.
+        gameMap.at(6, 10).placeSettlement(playerOne);
+        gameMap.at(7, 10).placeSettlement(playerOne);
+        gameMap.at(7, 11).placeSettlement(playerOne);
+        gameMap.at(8, 11).placeSettlement(playerOne);
+        gameMap.at(9, 11).placeSettlement(playerOne);
+        gameMap.at(10, 10).placeSettlement(playerOne);
+        gameMap.at(11, 10).placeSettlement(playerOne);
+        gameMap.at(9, 14).placeSettlement(playerOne);
+
+        assertEquals(8, Game.scoreMiner(gameMap, playerOne));
+
+        //Test#2: add 4 settlements next to Mountain on each quadrant;
+        //total points = 12.
+        gameMap.at(1, 0).placeSettlement(playerOne);
+        gameMap.at(10, 2).placeSettlement(playerOne);
+        gameMap.at(16, 12).placeSettlement(playerOne);
+        gameMap.at(4, 11).placeSettlement(playerOne);
+
+        assertEquals(12, Game.scoreMiner(gameMap, playerOne));
+
+        //Test#3: add 4 settlements on water next to a mountain.
+        //total points = 16.
+        gameMap.at(15, 12).placeSettlement(playerOne);
+        gameMap.at(14, 13).placeSettlement(playerOne);
+        gameMap.at(14, 14).placeSettlement(playerOne);
+        gameMap.at(3, 10).placeSettlement(playerOne);
+
+        assertEquals(16, Game.scoreMiner(gameMap, playerOne));
+
+        //Test#4: add 4 settlements on random places not next to mountain.
+        //total points = 16.
+        gameMap.at(5, 14).placeSettlement(playerOne);
+        gameMap.at(15, 8).placeSettlement(playerOne);
+        gameMap.at(10, 19).placeSettlement(playerOne);
+        gameMap.at(9, 18).placeSettlement(playerOne);
+
+        assertEquals(16, Game.scoreMiner(gameMap, playerOne));
+    }
 }

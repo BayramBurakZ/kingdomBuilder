@@ -49,9 +49,9 @@ public class Game {
      * paddock or tavern token.
      *
      * @param gameMap the map.
-     * @param player the player that wants to place a settlement.
-     * @param x      the x coordinate of tile to place a settlement.
-     * @param y      the y coordinate of tile to place a settlement.
+     * @param player  the player that wants to place a settlement.
+     * @param x       the x coordinate of tile to place a settlement.
+     * @param y       the y coordinate of tile to place a settlement.
      * @return true if settlement can be placed on tile. False otherwise.
      */
     protected static boolean canUseBasicTurn(GameMap gameMap, Player player, int x, int y) {
@@ -81,11 +81,11 @@ public class Game {
      * Checks if the given settlement can be moved without context of terrain.
      *
      * @param gameMap the map.
-     * @param player the player whose turn it is and who owns the settlement.
-     * @param fromX  the old horizontal position of the settlement on the map.
-     * @param fromY  the old vertical position of the settlement on the map.
-     * @param toX    the new horizontal position of the settlement on the map.
-     * @param toY    the new vertical position of the settlement on the map.
+     * @param player  the player whose turn it is and who owns the settlement.
+     * @param fromX   the old horizontal position of the settlement on the map.
+     * @param fromY   the old vertical position of the settlement on the map.
+     * @param toX     the new horizontal position of the settlement on the map.
+     * @param toY     the new vertical position of the settlement on the map.
      * @return true if settlement can be moved. False otherwise.
      */
     protected static boolean canMoveSettlement(GameMap gameMap, Player player, int fromX, int fromY, int toX, int toY) {
@@ -109,11 +109,11 @@ public class Game {
     }
 
     //TODO: Doc check!
+
     /**
      * Show all possible placements at the start of the turn.
      *
      * @param gameMap the map.
-     *
      * @return all possible tiles at the start of the game.
      */
     public static Stream<Tile> allBasicTurnTiles(GameMap gameMap, Player player) {
@@ -125,8 +125,7 @@ public class Game {
      * Returns all possible places with using an oracle token.
      *
      * @param gameMap the map.
-     * @param player the player that is using the token.
-     *
+     * @param player  the player that is using the token.
      * @return the set of tiles where the player could place a settlement using the oracle token.
      */
     public static Stream<Tile> allTokenOracleTiles(GameMap gameMap, Player player) {
@@ -142,8 +141,7 @@ public class Game {
      * Returns all possible places with using a farm token.
      *
      * @param gameMap the map.
-     * @param player the player.
-     *
+     * @param player  the player.
      * @return the set of tiles where the player could place a settlement with using the farm token.
      */
     public static Stream<Tile> allTokenFarmTiles(GameMap gameMap, Player player) {
@@ -159,8 +157,7 @@ public class Game {
      * Returns all possible places with using a tavern token.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     *
+     * @param player  the player to update for.
      * @return the set of tiles where the player could place a settlement with using the tavern token.
      */
     public static Stream<Tile> allTokenTavernTiles(GameMap gameMap, Player player) {
@@ -178,8 +175,7 @@ public class Game {
      * Returns all possible places with using a tower token.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     *
+     * @param player  the player to update for.
      * @return the set of tiles where the player could place a settlement with using the tower token.
      */
     public static Stream<Tile> allTokenTowerTiles(GameMap gameMap, Player player) {
@@ -195,8 +191,7 @@ public class Game {
      * Returns all possible places with using an oasis token.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     *
+     * @param player  the player to update for.
      * @return the set of tiles where the player could place a settlement with using the Oasis Token.
      */
     public static Stream<Tile> allTokenOasisTiles(GameMap gameMap, Player player) {
@@ -212,8 +207,7 @@ public class Game {
      * Returns all possible places with using an oracle token AFTER selecting a settlement to move.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     *
+     * @param player  the player to update for.
      * @return all tiles that are placeable with token harbor.
      */
     public static Stream<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
@@ -238,7 +232,7 @@ public class Game {
      * Returns all possible places with using a harbor token.
      *
      * @param gameMap the map.
-     * @param player the player whose turn it is.
+     * @param player  the player whose turn it is.
      * @return all tiles that a paddock token can be used on.
      */
     public static Stream<Tile> allTokenPaddockTiles(GameMap gameMap, Player player) {
@@ -251,9 +245,9 @@ public class Game {
      * Returns all possible places with using a paddock token AFTER selecting a settlement to move.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     * @param fromX  the x-coordinate.
-     * @param fromY  the y-coordinate.
+     * @param player  the player to update for.
+     * @param fromX   the x-coordinate.
+     * @param fromY   the y-coordinate.
      * @return all tiles that are placeable with token paddock.
      * @throws InvalidParameterException when player does not own a settlement at given position.
      */
@@ -265,11 +259,10 @@ public class Game {
     }
 
     /**
-     *Returns all possible places with using a barn token AFTER selecting a settlement to move.
+     * Returns all possible places with using a barn token AFTER selecting a settlement to move.
      *
      * @param gameMap the map.
-     * @param player the player to update for.
-     *
+     * @param player  the player to update for.
      * @return all tiles that are placeable with token barn.
      */
     public static Stream<Tile> allTokenBarnTiles(GameMap gameMap, Player player, boolean highlightDestination) {
@@ -286,9 +279,9 @@ public class Game {
      * regardless of context.
      *
      * @param gameMap the map.
-     * @param player the player who receives the tokens.
-     * @param x      the x coordinate to check for surrounding special places.
-     * @param y      the y coordinate to check for surrounding special places.
+     * @param player  the player who receives the tokens.
+     * @param x       the x coordinate to check for surrounding special places.
+     * @param y       the y coordinate to check for surrounding special places.
      */
     public static void unsafeCheckForTokens(GameMap gameMap, Player player, int x, int y) {
         Tile originTile = gameMap.at(x, y);
@@ -302,9 +295,9 @@ public class Game {
      * Removes the specified token from the specified player regardless of context.
      *
      * @param gameMap the map.
-     * @param player the player who receives the tokens.
-     * @param x      the x coordinate of the special places.
-     * @param y      the y coordinate of the special places.
+     * @param player  the player who receives the tokens.
+     * @param x       the x coordinate of the special places.
+     * @param y       the y coordinate of the special places.
      */
     public static void unsafeRemoveToken(GameMap gameMap, Player player, int x, int y) {
         Tile specialPlace = gameMap.at(x, y);
@@ -315,9 +308,9 @@ public class Game {
      * Places a settlement regardless of context.
      *
      * @param gameMap the map.
-     * @param x      the horizontal position of the settlement on the map.
-     * @param y      the vertical position of the settlement on the map.
-     * @param player the player who owns the settlement.
+     * @param x       the horizontal position of the settlement on the map.
+     * @param y       the vertical position of the settlement on the map.
+     * @param player  the player who owns the settlement.
      */
     public static void unsafePlaceSettlement(GameMap gameMap, Player player, int x, int y) {
         gameMap.at(x, y).placeSettlement(player);
@@ -328,11 +321,11 @@ public class Game {
      * Moves a settlement to a new position regardless of context.
      *
      * @param gameMap the map.
-     * @param player the player who owns the settlement.
-     * @param fromX  the old horizontal position of the settlement on the map.
-     * @param fromY  the old vertical position of the settlement on the map.
-     * @param toX    the new horizontal position of the settlement on the map.
-     * @param toY    the new vertical position of the settlement on the map.
+     * @param player  the player who owns the settlement.
+     * @param fromX   the old horizontal position of the settlement on the map.
+     * @param fromY   the old vertical position of the settlement on the map.
+     * @param toX     the new horizontal position of the settlement on the map.
+     * @param toY     the new vertical position of the settlement on the map.
      */
     public static void unsafeMoveSettlement(GameMap gameMap, Player player, int fromX, int fromY, int toX, int toY) {
         if (gameMap.at(fromX, fromY).occupiedBy() != player)
@@ -344,9 +337,9 @@ public class Game {
      * Places a settlement as a basic turn and throws if the move is not valid.
      *
      * @param gameMap the map.
-     * @param x      the horizontal position of the settlement on the map.
-     * @param y      the vertical position of the settlement on the map.
-     * @param player the player whose turn it is and who owns the settlement.
+     * @param x       the horizontal position of the settlement on the map.
+     * @param y       the vertical position of the settlement on the map.
+     * @param player  the player whose turn it is and who owns the settlement.
      */
     public static void useBasicTurn(GameMap gameMap, Player player, int x, int y) {
         if (!canUseBasicTurn(gameMap, player, player.getTerrainCard(), x, y))
@@ -481,10 +474,10 @@ public class Game {
 
     /**
      * Calculates the score for a specific player on the given map with the given WinConditions.
-     * @param gameMap the map.
-     * @param player the player for which the score should be calculated.
-     * @param winConditions the winConditions
      *
+     * @param gameMap       the map.
+     * @param player        the player for which the score should be calculated.
+     * @param winConditions the winConditions
      * @return the score for the specified player.
      */
     // TODO: Call the method
@@ -492,7 +485,7 @@ public class Game {
         // TODO: remove debug messages when everything works fine
         int score = 0;
         for (WinCondition c : winConditions) {
-            switch(c) {
+            switch (c) {
                 case LORDS -> {
                     int tmp = scoreLord(gameMap, player);
                     System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
@@ -504,7 +497,7 @@ public class Game {
                     score += tmp;
                 }
                 case FARMER -> {
-                    int tmp =  scoreFarmer(gameMap, player);
+                    int tmp = scoreFarmer(gameMap, player);
                     System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
@@ -568,12 +561,10 @@ public class Game {
      * This win conditions gives one point for every group of settlements.
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
-     *
+     * @param player  the player for which the score should be calculated.
      * @return the score for the win condition "anchorite".
      */
-    static int scoreAnchorite(GameMap gameMap, Player player)
-    {
+    static int scoreAnchorite(GameMap gameMap, Player player) {
         Stream<Tile> settlements = gameMap.getSettlements(player);
 
         AtomicInteger score = new AtomicInteger();
@@ -595,12 +586,10 @@ public class Game {
      * This win conditions gives one point for two settlements in the biggest group of settlements.
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
-     *
+     * @param player  the player for which the score should be calculated.
      * @return the score for the win condition "citizen".
      */
-    static int scoreCitizen(GameMap gameMap, Player player)
-    {
+    static int scoreCitizen(GameMap gameMap, Player player) {
         Stream<Tile> settlements = gameMap.getSettlements(player);
 
         var ref = new Object() {
@@ -620,7 +609,7 @@ public class Game {
             }
         });
 
-        int score = (int) (ref.biggestGroupSize /2);
+        int score = (int) (ref.biggestGroupSize / 2);
 
         return score;
     }
@@ -630,12 +619,10 @@ public class Game {
      * This win conditions gives one point for every horizontal line with at least one settlement.
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
-     *
+     * @param player  the player for which the score should be calculated.
      * @return the score for the win condition "explorer".
      */
-    static int scoreExplorer(GameMap gameMap, Player player)
-    {
+    static int scoreExplorer(GameMap gameMap, Player player) {
         int score = 0;
 
         for (int y = 0; y < gameMap.mapWidth; y++) {
@@ -655,12 +642,10 @@ public class Game {
      * most settlement of your own.
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
-     *
+     * @param player  the player for which the score should be calculated.
      * @return the score for the win condition "knight".
      */
-    static int scoreKnight(GameMap gameMap, Player player)
-    {
+    static int scoreKnight(GameMap gameMap, Player player) {
         int highestAmount = -1;
 
         for (int y = 0; y < gameMap.mapWidth; y++) {
@@ -671,47 +656,96 @@ public class Game {
                 }
             }
 
-            if(settlementsPerLine > highestAmount) {
+            if (settlementsPerLine > highestAmount) {
                 highestAmount = settlementsPerLine;
             }
         }
 
-        return highestAmount *2;
+        return highestAmount * 2;
     }
 
     // TODO: JavaDoc
-    static int scoreMerchant(GameMap gameMap, Player player)
-    {
+    static int scoreMerchant(GameMap gameMap, Player player) {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    static int scoreLord(GameMap gameMap, Player player)
-    {
+    static int scoreLord(GameMap gameMap, Player player) {
         return 0; // TODO: Implementation
     }
 
     // TODO: JavaDoc
-    static int scoreFarmer(GameMap gameMap, Player player)
-    {
+    static int scoreFarmer(GameMap gameMap, Player player) {
         return 0; // TODO: Implementation
     }
 
-    // TODO: JavaDoc
-    static int scoreWorker(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
+    /**
+     * Calculates the score for the given player on the given map with the win condition "worker".
+     * This win conditions gives one point for every settlement that is next to a special place.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
+     * @return the score for the win condition "worker".
+     */
+    static int scoreWorker(GameMap gameMap, Player player) {
+
+        AtomicInteger score = new AtomicInteger(0);
+
+        Stream<Tile> specialPlaces = gameMap.getTiles().filter(
+                t -> TileType.tokenType.contains(t.tileType) || t.tileType == TileType.CASTLE);
+
+        specialPlaces.forEach(t -> {
+            score.addAndGet((int) t.surroundingSettlements(gameMap, player).count());
+        });
+
+        return score.get();
     }
 
-    // TODO: JavaDoc
-    static int scoreFisher(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
+    /**
+     * Calculates the score for the given player on the given map with the win condition "fisher".
+     * This win conditions gives one point for every settlement that is next to a water tile.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
+     * @return the score for the win condition "fisher".
+     */
+    static int scoreFisher(GameMap gameMap, Player player) {
+
+        AtomicInteger score = new AtomicInteger(0);
+
+        gameMap.getSettlements(player).filter(t -> t.tileType != TileType.WATER).forEach(t -> {
+
+            for (Tile tile : t.surroundingTiles(gameMap).collect(Collectors.toSet()))
+                if (tile.tileType == TileType.WATER) {
+                    score.addAndGet(1);
+                    break;
+                }
+        });
+
+        return score.get();
     }
 
-    // TODO: JavaDoc
-    static int scoreMiner(GameMap gameMap, Player player)
-    {
-        return 0; // TODO: Implementation
+    /**
+     * Calculates the score for the given player on the given map with the win condition "miner".
+     * This win conditions gives one point for every settlement that is next to a mountain tile.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
+     * @return the score for the win condition "miner".
+     */
+    static int scoreMiner(GameMap gameMap, Player player) {
+
+        AtomicInteger score = new AtomicInteger(0);
+
+        gameMap.getSettlements(player).forEach(t -> {
+
+            for (Tile tile : t.surroundingTiles(gameMap).collect(Collectors.toSet()))
+                if (tile.tileType == TileType.MOUNTAIN) {
+                    score.addAndGet(1);
+                    break;
+                }
+        });
+
+        return score.get();
     }
 }
