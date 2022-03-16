@@ -96,7 +96,9 @@ public class Store<State> {
 
     /**
      * Subscribes an entity, which is then informed, when the state changes.
-     * @param subscriber * @param attributes */
+     * @param subscriber
+     * @param attributes
+     */
     public void subscribe(Subscriber<State> subscriber, String... attributes) {
         final Set<String> attributeSet = Set.of(attributes);
 

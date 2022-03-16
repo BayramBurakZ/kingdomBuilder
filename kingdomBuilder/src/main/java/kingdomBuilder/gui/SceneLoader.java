@@ -464,7 +464,7 @@ public class SceneLoader {
         winViewController = (WinViewController) pair.getValue();
     }
 
-    // TODO: Remove
+    // TODO: Remove getter for ChatViewController
     // getter
     /**
      * Returns the ChatViewController.
@@ -472,5 +472,13 @@ public class SceneLoader {
      */
     public ChatViewController getChatViewController() {
         return chatViewController;
+    }
+
+    /**
+     * Returns the current IAmViewController.
+     * @return The IAmViewController with all functionalities for the IAmView.
+     */
+    public IAmViewController getIAmViewController() {
+        return iAmViewController;
     }
 }

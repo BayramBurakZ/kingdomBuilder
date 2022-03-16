@@ -117,8 +117,12 @@ public class IAmViewController extends Controller implements Initializable {
     private void onCheckBoxSelectionPressed(Event event) {
         String selectedLanguage = comboBox_language.getSelectionModel().getSelectedItem().getDisplayLanguage();
         System.out.println("Changed Language to: " + selectedLanguage);
+        String name = iAmViewTextField.getText().trim();
+
+        //reload
         sceneLoader.loadViews(comboBox_language.getSelectionModel().getSelectedItem());
         sceneLoader.showIAmView();
+        sceneLoader.getIAmViewController().iAmViewTextField.setText(name);
     }
 
     /**

@@ -40,33 +40,47 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private TableView<GameData> gameselection_tableview;
 
+    /**
+     * Represents the column for the id.
+     */
     @FXML
     private TableColumn<GameData, String> gameselection_column_id;
 
+    /**
+     * Represents the column for the name.
+     */
     @FXML
     private TableColumn<GameData, String> gameselection_column_name;
 
+    /**
+     * Represents the column for the players.
+     */
     @FXML
     private TableColumn<GameData, String> gameselection_column_players;
 
+    /**
+     * Represents the column for the status.
+     */
     @FXML
     private TableColumn<GameData, String> gameselection_column_status;
 
+    /**
+     * Represents the label to display the name of the game.
+     */
     @FXML
     private Label gameselection_label_gamename;
 
+    /**
+     * Represents the label to display the hostname.
+     */
     @FXML
     private Label gameselection_label_hostname;
 
-    @FXML
-    private Label gameselection_label_timelimit;
-
-    @FXML
-    private Label gameselection_label_turnlimit;
-
+    /**
+     * Represents the textarea to display the description.
+     */
     @FXML
     private TextArea gameselection_textarea_description;
-
 
     /**
      * Layout that contains the preview of a game
@@ -97,6 +111,12 @@ public class GameSelectionViewController extends Controller implements Initializ
 
         // updates the TableView
         store.subscribe(kbState -> gameselection_tableview.getItems().setAll(kbState.games().values()), "games");
+
+        store.subscribe(kbState -> {
+            if (kbState.client() != null)
+            kbState.client().gamesRequest();
+        }, "clients");
+
         updateGameInformation();
     }
 
@@ -119,6 +139,9 @@ public class GameSelectionViewController extends Controller implements Initializ
         });
     }
 
+    /**
+     * Updates the information about a game that is currently selected.
+     */
     private void updateGameInformation() {
         gameselection_tableview.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (oldValue != newValue) {
@@ -128,9 +151,6 @@ public class GameSelectionViewController extends Controller implements Initializ
                 gameselection_label_gamename.setText(newValue.gameName());
                 ClientData host = store.getState().clients().get(newValue.clientId());
                 gameselection_label_hostname.setText(host != null ? host.name() : "???");
-                // TODO?
-                //gameselection_label_timelimit;
-                //gameselection_label_turnlimit;
                 gameselection_textarea_description.setText(newValue.gameDescription());
             }
         });

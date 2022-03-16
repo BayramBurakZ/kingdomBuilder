@@ -129,18 +129,6 @@ public class GameSettingsViewController extends Controller implements Initializa
     private Button gamesettings_button_host;
 
     /**
-     * Represents the button to host a game and join it.
-     */
-    @FXML
-    private Button gamesettings_button_host_join;
-
-    /**
-     * Represents the button to host a game and spectate it.
-     */
-    @FXML
-    private Button gamesettings_button_host_spectate;
-
-    /**
      * Represents the TextField, to set the name of the game.
      */
     @FXML
@@ -374,38 +362,15 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Updates the Buttons according to the state of the spinners.
      */
     private void updateButtons() {
-        // not all informations to host a game are filled in
+        // not all information to host a game are filled in
         if (hasAllHostInformation()) {
             return;
         }
-        // no players selected or only hotseat
-        if (playerCount + hotseatCount + botCount == 0 || (hotseatCount > 0 && playerCount == 0)) {
+        // no players
+        if (playerCount + hotseatCount + botCount == 0) {
             deactivateHostGameButton();
-            deactivateHostAndJoinGameButton();
-            deactivateHostAndSpectateGameButton();
-        }
-
-        // min 1 playable player and:
-        // no online player and min 1 hotseat / no hotseat and min 1 bot
-        // -> impossible to host and not join/spectate
-        if (playerCount > 0 && ((hotseatCount >= 0 && botCount == 0) || (hotseatCount == 0 && botCount >= 0))) {
-            deactivateHostGameButton();
-            activateHostAndJoinGameButton();
-            activateHostAndSpectateGameButton();
-        }
-
-        // with only players you can host, host and join or spectate
-        if (playerCount > 0 && hotseatCount == 0 && botCount == 0) {
+        } else {
             activateHostGameButton();
-            activateHostAndJoinGameButton();
-            activateHostAndSpectateGameButton();
-        }
-
-        // with only bots you can spectate a game, but neither host nor join
-        if  (playerCount == 0 && hotseatCount == 0 && botCount > 0) {
-            deactivateHostGameButton();
-            deactivateHostAndJoinGameButton();
-            activateHostAndSpectateGameButton();
         }
     }
 
@@ -458,7 +423,7 @@ public class GameSettingsViewController extends Controller implements Initializa
         int timeLimit;
         if (gamesettings_checkBox_time.isSelected()) {
             // transform seconds in milliseconds
-            timeLimit = gamesettings_spinner_time.getValue() * 1000;
+            timeLimit = gamesettings_spinner_time.getValue() * 1000 * 60;
         } else {
             timeLimit = -1;
         }
@@ -517,35 +482,6 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private void deactivateHostGameButton() {
         gamesettings_button_host.setDisable(true);
-    }
-
-    // TODO: Remove because of missing features of the server
-    /**
-     * Activates the Host Game and Join Button.
-     */
-    private void activateHostAndJoinGameButton() {
-        //gamesettings_button_host_join.setDisable(false);
-    }
-
-    /**
-     * Deactivates the Host Game and Join Button.
-     */
-    private void deactivateHostAndJoinGameButton() {
-        //gamesettings_button_host_join.setDisable(true);
-    }
-
-    /**
-     * Activates the Host Game and Spectate Button.
-     */
-    private void activateHostAndSpectateGameButton() {
-        //gamesettings_button_host_spectate.setDisable(false);
-    }
-
-    /**
-     * Deactivates the Host Game and Spectate Button.
-     */
-    private void deactivateHostAndSpectateGameButton() {
-        //gamesettings_button_host_spectate.setDisable(true);
     }
 
     /**

@@ -418,6 +418,9 @@ public class GameReducer extends Reducer<KBState> {
         state.setPlayersMap(null);
         state.setCurrentPlayer(null);
         state.setJoinedGame(false);
+        state.setWinConditions(new ArrayList<>());
+
+        oldState.client().clientsRequest();
 
         return state;
     }

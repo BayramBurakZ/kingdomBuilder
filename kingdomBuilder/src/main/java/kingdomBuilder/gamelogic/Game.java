@@ -108,8 +108,6 @@ public class Game {
         return (gameMap.at(fromX, fromY).occupiedBy == player || canUseBasicTurn(gameMap, player, terrain, toX, toY));
     }
 
-    //TODO: Doc check!
-
     /**
      * Show all possible placements at the start of the turn.
      *
@@ -482,58 +480,57 @@ public class Game {
      */
     // TODO: Call the method
     public static int calculateScore(GameMap gameMap, Player player, List<WinCondition> winConditions) {
-        // TODO: remove debug messages when everything works fine
         int score = 0;
         for (WinCondition c : winConditions) {
             switch (c) {
                 case LORDS -> {
                     int tmp = scoreLord(gameMap, player);
-                    System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case MINER -> {
                     int tmp = scoreMiner(gameMap, player);
-                    System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case FARMER -> {
                     int tmp = scoreFarmer(gameMap, player);
-                    System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case FISHER -> {
                     int tmp = scoreFisher(gameMap, player);
-                    System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case KNIGHT -> {
                     int tmp = scoreKnight(gameMap, player);
-                    System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case WORKER -> {
                     int tmp = scoreWorker(gameMap, player);
-                    System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case CITIZEN -> {
                     int tmp = scoreCitizen(gameMap, player);
-                    System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case EXPLORER -> {
                     int tmp = scoreExplorer(gameMap, player);
-                    System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case MERCHANT -> {
                     int tmp = scoreMerchant(gameMap, player);
-                    System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case ANCHORITE -> {
                     int tmp = scoreAnchorite(gameMap, player);
-                    System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
+                    //System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
             }
@@ -551,7 +548,7 @@ public class Game {
                 castleScore += 3;
             }
         }
-        System.out.println("Points for Castles: " + castleScore);
+        //System.out.println("Points for Castles: " + castleScore);
 
         return castleScore;
     }

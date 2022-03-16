@@ -13,6 +13,8 @@ import javafx.scene.web.WebView;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
+import kingdomBuilder.gamelogic.WinCondition;
+import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.*;
 import kingdomBuilder.reducers.ChatReducer;
 import kingdomBuilder.redux.Store;
@@ -166,6 +168,9 @@ public class ChatViewController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         resourceBundle = resources;
 
+        setupClientList();
+        setupWebView();
+
         store.subscribe(this::onClientChanges, "clients");
         store.subscribe(this::onMessageChanged, "message");
         store.subscribe(this::onTurn, "gameLastTurn");
@@ -174,9 +179,7 @@ public class ChatViewController extends Controller implements Initializable {
         store.subscribe(this::onTurnStartChanged, "nextTerrainCard");
         store.subscribe(this::onQuadrantsUploadedChanged, "quadrantUploaded");
         store.subscribe(this::onScoresChanged, "scores");
-
-        setupClientList();
-        setupWebView();
+        store.subscribe(this::onWinConditionsChanged, "winConditions");
     }
 
     /**
@@ -247,6 +250,44 @@ public class ChatViewController extends Controller implements Initializable {
 
         turnLogWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
             turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
+    }
+
+    private void onWinConditionsChanged(KBState kbState) {
+        if (kbState.winConditions().isEmpty())
+            return;
+
+        ArrayList<WinCondition> wc = kbState.winConditions();
+
+        turnLogAppendElement(
+                //whisper because its orange - no further reason
+                createMessage(MessageStyle.WHISPER,
+                        createHTMLElement(resourceBundle.getString("winConditionsOfGame"), null)
+                ));
+
+        for (int i = 0; i < wc.size(); i++) {
+            String winCondString = "";
+
+            switch (wc.get(i)) {
+                case ANCHORITE -> winCondString = resourceBundle.getString("winCondAnchorite");
+                case CITIZEN -> winCondString = resourceBundle.getString("winCondCitizen");
+                case EXPLORER -> winCondString = resourceBundle.getString("winCondExplorer");
+                case FARMER -> winCondString = resourceBundle.getString("winCondFarmer");
+                case FISHER -> winCondString = resourceBundle.getString("winCondFisher");
+                case KNIGHT -> winCondString = resourceBundle.getString("winCondKnight");
+                case LORDS -> winCondString = resourceBundle.getString("winCondLords");
+                case MERCHANT -> winCondString = resourceBundle.getString("winCondMerchant");
+                case MINER -> winCondString = resourceBundle.getString("winCondMiner");
+                case WORKER -> winCondString = resourceBundle.getString("winCondWorker");
+            }
+
+            String logMessage = (i+1) + ".: " + winCondString;
+
+            turnLogAppendElement(
+                    //whisper because its orange - no further reason
+                    createMessage(MessageStyle.WHISPER,
+                        createHTMLElement(logMessage, null)
+                    ));
+        }
     }
 
     /**
@@ -435,10 +476,14 @@ public class ChatViewController extends Controller implements Initializable {
      * @param state the current state.
      */
     private void onTurn(KBState state) {
+        if (state.gameLastTurn() == null || state.gameLastTurn().x == -1) {
+            return;
+        }
         if (state.gameLastTurn() instanceof ServerTurn a) {
             String textContent =  a.type == ServerTurn.TurnType.PLACE ?
-                    " has placed a settlement at (" + a.x + "," + a.y + ")" :
-                    " has moved a settlement from (" + a.x + "," + a.y + ") to (" + a.toX + "," + a.toY + ")";
+                    " " + resourceBundle.getString("hasPlaced") + " (" + a.y + "," + a.x + ")" :
+                    " " + resourceBundle.getString("hasMoved") + " (" + a.y + "," + a.x + ") " +
+                          resourceBundle.getString("to") + " (" + a.toY + "," + a.toX + ")";
 
             turnLogAppendElement(createMessage(MessageStyle.GAME_CHAT,
                     createHTMLElement(state.currentPlayer().name, MessageStyle.BOLD),
@@ -468,11 +513,12 @@ public class ChatViewController extends Controller implements Initializable {
             differences.addAll(clientsState);
             differences.removeAll(clients);
 
-            if (differences.get(0).clientId() == store.getState().client().getClientId()) {
-                return;
-            }
-            onClientJoined(differences.get(0));
-        } else {
+            differences.removeIf(cd -> cd.clientId() == store.getState().client().getClientId());
+
+            for (ClientData cd : differences)
+                onClientJoined(cd);
+
+        } else if (clientsState.size() < clients.size()){
             // client left
             differences.addAll(clients);
             differences.removeAll(clientsState);

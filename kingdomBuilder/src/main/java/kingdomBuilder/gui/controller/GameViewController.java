@@ -115,7 +115,7 @@ public class GameViewController extends Controller implements Initializable {
      * Represents the Hbox that contains the tokens.
      */
     @FXML
-    private HBox gameview_hbox_tokens;
+    private HBox game_hbox_tokens;
     /**
      * Represents the Button to end the turn.
      */
@@ -127,6 +127,12 @@ public class GameViewController extends Controller implements Initializable {
      */
     @FXML
     private Group gameBoard_group;
+
+    /**
+     * Represents the Label to display the settlements left for the basic turn.
+     */
+    @FXML
+    public Label game_label_basic;
 
     //endregion FXML
 
@@ -174,11 +180,6 @@ public class GameViewController extends Controller implements Initializable {
      * Represents the state whether a map is currently loaded.
      */
     boolean hasMap = false;
-
-    /**
-     * Shows if the controller is already subscribed to the redux system.
-     */
-    private boolean isSubscribed = false;
 
     /**
      * Constructs the GameView with the given store.
@@ -254,6 +255,7 @@ public class GameViewController extends Controller implements Initializable {
             return;
 
         game_button_end.setDisable(true);
+        basicTurnLeft(kbState);
 
         // Highlight whose turn it is
         setCurrentPlayerHighlight(kbState.players(), kbState.currentPlayer());
@@ -311,10 +313,28 @@ public class GameViewController extends Controller implements Initializable {
             game_button_end.setDisable(false);
         }
 
+        // Update basic turn label
+        basicTurnLeft(kbState);
+
         // SCORE
         for (int i = 0; i < kbState.players().size(); i++) {
             int score = Game.calculateScore(kbState.gameMap(), kbState.players().get(i), kbState.winConditions());
             updateScoreForPlayer(i, score);
+        }
+    }
+
+    /**
+     * Shows how many settlements the player has left for their basic turn.
+     * @param kbState the current state
+     */
+    private void basicTurnLeft(KBState kbState) {
+        if (kbState.currentPlayer() != null && kbState.currentPlayer().ID == kbState.client().getClientId()) {
+            int basicSettlementsLeft = kbState.currentPlayer().getRemainingSettlementsOfTurn();
+            if (basicSettlementsLeft > 0) {
+                game_label_basic.setText(resourceBundle.getString("basicLeft") + " " + basicSettlementsLeft);
+            } else {
+                game_label_basic.setText("");
+            }
         }
     }
 
@@ -397,10 +417,10 @@ public class GameViewController extends Controller implements Initializable {
         MyGameReply myGame = kbState.myGameReply();
         if (myGame != null) {
             // display time limit
-            int time = 1000;
+            int time;
 
             if (myGame.timeLimit() != -1) {
-                time = (int) myGame.timeLimit() / 1000;
+                time = myGame.timeLimit() / 1000;
                 game_label_time.setText(resourceBundle.getObject("timeLimit:")
                         + " " + time);
             }
@@ -439,7 +459,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     private void updateTokens(KBState kbState) {
         tokens.clear();
-        gameview_hbox_tokens.getChildren().clear();
+        game_hbox_tokens.getChildren().clear();
 
         // check if the current player is the own client
         // TODO: fix for Hotseat
@@ -452,7 +472,7 @@ public class GameViewController extends Controller implements Initializable {
                         areTokensDisabled, resourceBundle, store);
 
                 tokens.add(token);
-                gameview_hbox_tokens.getChildren().add(token);
+                game_hbox_tokens.getChildren().add(token);
             }
         }
     }
@@ -578,6 +598,7 @@ public class GameViewController extends Controller implements Initializable {
      * @param camera the camera to move.
      */
     private void setupCameraScrollHandler(Camera camera) {
+        game_subscene.setOnMouseEntered(event -> game_subscene.requestFocus());
         // TODO: smoother scrolling
         game_subscene.setOnKeyPressed((KeyEvent event) -> {
             double scrollSpeed = 20.0;
@@ -586,8 +607,6 @@ public class GameViewController extends Controller implements Initializable {
                 case DOWN -> camera.setTranslateY(camera.getTranslateY() + scrollSpeed);
                 case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
                 case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
-                //ToDO: remove - just for testing the highlight
-                //case T -> updateTokens();
             }
             event.consume();
         });
@@ -656,8 +675,6 @@ public class GameViewController extends Controller implements Initializable {
      * @param tileType the type to show.
      */
     private void updateCardDescription(TileType tileType) {
-        // TODO read TileType from Datalogic/Store instead of parameter
-
         //Update Image
         Image img = TextureLoader.getTileTexture(tileType);
         game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
@@ -744,7 +761,6 @@ public class GameViewController extends Controller implements Initializable {
             if (playerList.get(i) == current)
                 players.get(i).setHighlight(true);
         }
-
     }
 
     /**

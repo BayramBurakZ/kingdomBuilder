@@ -56,19 +56,27 @@
         <VBox fx:id="game_vbox_terraincard" alignment="CENTER" style="-fx-border-color: white;
         -fx-background-color: ANTIQUEWHITE;">
             <Rectangle fx:id="game_rectangle_card" stroke="BLACK" strokeType="INSIDE" />
-            <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Flower" />
+            <Label fx:id="game_label_carddescribtion" alignment="CENTER" text="Game not started" />
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
         </VBox>
 
         <!-- HBox for Tokens-->
-        <HBox fx:id="gameview_hbox_tokens" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
+        <HBox fx:id="game_hbox_tokens" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" />
 
-        <Button fx:id="game_button_end" text="end" disable="true">
-            <padding>
-                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-            </padding>
-        </Button>
+        <VBox>
+            <Label fx:id="game_label_basic" text=" " textFill="white">
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+            </Label>
+
+            <Button fx:id="game_button_end" text="end" disable="true" maxWidth="Infinity">
+                <padding>
+                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                </padding>
+            </Button>
+        </VBox>
     </HBox>
 </VBox>
