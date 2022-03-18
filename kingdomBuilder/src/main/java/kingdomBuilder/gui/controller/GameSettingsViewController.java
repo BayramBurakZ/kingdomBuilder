@@ -1,6 +1,7 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.collections.FXCollections;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

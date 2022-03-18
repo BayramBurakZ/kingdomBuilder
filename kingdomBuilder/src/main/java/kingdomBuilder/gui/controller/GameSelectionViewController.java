@@ -1,6 +1,9 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +18,7 @@ import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -26,13 +30,19 @@ public class GameSelectionViewController extends Controller implements Initializ
      * Layout that contains the games table (left side) and the preview of a single game (right side)
      */
     @FXML
-    private HBox hbox_gameselection;
+    private HBox gameselection_hbox;
 
     /**
      * Layout that contains the games table with its buttons
      */
     @FXML
     private VBox vbox_table;
+
+    /**
+     * Represents the ComboCox for the filter.
+     */
+    @FXML
+    public ComboBox<String> gameselection_comboBox_filter;
 
     /**
      * Represents the TableView that displays the games on the server.
@@ -83,10 +93,26 @@ public class GameSelectionViewController extends Controller implements Initializ
     private TextArea gameselection_textarea_description;
 
     /**
+     * Represents the label to display the players in a game.
+     */
+    @FXML
+    public Label gameselection_label_playersOfGame;
+
+    /**
      * Layout that contains the preview of a game
      */
     @FXML
     private VBox vbox_preview;
+
+    /**
+     * Represents the list with the Data for the table.
+     */
+    private final ObservableList<GameData> masterData = FXCollections.observableArrayList();
+
+    /**
+     * Represents the list to filter the data for the table.
+     */
+    private final FilteredList<GameData> filteredData = new FilteredList<>(masterData, gameData -> true);
 
     /**
      * Constructs the GameSelectionViewController.
@@ -100,7 +126,7 @@ public class GameSelectionViewController extends Controller implements Initializ
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location the location used to resolve relative paths for the root object,
+     * @param location  the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
@@ -110,14 +136,37 @@ public class GameSelectionViewController extends Controller implements Initializ
         setupGameList();
 
         // updates the TableView
-        store.subscribe(kbState -> gameselection_tableview.getItems().setAll(kbState.games().values()), "games");
-
         store.subscribe(kbState -> {
-            if (kbState.client() != null)
-            kbState.client().gamesRequest();
-        }, "clients");
+            masterData.clear();
+            masterData.addAll(kbState.games().values());
+        }, "games");
+
+        // initialize the Combobox for filtering
+        gameselection_comboBox_filter.getItems().addAll("OPEN", "CLOSED", "ALL");
+        gameselection_tableview.setItems(masterData);
 
         updateGameInformation();
+    }
+
+    /**
+     * Updates the Tableview whenever a new Filter is selected.
+     *
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void filterTable(Event event) {
+        String filter = gameselection_comboBox_filter.getSelectionModel().getSelectedItem();
+        System.out.println(filter);
+
+        filteredData.setPredicate(gameData -> {
+            if (filter.equals("OPEN") && gameData.playersJoined() < gameData.playerLimit()) return true;
+            else if (filter.equals("CLOSED") && gameData.playersJoined() == gameData.playerLimit()) return true;
+            else if (filter.equals("ALL")) return true;
+
+            return false;
+        });
+
+        gameselection_tableview.setItems(filteredData);
     }
 
     /**
@@ -152,6 +201,27 @@ public class GameSelectionViewController extends Controller implements Initializ
                 ClientData host = store.getState().clients().get(newValue.clientId());
                 gameselection_label_hostname.setText(host != null ? host.name() : "???");
                 gameselection_textarea_description.setText(newValue.gameDescription());
+
+                KBState kbState = store.getState();
+                List<Integer> list = kbState.playersOfGame().get(newValue.gameId());
+                String s = "";
+
+                for (int i = 0; i < newValue.playersJoined(); i++) {
+                    String name;
+                    if (kbState.clients().containsKey(list.get(i)))
+                        name = kbState.clients().get(list.get(i)).name();
+                    else
+                        name = "???";
+
+                    s += (i+1) + ": " + name + "\n";
+                }
+
+                if (s.equals("")) {
+                    s = "---";
+                }
+
+                gameselection_label_playersOfGame.setText(s);
+
             }
         });
     }
@@ -160,8 +230,8 @@ public class GameSelectionViewController extends Controller implements Initializ
      * Initializes layout arrangement.
      */
     private void setupLayout() {
-        vbox_table.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
-        vbox_preview.prefWidthProperty().bind(hbox_gameselection.widthProperty().multiply(0.5));
+        vbox_table.prefWidthProperty().bind(gameselection_hbox.widthProperty().multiply(0.5));
+        vbox_preview.prefWidthProperty().bind(gameselection_hbox.widthProperty().multiply(0.5));
     }
 
     /**

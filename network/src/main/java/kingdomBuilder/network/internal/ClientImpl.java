@@ -292,6 +292,23 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void serverVersion() {
+        final String command = ProtocolSerializer.serialize(new VersionRequest());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void playersOfGame(int gameId) {
+        final String command = ProtocolSerializer.serialize(new PlayersOfGameRequest(gameId));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean hasPendingCommands() {
         return ioHandler.hasPendingCommands();
     }

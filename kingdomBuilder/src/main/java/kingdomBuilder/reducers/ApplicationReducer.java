@@ -2,7 +2,6 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
-import kingdomBuilder.gamelogic.Game;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.generated.DeferredState;
@@ -12,6 +11,7 @@ import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.network.protocol.QuadrantUploaded;
+import kingdomBuilder.network.protocol.VersionReply;
 import kingdomBuilder.redux.Reduce;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
@@ -31,6 +31,10 @@ public class ApplicationReducer extends Reducer<KBState> {
     public static final String LOGIN = "LOGIN";
     public static final String SET_SCENELOADER = "SET_SCENELOADER";
     public static final String NEW_QUADRANT_UPLOADED = "NEW_QUADRANT_UPLOADED";
+    /**
+     * Represents the String to identify the related reduce methode.
+     */
+    public static final String SERVER_VERSION = "SERVER_VERSION";
 
 
     public ApplicationReducer() { registerReducers(this);}
@@ -71,6 +75,7 @@ public class ApplicationReducer extends Reducer<KBState> {
             state.setSelectorThread(selectorThread);
         }
 
+        client.onVersionReply.subscribe(m -> store.dispatch(SERVER_VERSION, m));
         client.onLoggedIn.subscribe(m -> store.dispatch(LOGIN, m));
         client.onClientsReply.subscribe(m -> m.clients().forEach(c -> store.dispatch(ADD_CLIENT, c)));
         client.onClientJoined.subscribe(m -> store.dispatch(ADD_CLIENT, m.clientData()));
@@ -87,6 +92,7 @@ public class ApplicationReducer extends Reducer<KBState> {
         client.onTokenReceived.subscribe(m -> store.dispatch(GameReducer.GRANT_TOKEN, m));
         client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
         client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
+        client.onPlayersOfGameReply.subscribe(m -> store.dispatch(GameReducer.PLAYERS_OF_GAME, m));
 
         client.onGamesReply.subscribe(m -> {
             for (GameData g : m.games()) {
@@ -177,6 +183,7 @@ public class ApplicationReducer extends Reducer<KBState> {
         state.setIsConnected(true);
         System.out.println("Is connected.");
 
+        oldState.client().serverVersion();
         oldState.client().loadNamespace();
         oldState.client().clientsRequest();
         oldState.client().gamesRequest();
@@ -212,9 +219,25 @@ public class ApplicationReducer extends Reducer<KBState> {
     }
 
     @Reduce(action = NEW_QUADRANT_UPLOADED)
-    public DeferredState onNewQuadrantUploaded(Store<KBState> unused, KBState oldState, QuadrantUploaded playload) {
+    public DeferredState onNewQuadrantUploaded(Store<KBState> unused, KBState oldState, QuadrantUploaded payload) {
         DeferredState state = new DeferredState(oldState);
-        state.setQuadrantUploaded(playload);
+        state.setQuadrantUploaded(payload);
+        return state;
+    }
+
+    /**
+     * Represents the reducer to set the version of the server in the state.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param version the VersionReply with the server version.
+     *
+     * @return the deferredState that modifies the state.
+     */
+    @Reduce(action = SERVER_VERSION)
+    public DeferredState onServerVersion(Store<KBState> unused, KBState oldState, VersionReply version) {
+        DeferredState state = new DeferredState(oldState);
+        state.setServerVersion(version.serverVersion());
         return state;
     }
 }

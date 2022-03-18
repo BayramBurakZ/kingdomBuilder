@@ -40,6 +40,7 @@ public class GameReducer extends Reducer<KBState> {
     public static final String BETTER_COLOR_MODE = "BETTER_COLOR_MODE";
     public static final String ADD_GAME = "ADD_GAME";
     public static final String SET_WIN_CONDITION = "SET_WIN_CONDITION";
+    public static final String PLAYERS_OF_GAME = "PLAYERS_OF_GAME";
 
     public GameReducer() {
         registerReducers(this);
@@ -91,6 +92,9 @@ public class GameReducer extends Reducer<KBState> {
             // for some reason you only get the color of a player via ?players
             oldState.client().playersRequest();
         }
+        oldState.client().gamesRequest();
+        oldState.client().playersOfGame(a.gameId);
+
         return state;
     }
 
@@ -118,6 +122,8 @@ public class GameReducer extends Reducer<KBState> {
         final var games = oldState.games();
         games.put(gameData.gameId(), gameData);
         state.setGames(games);
+
+        oldState.client().playersOfGame(gameData.gameId());
         return state;
     }
 
@@ -421,6 +427,16 @@ public class GameReducer extends Reducer<KBState> {
         state.setWinConditions(new ArrayList<>());
 
         oldState.client().clientsRequest();
+
+        return state;
+    }
+
+    @Reduce(action = PLAYERS_OF_GAME)
+    public DeferredState reduce(Store<KBState> unused, KBState oldState, PlayersOfGameReply reply){
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.playersOfGame().put(reply.gameId(), reply.clientIds());
+        state.setPlayersOfGame(oldState.playersOfGame());
 
         return state;
     }

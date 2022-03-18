@@ -517,6 +517,16 @@ public abstract class Client {
     public abstract void uploadQuadrant(String quadrant);
 
     /**
+     * Sends the ?version to the server.
+     */
+    public abstract void serverVersion();
+
+    /**
+     * Sends the ?playersofgame to the server.
+     */
+    public abstract void playersOfGame(int gameId);
+
+    /**
      * {@return whether the client has commands stored internally
      *  that were not transmitted successfully to the server yet.}
      */

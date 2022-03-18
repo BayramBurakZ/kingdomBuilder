@@ -12,6 +12,7 @@ import kingdomBuilder.network.protocol.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +46,9 @@ import java.util.Map;
  *                   The Key represents the client ID.
  * @param currentPlayer represents the current player on turn.
  * @param joinedGame shows whether the client has joined a game.
+ * @param quadrantUploaded represents the message whenever a quadrant is uploaded.
+ * @param serverVersion represents a String with the version of the server.
+ * @param playersOfGame represents a mao with the gameID and a list with all clientIDs.
  */
 @State
 public record KBState(SceneLoader sceneLoader,
@@ -73,7 +77,9 @@ public record KBState(SceneLoader sceneLoader,
                       HashMap<Integer, Player> playersMap,
                       Player currentPlayer,
                       boolean joinedGame,
-                      QuadrantUploaded quadrantUploaded
+                      QuadrantUploaded quadrantUploaded,
+                      String serverVersion,
+                      Map<Integer, List<Integer>> playersOfGame
                       ) {
 
     //TODO: JavaDoc!
@@ -107,6 +113,8 @@ public record KBState(SceneLoader sceneLoader,
                 new HashMap<>(),
                 null,
                 false,
-                null);
+                null,
+                null,
+                new HashMap<>());
     }
 }

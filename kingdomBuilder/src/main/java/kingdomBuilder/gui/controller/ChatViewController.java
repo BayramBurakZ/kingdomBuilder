@@ -180,6 +180,30 @@ public class ChatViewController extends Controller implements Initializable {
         store.subscribe(this::onQuadrantsUploadedChanged, "quadrantUploaded");
         store.subscribe(this::onScoresChanged, "scores");
         store.subscribe(this::onWinConditionsChanged, "winConditions");
+        store.subscribe(this::onServerVersionChanged, "serverVersion");
+    }
+
+    /**
+     * Prints a warning message whenever the server version is lower than 1.3.2.
+     */
+    private void onServerVersionChanged(KBState kbState) {
+        String version = kbState.serverVersion();
+        if (version == null) {
+            return;
+        }
+
+        String minimumRequirement = "v1.3.2";
+
+        String text = resourceBundle.getString("incorrectServerVersion") + " ";
+        System.out.println(version);
+
+        // weird check, because pre 1.3.2 there is "ws2021" at the beginning of the version.
+        if (version.charAt(version.length()-3) < minimumRequirement.charAt(minimumRequirement.length()-3)) {
+            globalChatAppendElement(createMessage(MessageStyle.WARNING,
+                    createHTMLElement(text, null),
+                    createHTMLElement(version, MessageStyle.BOLD)
+            ));
+        }
     }
 
     /**
