@@ -1,7 +1,43 @@
-//package kingdomBuilder.gamelogic;
-//
+package kingdomBuilder.gamelogic;
+
+
+import kingdomBuilder.KBState;
+import kingdomBuilder.reducers.BotReducer;
+import kingdomBuilder.redux.Store;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class AIGame {
+
+    public static void randomPlacement(GameMap gameMap, Player player, TileType tileType, Store<KBState> store) {
+        // add Tokens somehow
+        GameMap AIMap = new GameMap(gameMap);
+        List<Tile> plannedMoves = new ArrayList<>();
+
+        for (int i = 0; i < player.remainingSettlementsOfTurn; i++) {
+
+            List<Tile> placeable = AIMap.getAllPlaceableTiles(player, tileType).toList();
+            int index = (int) (Math.random() * (placeable.size()));
+            Tile t = placeable.get(index);
+            System.out.println(t.x + "|" + t.y + "| " + t.tileType);
+            plannedMoves.add(t);
+            AIMap.at(t.x, t.y).placeSettlement(player);
+        }
+
+        for (Tile t : plannedMoves)
+            t.removeSettlement();
+
+        store.dispatch(BotReducer.PLACE_BOT, plannedMoves);
+
+    }
+}
+
+
+
 //import java.util.Set;
-//
 //// Temporary storage for methods that will be relevant for AI players later on
 //public class AIGame extends Game {
 //

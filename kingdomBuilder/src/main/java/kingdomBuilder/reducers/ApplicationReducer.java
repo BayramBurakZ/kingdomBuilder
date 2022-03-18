@@ -64,6 +64,8 @@ public class ApplicationReducer extends Reducer<KBState> {
             return state;
         }
 
+        state.setServerAddress(address);
+
         Thread selectorThread = oldState.selectorThread();
         if (selectorThread == null || !selectorThread.isAlive()) {
             assert !oldState.selector().isRunning();

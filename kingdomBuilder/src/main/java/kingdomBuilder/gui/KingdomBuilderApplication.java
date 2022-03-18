@@ -6,6 +6,7 @@ import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
+import kingdomBuilder.reducers.BotReducer;
 import kingdomBuilder.reducers.ChatReducer;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
@@ -39,7 +40,8 @@ public class KingdomBuilderApplication extends Application {
                 new KBState(),
                 new ApplicationReducer(),
                 new ChatReducer(),
-                new GameReducer()
+                new GameReducer(),
+                new BotReducer()
         );
     }
 

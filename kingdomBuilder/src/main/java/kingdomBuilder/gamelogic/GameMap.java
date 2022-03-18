@@ -51,6 +51,17 @@ public class GameMap implements Iterable<Tile> {
     public final int startingTokenCount;
 
     /**
+     * Creates a copy of a Map.
+     * @param gameMap The Map to copy.
+     */
+    public GameMap(GameMap gameMap) {
+        tiles = Arrays.copyOf(gameMap.tiles, gameMap.tiles.length);
+        tileSet = gameMap.tileSet;
+        quadrantWidth = gameMap.quadrantWidth;
+        mapWidth = gameMap.mapWidth;
+        startingTokenCount = gameMap.startingTokenCount;
+    }
+    /**
      * Creates the map from the given quadrants.
      *
      * @param startingTokenCount the amount of tokens that a special place contains at game start.

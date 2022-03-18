@@ -24,6 +24,7 @@ import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.network.protocol.MyGameReply;
+import kingdomBuilder.reducers.BotReducer;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
@@ -237,7 +238,33 @@ public class GameViewController extends Controller implements Initializable {
         // set the initial layout of the view
         setupLayout();
 
+        showPreStartButtons(true);
+
+        store.subscribe(kbState -> {
+            if (kbState.gameStarted())
+                showPreStartButtons(false);
+        }, "gameStarted");
+
         game_subscene.setFill(Color.LIGHTSKYBLUE);
+    }
+
+    private final Button addBot = new Button("Add Bot");
+    private final Button addHotseat = new Button("Add Hotseat");
+
+    /**
+     * Shows the Buttons to add Hotseat or Bots to the game.
+     * @param isDisplayed whether the buttons should be displayed.
+     */
+    private void showPreStartButtons(boolean isDisplayed) {
+        if (isDisplayed) {
+            game_hbox_tokens.getChildren().addAll(addBot, addHotseat);
+        } else {
+            game_hbox_tokens.getChildren().clear();
+        }
+
+        addBot.setOnAction(event -> {
+            store.dispatch(BotReducer.CONNECT_BOT, null);
+        });
     }
 
     /**
