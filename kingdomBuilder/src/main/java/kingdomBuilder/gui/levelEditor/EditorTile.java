@@ -37,7 +37,11 @@ public class EditorTile extends Tile {
      */
     @Override
     protected void setMouseHandler() {
-        setOnMouseClicked(event -> {
+        setOnMousePressed(event -> {
+            if (!event.isPrimaryButtonDown()) {
+                return;
+            }
+
             TileType tmp = levelEditorController.getTileTypeFromCombobox();
 
             tileType = tmp;

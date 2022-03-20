@@ -110,9 +110,9 @@ public class HexagonTile extends Tile {
      */
     @Override
     protected void setMouseHandler() {
-        setOnMouseClicked(event -> {
+        setOnMousePressed(event -> {
             // place settlement only if the tile is elevated/highlighted
-            if (isElevated) {
+            if (event.isPrimaryButtonDown() && isElevated) {
                 gameBoard.hexagonClicked(x, y);
             }
         });

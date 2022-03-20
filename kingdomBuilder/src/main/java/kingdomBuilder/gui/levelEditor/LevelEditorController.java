@@ -12,8 +12,10 @@ import javafx.scene.paint.Color;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.UploadQuadrantAction;
 import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gui.GameCamera;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -24,16 +26,6 @@ import java.util.ResourceBundle;
  * Class for the Controller of the LevelEditor.
  */
 public class LevelEditorController extends Controller implements Initializable {
-
-    /**
-     * Represents the setting for the field of view (fov).
-     */
-    private static final double FOV = 50.0;
-
-    /**
-     * Represents the angle for the camera.
-     */
-    private static final double VIEW_ANGLE = 30.0;
 
     /**
      * Represents the limit for castles in one quadrant defined by the server.
@@ -123,68 +115,8 @@ public class LevelEditorController extends Controller implements Initializable {
         setupBoard();
         setupComboBox();
 
-        setupCamera();
-        setupLight();
-    }
-
-    /**
-     * Initializes the Camera for the subScene.
-     */
-    private void setupCamera() {
-        // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-
-        camera.setFarClip(4096.0);
-        camera.setRotationAxis(new Point3D(1.0, 0, 0));
-        camera.setRotate(VIEW_ANGLE);
-        camera.setFieldOfView(FOV);
-        editor_subscene.setCamera(camera);
-
-
-        // TODO: set initial camera position properly
-        camera.setTranslateX(boardCenter.getX());
-        camera.setTranslateY(
-                (1 + Math.sin(Math.toRadians(VIEW_ANGLE)) + Math.sin(Math.toRadians(FOV))) * boardCenter.getY());
-        camera.setTranslateZ(-Math.cos(Math.toRadians(VIEW_ANGLE)) * board[9][0].getTranslateX());
-
-        setupCameraZoomHandler(camera);
-    }
-
-    /**
-     * Zooms the camera when the user scrolls the mousewheel.
-     * @param camera the camera for zooming.
-     */
-    private void setupCameraZoomHandler(Camera camera) {
-        editor_subscene.setOnScroll((ScrollEvent event) -> {
-            double deltaY = event.getDeltaY();
-
-            double zoomSpeed = 1.5;
-
-            double translation = deltaY * zoomSpeed;
-
-            Point3D pos = camera.localToScene(0, 0, translation);
-            camera.setTranslateX(pos.getX());
-            camera.setTranslateY(pos.getY());
-            camera.setTranslateZ(pos.getZ());
-
-            event.consume();
-        });
-    }
-
-    /**
-     * Sets the initial light for the board.
-     */
-    private void setupLight() {
-        AmbientLight al = new AmbientLight(Color.gray(0.4));
-        editor_board_group.getChildren().add(al);
-
-        // for some reason JavaFX doesn't support vector light/sunlight
-        SpotLight sl = new SpotLight(Color.gray(0.6));
-        editor_board_group.getChildren().add(sl);
-
-        sl.setTranslateX(boardCenter.getX());
-        sl.setTranslateY(boardCenter.getY());
-        sl.setTranslateZ(-7000);
+        new GameCamera(editor_subscene, boardCenter, -750);
+        Util.setupLight(editor_board_group, boardCenter);
     }
 
     /**
@@ -242,15 +174,14 @@ public class LevelEditorController extends Controller implements Initializable {
     }
 
     /**
-     * Generates the 20 x 20 field of the hexagons.
+     * Generates the 10 x 10 field of the hexagons.
      */
     private void setupBoard() {
-        // TODO: access data via state
         editorBoard.setupEmptyQuadrant(editor_board_group, resourceBundle);
 
         board = editorBoard.getBoard();
         boardCenter = new Point3D(
-                (board[4][0].getTranslateX() + board[5][0].getTranslateX()) / 2f,
+                (board[4][0].getTranslateX() + board[5][1].getTranslateX()) / 2f,
                 (board[0][4].getTranslateY() + board[0][5].getTranslateY()) / 2f,
                 Hexagon.HEXAGON_DEPTH
         );

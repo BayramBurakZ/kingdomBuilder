@@ -7,8 +7,6 @@ import javafx.scene.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.Priority;
@@ -21,8 +19,10 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gamelogic.PlayerColor;
 import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gui.GameCamera;
 import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.network.protocol.MyGameReply;
 import kingdomBuilder.reducers.BotReducer;
 import kingdomBuilder.reducers.GameReducer;
@@ -37,15 +37,6 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
-    /**
-     * Represents the setting for the field of view (fov).
-     */
-    private static final double FOV = 50.0;
-
-    /**
-     * Represents the angle for the camera.
-     */
-    private static final double VIEW_ANGLE = 30.0;
 
     //region FXML-Imports
 
@@ -412,8 +403,8 @@ public class GameViewController extends Controller implements Initializable {
     private void onGameMapChanged(KBState kbState) {
         if (kbState.gameMap() != null && !hasMap) {
             setupGameBoard(kbState.gameMap());
-            setupCamera();
-            setupLight();
+            new GameCamera(game_subscene, boardCenter, -300);
+            Util.setupLight(gameBoard_group, boardCenter);
             hasMap = true;
         }
     }
@@ -549,97 +540,6 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sets the initial light for the board.
-     */
-    private void setupLight() {
-        AmbientLight al = new AmbientLight(Color.gray(0.4));
-        gameBoard_group.getChildren().add(al);
-
-        // for some reason JavaFX doesn't support vector light/sunlight
-        SpotLight sl = new SpotLight(Color.gray(0.6));
-        gameBoard_group.getChildren().add(sl);
-
-        sl.setTranslateX(boardCenter.getX());
-        sl.setTranslateY(boardCenter.getY());
-        sl.setTranslateZ(-7000);
-    }
-
-    /**
-     * Initializes the Camera for the subScene.
-     */
-    private void setupCamera() {
-        // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
-        PerspectiveCamera camera = new PerspectiveCamera(true);
-
-        camera.setFarClip(4096.0);
-        camera.setRotationAxis(new Point3D(1.0, 0, 0));
-        camera.setRotate(VIEW_ANGLE);
-        camera.setFieldOfView(FOV);
-        game_subscene.setCamera(camera);
-
-
-        // TODO: set initial camera position properly
-        camera.setTranslateX(boardCenter.getX());
-        camera.setTranslateY(
-                (1 + Math.sin(Math.toRadians(VIEW_ANGLE)) + Math.sin(Math.toRadians(FOV))) * boardCenter.getY());
-        camera.setTranslateZ(-Math.cos(Math.toRadians(VIEW_ANGLE)) * gameBoard.getBoard()[19][0].getTranslateX());
-
-        setupCameraHandlers(camera);
-    }
-
-    /**
-     * Setup all connected EventHandler.
-     *
-     * @param camera the camera for the handlers.
-     */
-    private void setupCameraHandlers(Camera camera) {
-        setupCameraZoomHandler(camera);
-        setupCameraScrollHandler(camera);
-    }
-
-    /**
-     * Zooms the camera when the user scrolls the mousewheel.
-     *
-     * @param camera the camera for zooming.
-     */
-    private void setupCameraZoomHandler(Camera camera) {
-        game_subscene.setOnScroll((ScrollEvent event) -> {
-            double deltaY = event.getDeltaY();
-
-            double zoomSpeed = 1.5;
-
-            double translation = deltaY * zoomSpeed;
-
-            Point3D pos = camera.localToScene(0, 0, translation);
-            camera.setTranslateX(pos.getX());
-            camera.setTranslateY(pos.getY());
-            camera.setTranslateZ(pos.getZ());
-
-            event.consume();
-        });
-    }
-
-    /**
-     * Translates the camera when the user presses the arrow keys.
-     *
-     * @param camera the camera to move.
-     */
-    private void setupCameraScrollHandler(Camera camera) {
-        game_subscene.setOnMouseEntered(event -> game_subscene.requestFocus());
-        // TODO: smoother scrolling
-        game_subscene.setOnKeyPressed((KeyEvent event) -> {
-            double scrollSpeed = 20.0;
-            switch (event.getCode()) {
-                case UP -> camera.setTranslateY(camera.getTranslateY() - scrollSpeed);
-                case DOWN -> camera.setTranslateY(camera.getTranslateY() + scrollSpeed);
-                case LEFT -> camera.setTranslateX(camera.getTranslateX() - scrollSpeed);
-                case RIGHT -> camera.setTranslateX(camera.getTranslateX() + scrollSpeed);
-            }
-            event.consume();
-        });
-    }
-
-    /**
      * Generates the 20 x 20 field of the hexagons.
      *
      * @param gameMap the map with all information.
@@ -649,7 +549,7 @@ public class GameViewController extends Controller implements Initializable {
 
         HexagonTile[][] board = gameBoard.getBoard();
         boardCenter = new Point3D(
-                (board[9][0].getTranslateX() + board[10][0].getTranslateX()) / 2f,
+                (board[9][0].getTranslateX() + board[10][1].getTranslateX()) / 2f,
                 (board[0][9].getTranslateY() + board[0][10].getTranslateY()) / 2f,
                 Hexagon.HEXAGON_DEPTH
         );
