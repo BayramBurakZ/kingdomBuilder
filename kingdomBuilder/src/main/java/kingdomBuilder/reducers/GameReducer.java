@@ -363,6 +363,15 @@ public class GameReducer extends Reducer<KBState> {
             state.setNextPlayer(currentPlayer.ID);
             state.setCurrentPlayer(currentPlayer);
             state.setGameStarted(true);
+
+            if(!oldState.Bots().isEmpty()){
+                for(Client client : oldState.Bots().keySet())
+                    oldState.Bots().get(client).setWinConditions(
+                            oldState.winConditions().get(0),
+                            oldState.winConditions().get(1),
+                            oldState.winConditions().get(2)
+                    );
+            }
         }
         return state;
     }

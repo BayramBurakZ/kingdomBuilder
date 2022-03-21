@@ -487,51 +487,61 @@ public class Game {
                     int tmp = scoreLord(gameMap, player);
                     //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case MINER -> {
                     int tmp = scoreMiner(gameMap, player);
                     //System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case FARMER -> {
                     int tmp = scoreFarmer(gameMap, player);
                     //System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case FISHER -> {
                     int tmp = scoreFisher(gameMap, player);
                     //System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case KNIGHT -> {
                     int tmp = scoreKnight(gameMap, player);
                     //System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case WORKER -> {
                     int tmp = scoreWorker(gameMap, player);
                     //System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case CITIZEN -> {
                     int tmp = scoreCitizen(gameMap, player);
                     //System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case EXPLORER -> {
                     int tmp = scoreExplorer(gameMap, player);
                     //System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case MERCHANT -> {
                     int tmp = scoreMerchant(gameMap, player);
                     //System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
                 case ANCHORITE -> {
                     int tmp = scoreAnchorite(gameMap, player);
                     //System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
                     score += tmp;
+                    break;
                 }
             }
         }

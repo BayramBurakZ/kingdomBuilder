@@ -18,6 +18,7 @@ import java.util.List;
 
 //TODO: DELETE BOT WHEN GAME IS  FINISHED
 public class BotReducer extends Reducer<KBState> {
+
     public static final String CONNECT_BOT = "CONNECT_BOT";
     public static final String START_TURN_BOT = "START_TURN_BOT";
 
@@ -49,12 +50,13 @@ public class BotReducer extends Reducer<KBState> {
         */
         client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(START_TURN_BOT, client));
 
+
         client.login("AI");
         client.loadNamespace();
         client.joinGame(oldState.client().getGameId());
 
         //TODO: make difficulty changeable
-        oldState.Bots().put(client, new AIGame(oldState.gameMap(),0 ));
+        oldState.Bots().put(client, new AIGame(oldState.gameMap(), 1));
 
         state.setBots(oldState.Bots());
         return state;
@@ -65,16 +67,16 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState onStartTurnBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        if(client.getClientId() == oldState.nextPlayer()
+        if (client.getClientId() == oldState.nextPlayer()
                 && oldState.Bots().containsKey(client)
-                && oldState.Bots().get(client).aiPlayer.getRemainingSettlementsOfTurn() > 0){
-            List<Tile> moves= oldState.Bots().get(client).randomPlacement(oldState.nextTerrainCard(), oldState.gameMap());
+                && oldState.Bots().get(client).aiPlayer.getRemainingSettlementsOfTurn() > 0) {
+            List<Tile> moves = oldState.Bots().get(client).chooseAI(oldState.nextTerrainCard());
 
             for (Tile t : moves) {
                 client.placeSettlement(t.x, t.y);
             }
             client.endTurn();
-            }
+        }
 
         return state;
     }

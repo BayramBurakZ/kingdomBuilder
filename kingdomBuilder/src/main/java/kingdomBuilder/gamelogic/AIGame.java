@@ -2,15 +2,16 @@ package kingdomBuilder.gamelogic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AIGame {
 
     private GameMap gameMap;
     public Player aiPlayer;
 
-    private WinCondition firstWinCondition;
-    private WinCondition secondWinCondition;
-    private WinCondition thirdWinCondition;
+    private List<WinCondition> winConditions;
 
     private int difficulty;
 
@@ -19,7 +20,17 @@ public class AIGame {
         this.difficulty = difficulty;
     }
 
-    public List<Tile> randomPlacement(TileType terrain, GameMap gameMap) {
+
+    public List<Tile> chooseAI(TileType terrain) {
+        switch (difficulty) {
+            case 1:
+                return greedyPlacement(terrain);
+            default:
+                return randomPlacement(terrain);
+        }
+    }
+
+    public List<Tile> randomPlacement(TileType terrain) {
         // TODO: THIS gets triggered twice per AI ?
 
         List<Tile> moves = new ArrayList(3);
@@ -38,6 +49,70 @@ public class AIGame {
         return moves;
     }
 
+    public List<Tile> greedyPlacement(TileType terrain) {
+        GameMap aiGameMap = new GameMap(gameMap);
+        List<Tile> moves = new ArrayList<>();
+
+        boolean firstMoveOnSpecialPlace = false;
+
+        /*
+        Set<Tile> freeToken = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).filter(
+                t -> !t.surroundingTiles(aiGameMap).filter(
+                            l -> TileType.tokenType.contains(t.tileType)).collect(Collectors.toSet()).isEmpty()
+                ).collect(Collectors.toSet());
+
+        for (Tile t : freeToken) {
+            System.out.println("free token added!");
+            if (!t.hasSurroundingSettlement(aiGameMap, aiPlayer)) {
+                moves.add(t);
+                aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
+                break;
+            }
+        }
+
+         */
+
+        int currentScore = 0;
+        int bestScore = 0;
+        Tile bestTile = null;
+
+        for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
+            if (firstMoveOnSpecialPlace) {
+                firstMoveOnSpecialPlace = false;
+                continue;
+            }
+
+            Set<Tile> freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
+
+            for (Tile t : freeTiles) {
+                aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
+                currentScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions);
+                aiGameMap.at(t.x, t.y).removeSettlement();
+
+                if (currentScore >= bestScore) {
+                    bestScore = currentScore;
+                    bestTile = t;
+                }
+            }
+
+            System.out.println(bestScore + " Player = " + aiPlayer.ID);
+            aiGameMap.at(bestTile.x, bestTile.y).placeSettlement(aiPlayer);
+            moves.add(bestTile);
+            bestScore = 0;
+            bestTile = null;
+        }
+
+
+        /*
+        for( TileType token : aiPlayer.getTokens().keySet()){
+
+        }
+            TODO: greedy with token.
+
+         */
+        return moves;
+    }
+
     public void setAiPlayer(Player aiPlayer) {
         this.aiPlayer = aiPlayer;
     }
@@ -45,9 +120,10 @@ public class AIGame {
     public void setWinConditions(WinCondition firstWinCondition, WinCondition secondWinCondition,
                                  WinCondition thirdWinCondition) {
 
-        this.firstWinCondition = firstWinCondition;
-        this.secondWinCondition = secondWinCondition;
-        this.thirdWinCondition = thirdWinCondition;
+        winConditions = new ArrayList<>();
+        winConditions.add(firstWinCondition);
+        winConditions.add(secondWinCondition);
+        winConditions.add(thirdWinCondition);
     }
 }
 
@@ -56,7 +132,7 @@ public class AIGame {
 //// Temporary storage for methods that will be relevant for AI players later on
 //public class AIGame extends Game {
 //
-//    /**
+//    /**s
 //     * Throws if it's not the given player's turn.
 //     *
 //     * @param player the player to check if it's their turn.
