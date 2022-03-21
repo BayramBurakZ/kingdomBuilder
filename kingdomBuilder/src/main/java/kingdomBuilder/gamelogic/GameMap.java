@@ -12,6 +12,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -55,8 +56,9 @@ public class GameMap implements Iterable<Tile> {
      * @param gameMap The Map to copy.
      */
     public GameMap(GameMap gameMap) {
-        tiles = Arrays.copyOf(gameMap.tiles, gameMap.tiles.length);
-        tileSet = gameMap.tileSet;
+
+        tiles = Arrays.stream(gameMap.tiles).map(tile -> new Tile(tile)).toArray(Tile[]::new);
+        tileSet = gameMap.tileSet.stream().map(tile -> new Tile(tile)).collect(Collectors.toSet());
         quadrantWidth = gameMap.quadrantWidth;
         mapWidth = gameMap.mapWidth;
         startingTokenCount = gameMap.startingTokenCount;

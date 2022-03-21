@@ -14,12 +14,12 @@ import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
+
+//TODO: DELETE BOT WHEN GAME IS  FINISHED
 public class BotReducer extends Reducer<KBState> {
     public static final String CONNECT_BOT = "CONNECT_BOT";
     public static final String START_TURN_BOT = "START_TURN_BOT";
-    public static final String PLACE_BOT = "PLACE_BOT";
 
     /**
      * Constructs a new BotReducer and registers himself.
@@ -53,38 +53,30 @@ public class BotReducer extends Reducer<KBState> {
         client.loadNamespace();
         client.joinGame(oldState.client().getGameId());
 
-        oldState.Bots().add(client);
+        //TODO: make difficulty changeable
+        oldState.Bots().put(client, new AIGame(oldState.gameMap(),0 ));
+
         state.setBots(oldState.Bots());
         return state;
     }
+
 
     @Reduce(action = START_TURN_BOT)
     public DeferredState onStartTurnBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        if (client.getClientId() == oldState.nextPlayer())
-            AIGame.randomPlacement(oldState.gameMap(), oldState.currentPlayer(), oldState.nextTerrainCard(), store);
+        if(client.getClientId() == oldState.nextPlayer()
+                && oldState.Bots().containsKey(client)
+                && oldState.Bots().get(client).aiPlayer.getRemainingSettlementsOfTurn() > 0){
+            List<Tile> moves= oldState.Bots().get(client).randomPlacement(oldState.nextTerrainCard(), oldState.gameMap());
+
+            for (Tile t : moves) {
+                client.placeSettlement(t.x, t.y);
+            }
+            client.endTurn();
+            }
 
         return state;
     }
 
-    @Reduce(action = PLACE_BOT)
-    public DeferredState placeBot(Store<KBState> unused, KBState oldState, List<Tile> moves) {
-        DeferredState state = new DeferredState(oldState);
-
-        Client bot = null;
-        for (Client c : oldState.Bots()) {
-            if (c.getClientId() == oldState.nextPlayer())
-                bot = c;
-        }
-
-        if (bot == null) return state;
-
-        for (Tile t : moves) {
-            bot.placeSettlement(t.x, t.y);
-        }
-        bot.endTurn();
-
-        return state;
-    }
 }

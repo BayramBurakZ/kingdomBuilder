@@ -1,40 +1,55 @@
 package kingdomBuilder.gamelogic;
 
-
-import kingdomBuilder.KBState;
-import kingdomBuilder.reducers.BotReducer;
-import kingdomBuilder.redux.Store;
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class AIGame {
 
-    public static void randomPlacement(GameMap gameMap, Player player, TileType tileType, Store<KBState> store) {
-        // add Tokens somehow
-        GameMap AIMap = new GameMap(gameMap);
-        List<Tile> plannedMoves = new ArrayList<>();
+    private GameMap gameMap;
+    public Player aiPlayer;
 
-        for (int i = 0; i < player.remainingSettlementsOfTurn; i++) {
+    private WinCondition firstWinCondition;
+    private WinCondition secondWinCondition;
+    private WinCondition thirdWinCondition;
 
-            List<Tile> placeable = AIMap.getAllPlaceableTiles(player, tileType).toList();
+    private int difficulty;
+
+    public AIGame(GameMap gameMap, int difficulty) {
+        this.gameMap = gameMap;
+        this.difficulty = difficulty;
+    }
+
+    public List<Tile> randomPlacement(TileType terrain, GameMap gameMap) {
+        // TODO: THIS gets triggered twice per AI ?
+
+        List<Tile> moves = new ArrayList(3);
+        GameMap aiGameMap = new GameMap(gameMap);
+
+        for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
+
+            List<Tile> placeable = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).toList();
             int index = (int) (Math.random() * (placeable.size()));
             Tile t = placeable.get(index);
-            System.out.println(t.x + "|" + t.y + "| " + t.tileType);
-            plannedMoves.add(t);
-            AIMap.at(t.x, t.y).placeSettlement(player);
+
+            aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
+            moves.add(i, t);
         }
 
-        for (Tile t : plannedMoves)
-            t.removeSettlement();
+        return moves;
+    }
 
-        store.dispatch(BotReducer.PLACE_BOT, plannedMoves);
+    public void setAiPlayer(Player aiPlayer) {
+        this.aiPlayer = aiPlayer;
+    }
 
+    public void setWinConditions(WinCondition firstWinCondition, WinCondition secondWinCondition,
+                                 WinCondition thirdWinCondition) {
+
+        this.firstWinCondition = firstWinCondition;
+        this.secondWinCondition = secondWinCondition;
+        this.thirdWinCondition = thirdWinCondition;
     }
 }
-
 
 
 //import java.util.Set;

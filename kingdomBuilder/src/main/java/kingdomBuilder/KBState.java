@@ -83,7 +83,7 @@ public record KBState(SceneLoader sceneLoader,
                       String serverVersion,
                       Map<Integer, List<Integer>> playersOfGame,
                       InetSocketAddress serverAddress,
-                      List<Client> Bots
+                      Map<Client, AIGame> Bots
 ) {
 
     //TODO: JavaDoc!
@@ -122,7 +122,7 @@ public record KBState(SceneLoader sceneLoader,
                 null,
                 new HashMap<>(),
                 null,
-                new ArrayList<>()
+                new HashMap<>()
         );
     }
 }

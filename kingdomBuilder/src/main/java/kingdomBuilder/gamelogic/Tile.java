@@ -33,6 +33,20 @@ public class Tile {
     protected int remainingTokens;
 
     /**
+     * Creates a copy of a tile.
+     * @param tile The tile to copy.
+     */
+    public Tile(Tile tile) {
+
+        this.x = tile.x;
+        this.y = tile.y;
+        this.tileType = tile.tileType;
+
+        this.occupiedBy = tile.occupiedBy;
+        this.remainingTokens = tile.remainingTokens;
+    }
+
+    /**
      * Constructs a new TileReadOnly object with the given coordinate, the TileType and the amount of tokens.
      *
      * @param x               the x-coordinate.

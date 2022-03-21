@@ -152,6 +152,11 @@ public class GameReducer extends Reducer<KBState> {
                     Game.DEFAULT_STARTING_SETTLEMENTS);
             playerGame.add(p);
             playerMap.put(cd.clientId(), p);
+
+            for( Client client : oldState.Bots().keySet()){
+                if(client.getClientId() == pd.clientId())
+                    oldState.Bots().get(client).setAiPlayer(p);
+            }
         }
 
         state.setPlayers(playerGame);
