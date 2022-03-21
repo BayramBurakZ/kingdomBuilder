@@ -1,9 +1,12 @@
 package kingdomBuilder.gui;
 
+import javafx.animation.AnimationTimer;
+import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.SubScene;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.transform.Transform;
 
@@ -26,6 +29,36 @@ public class GameCamera extends PerspectiveCamera {
      * Represents the SubScene using the camera.
      */
     private final SubScene subScene;
+
+    /**
+     * Handles scrolling based on the up-arrow key.
+     */
+    private boolean dragUpPressed;
+
+    /**
+     * Handles scrolling based on the down-arrow key.
+     */
+    private boolean dragDownPressed;
+
+    /**
+     * Handles scrolling based on the left-arrow key.
+     */
+    private boolean dragLeftPressed;
+
+    /**
+     * Handles scrolling based on the right-arrow key.
+     */
+    private boolean dragRightPressed;
+
+    /**
+     * Handles scrolling based on the horizontal mouse movement.
+     */
+    private double dragPreviousX;
+
+    /**
+     * Handles scrolling based on the vertical mouse movement.
+     */
+    private double dragPreviousY;
 
     /**
      * Constructs a new GameCamera and sets the specified SubScene to use it.
@@ -98,17 +131,73 @@ public class GameCamera extends PerspectiveCamera {
      * Translates the camera when the user presses the arrow keys.
      */
     private void setupScrollHandler() {
-        subScene.setOnMouseEntered(event -> subScene.requestFocus());
-        // TODO: smoother scrolling
-        subScene.setOnKeyPressed((KeyEvent event) -> {
-            double scrollSpeed = 20.0;
-            switch (event.getCode()) {
-                case UP -> setTranslateY(getTranslateY() - scrollSpeed);
-                case DOWN -> setTranslateY(getTranslateY() + scrollSpeed);
-                case LEFT -> setTranslateX(getTranslateX() - scrollSpeed);
-                case RIGHT -> setTranslateX(getTranslateX() + scrollSpeed);
+        AnimationTimer scrolling = new AnimationTimer() {
+            private long previousTime;
+
+            @Override
+            public void handle(long l) {
+                // converting given time from nanoseconds (10^-9 s) into seconds
+                double deltaTime = (l - previousTime) * 1e-9;
+                previousTime = l;
+
+                // restrict scroll speed based on passed time since last frame to some reasonable amount
+                double scrollSpeed = 0.08 * Math.max(deltaTime, 0.1) * Math.abs(getTranslateZ());
+
+                // this is a little awkward with java booleans, getting the direction based on held arrow keys
+                Point2D direction = new Point2D(
+                        (dragRightPressed ? 1 : 0) + (dragLeftPressed ? -1 : 0),
+                        (dragDownPressed ? 1 : 0) + (dragUpPressed ? -1 : 0)).normalize();
+                setTranslateX(getTranslateX() + direction.getX() * scrollSpeed);
+                setTranslateY(getTranslateY() + direction.getY() * scrollSpeed);
             }
-            event.consume();
+
+            @Override
+            public void start() {
+                super.start();
+                previousTime = System.nanoTime();
+            }
+        };
+
+        subScene.setOnKeyPressed(keyEvent -> {
+            switch (keyEvent.getCode()) {
+                case UP -> dragUpPressed = true;
+                case DOWN -> dragDownPressed = true;
+                case LEFT -> dragLeftPressed = true;
+                case RIGHT -> dragRightPressed = true;
+            }
+            scrolling.start();
+            keyEvent.consume();
+        });
+
+        subScene.setOnKeyReleased(keyEvent -> {
+            switch (keyEvent.getCode()) {
+                case UP -> dragUpPressed = false;
+                case DOWN -> dragDownPressed = false;
+                case LEFT -> dragLeftPressed = false;
+                case RIGHT -> dragRightPressed = false;
+            }
+            if (!(dragUpPressed || dragDownPressed || dragLeftPressed || dragRightPressed)) {
+                scrolling.stop();
+            }
+            keyEvent.consume();
+        });
+
+        subScene.setOnMousePressed(mouseEvent -> {
+            subScene.requestFocus();
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                dragPreviousX = mouseEvent.getSceneX();
+                dragPreviousY = mouseEvent.getSceneY();
+            }
+        });
+
+        subScene.setOnMouseDragged(mouseEvent -> {
+            double scrollSpeed = 0.0015 * Math.abs(getTranslateZ());
+            if (mouseEvent.getButton() == MouseButton.SECONDARY) {
+                setTranslateX(getTranslateX() + (mouseEvent.getSceneX() - dragPreviousX) * -scrollSpeed);
+                setTranslateY(getTranslateY() + (mouseEvent.getSceneY() - dragPreviousY) * -scrollSpeed);
+                dragPreviousX = mouseEvent.getSceneX();
+                dragPreviousY = mouseEvent.getSceneY();
+            }
         });
     }
 }

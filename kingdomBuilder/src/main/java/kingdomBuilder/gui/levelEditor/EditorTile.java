@@ -43,32 +43,25 @@ public class EditorTile extends Tile {
             }
 
             TileType tmp = levelEditorController.getTileTypeFromCombobox();
-
-            tileType = tmp;
-
-            PhongMaterial mat = MaterialLoader.getMaterial(tmp);
-            hexagon.setMaterial(mat);
-        });
-
-        /*
-        // failed attempt to paint the terrain instead of clicking everytime
-
-        setOnMouseEntered(event -> {
-            if (event.isPrimaryButtonDown())
-                System.out.println("links");
-            if (event.isSecondaryButtonDown())
-                System.out.println("rechts");
-
-            if (event.isPrimaryButtonDown()) {
-                Game.TileType tmp = levelEditorController.getTileTypeFromCombobox();
-
+            if (tmp != null)  {
                 tileType = tmp;
-
                 PhongMaterial mat = MaterialLoader.getMaterial(tmp);
                 hexagon.setMaterial(mat);
             }
         });
-        */
 
+        // requires startFullDrag() in containing scene's OnDragDetected event
+        setOnMouseDragEntered(mouseDragEvent -> {
+            if (!mouseDragEvent.isPrimaryButtonDown()) {
+                return;
+            }
+
+            TileType tmp = levelEditorController.getTileTypeFromCombobox();
+            if (tmp != null)  {
+                tileType = tmp;
+                PhongMaterial mat = MaterialLoader.getMaterial(tmp);
+                hexagon.setMaterial(mat);
+            }
+        });
     }
 }

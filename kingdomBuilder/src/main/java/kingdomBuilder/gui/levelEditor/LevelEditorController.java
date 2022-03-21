@@ -185,6 +185,11 @@ public class LevelEditorController extends Controller implements Initializable {
                 (board[0][4].getTranslateY() + board[0][5].getTranslateY()) / 2f,
                 Hexagon.HEXAGON_DEPTH
         );
+
+        // required for dragging cursor over tiles to paint
+        editor_subscene.setOnDragDetected(mouseEvent -> {
+            editor_subscene.startFullDrag();
+        });
     }
 
     /**
@@ -228,42 +233,26 @@ public class LevelEditorController extends Controller implements Initializable {
      * @return The tile type as enum.
      */
     private TileType stringToTileType(String tileTypeString) {
-        switch (tileTypeString) {
-            case "Canyon":
-                return TileType.CANYON;
-            case "Desert":
-                return TileType.DESERT;
-            case "Flower":
-                return TileType.FLOWER;
-            case "Forest":
-                return TileType.FORREST;
-            case "Gras":
-                return TileType.GRAS;
-            case "Mountain":
-                return TileType.MOUNTAIN;
-            case "Water":
-                return TileType.WATER;
-            case "Castle":
-                return TileType.CASTLE;
-            case "Barn":
-                return TileType.BARN;
-            case "Farm":
-                return TileType.FARM;
-            case "Harbor":
-                return TileType.HARBOR;
-            case "Oasis":
-                return TileType.OASIS;
-            case "Oracle":
-                return TileType.ORACLE;
-            case "Paddock":
-                return TileType.PADDOCK;
-            case "Tavern":
-                return TileType.TAVERN;
-            case "Tower":
-                return TileType.TOWER;
-            default:
-                throw new InvalidParameterException("String doesn't match to Tile type.");
-        }
+        if (tileTypeString == null) return null;
+        return switch (tileTypeString) {
+            case "Canyon" -> TileType.CANYON;
+            case "Desert" -> TileType.DESERT;
+            case "Flower" -> TileType.FLOWER;
+            case "Forest" -> TileType.FORREST;
+            case "Gras" -> TileType.GRAS;
+            case "Mountain" -> TileType.MOUNTAIN;
+            case "Water" -> TileType.WATER;
+            case "Castle" -> TileType.CASTLE;
+            case "Barn" -> TileType.BARN;
+            case "Farm" -> TileType.FARM;
+            case "Harbor" -> TileType.HARBOR;
+            case "Oasis" -> TileType.OASIS;
+            case "Oracle" -> TileType.ORACLE;
+            case "Paddock" -> TileType.PADDOCK;
+            case "Tavern" -> TileType.TAVERN;
+            case "Tower" -> TileType.TOWER;
+            default -> throw new InvalidParameterException("String doesn't match to Tile type.");
+        };
     }
 
     /**
