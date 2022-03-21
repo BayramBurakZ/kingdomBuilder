@@ -37,6 +37,8 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
+    public static final int MIN_CAMERA_DEPTH = -1500;
+    public static final int MAX_CAMERA_DEPTH = -250;
 
     //region FXML-Imports
 
@@ -403,7 +405,10 @@ public class GameViewController extends Controller implements Initializable {
     private void onGameMapChanged(KBState kbState) {
         if (kbState.gameMap() != null && !hasMap) {
             setupGameBoard(kbState.gameMap());
-            new GameCamera(game_subscene, boardCenter, -300);
+            HexagonTile[][] board = gameBoard.getBoard();
+            Point3D minPosition = new Point3D(board[0][0].getTranslateX(), board[0][0].getTranslateY(), MIN_CAMERA_DEPTH);
+            Point3D maxPosition = new Point3D(board[19][1].getTranslateX(), board[0][19].getTranslateY(), MAX_CAMERA_DEPTH);
+            new GameCamera(game_subscene, minPosition, maxPosition, boardCenter, -300);
             Util.setupLight(gameBoard_group, boardCenter);
             hasMap = true;
         }

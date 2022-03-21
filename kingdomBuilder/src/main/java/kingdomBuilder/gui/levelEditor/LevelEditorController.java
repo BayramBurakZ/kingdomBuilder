@@ -15,6 +15,7 @@ import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.GameCamera;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
+import kingdomBuilder.gui.gameboard.HexagonTile;
 import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.redux.Store;
 
@@ -36,6 +37,8 @@ public class LevelEditorController extends Controller implements Initializable {
      * Represents the limit for special places in one quadrant defined by the server.
      */
     private static final int SPECIAL_LIMIT = 3;
+    public static final int MIN_CAMERA_DEPTH = -1250;
+    public static final int MAX_CAMERA_DEPTH = -250;
 
     /**
      * Represents the root hBox.
@@ -115,7 +118,10 @@ public class LevelEditorController extends Controller implements Initializable {
         setupBoard();
         setupComboBox();
 
-        new GameCamera(editor_subscene, boardCenter, -750);
+        EditorTile[][] board = editorBoard.getBoard();
+        Point3D minPosition = new Point3D(board[0][0].getTranslateX(), board[0][0].getTranslateY(), MIN_CAMERA_DEPTH);
+        Point3D maxPosition = new Point3D(board[9][1].getTranslateX(), board[0][9].getTranslateY(), MAX_CAMERA_DEPTH);
+        new GameCamera(editor_subscene, minPosition, maxPosition, boardCenter, -750);
         Util.setupLight(editor_board_group, boardCenter);
     }
 

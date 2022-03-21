@@ -31,6 +31,16 @@ public class GameCamera extends PerspectiveCamera {
     private final SubScene subScene;
 
     /**
+     * Represents the lower x, y and z boundary of the camera's view position.
+     */
+    private final Point3D minPosition;
+
+    /**
+     * Represents the upper x, y and z boundary of the camera's view position.
+     */
+    private final Point3D maxPosition;
+
+    /**
      * Handles scrolling based on the up-arrow key.
      */
     private boolean dragUpPressed;
@@ -64,19 +74,24 @@ public class GameCamera extends PerspectiveCamera {
      * Constructs a new GameCamera and sets the specified SubScene to use it.
      * The initial position of the camera is set to look at the specified position on the board.
      * @param subScene the SubScene using the camera.
+     * @param minPosition the lower boundary regarding the (x,y)-viewpoint on the board and the z-depth of the camera.
+     * @param maxPosition the upper boundary regarding the (x,y)-viewpoint on the board and the z-depth of the camera.
      * @param boardPosition the initial position the camera should look at on the board.
      * @param initialZoom the initial zoom of the camera.
      */
-    public GameCamera(SubScene subScene, Point3D boardPosition, double initialZoom) {
+    public GameCamera(SubScene subScene, Point3D minPosition, Point3D maxPosition, Point3D boardPosition, double initialZoom) {
         // fixedEyeAtCameraZero has to be true or a change in the window's aspect ratio modifies the FOV
         super(true);
+
+        this.subScene = subScene;
+        this.minPosition = minPosition;
+        this.maxPosition = maxPosition;
 
         setFarClip(4096.0);
         setRotationAxis(new Point3D(1.0, 0, 0));
         setRotate(VIEW_ANGLE);
         setFieldOfView(FOV);
         subScene.setCamera(this);
-        this.subScene = subScene;
 
         // calculates the initial position of the camera considering the view angle and FOV using the law of sines
         double ang1 = Math.toRadians(VIEW_ANGLE - FOV/2d);
@@ -123,6 +138,7 @@ public class GameCamera extends PerspectiveCamera {
             setTranslateY(pos.getY());
             setTranslateZ(pos.getZ());
 
+            clampPositionToBounds();
             event.consume();
         });
     }
@@ -149,6 +165,8 @@ public class GameCamera extends PerspectiveCamera {
                         (dragDownPressed ? 1 : 0) + (dragUpPressed ? -1 : 0)).normalize();
                 setTranslateX(getTranslateX() + direction.getX() * scrollSpeed);
                 setTranslateY(getTranslateY() + direction.getY() * scrollSpeed);
+
+                clampPositionToBounds();
             }
 
             @Override
@@ -197,7 +215,47 @@ public class GameCamera extends PerspectiveCamera {
                 setTranslateY(getTranslateY() + (mouseEvent.getSceneY() - dragPreviousY) * -scrollSpeed);
                 dragPreviousX = mouseEvent.getSceneX();
                 dragPreviousY = mouseEvent.getSceneY();
+
+                clampPositionToBounds();
             }
         });
+    }
+
+    /**
+     * Checks if the camera's position is outside its boundaries and clamps it to the border if so.
+     */
+    private void clampPositionToBounds() {
+        Transform t = getLocalToSceneTransform();
+        Point3D forward = new Point3D(t.getMxz(), t.getMyz(), t.getMzz());
+        // find intersection point of view line and board (z = 0) based on view angle (using forward vector)
+        Point2D viewPoint = new Point2D(
+                getTranslateX(),
+                -getTranslateZ() * (forward.getY() / forward.getZ()) + getTranslateY());
+
+        // clamp camera into bounds
+        if (viewPoint.getX() < minPosition.getX()) {
+            setTranslateX(minPosition.getX());
+        } else if (viewPoint.getX() > maxPosition.getX()) {
+            setTranslateX(maxPosition.getX());
+        }
+
+        if (viewPoint.getY() < minPosition.getY()) {
+            // offsetY describes how far out of bounds the camera's y position is
+            double offsetY = viewPoint.getY() - minPosition.getY();
+            setTranslateY(getTranslateY() - offsetY);
+        } else if (viewPoint.getY() > maxPosition.getY()) {
+            double offsetY = viewPoint.getY() - maxPosition.getY();
+            setTranslateY(getTranslateY() - offsetY);
+        }
+
+        if (getTranslateZ() < minPosition.getZ()) {
+            double offsetZ = getTranslateZ() - minPosition.getZ();
+            setTranslateY(getTranslateY() - (forward.getY() / forward.getZ()) * offsetZ);
+            setTranslateZ(minPosition.getZ());
+        } else if (getTranslateZ() > maxPosition.getZ()) {
+            double offsetZ = getTranslateZ() - maxPosition.getZ();
+            setTranslateY(getTranslateY() - (forward.getY() / forward.getZ()) * offsetZ);
+            setTranslateZ(maxPosition.getZ());
+        }
     }
 }
