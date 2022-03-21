@@ -4,11 +4,8 @@ import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
-import kingdomBuilder.reducers.ApplicationReducer;
+import kingdomBuilder.reducers.*;
 import kingdomBuilder.network.internal.ClientSelectorImpl;
-import kingdomBuilder.reducers.BotReducer;
-import kingdomBuilder.reducers.ChatReducer;
-import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
@@ -25,7 +22,6 @@ public class KingdomBuilderApplication extends Application {
      */
     private Store<KBState> store;
 
-
     /**
      * Represents the SceneLoader that contains all Views and Controllers.
      */
@@ -41,6 +37,7 @@ public class KingdomBuilderApplication extends Application {
                 new ApplicationReducer(),
                 new ChatReducer(),
                 new GameReducer(),
+                new RootReducer(),
                 new BotReducer()
         );
     }

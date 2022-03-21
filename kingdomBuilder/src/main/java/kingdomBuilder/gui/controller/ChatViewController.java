@@ -14,9 +14,9 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.WinCondition;
-import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.*;
 import kingdomBuilder.reducers.ChatReducer;
+import kingdomBuilder.reducers.RootReducer;
 import kingdomBuilder.redux.Store;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -50,6 +50,12 @@ public class ChatViewController extends Controller implements Initializable {
     private final List<ClientData> clients = new ArrayList<>();
 
     //region FXML-Imports
+
+    /**
+     * Represents the button to kick a client.
+     */
+    @FXML
+    private Button chatview_button_kick;
 
     /**
      * Represents the table for the clients on the server.
@@ -181,6 +187,7 @@ public class ChatViewController extends Controller implements Initializable {
         store.subscribe(this::onScoresChanged, "scores");
         store.subscribe(this::onWinConditionsChanged, "winConditions");
         store.subscribe(this::onServerVersionChanged, "serverVersion");
+        store.subscribe(this::onClientStatusChanged, "clientState");
     }
 
     /**
@@ -276,6 +283,36 @@ public class ChatViewController extends Controller implements Initializable {
             turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
     }
 
+    /**
+     * Sends a chat message when the player gain the root state or the player failed to get it.
+     * @param kbState the current state.
+     */
+    private void onClientStatusChanged(KBState kbState) {
+        //for the rare case something is broken
+        if (kbState.clientState() == null) return;
+
+        switch ( kbState.clientState()) {
+            case NO_ROOT -> {}
+            case ERROR -> {
+                String text = resourceBundle.getString("invalidPassword");
+                globalChatAppendElement(
+                        createMessage(MessageStyle.CLIENT,
+                        createHTMLElement(text, null)));
+                store.dispatch(RootReducer.RESET_STATUS, null);
+            }
+            case ROOT -> {
+                chatview_button_kick.setVisible(true);
+                globalChatAppendElement(
+                        createMessage(MessageStyle.CLIENT,
+                        createHTMLElement("You are (g)root!", null)));
+            }
+        }
+    }
+
+    /**
+     * Sends a message in the game log with a description of the win conditions for the current game.
+     * @param kbState the current state.
+     */
     private void onWinConditionsChanged(KBState kbState) {
         if (kbState.winConditions().isEmpty())
             return;
@@ -387,10 +424,13 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private void onConnect() {
         if (!isConnected) {
-            var elem = createHTMLElement(
+            globalChatAppendElement(createHTMLElement(
                     "<--- " + resourceBundle.getString("youAreConnected") + " --->",
-                    MessageStyle.SERVER);
-            globalChatAppendElement(elem);
+                    MessageStyle.SERVER));
+
+            globalChatAppendElement(createHTMLElement(
+                    "Type #help for further functions", MessageStyle.CLIENT));
+
         }
 
         chatview_textarea_chatinput.setDisable(false);
@@ -581,12 +621,58 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
+     * Processes every message which starts with '#'.
+     * @param command the entered command.
+     */
+    private void enteredCommand(String command) {
+        if (!command.startsWith("#")) {
+            return;
+        }
+
+        String[] strings = command.split(" ");
+        switch (strings[0]) {
+            case "#root" -> store.dispatch(RootReducer.SEND_ROOT, strings[1]);
+            case "#shutdown" -> {
+                if (store.getState().clientState() == KBState.ClientState.ROOT)
+                    store.dispatch(RootReducer.SHUTDOWN_SERVER, null);
+                else {
+                    globalChatAppendElement(createMessage(MessageStyle.CLIENT,
+                            createHTMLElement("Cannot shutdown server! You need to be root first!", null)));
+                }
+            }
+            case "#help" -> {
+                String line1 = "Following command are available:";
+                String line2 = "#help: to show this message";
+                String line3 = "#root <password>: enter the correct password to get the root state";
+                String line4 = "#shutdown: shutdown the server (only with root state)";
+
+                globalChatAppendElement(createMessage(
+                        MessageStyle.CLIENT,
+                        createHTMLElement(line1, null),
+                        createHTMLElementByTag("br"),
+                        createHTMLElement(line2, null),
+                        createHTMLElementByTag("br"),
+                        createHTMLElement(line3, null),
+                        createHTMLElementByTag("br"),
+                        createHTMLElement(line4, null)
+                ));
+            }
+        }
+    }
+
+    /**
      * Sends the message from the textarea to all clients in the current channel.
      */
     private void printAndSendMessage() {
         String message = chatview_textarea_chatinput.getText().trim();
         final String chatMessage = message;
         if (!message.isEmpty()) {
+            // process command for root that starts with a '#'
+            if (message.startsWith("#")) {
+                enteredCommand(message);
+                chatview_textarea_chatinput.clear();
+                return;
+            }
             List<Integer> receiverIds = new ArrayList<>();
 
             if (tab_global.isSelected()) {
@@ -629,6 +715,12 @@ public class ChatViewController extends Controller implements Initializable {
         String message = chatview_textarea_chatinput.getText().trim();
         String chatMessage;
         if (!message.isEmpty()) {
+            // process command for root that starts with a '#'
+            if (message.startsWith("#")) {
+                enteredCommand(message);
+                chatview_textarea_chatinput.clear();
+                return;
+            }
             List<Integer> receiverIds = new ArrayList<>();
 
             // don't send message to ourselves
@@ -695,7 +787,12 @@ public class ChatViewController extends Controller implements Initializable {
         /**
          * Text should be highlighted as a bold message.
          */
-        BOLD
+        BOLD,
+
+        /**
+         * Text should be highlighted as a client message.
+         */
+        CLIENT
     }
 
     /**
@@ -742,6 +839,12 @@ public class ChatViewController extends Controller implements Initializable {
         return main;
     }
 
+    /**
+     * Creates a HTML Element with the given text and style.
+     * @param textContent the text for the element.
+     * @param messageStyle the style.
+     * @return the finished element.
+     */
     private Node createHTMLElement(String textContent, MessageStyle messageStyle) {
         if (messageStyle == null) {
             // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
@@ -768,6 +871,7 @@ public class ChatViewController extends Controller implements Initializable {
             case GAME_CHAT -> createHTMLElementByTag("game");
             case WHISPER -> createHTMLElementByTag("whisper");
             case BOLD -> createHTMLElementByTag("b");
+            case CLIENT -> createHTMLElementByTag("client");
         };
     }
 
@@ -829,6 +933,21 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     //region Button-functions
+
+    /**
+     * Sets the functionality for the kick button.
+     */
+    @FXML
+    private void onKickButtonPressed() {
+        if (store.getState().clientState() != KBState.ClientState.ROOT) {
+            return;
+        }
+        if (tableview_chat.getSelectionModel().getSelectedItem() != null) {
+            int clientID = tableview_chat.getSelectionModel().getSelectedItem().clientId();
+            store.dispatch(RootReducer.KICK_CLIENT, clientID);
+        }
+
+    }
 
     /**
      * Sets the functionality for the clear selection button.

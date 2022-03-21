@@ -25,6 +25,7 @@ public class ProtocolDeserializer {
     private static final String SERVER_MESSAGE = "[SERVER_MESSAGE]";
     private static final String REPLY_MESSAGE = "[REPLY_MESSAGE]";
     private static final String GAME_MESSAGE = "[GAME_MESSAGE]";
+    private static final String ERROR_MESSAGE = "[ERROR_MESSAGE]";
 
     public static void deserialize(String rawPacket, ProtocolConsumer consumer) {
         // The protocol for packets sent by the server defines three sections:
@@ -34,7 +35,7 @@ public class ProtocolDeserializer {
         //
         // The split gives us these three sections.
         final String[] sections = rawPacket.split(" ", 3);
-        if(!sections[0].equals(SERVER_MESSAGE) && !sections[0].equals(REPLY_MESSAGE) && !sections[0].equals(GAME_MESSAGE)) {
+        if(!sections[0].equals(SERVER_MESSAGE) && !sections[0].equals(REPLY_MESSAGE) && !sections[0].equals(GAME_MESSAGE) && !sections[0].equals(ERROR_MESSAGE)) {
             consumer.onFailure(rawPacket);
             return;
         }

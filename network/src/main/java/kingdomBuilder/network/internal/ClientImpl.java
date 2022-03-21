@@ -300,8 +300,36 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void playersOfGame(int gameId) {
         final String command = ProtocolSerializer.serialize(new PlayersOfGameRequest(gameId));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void root(String password) {
+        final String command = ProtocolSerializer.serialize(new Root(password));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void kickClient(int clientID) {
+        final String command = ProtocolSerializer.serialize(new KickClient(clientID));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void shutdownServer() {
+        final String command = ProtocolSerializer.serialize(new ShutdownServer());
         trySendCommand(command);
     }
 
@@ -641,5 +669,10 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void accept(MyGameReply message) {
         onMyGameReply.dispatch(message);
+    }
+
+    @Override
+    public void accept(WrongPassword message) {
+        onWrongPassword.dispatch(message);
     }
 }

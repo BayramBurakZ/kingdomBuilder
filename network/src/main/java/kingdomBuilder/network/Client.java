@@ -300,6 +300,11 @@ public abstract class Client {
     public final Event<MyGameReply> onMyGameReply = new Event<>();
 
     /**
+     * Event that gets dispatched whenever a message is received that contains data of a game.
+     */
+    public final Event<WrongPassword> onWrongPassword = new Event<>();
+
+    /**
      * Constructs a new client object.
      */
     public Client() {
@@ -525,6 +530,21 @@ public abstract class Client {
      * Sends the ?playersofgame to the server.
      */
     public abstract void playersOfGame(int gameId);
+
+    /**
+     * Sends the root message to the server.
+     */
+    public abstract void root(String password);
+
+    /**
+     * Sends the kick client message to the server.
+     */
+    public abstract void kickClient(int clientId);
+
+    /**
+     * Sends the shutdown server message to the server.
+     */
+    public abstract void shutdownServer();
 
     /**
      * {@return whether the client has commands stored internally

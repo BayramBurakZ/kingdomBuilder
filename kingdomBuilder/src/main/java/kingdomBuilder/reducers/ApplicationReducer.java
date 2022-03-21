@@ -34,6 +34,10 @@ public class ApplicationReducer extends Reducer<KBState> {
     /**
      * Represents the String to identify the related reduce methode.
      */
+    public static final String NAMESPACE_LOADED = "NAMESPACE_LOADED";
+    /**
+     * Represents the String to identify the related reduce methode.
+     */
     public static final String SERVER_VERSION = "SERVER_VERSION";
 
 
@@ -95,6 +99,11 @@ public class ApplicationReducer extends Reducer<KBState> {
         client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
         client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
         client.onPlayersOfGameReply.subscribe(m -> store.dispatch(GameReducer.PLAYERS_OF_GAME, m));
+        client.onNamespaceLoaded.subscribe(m -> store.dispatch(NAMESPACE_LOADED, null));
+        // root stuff
+        client.onWrongPassword.subscribe(m -> store.dispatch(RootReducer.WRONG_PASSWORD, null));
+        client.onYouAreRoot.subscribe(m -> store.dispatch(RootReducer.ON_ROOT, null));
+
 
         client.onGamesReply.subscribe(m -> {
             for (GameData g : m.games()) {
@@ -144,7 +153,6 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         client.onQuadrantUploaded.subscribe(m ->{
             store.dispatch(NEW_QUADRANT_UPLOADED, m);
-            // TODO: maybe make a chat message that someone has uploaded a new quadrant
             client.quadrantRequest(m.quadrantId());
         });
 
@@ -179,7 +187,7 @@ public class ApplicationReducer extends Reducer<KBState> {
     }
 
     @Reduce(action = LOGIN)
-    public DeferredState onLogin(Store<KBState> unused, KBState oldState, Client unused2) {
+    public DeferredState onLogin(Store<KBState> unused, KBState oldState, Object unused2) {
         DeferredState state = new DeferredState(oldState);
         state.setIsConnecting(false);
         state.setIsConnected(true);
@@ -189,7 +197,6 @@ public class ApplicationReducer extends Reducer<KBState> {
         oldState.client().loadNamespace();
         oldState.client().clientsRequest();
         oldState.client().gamesRequest();
-        oldState.client().quadrantsRequest();
         return state;
     }
 
@@ -241,5 +248,22 @@ public class ApplicationReducer extends Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
         state.setServerVersion(version.serverVersion());
         return state;
+    }
+
+    /**
+     * Represents the reducer to send the '?quadrants' message always after the namespace is loaded.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param unused2 an object that is unused in this case.
+     *
+     * @return the deferredState.
+     */
+    @Reduce(action = NAMESPACE_LOADED)
+    public DeferredState onNameSpaceLoaded(Store<KBState> unused, KBState oldState, Object unused2) {
+        //This prevents the bug, that the server processes the '?quadrants' message before
+        // it starts to load the namespace.
+        oldState.client().quadrantsRequest();
+        return new DeferredState(oldState);
     }
 }

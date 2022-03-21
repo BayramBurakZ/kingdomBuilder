@@ -51,6 +51,8 @@ import java.util.Map;
  * @param serverVersion       represents a String with the version of the server.
  * @param playersOfGame       represents a map with the gameID and a list with all clientIDs.
  * @param serverAddress       represents the server address.
+ * @param Bots                represents the Map for the bots.
+ * @param clientState         represents the state of the client (Root or non-Root).
  */
 @State
 public record KBState(SceneLoader sceneLoader,
@@ -83,11 +85,11 @@ public record KBState(SceneLoader sceneLoader,
                       String serverVersion,
                       Map<Integer, List<Integer>> playersOfGame,
                       InetSocketAddress serverAddress,
-                      Map<Client, AIGame> Bots
+                      Map<Client, AIGame> Bots,
+                      ClientState clientState
 ) {
 
     //TODO: JavaDoc!
-
     /**
      * Initializes the state with initial value.
      */
@@ -122,7 +124,26 @@ public record KBState(SceneLoader sceneLoader,
                 null,
                 new HashMap<>(),
                 null,
-                new HashMap<>()
+                new HashMap<>(),
+                ClientState.NO_ROOT
         );
+    }
+
+    /**
+     * Represents the clientStatus.
+     */
+    public enum ClientState{
+        /**
+         * Represents the status when the client has not gained the root status yet.
+         */
+        NO_ROOT,
+        /**
+         * Represents the status when the client has gained the root status.
+         */
+        ROOT,
+        /**
+         * Represents the status when the client tried to get the root status but failed with a wrong password.
+         */
+        ERROR;
     }
 }

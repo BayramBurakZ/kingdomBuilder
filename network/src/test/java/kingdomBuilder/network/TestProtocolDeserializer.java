@@ -787,4 +787,13 @@ public class TestProtocolDeserializer {
         assertEquals(-1, typedPacket.turnLimit());
         assertEquals(expectedBoardData, typedPacket.boardData());
     }
+
+    @Test
+    void testDeserializingWrongPassword() {
+        final String packet = "[ERROR_MESSAGE] [WRONG_PASSWORD] <>";
+        ProtocolDeserializer.deserialize(packet, testConsumer);
+
+        assertFalse(testConsumer.hasError());
+        assertInstanceOf(WrongPassword.class, testConsumer.getObject());
+    }
 }

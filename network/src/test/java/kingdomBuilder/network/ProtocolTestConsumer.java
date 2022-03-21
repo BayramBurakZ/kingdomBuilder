@@ -93,6 +93,11 @@ public class ProtocolTestConsumer implements ProtocolConsumer {
     }
 
     @Override
+    public void accept(WrongPassword message) {
+        object = message;
+    }
+
+    @Override
     public void accept(PlayerLeft message) {
         object = message;
     }

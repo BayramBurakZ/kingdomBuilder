@@ -20,7 +20,7 @@ warning {
 }
 
 server {
-    color: lightgrey;
+    color: lightgray;
 }
 
 game {
@@ -29,4 +29,8 @@ game {
 
 whisper {
     color: orange;
+}
+
+client {
+    color: darkseagreen;
 }

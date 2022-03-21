@@ -14,7 +14,8 @@
 	<HBox alignment="CENTER">
 		<Label text="%clients" />
 		<Region HBox.hgrow="ALWAYS" />
-		<Button fx:id="chatview_button_clear" onAction="#onClearSelectionButtonPressed" text="%clearSelection" />
+		<Button fx:id="chatview_button_kick" visible="false" onAction="#onKickButtonPressed" text="Kick" />
+		<Button onAction="#onClearSelectionButtonPressed" text="%clearSelection" />
 	</HBox>
 
 	<TableView fx:id="tableview_chat" prefHeight="200.0" prefWidth="200.0">
