@@ -570,4 +570,54 @@ public class GameMap implements Iterable<Tile> {
             getSettlementGroup(tiles, player, t.x, t.y);
         });
     }
+
+    /**
+     * Computes the lowest number of settlements the player placed in each quadrant if the player has
+     * settlements in every quadrant.
+     *
+     * @param player the player as the owner of the settlements.
+     * @return lowest number of settlements the player placed in each quadrant.
+     */
+    public int fewestSettlementsInAllQuadrants(Player player) {
+        int lowestCount = 100;
+        int quadrant1 = 0;
+        int quadrant2 = 0;
+        int quadrant3 = 0;
+        int quadrant4 = 0;
+
+        //checking the top right quadrant
+        for(int i = 0; i < quadrantWidth; i++) {
+            for (int j = 0; j < quadrantWidth; j++){
+                //checking the top left quadrant
+                if(tiles[to1DIndexTopLeft(i, j, quadrantWidth)].occupiedBy() == player)
+                    quadrant1++;
+
+                //checking the top right quadrant
+                if(tiles[to1DIndexTopRight(i, j, quadrantWidth)].occupiedBy() == player)
+                    quadrant2++;
+
+                //checking the bottom left quadrant
+                if(tiles[to1DIndexBottomLeft(i, j, quadrantWidth)].occupiedBy() == player)
+                    quadrant3++;
+
+                //checking the bottom right quadrant
+                if(tiles[to1DIndexBottomRight(i, j, quadrantWidth)].occupiedBy() == player)
+                    quadrant4++;
+            }
+        }
+
+        if ((quadrant1 == 0) || (quadrant2 == 0) || (quadrant3 == 0) || (quadrant4 == 0))
+            return 0;
+
+        if(quadrant1 < lowestCount)
+            lowestCount = quadrant1;
+        if(quadrant2 < lowestCount)
+            lowestCount = quadrant2;
+        if(quadrant3 < lowestCount)
+            lowestCount = quadrant3;
+        if(quadrant4 < lowestCount)
+            lowestCount = quadrant4;
+
+        return lowestCount;
+    }
 }

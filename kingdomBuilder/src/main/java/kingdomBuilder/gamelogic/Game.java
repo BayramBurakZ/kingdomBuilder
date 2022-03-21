@@ -681,9 +681,18 @@ public class Game {
         return 0; // TODO: Implementation
     }
 
-    // TODO: JavaDoc
+    /**
+     * Calculates the score for the given player on the given map with the win condition "farmer".
+     * This win conditions gives one point for every settlement placed in the quadrant in which
+     * the fewest settlements of the player are placed. The condition to get the points is that in
+     * each quadrant is at least one settlement.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
+     * @return the score for the win condition "farmer".
+     */
     static int scoreFarmer(GameMap gameMap, Player player) {
-        return 0; // TODO: Implementation
+        return (gameMap.fewestSettlementsInAllQuadrants(player) * 3);
     }
 
     /**
