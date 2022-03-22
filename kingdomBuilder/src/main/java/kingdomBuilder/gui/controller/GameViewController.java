@@ -339,7 +339,8 @@ public class GameViewController extends Controller implements Initializable {
 
         // SCORE
         for (int i = 0; i < kbState.players().size(); i++) {
-            int score = Game.calculateScore(kbState.gameMap(), kbState.players().get(i), kbState.winConditions());
+            int score = Game.calculateScore(kbState.gameMap(), kbState.players().get(i),
+                    kbState.winConditions(), kbState.players());
             updateScoreForPlayer(i, score);
         }
     }

@@ -1,5 +1,8 @@
 package kingdomBuilder.gamelogic;
 
+import kingdomBuilder.KBState;
+import kingdomBuilder.redux.Store;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +33,10 @@ public class AIGame {
      */
     private int difficulty;
 
+    /**
+     * The store of the game.
+     */
+    private final Store<KBState> store;
 
     /**
      * the constructor for AIGame.
@@ -37,9 +44,10 @@ public class AIGame {
      * @param gameMap    the game map that is shared between all players.
      * @param difficulty the difficulty of the AI.
      */
-    public AIGame(GameMap gameMap, int difficulty) {
+    public AIGame(GameMap gameMap, int difficulty, Store<KBState> store) {
         this.gameMap = gameMap;
         this.difficulty = difficulty;
+        this.store = store;
     }
 
     /**
@@ -116,7 +124,7 @@ public class AIGame {
 
         // make basic turn
         int currentScore = 0;
-        int bestScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions);
+        int bestScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions, store.getState().players());
         Tile bestTile = null;
 
         for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
@@ -129,7 +137,7 @@ public class AIGame {
 
             for (Tile t : freeTiles) {
                 aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
-                currentScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions);
+                currentScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions, store.getState().players());
                 aiGameMap.at(t.x, t.y).removeSettlement();
 
                 if (currentScore >= bestScore) {
@@ -169,7 +177,8 @@ public class AIGame {
 
                 if (move != null) {
                     moves.add(move);
-                    System.out.println(aiPlayer.name + " is using token: " + t + " with: fromX:" + move.x + " fromY:" + move.y + " ToX:" + move.toX + " ToY:" + move.toY);
+                    System.out.println(aiPlayer.name + " is using token: " + t + " with: fromX:" + move.x + " fromY:"
+                            + move.y + " ToX:" + move.toX + " ToY:" + move.toY);
                     if (!(t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN))
                         settlementsLeft--;
                 }
@@ -194,19 +203,20 @@ public class AIGame {
 
         Set<Tile> freeTiles;
         int currentScore = 0;
-        int bestScore = Game.calculateScore(map, player, winConditions);
+        int bestScore = Game.calculateScore(map, player, winConditions, store.getState().players());
 
         switch (token) {
 
             case HARBOR -> {
-                Set<Tile> settlements = Game.allTokenHarborTiles(map, player, false).collect(Collectors.toSet());
+                Set<Tile> settlements =
+                        Game.allTokenHarborTiles(map, player, false).collect(Collectors.toSet());
 
                 for (Tile t : settlements) {
                     freeTiles = Game.allTokenHarborTiles(map, player, true).collect(Collectors.toSet());
 
                     for (Tile l : freeTiles) {
                         useTokenHarbor(map, player, t.x, t.y, l.x, l.y);
-                        currentScore = Game.calculateScore(map, player, winConditions);
+                        currentScore = Game.calculateScore(map, player, winConditions, store.getState().players());
 
                         if (currentScore > bestScore) {
                             bestScore = currentScore;
@@ -230,7 +240,7 @@ public class AIGame {
 
                     for (Tile l : freeTiles) {
                         useTokenPaddock(map, player, t.x, t.y, l.x, l.y);
-                        currentScore = Game.calculateScore(map, player, winConditions);
+                        currentScore = Game.calculateScore(map, player, winConditions, store.getState().players());
 
                         if (currentScore > bestScore) {
                             bestScore = currentScore;
@@ -248,14 +258,15 @@ public class AIGame {
             }
 
             case BARN -> {
-                Set<Tile> settlements = Game.allTokenBarnTiles(map, player, false).collect(Collectors.toSet());
+                Set<Tile> settlements =
+                        Game.allTokenBarnTiles(map, player, false).collect(Collectors.toSet());
 
                 for (Tile t : settlements) {
                     freeTiles = Game.allTokenBarnTiles(map, player, true).collect(Collectors.toSet());
 
                     for (Tile l : freeTiles) {
                         useTokenBarn(map, player, t.x, t.y, l.x, l.y);
-                        currentScore = Game.calculateScore(map, player, winConditions);
+                        currentScore = Game.calculateScore(map, player, winConditions, store.getState().players());
 
                         if (currentScore > bestScore) {
                             bestScore = currentScore;
@@ -285,7 +296,7 @@ public class AIGame {
 
                 for (Tile t : freeTiles) {
                     useToken(map, player, token, t.x, t.y);
-                    currentScore = Game.calculateScore(map, player, winConditions);
+                    currentScore = Game.calculateScore(map, player, winConditions, store.getState().players());
 
                     // always play a token
                     if (currentScore >= bestScore) {
@@ -561,17 +572,10 @@ public class AIGame {
     /**
      * set the win conditions of the game.
      *
-     * @param firstWinCondition  first win condition.
-     * @param secondWinCondition second win condition.
-     * @param thirdWinCondition  third win condition.
+     * @param winConditions the win conditions.
      */
-    public void setWinConditions(WinCondition firstWinCondition, WinCondition secondWinCondition,
-                                 WinCondition thirdWinCondition) {
-
-        winConditions = new ArrayList<>();
-        winConditions.add(firstWinCondition);
-        winConditions.add(secondWinCondition);
-        winConditions.add(thirdWinCondition);
+    public void setWinConditions(List<WinCondition> winConditions) {
+        this.winConditions = winConditions;
     }
 }
 

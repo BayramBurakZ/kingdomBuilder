@@ -477,10 +477,11 @@ public class Game {
      * @param gameMap       the map.
      * @param player        the player for which the score should be calculated.
      * @param winConditions the winConditions
+     * @param players       the players of the game.
      * @return the score for the specified player.
      */
-    // TODO: Call the method
-    public static int calculateScore(GameMap gameMap, Player player, List<WinCondition> winConditions) {
+    public static int calculateScore(GameMap gameMap, Player player, List<WinCondition> winConditions,
+                                     List<Player> players) {
         int score = 0;
         for (WinCondition c : winConditions) {
             switch (c) {

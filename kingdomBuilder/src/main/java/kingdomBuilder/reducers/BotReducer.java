@@ -53,6 +53,10 @@ public class BotReducer extends Reducer<KBState> {
         */
         //client.onYourTerrainCard.subscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
         store.subscribe(kbState -> store.dispatch(MAKE_TURN_BOT, client), "nextTerrainCard");
+        store.subscribe(kbState -> {
+            if(!kbState.winConditions().isEmpty())
+                kbState.Bots().get(client).setWinConditions(kbState.winConditions());
+        }, "winConditions");
         client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
         //TODO: unnecessary because the main client does this already
         // but it does not affect the gamelogic because a player only gets one token from the same special place
@@ -63,7 +67,7 @@ public class BotReducer extends Reducer<KBState> {
         client.joinGame(oldState.client().getGameId());
 
         //TODO: make difficulty changeable
-        oldState.Bots().put(client, new AIGame(oldState.gameMap(), 1));
+        oldState.Bots().put(client, new AIGame(oldState.gameMap(), 1, store));
 
         state.setBots(oldState.Bots());
         return state;
