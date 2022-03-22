@@ -209,6 +209,7 @@ public class Game {
      * @return all tiles that are placeable with token harbor.
      */
     public static Stream<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
+        //TODO: possible bug: only settlement that is near water could be moved to the water.
         if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.HARBOR))
             return Stream.empty();
@@ -487,61 +488,51 @@ public class Game {
                     int tmp = scoreLord(gameMap, player);
                     //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case MINER -> {
                     int tmp = scoreMiner(gameMap, player);
                     //System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case FARMER -> {
                     int tmp = scoreFarmer(gameMap, player);
                     //System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case FISHER -> {
                     int tmp = scoreFisher(gameMap, player);
                     //System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case KNIGHT -> {
                     int tmp = scoreKnight(gameMap, player);
                     //System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case WORKER -> {
                     int tmp = scoreWorker(gameMap, player);
                     //System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case CITIZEN -> {
                     int tmp = scoreCitizen(gameMap, player);
                     //System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case EXPLORER -> {
                     int tmp = scoreExplorer(gameMap, player);
                     //System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case MERCHANT -> {
                     int tmp = scoreMerchant(gameMap, player);
                     //System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
                 case ANCHORITE -> {
                     int tmp = scoreAnchorite(gameMap, player);
                     //System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
                     score += tmp;
-                    break;
                 }
             }
         }
@@ -549,6 +540,13 @@ public class Game {
         return score + scoreCastles(gameMap, player);
     }
 
+    /**
+     * Calculates the score for settlements that are next to castles.
+     *
+     * @param gameMap the map.
+     * @param player  the player.
+     * @return the score for all settlements that are near a castle.
+     */
     static int scoreCastles(GameMap gameMap, Player player) {
         Set<Tile> castles = gameMap.stream().filter(t -> t.tileType == TileType.CASTLE).collect(Collectors.toSet());
 

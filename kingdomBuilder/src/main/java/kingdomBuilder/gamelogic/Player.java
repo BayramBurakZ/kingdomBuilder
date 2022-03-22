@@ -50,6 +50,7 @@ public class Player {
     private TurnState currentTurnState;
 
     // TODO: maybe properly hide this class instead of moving it outside
+
     /**
      * Class that represents a token.
      */
@@ -57,7 +58,10 @@ public class Player {
         private final HashSet<Tile> originTiles = new HashSet<>();
         private int remaining;
 
-        public int getRemaining() { return remaining; }
+        public int getRemaining() {
+            return remaining;
+        }
+
         public int getTotal() {
             return originTiles.size();
         }
@@ -119,6 +123,7 @@ public class Player {
 
     /**
      * Returns whether the player has a token from the specified special place.
+     *
      * @param originTile the special place the player might own a token from.
      * @return whether the player has a token from the specified special place.
      */
@@ -157,6 +162,15 @@ public class Player {
         if (token.remaining <= 0)
             throw new RuntimeException("Tried to use a token but the player had none remaining!");
         token.remaining--;
+    }
+
+    /**
+     * Undo the used token for AI purposes.
+     *
+     * @param tokenType to undo.
+     */
+    void undoToken(TileType tokenType) {
+        tokens.get(tokenType).remaining++;
     }
 
     /**

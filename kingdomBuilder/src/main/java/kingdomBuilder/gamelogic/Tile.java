@@ -34,6 +34,7 @@ public class Tile {
 
     /**
      * Creates a copy of a tile.
+     *
      * @param tile The tile to copy.
      */
     public Tile(Tile tile) {
@@ -131,8 +132,8 @@ public class Tile {
     /**
      * Check if a tile is at the front or back part of a chain of settlements that are owned by the specified player.
      *
-     * @param gameMap    the map containing the tile.
-     * @param player the player to check for.
+     * @param gameMap the map containing the tile.
+     * @param player  the player to check for.
      * @return True if tile is a part of a chain. False otherwise.
      */
     public boolean isAtEndOfAChain(GameMap gameMap, Player player) {
@@ -388,7 +389,7 @@ public class Tile {
      * Returns the surrounding settlements owned by the specified player.
      *
      * @param gameMap the map containing the tile.
-     * @param player the player whose settlements to look for.
+     * @param player  the player whose settlements to look for.
      * @return all tiles with a settlement of the specified player.
      */
     public Stream<Tile> surroundingSettlements(GameMap gameMap, Player player) {
@@ -408,8 +409,8 @@ public class Tile {
     /**
      * Check if settlement of a player has at least one neighbour.
      *
-     * @param gameMap    the map containing the tile.
-     * @param player the player to check.
+     * @param gameMap the map containing the tile.
+     * @param player  the player to check.
      * @return True if player has a neighbouring settlement. False otherwise.
      */
     public boolean hasSurroundingSettlement(GameMap gameMap, Player player) {
