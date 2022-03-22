@@ -3,18 +3,12 @@ package kingdomBuilder.gamelogic;
 import org.jetbrains.annotations.NotNull;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.stream.*;
 
 /**
  * Contains the data of a map.
@@ -539,13 +533,24 @@ public class GameMap implements Iterable<Tile> {
     }
 
     /**
-     * Get all positions where the player has a settlement.
+     * Gets all tiles where the player has a settlement.
      *
      * @param player the player as the owner of the settlements.
      * @return all settlements of the player.
      */
     public Stream<Tile> getSettlements(Player player) {
         return stream().filter(t -> t.occupiedBy == player);
+    }
+
+    /**
+     * Gets all tiles occupied by the player in the given quadrant.
+     *
+     * @param player the player as the owner of the settlements.
+     * @param quadrant the quadrant to which the tiles belong to.
+     * @return all tiles occupied by the player in the given quadrant.
+     */
+    public Stream<Tile> getSettlementsOfQuadrant(Player player, Quadrants quadrant) {
+        return getSettlements(player).filter(t -> t.getQuadrant(quadrantWidth, mapWidth) == quadrant);
     }
 
     /**
@@ -579,45 +584,47 @@ public class GameMap implements Iterable<Tile> {
      * @return lowest number of settlements the player placed in each quadrant.
      */
     public int fewestSettlementsInAllQuadrants(Player player) {
-        int lowestCount = 100;
-        int quadrant1 = 0;
-        int quadrant2 = 0;
-        int quadrant3 = 0;
-        int quadrant4 = 0;
+        int quadrant1 = (int)getSettlementsOfQuadrant(player, Quadrants.TOPLEFT).count();
+        int quadrant2 = (int)getSettlementsOfQuadrant(player, Quadrants.TOPRIGHT).count();
+        int quadrant3 = (int)getSettlementsOfQuadrant(player, Quadrants.BOTTOMLEFT).count();
+        int quadrant4 = (int)getSettlementsOfQuadrant(player, Quadrants.BOTTOMRIGHT).count();
 
-        //checking the top right quadrant
-        for(int i = 0; i < quadrantWidth; i++) {
-            for (int j = 0; j < quadrantWidth; j++){
-                //checking the top left quadrant
-                if(tiles[to1DIndexTopLeft(i, j, quadrantWidth)].occupiedBy() == player)
-                    quadrant1++;
+        return IntStream
+                .of(quadrant1, quadrant2, quadrant3, quadrant4)
+                .min()
+                .orElseThrow(NoSuchElementException::new);
+    }
 
-                //checking the top right quadrant
-                if(tiles[to1DIndexTopRight(i, j, quadrantWidth)].occupiedBy() == player)
-                    quadrant2++;
+    /**
+     * Checks whether the player has the most, second most or fewer settlements in the given quadrant.
+     *
+     * @param player player as the owner of the settlements we are interested in.
+     * @param players players of the game.
+     * @param quadrant the quadrant we look at.
+     * @return the factor of points. two for the most settlements, one for the second most settlements - zero otherwise.
+     */
+    public int rankOfSettlementsInQuadrant(Player player, List<Player> players, Quadrants quadrant)
+    {
+        HashMap<Player, Integer> countsOfPlayers = new HashMap<>();
+        int[] countsOfSettlements = new int[players.size()];
 
-                //checking the bottom left quadrant
-                if(tiles[to1DIndexBottomLeft(i, j, quadrantWidth)].occupiedBy() == player)
-                    quadrant3++;
-
-                //checking the bottom right quadrant
-                if(tiles[to1DIndexBottomRight(i, j, quadrantWidth)].occupiedBy() == player)
-                    quadrant4++;
-            }
+        for(int i = 0; i < players.size(); i++) {
+           countsOfSettlements[i] = (int) getSettlementsOfQuadrant(players.get(i), quadrant).count();
+           countsOfPlayers.put(players.get(i), countsOfSettlements[i]);
         }
 
-        if ((quadrant1 == 0) || (quadrant2 == 0) || (quadrant3 == 0) || (quadrant4 == 0))
-            return 0;
+        IntStream arrayOfCounts = Arrays.stream(countsOfSettlements);
 
-        if(quadrant1 < lowestCount)
-            lowestCount = quadrant1;
-        if(quadrant2 < lowestCount)
-            lowestCount = quadrant2;
-        if(quadrant3 < lowestCount)
-            lowestCount = quadrant3;
-        if(quadrant4 < lowestCount)
-            lowestCount = quadrant4;
+        int highestCount = arrayOfCounts.max().getAsInt();
 
-        return lowestCount;
+        if(countsOfPlayers.get(player) == highestCount)
+            return 2;
+
+        int secondHighCount = arrayOfCounts.filter(i -> i != highestCount).max().getAsInt();
+
+        if(countsOfPlayers.get(player) == secondHighCount)
+            return 1;
+
+        return 0;
     }
 }

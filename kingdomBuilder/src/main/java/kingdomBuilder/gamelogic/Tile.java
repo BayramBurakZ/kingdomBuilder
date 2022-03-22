@@ -498,4 +498,16 @@ public class Tile {
         remainingTokens--;
         return tileType;
     }
+
+    public Quadrants getQuadrant(int quadrantWidth, int mapWidth){
+        if(x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
+            return Quadrants.TOPLEFT;
+        else if(x >= quadrantWidth && x < mapWidth && y >= 0 && y < quadrantWidth)
+            return Quadrants.TOPRIGHT;
+        else if(x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < mapWidth)
+            return Quadrants.BOTTOMLEFT;
+            //if(x >= quadrantWidth && x < mapWidth && y >= quadrantWidth && y < mapWidth)
+        else
+            return Quadrants.BOTTOMRIGHT;
+    }
 }

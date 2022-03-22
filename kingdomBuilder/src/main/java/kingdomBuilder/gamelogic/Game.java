@@ -486,7 +486,7 @@ public class Game {
         for (WinCondition c : winConditions) {
             switch (c) {
                 case LORDS -> {
-                    int tmp = scoreLord(gameMap, player);
+                    int tmp = scoreLord(gameMap, player, players);
                     //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
@@ -675,9 +675,24 @@ public class Game {
         return 0; // TODO: Implementation
     }
 
-    // TODO: JavaDoc
-    static int scoreLord(GameMap gameMap, Player player) {
-        return 0; // TODO: Implementation
+    /**
+     * Calculates the score for the given player on the given map with the win condition "lords".
+     * This win condition gives twelve points for each quadrant in which the player placed the most settlements.
+     * If the player placed the second most settlements the win condition gives six points.
+     * If more players placed the highest number of settlements in the same quadrant each of the players get 12 points.
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     * @param players the players of the game.
+     * @return the score for the win condition "lords".
+     */
+    static int scoreLord(GameMap gameMap, Player player, List<Player> players) {
+        int factorOfPoints = 0;
+
+        for(Quadrants c : Quadrants.values())
+            factorOfPoints += gameMap.rankOfSettlementsInQuadrant(player, players, c);
+
+        return (factorOfPoints * 6);
     }
 
     /**
