@@ -329,7 +329,8 @@ public class GameViewController extends Controller implements Initializable {
                 updateSettlementsForPlayer(i, players.get(i).getRemainingSettlements());
         }
 
-        if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN) {
+        if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN
+            && kbState.client().getClientId() == kbState.currentPlayer().ID) {
             game_button_end.setDisable(false);
         }
 

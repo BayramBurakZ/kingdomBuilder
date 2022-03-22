@@ -1,13 +1,10 @@
 package kingdomBuilder.gamelogic;
 
-import kingdomBuilder.network.protocol.Oracle;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * AIGame represents the AI.
@@ -96,25 +93,30 @@ public class AIGame {
         GameMap aiGameMap = new GameMap(gameMap);
         List<ClientTurn> moves = new ArrayList<>();
         boolean firstMoveOnSpecialPlace = false;
+        int settlementsLeft = aiPlayer.getRemainingSettlements();
 
         Set<Tile> freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
         Set<Tile> token = aiGameMap.getTiles().filter
                 (t -> TileType.tokenType.contains(t.tileType)).collect(Collectors.toSet());
 
+        // prefer a special place as first turn
         outerloop:
         for (Tile t : token) {
             for (Tile l : t.surroundingTiles(aiGameMap).collect(Collectors.toSet())) {
                 if (!t.hasSurroundingSettlement(aiGameMap, aiPlayer) && freeTiles.contains(l)) {
                     firstMoveOnSpecialPlace = true;
                     moves.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, l.x, l.y, -1, -1));
+                    System.out.println("BOT: Placing Basic Settlement on: x" + l.x + ", y: " + l.y);
                     aiGameMap.at(l.x, l.y).placeSettlement(aiPlayer);
+                    settlementsLeft--;
                     break outerloop;
                 }
             }
         }
 
+        // make basic turn
         int currentScore = 0;
-        int bestScore = 0;
+        int bestScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions);
         Tile bestTile = null;
 
         for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
@@ -136,36 +138,46 @@ public class AIGame {
                 }
             }
 
-            aiGameMap.at(bestTile.x, bestTile.y).placeSettlement(aiPlayer);
             moves.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, bestTile.x, bestTile.y, -1, -1));
+            System.out.println("BOT: Placing Basic Settlement on: x" + bestTile.x + ", y: " + bestTile.y);
+            aiGameMap.at(bestTile.x, bestTile.y).placeSettlement(aiPlayer);
+            settlementsLeft--;
+
             bestScore = 0;
             bestTile = null;
         }
 
-        outerloop:
+        // use tokens
+        outerloop2:
         for (TileType t : aiPlayer.getTokens().keySet()) {
 
             //TODO: !!!BUG!!! following token do not work!
-            if (t == TileType.TAVERN || t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN)
-                continue;
+            //if (t == TileType.TAVERN || t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN)
+            //    continue;
 
             int amountToken = aiPlayer.getTokens().get(t).getRemaining();
 
             for (int i = 0; i < amountToken; i++) {
 
-                if (!aiPlayer.hasRemainingSettlements())
-                    break outerloop;
+                // move is allowed because it does not place a settlement
+                if (settlementsLeft <= 0 && !(t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN)) {
+                    // search for more tokens that could be played
+                    continue outerloop2;
+                }
 
                 ClientTurn move = calculateScoreToken(aiGameMap, aiPlayer, t);
 
                 if (move != null) {
                     moves.add(move);
                     System.out.println(aiPlayer.name + " is using token: " + t + " with: fromX:" + move.x + " fromY:" + move.y + " ToX:" + move.toX + " ToY:" + move.toY);
+                    if (!(t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN))
+                        settlementsLeft--;
                 }
 
             }
         }
-
+        // debug message
+        //System.out.println(settlementsLeft);
         return moves;
     }
 
@@ -182,7 +194,7 @@ public class AIGame {
 
         Set<Tile> freeTiles;
         int currentScore = 0;
-        int bestScore = 0;
+        int bestScore = Game.calculateScore(map, player, winConditions);
 
         switch (token) {
 
@@ -275,6 +287,7 @@ public class AIGame {
                     useToken(map, player, token, t.x, t.y);
                     currentScore = Game.calculateScore(map, player, winConditions);
 
+                    // always play a token
                     if (currentScore >= bestScore) {
                         bestScore = currentScore;
                         bestTile = t;
@@ -410,9 +423,11 @@ public class AIGame {
      * @throws RuntimeException gets thrown when player can not use farm token.
      */
     private void useTokenFarm(GameMap map, Player player, int x, int y) {
+        /*
         if (!Game.canUseBasicTurn(map, player, TileType.GRAS, x, y))
             throw new RuntimeException("Can't use token farm on"
                     + " tile: " + map.at(x, y).tileType + " at " + x + "," + y);
+         */
 
         map.at(x, y).placeSettlement(player);
         player.useToken(TileType.FARM);
@@ -428,10 +443,11 @@ public class AIGame {
      * @throws RuntimeException gets thrown when player can not use tavern token.
      */
     private void useTokenTavern(GameMap map, Player player, int x, int y) {
-        if (!Game.canUseBasicTurn(map, player, x, y) || !gameMap.at(x, y).isAtEndOfAChain(gameMap, player))
+        /*
+        if (Game.canUseBasicTurn(map, player, x, y) || !gameMap.at(x, y).isAtEndOfAChain(gameMap, player))
             throw new RuntimeException("Can't use token tavern on"
                     + " tile: " + map.at(x, y).tileType + " at " + x + "," + y);
-
+         */
         map.at(x, y).placeSettlement(player);
         player.useToken(TileType.TAVERN);
     }

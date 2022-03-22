@@ -12,6 +12,9 @@ import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Stack;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 //TODO: DELETE BOT WHEN GAME IS  FINISHED
@@ -46,14 +49,14 @@ public class BotReducer extends Reducer<KBState> {
         /*
         - Start Turn
         - Terrain Card
-        - Token received
         - Game Over (self destruct)
         */
         //client.onYourTerrainCard.subscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
         store.subscribe(kbState -> store.dispatch(MAKE_TURN_BOT, client), "nextTerrainCard");
         client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
-        client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
-
+        //TODO: unnecessary because the main client does this already
+        // but it does not affect the gamelogic because a player only gets one token from the same special place
+        //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
 
         client.login("AI");
         client.loadNamespace();
@@ -78,25 +81,41 @@ public class BotReducer extends Reducer<KBState> {
             //System.out.println(oldState.nextPlayer() + " || " + client.getClientId());
             List<ClientTurn> moves = oldState.Bots().get(client).chooseAI(oldState.nextTerrainCard());
 
-            for (ClientTurn c : moves) {
-                int x = c.x;
-                int y = c.y;
-                int toX = c.toX;
-                int toY = c.toY;
-
-                switch (c.type) {
-                    case PLACE -> client.placeSettlement(x, y);
-                    case ORACLE -> client.useTokenOracle(x, y);
-                    case FARM -> client.useTokenFarm(x, y);
-                    case TAVERN -> client.useTokenTavern(x, y);
-                    case TOWER -> client.useTokenTower(x, y);
-                    case HARBOR -> client.useTokenHarbor(x, y, toX, toY);
-                    case PADDOCK -> client.useTokenPaddock(x, y, toX, toY);
-                    case BARN -> client.useTokenBarn(x, y, toX, toY);
-                    case OASIS -> client.useTokenOasis(x, y);
-                }
+            // adding turns in reverse on the stack, so pop() gets the turns in order
+            Stack<ClientTurn> stack = new Stack<>();
+            for (int i = moves.size()-1; i >= 0; i--) {
+                stack.push(moves.get(i));
             }
-            client.endTurn();
+
+            Timer timer = new Timer();
+            timer.scheduleAtFixedRate(new TimerTask() {
+                @Override
+                public void run() {
+                    if (stack.empty()) {
+                        //cancels the timer task when all moves are made and sends the end turn message
+                        client.endTurn();
+                        cancel();
+                        return;
+                    }
+                    ClientTurn c = stack.pop();
+                    int x = c.x;
+                    int y = c.y;
+                    int toX = c.toX;
+                    int toY = c.toY;
+
+                    switch (c.type) {
+                        case PLACE -> client.placeSettlement(x, y);
+                        case ORACLE -> client.useTokenOracle(x, y);
+                        case FARM -> client.useTokenFarm(x, y);
+                        case TAVERN -> client.useTokenTavern(x, y);
+                        case TOWER -> client.useTokenTower(x, y);
+                        case HARBOR -> client.useTokenHarbor(x, y, toX, toY);
+                        case PADDOCK -> client.useTokenPaddock(x, y, toX, toY);
+                        case BARN -> client.useTokenBarn(x, y, toX, toY);
+                        case OASIS -> client.useTokenOasis(x, y);
+                    }
+                }
+            }, 1000, 3 * 1000);
         }
 
         return state;

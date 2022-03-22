@@ -14,6 +14,7 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.WinCondition;
+import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.*;
 import kingdomBuilder.reducers.ChatReducer;
 import kingdomBuilder.reducers.RootReducer;
@@ -232,7 +233,13 @@ public class ChatViewController extends Controller implements Initializable {
                 } else if (item.clientId() == store.getState().client().getClientId()) {
                     setStyle("-fx-background-color: #ff9966;");
                 } else {
-                    setStyle("");
+                    for (Client c : store.getState().Bots().keySet()) {
+                        if (item.clientId() == c.getClientId()) {
+                            setStyle("-fx-background-color: #66CCFF;");
+                            return;
+                        }
+                    }
+                setStyle("");
                 }
             }
         });
@@ -275,7 +282,6 @@ public class ChatViewController extends Controller implements Initializable {
         // Setup for turn log /////////////////////////
         webview_log.setContextMenuEnabled(false);
         WebEngine turnLogWebEngine = webview_log.getEngine();
-        // TODO: stylesheet for turn log
         turnLogWebEngine.setUserStyleSheetLocation(globalStylesheetPath);
         turnLogWebEngine.loadContent("<html><body></body></html>");
 
