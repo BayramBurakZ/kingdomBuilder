@@ -1,14 +1,20 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.collections.FXCollections;
-import javafx.collections.transformation.FilteredList;
+import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
+import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -42,6 +48,8 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Represents the minimal turn limit the user can set.
      */
     private static final int MIN_TURN_LIMIT = 1;
+
+    private static final int QUADRANT_RESOLUTION = 200;
 
     //region FXML-Imports
 
@@ -80,6 +88,12 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     @FXML
     private GridPane gamesettings_gridpane_ids;
+
+    /**
+     * Represents GridPane for the previews of the quadrants.
+     */
+    @FXML
+    public GridPane gamesettings_gridpane_previews;
 
     /**
      * Represents the spinner, where the user sets, how many (human-)players can join.
@@ -141,7 +155,21 @@ public class GameSettingsViewController extends Controller implements Initializa
     @FXML
     private TextField gamesettings_textfield_desc;
 
+    @FXML
+    public ImageView gamsettings_quadrant_upperleft;
+    @FXML
+    public ImageView gamsettings_quadrant_lowerleft;
+    @FXML
+    public ImageView gamsettings_quadrant_upperright;
+    @FXML
+    public ImageView gamsettings_quadrant_lowerright;
+
     //endregion FXML-Imports
+
+    private WritableImage quadrantUpperLeft;
+    private WritableImage quadrantLowerLeft;
+    private WritableImage quadrantUpperRight;
+    private WritableImage quadrantLowerRight;
 
     /**
      * Represents if the menu is for a local (0) or online (1) game.
@@ -186,9 +214,31 @@ public class GameSettingsViewController extends Controller implements Initializa
         }
 
         setupLayout();
+        initializeQuadrantPreviews();
         initializeChoiceBox();
         initializeSpinner();
         initializeListeners();
+    }
+
+    /**
+     * Initializes all quadrant previews.
+     */
+    private void initializeQuadrantPreviews() {
+        // JavaFX doesn't support nearest neighbour interpolation, so you gotta deal with upressing the image itself
+        quadrantUpperLeft = new WritableImage(QUADRANT_RESOLUTION, QUADRANT_RESOLUTION);
+        quadrantLowerLeft = new WritableImage(QUADRANT_RESOLUTION, QUADRANT_RESOLUTION);
+        quadrantUpperRight = new WritableImage(QUADRANT_RESOLUTION, QUADRANT_RESOLUTION);
+        quadrantLowerRight = new WritableImage(QUADRANT_RESOLUTION, QUADRANT_RESOLUTION);
+
+        gamsettings_quadrant_upperleft.setImage(quadrantUpperLeft);
+        gamsettings_quadrant_lowerleft.setImage(quadrantLowerLeft);
+        gamsettings_quadrant_upperright.setImage(quadrantUpperRight);
+        gamsettings_quadrant_lowerright.setImage(quadrantLowerRight);
+
+        updateQuadrant(quadrantUpperLeft, gamesettings_choicebox_upperleft.getValue());
+        updateQuadrant(quadrantLowerLeft, gamesettings_choicebox_bottomleft.getValue());
+        updateQuadrant(quadrantUpperRight, gamesettings_choicebox_upperright.getValue());
+        updateQuadrant(quadrantLowerRight, gamesettings_choicebox_bottomright.getValue());
     }
 
     /**
@@ -201,10 +251,14 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamesettings_textfield_name.textProperty().addListener(observable -> updateButtons());
         gamesettings_textfield_desc.textProperty().addListener(observable -> updateButtons());
 
-        gamesettings_choicebox_upperleft.valueProperty().addListener(observable -> updateButtons());
-        gamesettings_choicebox_upperright.valueProperty().addListener(observable -> updateButtons());
-        gamesettings_choicebox_bottomleft.valueProperty().addListener(observable -> updateButtons());
-        gamesettings_choicebox_bottomright.valueProperty().addListener(observable -> updateButtons());
+        gamesettings_choicebox_upperleft.valueProperty().addListener(
+                observable -> updateQuadrant(quadrantUpperLeft, gamesettings_choicebox_upperleft.getValue()));
+        gamesettings_choicebox_upperright.valueProperty().addListener(
+                observable -> updateQuadrant(quadrantUpperRight, gamesettings_choicebox_upperright.getValue()));
+        gamesettings_choicebox_bottomleft.valueProperty().addListener(
+                observable -> updateQuadrant(quadrantLowerLeft, gamesettings_choicebox_bottomleft.getValue()));
+        gamesettings_choicebox_bottomright.valueProperty().addListener(
+                observable -> updateQuadrant(quadrantLowerRight, gamesettings_choicebox_bottomright.getValue()));
     }
 
     /**
@@ -373,6 +427,49 @@ public class GameSettingsViewController extends Controller implements Initializa
         } else {
             activateHostGameButton();
         }
+    }
+
+    /**
+     * Updates the specified quadrant preview according to the state of the ChoiceBoxes.
+     */
+    private void updateQuadrant(WritableImage quadrant, Integer quadrantId) {
+        PixelWriter pw = quadrant.getPixelWriter();
+        TileType[] tileTypes = store.getState().quadrants().get(quadrantId);
+        if (tileTypes != null) {
+            int i = 0;
+            for (int y = 0; y < 10; y++) {
+                for (int x = 0; x < 10; x++) {
+                    Color color = switch(tileTypes[i++]) {
+                        case GRAS -> Color.LAWNGREEN;
+                        case FLOWER -> Color.PALEGREEN;
+                        case FORREST -> Color.FORESTGREEN;
+                        case CANYON -> Color.SADDLEBROWN;
+                        case DESERT -> Color.LIGHTYELLOW;
+                        case WATER -> Color.DARKBLUE;
+                        case MOUNTAIN -> Color.DARKGRAY;
+                        case CASTLE -> Color.LIGHTGRAY;
+                        case ORACLE -> Color.MEDIUMPURPLE;
+                        case FARM -> Color.YELLOW;
+                        case TAVERN -> Color.BURLYWOOD;
+                        case TOWER -> Color.DARKSLATEGRAY;
+                        case HARBOR -> Color.CADETBLUE;
+                        case PADDOCK -> Color.BROWN;
+                        case BARN -> Color.ROSYBROWN;
+                        case OASIS -> Color.TURQUOISE;
+                    };
+                    //pw.setColor(x, y, color);
+                    ///*
+                    int pixelSize = QUADRANT_RESOLUTION / 10;
+                    for (int w = 0; w < pixelSize; w++) {
+                        for (int h = 0; h < pixelSize; h++) {
+                            pw.setColor(pixelSize*x+w, pixelSize*y+h, color);
+                        }
+                    }
+                    //*/
+                }
+            }
+        }
+        updateButtons();
     }
 
     /**

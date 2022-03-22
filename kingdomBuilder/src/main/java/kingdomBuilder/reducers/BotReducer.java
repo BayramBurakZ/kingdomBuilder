@@ -53,10 +53,6 @@ public class BotReducer extends Reducer<KBState> {
         */
         //client.onYourTerrainCard.subscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
         store.subscribe(kbState -> store.dispatch(MAKE_TURN_BOT, client), "nextTerrainCard");
-        store.subscribe(kbState -> {
-            if(!kbState.winConditions().isEmpty())
-                kbState.Bots().get(client).setWinConditions(kbState.winConditions());
-        }, "winConditions");
         client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
         //TODO: unnecessary because the main client does this already
         // but it does not affect the gamelogic because a player only gets one token from the same special place
@@ -119,7 +115,7 @@ public class BotReducer extends Reducer<KBState> {
                         case OASIS -> client.useTokenOasis(x, y);
                     }
                 }
-            }, 1000, 3 * 1000);
+            }, 1000, 2 * 1000);
         }
 
         return state;

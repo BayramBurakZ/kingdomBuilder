@@ -2,11 +2,11 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane fx:id="gamesettings_borderpane" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="kingdomBuilder.gui.controller.GameSettingsViewController">
+<BorderPane fx:id="gamesettings_borderpane" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.GameSettingsViewController">
 
    <top>
       <HBox minHeight="50.0" minWidth="500.0" BorderPane.alignment="CENTER">
@@ -35,7 +35,7 @@
    <center>
          <VBox fx:id="gamesettings_vBox_preview" BorderPane.alignment="CENTER">
 
-              <GridPane alignment="CENTER" gridLinesVisible="true" VBox.vgrow="ALWAYS">
+              <GridPane fx:id="gamesettings_gridpane_previews" alignment="CENTER" gridLinesVisible="true" VBox.vgrow="ALWAYS">
                   <columnConstraints>
                             <ColumnConstraints hgrow="ALWAYS" />
                             <ColumnConstraints hgrow="ALWAYS" />
@@ -44,15 +44,16 @@
                             <RowConstraints vgrow="ALWAYS" />
                             <RowConstraints vgrow="ALWAYS" />
                   </rowConstraints>
-
-                  <Pane GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                  <Pane GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                  <Pane GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                  <Pane GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <children>
+               <ImageView fx:id="gamsettings_quadrant_upperleft" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+               <ImageView fx:id="gamsettings_quadrant_lowerleft" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+               <ImageView fx:id="gamsettings_quadrant_upperright" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+               <ImageView fx:id="gamsettings_quadrant_lowerright" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            </children>
 
               </GridPane>
 
-              <GridPane alignment="CENTER" fx:id="gamesettings_gridpane_ids">
+              <GridPane fx:id="gamesettings_gridpane_ids" alignment="CENTER">
                       <columnConstraints>
                             <ColumnConstraints hgrow="ALWAYS" />
                             <ColumnConstraints hgrow="ALWAYS" />
@@ -62,14 +63,10 @@
                             <RowConstraints vgrow="ALWAYS" />
                       </rowConstraints>
 
-                            <ChoiceBox fx:id="gamesettings_choicebox_upperleft"
-                                       GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft"
-                                       GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_upperright"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_bottomright"
-                                       GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_upperleft" GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft" GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_upperright" GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                            <ChoiceBox fx:id="gamesettings_choicebox_bottomright" GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
               </GridPane>
          </VBox>
    </center>
@@ -78,7 +75,7 @@
     <right>
         <VBox>
             <!-- Game Name -->
-            <TextField promptText="%gameName" fx:id="gamesettings_textfield_name">
+            <TextField fx:id="gamesettings_textfield_name" promptText="%gameName">
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </padding>
@@ -87,7 +84,7 @@
                 </VBox.margin>
             </TextField>
             <!-- Game Description -->
-            <TextField promptText="%gameDesc:" fx:id="gamesettings_textfield_desc">
+            <TextField fx:id="gamesettings_textfield_desc" promptText="%gameDesc:">
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </padding>
@@ -136,7 +133,7 @@
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>
             </CheckBox>
-            <Spinner fx:id="gamesettings_spinner_time" editable="true" disable="true">
+            <Spinner fx:id="gamesettings_spinner_time" disable="true" editable="true">
                 <VBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>
@@ -147,7 +144,7 @@
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>
             </CheckBox>
-            <Spinner fx:id="gamesettings_spinner_turn" editable="true" disable="true">
+            <Spinner fx:id="gamesettings_spinner_turn" disable="true" editable="true">
                 <VBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>
@@ -156,10 +153,8 @@
     </right>
 
     <bottom>
-        <HBox alignment="CENTER" centerShape="false" minHeight="80.0" minWidth="500.0"
-              nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
-            <Button fx:id="gamesettings_button_host" alignment="CENTER" contentDisplay="CENTER" disable="true"
-                    onAction="#onHostGameButtonPressed" text="%hostGame" HBox.hgrow="ALWAYS">
+        <HBox alignment="CENTER" centerShape="false" minHeight="80.0" minWidth="500.0" nodeOrientation="LEFT_TO_RIGHT" BorderPane.alignment="CENTER">
+            <Button fx:id="gamesettings_button_host" alignment="CENTER" contentDisplay="CENTER" disable="true" onAction="#onHostGameButtonPressed" text="%hostGame" HBox.hgrow="ALWAYS">
                 <HBox.margin>
                     <Insets bottom="10.0" left="5.0" right="5.0" top="10.0" />
                 </HBox.margin>
