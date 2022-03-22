@@ -206,7 +206,8 @@ public class ChatViewController extends Controller implements Initializable {
         System.out.println(version);
 
         // weird check, because pre 1.3.2 there is "ws2021" at the beginning of the version.
-        if (version.charAt(version.length()-3) < minimumRequirement.charAt(minimumRequirement.length()-3)) {
+        if (version.substring(version.length()-3, version.length()-1).equals(
+                minimumRequirement.substring(minimumRequirement.length()-3, minimumRequirement.length()-1))) {
             globalChatAppendElement(createMessage(MessageStyle.WARNING,
                     createHTMLElement(text, null),
                     createHTMLElement(version, MessageStyle.BOLD)
