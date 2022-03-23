@@ -26,6 +26,8 @@ public class BotReducer extends Reducer<KBState> {
     public static final String GRANT_TOKEN_BOT = "GRANT_TOKEN_BOT";
     public static final String ACTIVATE_TOKEN_BOT = "ACTIVATE_TOKEN_BOT";
     public static final String DISCONNECT_BOT = "DISCONNECT_BOT";
+    public static final String SET_WIN_CONDITION_BOT = "SET_WIN_CONDITION_BOT";
+    public static final String SET_PLAYERS_BOT = "SET_PLAYERS_BOT";
 
     /**
      * Constructs a new BotReducer and registers himself.
@@ -54,6 +56,16 @@ public class BotReducer extends Reducer<KBState> {
         */
         //client.onYourTerrainCard.subscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
         store.subscribe(kbState -> store.dispatch(MAKE_TURN_BOT, client), "nextTerrainCard");
+        store.subscribe(kbState -> {
+            if(kbState.winConditions() != null && !kbState.winConditions().isEmpty())
+                store.dispatch(SET_WIN_CONDITION_BOT, client);
+            },"winConditions");
+
+        store.subscribe(kbState ->{
+                if(kbState.players() != null && !kbState.players().isEmpty())
+                    store.dispatch(SET_PLAYERS_BOT, client);}
+                , "players");
+
         client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
         //TODO: unnecessary because the main client does this already
         // but it does not affect the gamelogic because a player only gets one token from the same special place
@@ -64,7 +76,7 @@ public class BotReducer extends Reducer<KBState> {
         client.joinGame(oldState.client().getGameId());
 
         //TODO: make difficulty changeable
-        oldState.Bots().put(client, new AIGame(oldState.gameMap(), difficulty, store));
+        oldState.Bots().put(client, new AIGame(oldState.gameMap(), difficulty));
 
         state.setBots(oldState.Bots());
         return state;
@@ -155,4 +167,21 @@ public class BotReducer extends Reducer<KBState> {
         return state;
     }
 
+    @Reduce(action = SET_WIN_CONDITION_BOT)
+    public DeferredState setWinConditionBot(Store<KBState> store, KBState oldState, Client client) {
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.Bots().get(client).setWinConditions(oldState.winConditions());
+
+        return state;
+    }
+
+    @Reduce(action = SET_PLAYERS_BOT)
+    public DeferredState setPlayersBot(Store<KBState> store, KBState oldState, Client client) {
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.Bots().get(client).setPlayers(oldState.players());
+
+        return state;
+    }
 }

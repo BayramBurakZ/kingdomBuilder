@@ -486,7 +486,9 @@ public class Game {
         for (WinCondition c : winConditions) {
             switch (c) {
                 case LORDS -> {
-                    int tmp = scoreLord(gameMap, player, players);
+                    //TODO: doesnt work
+                    int tmp = 0;
+                    //int tmp = scoreLord(gameMap, player, players);
                     //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
