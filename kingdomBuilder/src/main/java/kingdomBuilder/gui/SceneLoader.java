@@ -481,4 +481,12 @@ public class SceneLoader {
     public IAmViewController getIAmViewController() {
         return iAmViewController;
     }
+
+    /**
+     * Gets the current locale.
+     * @return the locale.
+     */
+    public Locale getLocale() {
+        return locale;
+    }
 }

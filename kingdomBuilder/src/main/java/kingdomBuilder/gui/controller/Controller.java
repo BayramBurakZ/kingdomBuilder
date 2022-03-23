@@ -16,7 +16,7 @@ public class Controller {
     /**
      * Represents the store of the application.
      */
-    protected Store<KBState> store;
+    protected static Store<KBState> store;
 
     /**
      * Sets the SceneLoader.

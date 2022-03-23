@@ -2,6 +2,7 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
+import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.TokenReceived;
 import kingdomBuilder.redux.Reduce;
@@ -34,7 +35,7 @@ public class BotReducer extends Reducer<KBState> {
     }
 
     @Reduce(action = CONNECT_BOT)
-    public DeferredState Reduce(Store<KBState> store, KBState oldState, Object unused2) {
+    public DeferredState Reduce(Store<KBState> store, KBState oldState, BotDifficulty difficulty) {
         DeferredState state = new DeferredState(oldState);
 
         Client client;
@@ -63,7 +64,7 @@ public class BotReducer extends Reducer<KBState> {
         client.joinGame(oldState.client().getGameId());
 
         //TODO: make difficulty changeable
-        oldState.Bots().put(client, new AIGame(oldState.gameMap(), 1, store));
+        oldState.Bots().put(client, new AIGame(oldState.gameMap(), difficulty, store));
 
         state.setBots(oldState.Bots());
         return state;

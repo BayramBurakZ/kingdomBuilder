@@ -203,11 +203,20 @@ public class ChatViewController extends Controller implements Initializable {
         String minimumRequirement = "v1.3.2";
 
         String text = resourceBundle.getString("incorrectServerVersion") + " ";
+
         System.out.println(version);
 
+
+        int versionInt = Character.getNumericValue(version.charAt(version.length()-3)) * 100 +
+                Character.getNumericValue(version.charAt(version.length()-1));
+        int requirementInt = Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length()-3)) * 100 +
+                Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length()-1));
+
+        // debug message
+        //System.out.println(versionInt + "||" + requirementInt);
+
         // weird check, because pre 1.3.2 there is "ws2021" at the beginning of the version.
-        if (version.substring(version.length()-3, version.length()-1).equals(
-                minimumRequirement.substring(minimumRequirement.length()-3, minimumRequirement.length()-1))) {
+        if (versionInt < requirementInt) {
             globalChatAppendElement(createMessage(MessageStyle.WARNING,
                     createHTMLElement(text, null),
                     createHTMLElement(version, MessageStyle.BOLD)

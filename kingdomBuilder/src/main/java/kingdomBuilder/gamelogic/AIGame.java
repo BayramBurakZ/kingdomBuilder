@@ -1,6 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 import kingdomBuilder.KBState;
+import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.redux.Store;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class AIGame {
     /**
      * the difficulty of the AI.
      */
-    private int difficulty;
+    private BotDifficulty difficulty;
 
     /**
      * The store of the game.
@@ -39,7 +40,7 @@ public class AIGame {
      * @param gameMap    the game map that is shared between all players.
      * @param difficulty the difficulty of the AI.
      */
-    public AIGame(GameMap gameMap, int difficulty, Store<KBState> store) {
+    public AIGame(GameMap gameMap, BotDifficulty difficulty, Store<KBState> store) {
         this.gameMap = gameMap;
         this.difficulty = difficulty;
         this.store = store;
@@ -52,12 +53,10 @@ public class AIGame {
      * @return a list of all moves that the AI makes this turn.
      */
     public List<ClientTurn> chooseAI(TileType terrain) {
-        switch (difficulty) {
-            case 1:
-                return greedyPlacement(terrain);
-            default:
-                return randomPlacement(terrain);
-        }
+        return switch (difficulty) {
+            case EASY -> randomPlacement(terrain);
+            default -> greedyPlacement(terrain);
+        };
     }
 
     /**

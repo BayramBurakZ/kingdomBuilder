@@ -2,25 +2,26 @@ package kingdomBuilder.gui.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Point3D;
-import javafx.scene.*;
+import javafx.scene.Group;
+import javafx.scene.SubScene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
-import javafx.fxml.Initializable;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
-import kingdomBuilder.gamelogic.PlayerColor;
-import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.GameCamera;
-import kingdomBuilder.gui.gameboard.GameBoard;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.network.protocol.MyGameReply;
@@ -139,6 +140,11 @@ public class GameViewController extends Controller implements Initializable {
     //endregion FXML
 
     /**
+     * Represents the control menu to add Bots
+     */
+    private final VBox game_vBox_addPlayerVBox = new VBox();
+
+    /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
      */
     public GameBoard gameBoard;
@@ -249,22 +255,59 @@ public class GameViewController extends Controller implements Initializable {
         game_subscene.setFill(Color.LIGHTSKYBLUE);
     }
 
-    private final Button addBot = new Button("Add Bot");
-    private final Button addHotseat = new Button("Add Hotseat");
-
     /**
      * Shows the Buttons to add Hotseat or Bots to the game.
+     *
      * @param isDisplayed whether the buttons should be displayed.
      */
     private void showPreStartButtons(boolean isDisplayed) {
+        // initialize everything
+        Button game_button_addBot = new Button("Add Bot");
+        Button game_button_addHotseat = new Button("Add Hotseat");
+        ComboBox<BotDifficulty> game_comboBox_difficulty = new ComboBox<>();
+        HBox game_hBox_addPlayerHBox = new HBox();
+
+        // add the items in the comboBox
+        game_comboBox_difficulty.getItems().addAll(
+                BotDifficulty.EASY,
+                BotDifficulty.NORMAL,
+                BotDifficulty.HARD,
+                BotDifficulty.EXPERT
+        );
+
+        // setup the ComboBox
+        game_comboBox_difficulty.setConverter(new StringConverter<BotDifficulty>() {
+            @Override
+            public String toString(BotDifficulty object) {
+                return object.toString();
+            }
+
+            @Override
+            public BotDifficulty fromString(String string) {
+                return null;
+            }
+        });
+        game_comboBox_difficulty.getSelectionModel().selectFirst();
+
+        // decide if it should be shown
         if (isDisplayed) {
-            game_hbox_tokens.getChildren().addAll(addBot, addHotseat);
+            game_hBox_addPlayerHBox.getChildren().addAll(game_button_addBot, game_button_addHotseat);
+            game_vBox_addPlayerVBox.getChildren().addAll(game_comboBox_difficulty, game_hBox_addPlayerHBox);
+            game_hbox_players.getChildren().addAll(game_vBox_addPlayerVBox);
         } else {
-            game_hbox_tokens.getChildren().clear();
+            game_hbox_players.getChildren().remove(game_vBox_addPlayerVBox);
         }
 
-        addBot.setOnAction(event -> {
-            store.dispatch(BotReducer.CONNECT_BOT, null);
+        HBox.setMargin(game_vBox_addPlayerVBox, new Insets(10, 10, 10, 10));
+
+        // bind width properties
+        game_comboBox_difficulty.prefWidthProperty().bind(game_vBox_addPlayerVBox.widthProperty());
+
+        // event handler when "Add Bot" is pressed
+        game_button_addBot.setOnAction(event -> {
+            BotDifficulty difficulty = game_comboBox_difficulty.getSelectionModel().getSelectedItem();
+            game_hbox_players.getChildren().remove(game_vBox_addPlayerVBox);
+            store.dispatch(BotReducer.CONNECT_BOT, difficulty);
         });
     }
 
@@ -676,14 +719,20 @@ public class GameViewController extends Controller implements Initializable {
         if (size == 3) color = PlayerColor.WHITE;
         if (size > 3) return;
 
+        game_hbox_players.getChildren().remove(game_vBox_addPlayerVBox);
+
         boolean colorMode = store.getState().betterColorsActive();
         PlayerInformation player = new PlayerInformation(name, color, colorMode);
         game_hbox_players.getChildren().add(player);
+
+        if (!game_hbox_players.getChildren().contains(game_vBox_addPlayerVBox))
+            game_hbox_players.getChildren().add(game_vBox_addPlayerVBox);
 
         // add spacing
         Region region = new Region();
         game_hbox_players.getChildren().add(region);
         HBox.setHgrow(region, Priority.ALWAYS);
+
 
         players.add(player);
     }
