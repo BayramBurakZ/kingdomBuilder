@@ -37,7 +37,15 @@ public class LevelEditorController extends Controller implements Initializable {
      * Represents the limit for special places in one quadrant defined by the server.
      */
     private static final int SPECIAL_LIMIT = 3;
+
+    /**
+     * Represents the minimum depth the camera is allowed to zoom away from the board.
+     */
     public static final int MIN_CAMERA_DEPTH = -1250;
+
+    /**
+     * Represents the maximum depth the camera is allowed to zoom towards the board.
+     */
     public static final int MAX_CAMERA_DEPTH = -250;
 
     /**

@@ -33,42 +33,54 @@
 
 
    <center>
-         <VBox fx:id="gamesettings_vBox_preview" BorderPane.alignment="CENTER">
-
-              <GridPane fx:id="gamesettings_gridpane_previews" alignment="CENTER" gridLinesVisible="true" VBox.vgrow="ALWAYS">
-                  <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" />
-                            <ColumnConstraints hgrow="ALWAYS" />
-                  </columnConstraints>
-                  <rowConstraints>
-                            <RowConstraints vgrow="ALWAYS" />
-                            <RowConstraints vgrow="ALWAYS" />
-                  </rowConstraints>
-            <children>
-               <ImageView fx:id="gamsettings_quadrant_upperleft" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-               <ImageView fx:id="gamsettings_quadrant_lowerleft" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-               <ImageView fx:id="gamsettings_quadrant_upperright" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-               <ImageView fx:id="gamsettings_quadrant_lowerright" fitHeight="200.0" fitWidth="200.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            </children>
-
-              </GridPane>
-
-              <GridPane fx:id="gamesettings_gridpane_ids" alignment="CENTER">
-                      <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" />
-                            <ColumnConstraints hgrow="ALWAYS" />
-                      </columnConstraints>
-                      <rowConstraints>
-                            <RowConstraints vgrow="ALWAYS" />
-                            <RowConstraints vgrow="ALWAYS" />
-                      </rowConstraints>
-
-                            <ChoiceBox fx:id="gamesettings_choicebox_upperleft" GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_bottomleft" GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_upperright" GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
-                            <ChoiceBox fx:id="gamesettings_choicebox_bottomright" GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
-              </GridPane>
-         </VBox>
+      <HBox maxWidth="-Infinity" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+               <VBox fx:id="gamesettings_vBox_preview" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity">
+      
+                    <GridPane fx:id="gamesettings_gridpane_previews" alignment="CENTER" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity">
+                        <columnConstraints>
+                                  <ColumnConstraints hgrow="ALWAYS" />
+                                  <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                        <rowConstraints>
+                                  <RowConstraints vgrow="ALWAYS" />
+                                  <RowConstraints vgrow="ALWAYS" />
+                        </rowConstraints>
+                  <children>
+                     <ImageView fx:id="gamsettings_quadrant_upperleft" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                     <ImageView fx:id="gamsettings_quadrant_lowerleft" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" smooth="false" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                     <ImageView fx:id="gamsettings_quadrant_upperright" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                     <ImageView fx:id="gamsettings_quadrant_lowerright" fitHeight="160.0" fitWidth="160.0" pickOnBounds="true" smooth="false" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+                  </children>
+      
+                    </GridPane>
+      
+                    <GridPane fx:id="gamesettings_gridpane_ids" alignment="CENTER">
+                            <columnConstraints>
+                                  <ColumnConstraints hgrow="ALWAYS" />
+                                  <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                  <RowConstraints vgrow="ALWAYS" />
+                                  <RowConstraints vgrow="ALWAYS" />
+                            </rowConstraints>
+      
+                                  <ChoiceBox fx:id="gamesettings_choicebox_upperleft" GridPane.columnIndex="0" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                                  <ChoiceBox fx:id="gamesettings_choicebox_bottomleft" GridPane.columnIndex="0" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                                  <ChoiceBox fx:id="gamesettings_choicebox_upperright" GridPane.columnIndex="1" GridPane.rowIndex="0" VBox.vgrow="ALWAYS" />
+                                  <ChoiceBox fx:id="gamesettings_choicebox_bottomright" GridPane.columnIndex="1" GridPane.rowIndex="1" VBox.vgrow="ALWAYS" />
+                    </GridPane>
+               </VBox>
+            <VBox fx:id="gamesettings_legend_vbox" maxHeight="-Infinity" maxWidth="-Infinity">
+               <children>
+                  <Label fx:id="gamesettings_legend_label" text="%legend" textOverrun="CLIP" underline="true" />
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
+      </HBox>
    </center>
 
 
@@ -84,7 +96,7 @@
                 </VBox.margin>
             </TextField>
             <!-- Game Description -->
-            <TextField fx:id="gamesettings_textfield_desc" promptText="%gameDesc:">
+            <TextField fx:id="gamesettings_textfield_desc" promptText="%gameDesc">
                 <padding>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </padding>
@@ -111,17 +123,6 @@
                 </VBox.margin>
             </Label>
             <Spinner fx:id="gamesettings_spinner_bots">
-                <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </VBox.margin>
-            </Spinner>
-            <!-- Number of Hotseat that join -->
-            <Label text="%hotseatcanJoin">
-                <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </VBox.margin>
-            </Label>
-            <Spinner fx:id="gamesettings_spinner_hotseat">
                 <VBox.margin>
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>

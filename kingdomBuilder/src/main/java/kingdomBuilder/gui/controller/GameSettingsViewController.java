@@ -11,13 +11,19 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -49,7 +55,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private static final int MIN_TURN_LIMIT = 1;
 
-    private static final int QUADRANT_RESOLUTION = 200;
+    private static final int QUADRANT_RESOLUTION = 10 * 16;
 
     //region FXML-Imports
 
@@ -108,12 +114,6 @@ public class GameSettingsViewController extends Controller implements Initializa
     private Spinner<Integer> gamesettings_spinner_bots;
 
     /**
-     * Represents the spinner, where the user sets, how many hotseat players should contain.
-     */
-    @FXML
-    private Spinner<Integer> gamesettings_spinner_hotseat;
-
-    /**
      * Represents the checkBox if a time limit is preferred.
      */
     @FXML
@@ -155,14 +155,35 @@ public class GameSettingsViewController extends Controller implements Initializa
     @FXML
     private TextField gamesettings_textfield_desc;
 
+    /**
+     * Represents the ImageView showing the currently selected upper left quadrant.
+     */
     @FXML
     public ImageView gamsettings_quadrant_upperleft;
+
+    /**
+     * Represents the ImageView showing the currently selected lower left quadrant.
+     */
     @FXML
     public ImageView gamsettings_quadrant_lowerleft;
+
+    /**
+     * Represents the ImageView showing the currently selected upper right quadrant.
+     */
     @FXML
     public ImageView gamsettings_quadrant_upperright;
+
+    /**
+     * Represents the ImageView showing the currently selected lower right quadrant.
+     */
     @FXML
     public ImageView gamsettings_quadrant_lowerright;
+
+    /**
+     * Represents the VBox containing all the legend elements that describe the quadrant previews.
+     */
+    @FXML
+    public VBox gamesettings_legend_vbox;
 
     //endregion FXML-Imports
 
@@ -180,14 +201,16 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Represents the value of human players, that can join the game.
      */
     private int playerCount = 0;
+
     /**
      * Represents the value of bot players, that joins the game.
      */
     private int botCount = 0;
+
     /**
-     * Represents the value of hotseat players, that joins a game.
+     * Represents the map specifying what color TileTypes should have for the quadrant previews.
      */
-    private int hotseatCount = 0;
+    private final Map<TileType, Color> tileTypeColorMap = new HashMap<>();
 
     /**
      * Constructs the GameSettingsViewController.
@@ -214,10 +237,11 @@ public class GameSettingsViewController extends Controller implements Initializa
         }
 
         setupLayout();
-        initializeQuadrantPreviews();
         initializeChoiceBox();
         initializeSpinner();
         initializeListeners();
+        initializeQuadrantPreviews();
+        initializeLegend();
     }
 
     /**
@@ -235,10 +259,55 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamsettings_quadrant_upperright.setImage(quadrantUpperRight);
         gamsettings_quadrant_lowerright.setImage(quadrantLowerRight);
 
+        gamsettings_quadrant_upperleft.setFitWidth(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_lowerleft.setFitWidth(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_upperright.setFitWidth(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_lowerright.setFitWidth(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_upperleft.setFitHeight(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_lowerleft.setFitHeight(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_upperright.setFitHeight(QUADRANT_RESOLUTION);
+        gamsettings_quadrant_lowerright.setFitHeight(QUADRANT_RESOLUTION);
+
+        // assigning colors to TileTypes
+        tileTypeColorMap.put(TileType.GRAS, Color.LAWNGREEN);
+        tileTypeColorMap.put(TileType.FLOWER, Color.PALEGREEN);
+        tileTypeColorMap.put(TileType.FORREST, Color.FORESTGREEN);
+        tileTypeColorMap.put(TileType.CANYON, Color.SADDLEBROWN);
+        tileTypeColorMap.put(TileType.DESERT, Color.LIGHTYELLOW);
+        tileTypeColorMap.put(TileType.WATER, Color.BLUE);
+        tileTypeColorMap.put(TileType.MOUNTAIN, Color.DARKGRAY);
+        tileTypeColorMap.put(TileType.CASTLE, Color.LIGHTGRAY);
+        tileTypeColorMap.put(TileType.ORACLE, Color.MEDIUMPURPLE);
+        tileTypeColorMap.put(TileType.FARM, Color.YELLOW);
+        tileTypeColorMap.put(TileType.TAVERN, Color.BURLYWOOD);
+        tileTypeColorMap.put(TileType.TOWER, Color.DARKSLATEGRAY);
+        tileTypeColorMap.put(TileType.HARBOR, Color.CADETBLUE);
+        tileTypeColorMap.put(TileType.PADDOCK, Color.BROWN);
+        tileTypeColorMap.put(TileType.BARN, Color.ROSYBROWN);
+        tileTypeColorMap.put(TileType.OASIS, Color.TURQUOISE);
+
         updateQuadrant(quadrantUpperLeft, gamesettings_choicebox_upperleft.getValue());
         updateQuadrant(quadrantLowerLeft, gamesettings_choicebox_bottomleft.getValue());
         updateQuadrant(quadrantUpperRight, gamesettings_choicebox_upperright.getValue());
         updateQuadrant(quadrantLowerRight, gamesettings_choicebox_bottomright.getValue());
+    }
+
+    /**
+     * Initializes the legend of the quadrant previews.
+     */
+    private void initializeLegend() {
+        var children = gamesettings_legend_vbox.getChildren();
+        // TODO: get locale for the bundle from SceneLoader
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("kingdomBuilder/gui/gui");
+        for (var entry : tileTypeColorMap.entrySet()) {
+            Rectangle rectangle = new Rectangle(20, 20, entry.getValue());
+            rectangle.setStroke(Color.BLACK);
+            rectangle.setStrokeWidth(1);
+            Label label = new Label(resourceBundle.getString(entry.getKey().toString().toLowerCase(Locale.ROOT)));
+            HBox hbox = new HBox(rectangle, label);
+            hbox.setSpacing(5);
+            children.add(hbox);
+        }
     }
 
     /**
@@ -280,6 +349,10 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamesettings_choicebox_upperright.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
         gamesettings_choicebox_bottomleft.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
         gamesettings_choicebox_bottomright.setItems(FXCollections.observableList(store.getState().quadrants().keySet().stream().toList()));
+        gamesettings_choicebox_upperleft.getSelectionModel().select(0);
+        gamesettings_choicebox_upperright.getSelectionModel().select(1);
+        gamesettings_choicebox_bottomleft.getSelectionModel().select(2);
+        gamesettings_choicebox_bottomright.getSelectionModel().select(3);
     }
 
     /**
@@ -318,10 +391,6 @@ public class GameSettingsViewController extends Controller implements Initializa
         gamesettings_spinner_bots.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_PLAYERS, botCount)
         );
-
-        gamesettings_spinner_hotseat.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_PLAYERS - 1, hotseatCount)
-        );
     }
 
     /**
@@ -335,19 +404,6 @@ public class GameSettingsViewController extends Controller implements Initializa
             updateButtons();
             // update values in bot spinner
             updateBotSpinner();
-            // update values in hotseat spinner
-            updateHotseatSpinner();
-        });
-
-        gamesettings_spinner_hotseat.valueProperty().addListener((observable, oldValue, newValue) -> {
-            hotseatCount = newValue;
-
-            // update Buttons
-            updateButtons();
-            // update values in bot spinner
-            updateBotSpinner();
-            // update values in player spinner
-            updatePlayerSpinner();
         });
 
         gamesettings_spinner_bots.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -355,8 +411,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
             // update Buttons
             updateButtons();
-            // update values in hotseat spinner
-            updateHotseatSpinner();
             // update values in player spinner
             updatePlayerSpinner();
         });
@@ -367,7 +421,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private void updateBotSpinner() {
         int currentValue = gamesettings_spinner_bots.getValue();
-        int max_bots = MAX_PLAYERS - playerCount - hotseatCount;
+        int max_bots = MAX_PLAYERS - playerCount;
 
         if (currentValue > max_bots) {
             currentValue = max_bots;
@@ -378,35 +432,14 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Updates the Spinner for hotseat players.
-     */
-    private void updateHotseatSpinner() {
-        int currentValue = gamesettings_spinner_hotseat.getValue();
-        int max_hotseat = MAX_PLAYERS - playerCount - botCount;
-
-        if (currentValue > max_hotseat) {
-            currentValue = max_hotseat;
-        }
-
-        gamesettings_spinner_hotseat.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, max_hotseat, currentValue));
-    }
-
-    /**
      * Updates the Spinner for human players.
      */
     private void updatePlayerSpinner() {
         int currentValue = gamesettings_spinner_online_players.getValue();
-        int max_players = MAX_PLAYERS - botCount - hotseatCount;
+        int max_players = MAX_PLAYERS - botCount;
 
         if (currentValue > max_players) {
             currentValue = max_players;
-        }
-
-        // no hotseat allowed without own player
-        if (currentValue == 0) {
-            gamesettings_spinner_hotseat.getValueFactory().setValue(0);
-            hotseatCount = 0;
         }
 
         gamesettings_spinner_online_players.setValueFactory(
@@ -422,7 +455,7 @@ public class GameSettingsViewController extends Controller implements Initializa
             return;
         }
         // no players
-        if (playerCount + hotseatCount + botCount == 0) {
+        if (playerCount + botCount == 0) {
             deactivateHostGameButton();
         } else {
             activateHostGameButton();
@@ -439,24 +472,7 @@ public class GameSettingsViewController extends Controller implements Initializa
             int i = 0;
             for (int y = 0; y < 10; y++) {
                 for (int x = 0; x < 10; x++) {
-                    Color color = switch(tileTypes[i++]) {
-                        case GRAS -> Color.LAWNGREEN;
-                        case FLOWER -> Color.PALEGREEN;
-                        case FORREST -> Color.FORESTGREEN;
-                        case CANYON -> Color.SADDLEBROWN;
-                        case DESERT -> Color.LIGHTYELLOW;
-                        case WATER -> Color.DARKBLUE;
-                        case MOUNTAIN -> Color.DARKGRAY;
-                        case CASTLE -> Color.LIGHTGRAY;
-                        case ORACLE -> Color.MEDIUMPURPLE;
-                        case FARM -> Color.YELLOW;
-                        case TAVERN -> Color.BURLYWOOD;
-                        case TOWER -> Color.DARKSLATEGRAY;
-                        case HARBOR -> Color.CADETBLUE;
-                        case PADDOCK -> Color.BROWN;
-                        case BARN -> Color.ROSYBROWN;
-                        case OASIS -> Color.TURQUOISE;
-                    };
+                    Color color = tileTypeColorMap.get(tileTypes[i++]);
                     //pw.setColor(x, y, color);
                     ///*
                     int pixelSize = QUADRANT_RESOLUTION / 10;
@@ -534,7 +550,7 @@ public class GameSettingsViewController extends Controller implements Initializa
             turnLimit = -1;
         }
 
-        int playerLimit = botCount + hotseatCount + playerCount;
+        int playerLimit = botCount + playerCount;
         if (playerLimit == 0) {
             return true;
         }
@@ -547,7 +563,6 @@ public class GameSettingsViewController extends Controller implements Initializa
         System.out.println(
                 "Joinable Players: " + playerCount + "\n" +
                 "Bots: " + botCount + "\n" +
-                "Hotseat Players: " + hotseatCount + "\n" +
                 "Name: " + gameName + "\n" +
                 "Desc: " + gameDesc + "\n" +
                 "Time: " + timeLimit + "\n" +

@@ -37,7 +37,15 @@ import java.util.ResourceBundle;
  * This class controls all functions for the GameView.
  */
 public class GameViewController extends Controller implements Initializable {
+
+    /**
+     * Represents the minimum depth the camera is allowed to zoom away from the board.
+     */
     public static final int MIN_CAMERA_DEPTH = -1500;
+
+    /**
+     * Represents the maximum depth the camera is allowed to zoom towards the board.
+     */
     public static final int MAX_CAMERA_DEPTH = -250;
 
     //region FXML-Imports
