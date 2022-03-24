@@ -71,7 +71,17 @@ public class BotReducer extends Reducer<KBState> {
         // but it does not affect the gamelogic because a player only gets one token from the same special place
         //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
 
-        client.login("AI");
+        String aiName;
+        switch (difficulty){
+
+            case EASY -> aiName = "Easy AI";
+            case NORMAL -> aiName = "Normal AI";
+            case HARD -> aiName = "Hard AI";
+            case EXPERT -> aiName = "Expert AI";
+            default -> aiName = "AI";
+        }
+
+        client.login(aiName);
         client.loadNamespace();
         client.joinGame(oldState.client().getGameId());
 
@@ -92,7 +102,7 @@ public class BotReducer extends Reducer<KBState> {
                 && oldState.Bots().get(client).aiPlayer.getRemainingSettlementsOfTurn() > 0) {
 
             //System.out.println(oldState.nextPlayer() + " || " + client.getClientId());
-            List<ClientTurn> moves = oldState.Bots().get(client).chooseAI(oldState.nextTerrainCard());
+            List<ClientTurn> moves = oldState.Bots().get(client).chooseAI();
 
             // adding turns in reverse on the stack, so pop() gets the turns in order
             Stack<ClientTurn> stack = new Stack<>();

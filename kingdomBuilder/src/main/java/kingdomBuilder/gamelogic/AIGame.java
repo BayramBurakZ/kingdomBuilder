@@ -1,8 +1,6 @@
 package kingdomBuilder.gamelogic;
 
-import kingdomBuilder.KBState;
 import kingdomBuilder.gui.controller.BotDifficulty;
-import kingdomBuilder.redux.Store;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,7 +16,7 @@ public class AIGame {
     /**
      * the map that is shared  between  all  players.
      */
-    private GameMap gameMap;
+    private GameMap gameMap; //TODO: used it once so far maybe change this.
     /**
      * the player that the  AI  controls.
      */
@@ -53,59 +51,59 @@ public class AIGame {
     /**
      * selects the AI that is used for the game.
      *
-     * @param terrain of the current turn.
      * @return a list of all moves that the AI makes this turn.
      */
-    public List<ClientTurn> chooseAI(TileType terrain) {
+    public List<ClientTurn> chooseAI() {
         return switch (difficulty) {
-            case EASY -> randomPlacement(terrain);
-            default -> greedyPlacement(terrain);
+            case EASY -> randomPlacement();
+            default -> greedyPlacement();
         };
     }
 
     /**
-     * AI that places settlements randomly without using token.
+     * AI that places settlements randomly without using token. Difficulty EASY
      *
-     * @param terrain of the current turn.
      * @return a list of all moves that the AI makes this turn.
      */
-    public List<ClientTurn> randomPlacement(TileType terrain) {
+    public List<ClientTurn> randomPlacement() {
 
         List<ClientTurn> moves = new ArrayList(3);
         GameMap aiGameMap = new GameMap(gameMap);
 
         for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
 
-            List<Tile> placeable = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).toList();
+            List<Tile> placeable = aiGameMap.getAllPlaceableTiles(aiPlayer, aiPlayer.getTerrainCard()).toList();
             int index = (int) (Math.random() * (placeable.size()));
             Tile t = placeable.get(index);
 
             aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
             moves.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, t.x, t.y, -1, -1));
         }
-
         return moves;
     }
 
     /**
      * AI that uses greedy algorithm and uses token.
-     * It calculates the best next placement for a settlement within a basic turn and with every token  that the  AI  has.
+     * It calculates the best next placement for a settlement within a basic turn and with every token that the AI has.
+     * Difficulty NORMAL: calculates for two out of three win conditions.
+     * Difficulty HARD: calculates for all win conditions.
      *
-     * @param terrain of the current turn.
      * @return a list of all moves that the AI makes this turn.
      */
-    public List<ClientTurn> greedyPlacement(TileType terrain) {
+    public List<ClientTurn> greedyPlacement() {
 
         GameMap aiGameMap = new GameMap(gameMap);
         List<ClientTurn> moves = new ArrayList<>();
         boolean firstMoveOnSpecialPlace = false;
-        int settlementsLeft = aiPlayer.getRemainingSettlements();
 
-        settlementsLeft = findBestTurnToken(aiGameMap, moves, settlementsLeft);
+        // AI uses token before basic turn.
+        int settlementsLeft = findBestTurnToken(aiGameMap, moves, aiPlayer.getRemainingSettlements());
 
-        Set<Tile> freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
-        Tile bestToken = findBestToken(aiGameMap, freeTiles);
+        Set<Tile> freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, aiPlayer.getTerrainCard())
+                .collect(Collectors.toSet());
 
+        // AI prioritizes collectable tokens.
+        Tile bestToken = collectBestToken(aiGameMap, freeTiles);
         if (bestToken != null) {
             firstMoveOnSpecialPlace = true;
             moves.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, bestToken.x, bestToken.y, -1, -1));
@@ -114,13 +112,11 @@ public class AIGame {
             settlementsLeft--;
         }
 
-
-        // make basic turn
+        // AI does basic turn.
         int currentScore = 0;
         int bestScore = Game.calculateScore(aiGameMap, aiPlayer, winConditions, players);
-        Tile bestTile = null;
-
         int alternativeScore = Integer.MIN_VALUE;
+        Tile bestTile = null;
         Tile alternativeTile = null;
 
         for (int i = 0; i < aiPlayer.remainingSettlementsOfTurn; i++) {
@@ -129,7 +125,7 @@ public class AIGame {
                 continue;
             }
 
-            freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
+            freeTiles = aiGameMap.getAllPlaceableTiles(aiPlayer, aiPlayer.getTerrainCard()).collect(Collectors.toSet());
 
             for (Tile t : freeTiles) {
                 aiGameMap.at(t.x, t.y).placeSettlement(aiPlayer);
@@ -161,12 +157,10 @@ public class AIGame {
             alternativeScore = Integer.MIN_VALUE;
         }
 
-        // use tokens
+        // AI uses tokens at end of turn.
         findBestTurnToken(aiGameMap, moves, settlementsLeft);
-
         return moves;
     }
-
 
     /**
      * Search for a collectable token and find the best one for current win conditions.
@@ -175,20 +169,20 @@ public class AIGame {
      * @param freeTiles the tiles settlement can be placed.
      * @return the best token to place a settlement or null.
      */
-    private Tile findBestToken(GameMap map, Set<Tile> freeTiles) {
+    private Tile collectBestToken(GameMap map, Set<Tile> freeTiles) {
 
+        Set<Tile> collectableToken = new HashSet<>();
         Set<Tile> token = map.getTiles().filter
                 (t -> TileType.tokenType.contains(t.tileType)).collect(Collectors.toSet());
-        Set<Tile> collectableToken = new HashSet<>();
 
-        // prefer a special place as first turn
+        // find out which token could be collected.
         token.forEach(t -> {
-            if(t.hasSurroundingSettlement(map, aiPlayer))
+            if (t.hasSurroundingSettlement(map, aiPlayer))
                 return;
 
             for (Tile l : t.surroundingTiles(map).collect(Collectors.toSet()))
-                    if (freeTiles.contains(l))
-                        collectableToken.add(t);
+                if (freeTiles.contains(l))
+                    collectableToken.add(t);
         });
 
         if (collectableToken.isEmpty())
@@ -196,7 +190,9 @@ public class AIGame {
 
         Tile bestToken = null;
 
+        // choose a token to take.
         if (winConditions.contains(WinCondition.LORDS) || winConditions.contains(WinCondition.FARMER)) {
+
             if (collectableToken.stream().anyMatch(t -> t.tileType == TileType.ORACLE))
                 bestToken = collectableToken.stream().filter(t -> t.tileType == TileType.ORACLE).findAny().orElse(null);
             else if (collectableToken.stream().anyMatch(t -> t.tileType == TileType.FARM))
@@ -205,12 +201,14 @@ public class AIGame {
                 bestToken = collectableToken.stream().filter(t -> t.tileType == TileType.OASIS).findAny().orElse(null);
 
         } else if (winConditions.contains(WinCondition.KNIGHT) || winConditions.contains(WinCondition.EXPLORER)) {
+
             if (collectableToken.stream().anyMatch(t -> t.tileType == TileType.TAVERN))
                 bestToken = collectableToken.stream().filter(t -> t.tileType == TileType.TAVERN).findAny().orElse(null);
             else if (collectableToken.stream().anyMatch(t -> t.tileType == TileType.TOWER))
                 bestToken = collectableToken.stream().filter(t -> t.tileType == TileType.TOWER).findAny().orElse(null);
 
         } else if (winConditions.contains(WinCondition.ANCHORITE)) {
+
             if (collectableToken.stream().anyMatch(t -> t.tileType == TileType.PADDOCK))
                 bestToken = collectableToken.stream().filter(t -> t.tileType == TileType.PADDOCK).findAny().orElse(null);
 
@@ -233,19 +231,17 @@ public class AIGame {
      * @return the amount of settlements that are left.
      */
     private int findBestTurnToken(GameMap aiGameMap, List<ClientTurn> moves, int settlementsLeft) {
-        // use tokens
-        outerloop2:
-        for (TileType t : aiPlayer.getTokens().keySet()) {
 
+        outerloop:
+        for (TileType t : aiPlayer.getTokens().keySet()) {
             int amountToken = aiPlayer.getTokens().get(t).getRemaining();
 
             for (int i = 0; i < amountToken; i++) {
 
                 // move is allowed because it does not place a settlement
-                if (settlementsLeft <= 0 && !(t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN)) {
-                    // search for more tokens that could be played
-                    continue outerloop2;
-                }
+                if (settlementsLeft <= 0 && !(t == TileType.PADDOCK || t == TileType.HARBOR || t == TileType.BARN))
+                    continue outerloop;     //search for more tokens that could be played
+
                 ClientTurn move = calculateScoreToken(aiGameMap, aiPlayer, t);
 
                 if (move != null) {
@@ -400,7 +396,6 @@ public class AIGame {
             default -> {
 
                 Tile bestTile = null;
-
                 if (!TileType.tokenType.contains(token))
                     return null;
 
@@ -424,7 +419,7 @@ public class AIGame {
                     useToken(map, player, token, l.x, l.y);
                     currentScore = Game.calculateScore(map, player, winConditions, players);
 
-                    // always play a token
+                    // always play a token that places
                     if (currentScore >= bestScore) {
                         bestScore = currentScore;
                         bestTile = l;
@@ -694,7 +689,13 @@ public class AIGame {
      * @param winConditions win conditions to set.
      */
     public void setWinConditions(ArrayList<WinCondition> winConditions) {
-        this.winConditions = winConditions;
+
+        if (difficulty == BotDifficulty.NORMAL) {
+            this.winConditions = new ArrayList<>();
+            this.winConditions.add(winConditions.get(0));
+            this.winConditions.add(winConditions.get(1));
+        } else
+            this.winConditions = winConditions;
     }
 
     /**
