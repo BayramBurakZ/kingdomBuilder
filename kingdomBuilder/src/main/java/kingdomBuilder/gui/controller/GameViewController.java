@@ -465,9 +465,8 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     /**
-     * Highlights the given tiles on the board and enables the fog if any are highlighted.
+     * Highlights the given tiles on the board and enables the fog/shadow if any are highlighted.
      * @param tiles the tiles to highlight.
-     * @return whether any tiles are highlighted.
      */
     private void highlightTerrain(Stream<Tile> tiles) {
         boolean tilesAreHighlighted = gameBoard.highlightTerrain(tiles);
@@ -654,8 +653,6 @@ public class GameViewController extends Controller implements Initializable {
         shadow.setTranslateX(boardCenter.getX());
         shadow.setTranslateY(boardCenter.getY());
         shadow.setTranslateZ(boardCenter.getZ() * 1.3); // above the board
-
-        shadow.setVisible(false);
 
         clouds.setTranslateX(boardCenter.getX());
         clouds.setTranslateY(boardCenter.getY());

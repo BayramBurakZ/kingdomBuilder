@@ -91,6 +91,7 @@ public class Fog extends Box {
      */
     public Fog(double width, double height, double depth, int resolution, Color color, double minOpacity, double maxOpacity) {
         super(width, height, depth);
+        setVisible(false);
 
         this.minOpacity = minOpacity;
         this.maxOpacity = maxOpacity;

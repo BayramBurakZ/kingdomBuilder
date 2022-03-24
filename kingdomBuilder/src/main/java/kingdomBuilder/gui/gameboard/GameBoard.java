@@ -173,8 +173,9 @@ public class GameBoard extends Board {
     }
 
     /**
-     * Highlights Hexagons on the map which matches the given type.
+     * Highlights Hexagons on the map which matches the given type and returns whether any tiles were highlighted.
      * @param tiles the tiles to highlight.
+     * @return whether any tiles were highlighted.
      */
     public boolean highlightTerrain(Stream<Tile> tiles) {
         for (HexagonTile[] o : board)
