@@ -613,14 +613,12 @@ public class GameMap implements Iterable<Tile> {
            countsOfPlayers.put(players.get(i), countsOfSettlements[i]);
         }
 
-        IntStream arrayOfCounts = Arrays.stream(countsOfSettlements);
-
-        int highestCount = arrayOfCounts.max().getAsInt();
+        int highestCount = Arrays.stream(countsOfSettlements).max().getAsInt();
 
         if(countsOfPlayers.get(player) == highestCount)
             return 2;
 
-        int secondHighCount = arrayOfCounts.filter(i -> i != highestCount).max().getAsInt();
+        int secondHighCount = Arrays.stream(countsOfSettlements).filter(i -> i != highestCount).max().getAsInt();
 
         if(countsOfPlayers.get(player) == secondHighCount)
             return 1;

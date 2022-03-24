@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,6 +61,7 @@ class GameTest {
 
     Player playerOne;
     Player playerTwo;
+    Player playerThree;
 
     @BeforeEach
     public void testInitializeMap() {
@@ -75,6 +77,7 @@ class GameTest {
     public void testInitializePlayers() {
         playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
         playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
+        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
     }
 
     @Test
@@ -343,72 +346,132 @@ class GameTest {
 
     }
 
-    @Test @Disabled
+    @Test
     void testScoreLord() {
-        Player playerThird = new Player(3, "TestPlayer3", PlayerColor.BLACK, 40);
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(playerOne);
+        players.add(playerTwo);
+        players.add(playerThree);
 
-        //TODO: adjust test
-        //Test#1: no settlement placed
-        //assertEquals(0, Game.scoreLord(gameMap, playerOne));
+        //Test#1: no settlement placed => all players have the highest amount of settlements
+        assertEquals(48, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(48, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(48, Game.scoreLord(gameMap, playerThree, players));
 
-        //Test#2: one settlement in upper left quadrant (largest group)
+        //Test#2: PlayerOne has most settlements on upper left.
         gameMap.at(0,0).placeSettlement(playerOne);
-        //assertEquals(12, Game.scoreLord(gameMap, playerOne));
+        assertEquals(48, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(42, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(42, Game.scoreLord(gameMap, playerThree, players));
         gameMap.at(0,0).removeSettlement();
 
-        //Test#3: biggest group in upper left quadrant and biggest in bottom right quadrant
+        //Test#3: playerOne hast most settlements on upper left and bottom right.
         gameMap.at(0,0).placeSettlement(playerOne);
         gameMap.at(19,19).placeSettlement(playerOne);
-
-        //assertEquals(24, Game.scoreLord(gameMap, playerOne));
+        assertEquals(48, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(36, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(36, Game.scoreLord(gameMap, playerThree, players));
         gameMap.at(0,0).removeSettlement();
         gameMap.at(19,19).removeSettlement();
 
-        //Test#4: second-largest group in upper left quadrant for playerOne
+        //Test#4:
+        // playerOne has second most settlements on upper left.
+        // playerTwo has most settlements on upper left.
         gameMap.at(0,0).placeSettlement(playerTwo);
         gameMap.at(1,0).placeSettlement(playerTwo);
         gameMap.at(0,1).placeSettlement(playerOne);
 
-        //assertEquals(6, Game.scoreLord(gameMap, playerOne));
+        assertEquals(42, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(48, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(36, Game.scoreLord(gameMap, playerThree, players));
+
         gameMap.at(0,0).removeSettlement();
         gameMap.at(1,0).removeSettlement();
         gameMap.at(0,1).removeSettlement();
 
         //Test#5: at quadrant border
-        //upper left is the biggest
-        //upper right is second biggest
+        // playerOne has most on upper left.
+        // playerTwo has most on upper right.
+        // playerThree has second most on upper left and right.
         gameMap.at(9,0).placeSettlement(playerOne);
-        gameMap.at(10,0).placeSettlement(playerOne);
-
+        gameMap.at(8,0).placeSettlement(playerOne);
         gameMap.at(19,0).placeSettlement(playerTwo);
         gameMap.at(19,1).placeSettlement(playerTwo);
+        gameMap.at(9,1).placeSettlement(playerThree);
+        gameMap.at(18,0).placeSettlement(playerThree);
 
-        //assertEquals(18, Game.scoreLord(gameMap, playerOne));
-
-        //Test#6: third-largest group
-        //(same map as #5)
-        gameMap.at(15,0).placeSettlement(playerThird);
-        //assertEquals(0, Game.scoreLord(gameMap, playerThird));
+        assertEquals(36, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(36, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(36, Game.scoreLord(gameMap, playerThree, players));
 
         gameMap.at(9,0).removeSettlement();
-        gameMap.at(10,0).removeSettlement();
+        gameMap.at(8,0).removeSettlement();
         gameMap.at(19,0).removeSettlement();
         gameMap.at(19,1).removeSettlement();
-        gameMap.at(15,0).removeSettlement();
+        gameMap.at(9,1).removeSettlement();
+        gameMap.at(18,0).removeSettlement();
 
-        //Test#7: two players with same amount of settlements
-        gameMap.at(0,0).placeSettlement(playerOne);
-        gameMap.at(1,0).placeSettlement(playerOne);
+        //Test#6:
+        // playerOne has most on every quadrant.
+        // playerTwo hast second most on every quadrant
+        // playerThree does not get any points.
+        gameMap.at(3,4).placeSettlement(playerOne);
+        gameMap.at(3,5).placeSettlement(playerOne);
+        gameMap.at(3,7).placeSettlement(playerOne);
+        gameMap.at(15,6).placeSettlement(playerOne);
+        gameMap.at(16,6).placeSettlement(playerOne);
+        gameMap.at(16,7).placeSettlement(playerOne);
+        gameMap.at(5,14).placeSettlement(playerOne);
+        gameMap.at(5,15).placeSettlement(playerOne);
+        gameMap.at(5,16).placeSettlement(playerOne);
+        gameMap.at(17,16).placeSettlement(playerOne);
+        gameMap.at(18,16).placeSettlement(playerOne);
+        gameMap.at(19,16).placeSettlement(playerOne);
+
+        gameMap.at(0,0).placeSettlement(playerTwo);
+        gameMap.at(0,9).placeSettlement(playerTwo);
+        gameMap.at(10,0).placeSettlement(playerTwo);
         gameMap.at(19,0).placeSettlement(playerTwo);
-        gameMap.at(19,1).placeSettlement(playerTwo);
+        gameMap.at(0,19).placeSettlement(playerTwo);
+        gameMap.at(1,18).placeSettlement(playerTwo);
+        gameMap.at(19,19).placeSettlement(playerTwo);
+        gameMap.at(19,18).placeSettlement(playerTwo);
 
-        //assertEquals(12, Game.scoreLord(gameMap, playerOne));
-        //assertEquals(12, Game.scoreLord(gameMap, playerTwo));
+        gameMap.at(0,3).placeSettlement(playerThree);
+        gameMap.at(19,6).placeSettlement(playerThree);
+        gameMap.at(4,12).placeSettlement(playerThree);
+        gameMap.at(14,15).placeSettlement(playerThree);
+
+        assertEquals(48, Game.scoreLord(gameMap, playerOne, players));
+        assertEquals(24, Game.scoreLord(gameMap, playerTwo, players));
+        assertEquals(0, Game.scoreLord(gameMap, playerThree, players));
+
+        gameMap.at(3,4).removeSettlement();
+        gameMap.at(3,5).removeSettlement();
+        gameMap.at(3,7).removeSettlement();
+        gameMap.at(15,6).removeSettlement();
+        gameMap.at(16,6).removeSettlement();
+        gameMap.at(16,7).removeSettlement();
+        gameMap.at(5,14).removeSettlement();
+        gameMap.at(5,15).removeSettlement();
+        gameMap.at(5,16).removeSettlement();
+        gameMap.at(17,16).removeSettlement();
+        gameMap.at(18,16).removeSettlement();
+        gameMap.at(19,16).removeSettlement();
 
         gameMap.at(0,0).removeSettlement();
-        gameMap.at(1,0).removeSettlement();
+        gameMap.at(0,9).removeSettlement();
+        gameMap.at(10,0).removeSettlement();
         gameMap.at(19,0).removeSettlement();
-        gameMap.at(19,1).removeSettlement();
+        gameMap.at(0,19).removeSettlement();
+        gameMap.at(1,18).removeSettlement();
+        gameMap.at(19,19).removeSettlement();
+        gameMap.at(19,18).removeSettlement();
+
+        gameMap.at(0,3).removeSettlement();
+        gameMap.at(19,6).removeSettlement();
+        gameMap.at(4,12).removeSettlement();
+        gameMap.at(14,15).removeSettlement();
     }
 
     @Test @Disabled

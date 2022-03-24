@@ -171,7 +171,8 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState setWinConditionBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        oldState.Bots().get(client).setWinConditions(oldState.winConditions());
+        if(oldState.Bots() != null)
+            oldState.Bots().get(client).setWinConditions(oldState.winConditions());
 
         return state;
     }
@@ -180,7 +181,8 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState setPlayersBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        oldState.Bots().get(client).setPlayers(oldState.players());
+        if(oldState.Bots() != null)
+            oldState.Bots().get(client).setPlayers(oldState.players());
 
         return state;
     }
