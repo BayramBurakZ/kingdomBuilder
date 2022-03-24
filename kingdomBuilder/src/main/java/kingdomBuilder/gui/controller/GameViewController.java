@@ -642,7 +642,7 @@ public class GameViewController extends Controller implements Initializable {
                 -Hexagon.HEXAGON_DEPTH
         );
 
-        shadow = new Fog(1600, 1500, 1, 8, Color.BLACK, 0.2, 0.4);
+        shadow = new Fog(1650, 1550, 1, 8, Color.BLACK, 0.2, 0.4);
 
         // the clouds in the background of the scene
         Fog clouds = new Fog(5000, 4000, 1, 16, Color.WHITE);
@@ -654,6 +654,8 @@ public class GameViewController extends Controller implements Initializable {
         shadow.setTranslateX(boardCenter.getX());
         shadow.setTranslateY(boardCenter.getY());
         shadow.setTranslateZ(boardCenter.getZ() * 1.3); // above the board
+
+        shadow.setVisible(false);
 
         clouds.setTranslateX(boardCenter.getX());
         clouds.setTranslateY(boardCenter.getY());
