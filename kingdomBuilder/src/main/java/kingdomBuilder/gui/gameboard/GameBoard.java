@@ -8,7 +8,7 @@ import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 /**
@@ -174,16 +174,20 @@ public class GameBoard extends Board {
 
     /**
      * Highlights Hexagons on the map which matches the given type.
-     * @param tiles the tiles to highlight
+     * @param tiles the tiles to highlight.
      */
-    public void highlightTerrain(Stream<Tile> tiles) {
+    public boolean highlightTerrain(Stream<Tile> tiles) {
         for (HexagonTile[] o : board)
             for (HexagonTile h : o) {
                 h.removeElevated();
             }
+
+        AtomicReference<Boolean> tilesAreHighlighted = new AtomicReference<>(false);
         tiles.forEach(t -> {
             board[t.x][t.y].setElevated();
+            tilesAreHighlighted.set(true);
         });
+        return tilesAreHighlighted.get();
     }
 
     /**

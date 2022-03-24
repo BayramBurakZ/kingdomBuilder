@@ -1,5 +1,6 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -11,16 +12,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.paint.Material;
+import javafx.scene.paint.PhongMaterial;
+import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
+import kingdomBuilder.gui.Fog;
 import kingdomBuilder.gui.GameCamera;
 import kingdomBuilder.gui.gameboard.*;
 import kingdomBuilder.gui.util.Util;
@@ -33,6 +41,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Stream;
 
 /**
  * This class controls all functions for the GameView.
@@ -190,6 +199,11 @@ public class GameViewController extends Controller implements Initializable {
     boolean hasMap = false;
 
     /**
+     * Represents the shadow that helps highlight the selectable hexagons.
+     */
+    private Fog shadow;
+
+    /**
      * Constructs the GameView with the given store.
      *
      * @param store the Store for access to the state.
@@ -217,7 +231,7 @@ public class GameViewController extends Controller implements Initializable {
             if (kbState.nextPlayer() >= 0 && kbState.gameStarted() && kbState.nextTerrainCard() != null) {
                 // only preview for this client
                 if (kbState.nextPlayer() == kbState.client().getClientId())
-                    gameBoard.highlightTerrain(Game.allBasicTurnTiles(
+                    highlightTerrain(Game.allBasicTurnTiles(
                             kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
             }
         }, "gameStarted", "nextPlayer", "nextTerrainCard");
@@ -364,7 +378,7 @@ public class GameViewController extends Controller implements Initializable {
         }
         // Highlight Terrain only for client
         if (kbState.nextPlayer() == kbState.client().getClientId()) {
-            gameBoard.highlightTerrain(Game.allBasicTurnTiles(
+            highlightTerrain(Game.allBasicTurnTiles(
                     kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
         }
 
@@ -425,7 +439,7 @@ public class GameViewController extends Controller implements Initializable {
             updateTokens(kbState);
 
             disableTokens(false);
-            gameBoard.highlightTerrain(Game.allBasicTurnTiles(
+            highlightTerrain(Game.allBasicTurnTiles(
                     kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
             if (gameBoard.getMarkedHexagon() != null) {
                 gameBoard.getMarkedHexagon().removeMarker();
@@ -438,15 +452,31 @@ public class GameViewController extends Controller implements Initializable {
 
         switch (token) {
 
-            case ORACLE -> gameBoard.highlightTerrain(Game.allTokenOracleTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case FARM -> gameBoard.highlightTerrain(Game.allTokenFarmTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case TAVERN -> gameBoard.highlightTerrain(Game.allTokenTavernTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case TOWER -> gameBoard.highlightTerrain(Game.allTokenTowerTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case HARBOR -> gameBoard.highlightTerrain(Game.allTokenHarborTiles(kbState.gameMap(), kbState.currentPlayer(), false));
-            case PADDOCK -> gameBoard.highlightTerrain(Game.allTokenPaddockTiles(kbState.gameMap(), kbState.currentPlayer()));
-            case BARN -> gameBoard.highlightTerrain(Game.allTokenBarnTiles(kbState.gameMap(), kbState.currentPlayer(), false));
-            case OASIS -> gameBoard.highlightTerrain(Game.allTokenOasisTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case ORACLE -> highlightTerrain(Game.allTokenOracleTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case FARM -> highlightTerrain(Game.allTokenFarmTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case TAVERN -> highlightTerrain(Game.allTokenTavernTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case TOWER -> highlightTerrain(Game.allTokenTowerTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case HARBOR -> highlightTerrain(Game.allTokenHarborTiles(kbState.gameMap(), kbState.currentPlayer(), false));
+            case PADDOCK -> highlightTerrain(Game.allTokenPaddockTiles(kbState.gameMap(), kbState.currentPlayer()));
+            case BARN -> highlightTerrain(Game.allTokenBarnTiles(kbState.gameMap(), kbState.currentPlayer(), false));
+            case OASIS -> highlightTerrain(Game.allTokenOasisTiles(kbState.gameMap(), kbState.currentPlayer()));
             default -> throw new RuntimeException("Tile type is not a token!");
+        }
+    }
+
+    /**
+     * Highlights the given tiles on the board and enables the fog if any are highlighted.
+     * @param tiles the tiles to highlight.
+     * @return whether any tiles are highlighted.
+     */
+    private void highlightTerrain(Stream<Tile> tiles) {
+        boolean tilesAreHighlighted = gameBoard.highlightTerrain(tiles);
+        if (shadow != null) {
+            if (tilesAreHighlighted) {
+                shadow.fadeIn();
+            } else {
+                shadow.fadeOut();
+            }
         }
     }
 
@@ -577,7 +607,7 @@ public class GameViewController extends Controller implements Initializable {
 
         if (kbState.currentPlayer() != null)
             if (kbState.nextPlayer() == kbState.client().getClientId())
-                gameBoard.highlightTerrain(Game.allBasicTurnTiles(
+                highlightTerrain(Game.allBasicTurnTiles(
                         kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
     }
 
@@ -609,8 +639,26 @@ public class GameViewController extends Controller implements Initializable {
         boardCenter = new Point3D(
                 (board[9][0].getTranslateX() + board[10][1].getTranslateX()) / 2f,
                 (board[0][9].getTranslateY() + board[0][10].getTranslateY()) / 2f,
-                Hexagon.HEXAGON_DEPTH
+                -Hexagon.HEXAGON_DEPTH
         );
+
+        shadow = new Fog(1600, 1500, 1, 8, Color.BLACK, 0.2, 0.4);
+
+        // the clouds in the background of the scene
+        Fog clouds = new Fog(5000, 4000, 1, 16, Color.WHITE);
+
+        // the order of adding these matters for transparent rendering in JavaFX despite usage of a z-buffer
+        gameBoard_group.getChildren().add(clouds);
+        gameBoard_group.getChildren().add(shadow);
+
+        shadow.setTranslateX(boardCenter.getX());
+        shadow.setTranslateY(boardCenter.getY());
+        shadow.setTranslateZ(boardCenter.getZ() * 1.3); // above the board
+
+        clouds.setTranslateX(boardCenter.getX());
+        clouds.setTranslateY(boardCenter.getY());
+        clouds.setTranslateZ(-boardCenter.getZ() * 1.3); // below the board
+        clouds.fadeIn();
     }
 
     /**

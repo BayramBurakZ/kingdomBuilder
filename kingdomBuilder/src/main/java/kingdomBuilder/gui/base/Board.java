@@ -35,7 +35,6 @@ public abstract class Board {
                 }
 
                 int yPos = y * 60;
-                // TODO: this cast was necessary cause IntelliJ bugged out, remove
                 placeTileOnBoard(group, x, y, xPos, yPos, gameMap.at(x, y).tileType, resource);
             }
         }
