@@ -167,15 +167,18 @@ public class ApplicationReducer extends Reducer<KBState> {
     public DeferredState onDisconnect(Store<KBState> unused, KBState oldState, Boolean wasKicked) {
         DeferredState state = new DeferredState(oldState);
 
-        // TODO: remove sceneloader/controller
+        // TODO: error message for being kicked
+        /*
         if (wasKicked) {
             var sceneLoader = oldState.sceneLoader();
             sceneLoader.getChatViewController().onYouHaveBeenKicked();
         }
+         */
 
         oldState.client().disconnect();
         state.setClient(null);
         state.setIsConnected(false);
+        state.setClientState(KBState.ClientState.NO_ROOT);
 
         oldState.clients().clear();
         state.setClients(oldState.clients());

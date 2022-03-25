@@ -308,7 +308,9 @@ public class ChatViewController extends Controller implements Initializable {
         if (kbState.clientState() == null) return;
 
         switch ( kbState.clientState()) {
-            case NO_ROOT -> {}
+            case NO_ROOT -> {
+                chatview_button_kick.setVisible(false);
+            }
             case ERROR -> {
                 String text = resourceBundle.getString("invalidPassword");
                 globalChatAppendElement(

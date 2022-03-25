@@ -16,14 +16,14 @@
 
         <Region HBox.hgrow="ALWAYS" />
         <!-- Turn information of the game-->
-        <Label fx:id="game_label_turn" text="00" textFill="WHITE">
+        <Label fx:id="game_label_turn" textFill="WHITE">
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>
         </Label>
 
         <!-- Time information of the game-->
-        <Label fx:id="game_label_time" text="00" textFill="WHITE">
+        <Label fx:id="game_label_time" textFill="WHITE">
             <padding>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </padding>

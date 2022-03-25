@@ -142,6 +142,7 @@ public class GameReducer extends Reducer<KBState> {
         oldState.client().joinGame(gameId);
         state.setClient(oldState.client());
         state.setJoinedGame(true);
+        state.setTurnCount(0);
         return state;
     }
 
@@ -392,6 +393,7 @@ public class GameReducer extends Reducer<KBState> {
         }
 
         state.setNextPlayer(turnStart.clientId());
+        state.setTurnCount(oldState.turnCount() + 1);
         return state;
     }
 

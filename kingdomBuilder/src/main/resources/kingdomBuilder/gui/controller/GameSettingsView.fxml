@@ -116,17 +116,6 @@
                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                 </VBox.margin>
             </Spinner>
-            <!-- Number of Bots that can join -->
-            <Label text="%botsCanJoin">
-                <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </VBox.margin>
-            </Label>
-            <Spinner fx:id="gamesettings_spinner_bots">
-                <VBox.margin>
-                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                </VBox.margin>
-            </Spinner>
 
             <!-- Time -->
             <CheckBox fx:id="gamesettings_checkBox_time" text="%enableTimeLimit">

@@ -86,7 +86,8 @@ public record KBState(SceneLoader sceneLoader,
                       Map<Integer, List<Integer>> playersOfGame,
                       InetSocketAddress serverAddress,
                       Map<Client, AIGame> Bots,
-                      ClientState clientState
+                      ClientState clientState,
+                      int turnCount
 ) {
 
     /**
@@ -126,7 +127,8 @@ public record KBState(SceneLoader sceneLoader,
                 new HashMap<>(),
                 null,
                 new HashMap<>(),
-                ClientState.NO_ROOT
+                ClientState.NO_ROOT,
+                0
         );
     }
 

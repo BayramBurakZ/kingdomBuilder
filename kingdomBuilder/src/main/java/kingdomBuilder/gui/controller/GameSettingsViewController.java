@@ -39,23 +39,36 @@ public class GameSettingsViewController extends Controller implements Initializa
     /**
      * Represents the maximal time limit the user can set.
      */
-    private static final int MAX_TIME_LIMIT = Integer.MAX_VALUE;
+    private static final int MAX_TIME_LIMIT = 20;
+
+    /**
+     * Represents the default time limit.
+     */
+    public static final int DEFAULT_TIME_LIMIT = 5;
 
     /**
      * Represents the minimal time limit the user can set.
      */
-    private static final int MIN_TIME_LIMIT = 10;
+    private static final int MIN_TIME_LIMIT = 1;
 
     /**
      * Represents the maximal turn limit the user can set.
      */
-    private static final int MAX_TURN_LIMIT = Integer.MAX_VALUE;
+    private static final int MAX_TURN_LIMIT = 500;
+
+    /**
+     * Represents the default turn limit.
+     */
+    public static final int DEFAULT_TURN_LIMIT = 50;
 
     /**
      * Represents the minimal turn limit the user can set.
      */
     private static final int MIN_TURN_LIMIT = 1;
 
+    /**
+     * Represents the resolution of the square quadrant preview image.
+     */
     private static final int QUADRANT_RESOLUTION = 10 * 16;
 
     //region FXML-Imports
@@ -107,12 +120,6 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     @FXML
     private Spinner<Integer> gamesettings_spinner_online_players;
-
-    /**
-     * Represents the spinner, where the user sets, how many bots the game should contain.
-     */
-    @FXML
-    private Spinner<Integer> gamesettings_spinner_bots;
 
     /**
      * Represents the checkBox if a time limit is preferred.
@@ -188,9 +195,24 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     //endregion FXML-Imports
 
+    /**
+     * Represents the image of the upper left quadrant preview.
+     */
     private WritableImage quadrantUpperLeft;
+
+    /**
+     * Represents the image of the lower left quadrant preview.
+     */
     private WritableImage quadrantLowerLeft;
+
+    /**
+     * Represents the image of the upper right quadrant preview.
+     */
     private WritableImage quadrantUpperRight;
+
+    /**
+     * Represents the image of the lower right quadrant preview.
+     */
     private WritableImage quadrantLowerRight;
 
     /**
@@ -202,11 +224,6 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Represents the value of human players, that can join the game.
      */
     private int playerCount = 0;
-
-    /**
-     * Represents the value of bot players, that joins the game.
-     */
-    private int botCount = 0;
 
     /**
      * Represents the map specifying what color TileTypes should have for the quadrant previews.
@@ -372,23 +389,19 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Initializes the Spinner values for time and turn.
      */
     private void initializeSpinner() {
-        // playerlimit
+        // time limit
         gamesettings_spinner_time.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_TIME_LIMIT, MAX_TIME_LIMIT, 1800)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_TIME_LIMIT, MAX_TIME_LIMIT, DEFAULT_TIME_LIMIT)
         );
 
-        // timelimit
+        // turn limit
         gamesettings_spinner_turn.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_TURN_LIMIT, MAX_TURN_LIMIT, 20)
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(MIN_TURN_LIMIT, MAX_TURN_LIMIT, DEFAULT_TURN_LIMIT)
         );
 
         // 0 - 4 players
         gamesettings_spinner_online_players.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_PLAYERS, playerCount)
-        );
-
-        gamesettings_spinner_bots.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, MAX_PLAYERS, botCount)
         );
     }
 
@@ -401,48 +414,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
             // update Buttons
             updateButtons();
-            // update values in bot spinner
-            updateBotSpinner();
         });
-
-        gamesettings_spinner_bots.valueProperty().addListener((observable, oldValue, newValue) -> {
-            botCount = newValue;
-
-            // update Buttons
-            updateButtons();
-            // update values in player spinner
-            updatePlayerSpinner();
-        });
-    }
-
-    /**
-     * Updates the Spinner for bots.
-     */
-    private void updateBotSpinner() {
-        int currentValue = gamesettings_spinner_bots.getValue();
-        int max_bots = MAX_PLAYERS - playerCount;
-
-        if (currentValue > max_bots) {
-            currentValue = max_bots;
-        }
-
-        gamesettings_spinner_bots.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, max_bots, currentValue));
-    }
-
-    /**
-     * Updates the Spinner for human players.
-     */
-    private void updatePlayerSpinner() {
-        int currentValue = gamesettings_spinner_online_players.getValue();
-        int max_players = MAX_PLAYERS - botCount;
-
-        if (currentValue > max_players) {
-            currentValue = max_players;
-        }
-
-        gamesettings_spinner_online_players.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, max_players, currentValue));
     }
 
     /**
@@ -454,7 +426,7 @@ public class GameSettingsViewController extends Controller implements Initializa
             return;
         }
         // no players
-        if (playerCount + botCount == 0) {
+        if (playerCount == 0) {
             deactivateHostGameButton();
         } else {
             activateHostGameButton();
@@ -549,8 +521,8 @@ public class GameSettingsViewController extends Controller implements Initializa
             turnLimit = -1;
         }
 
-        int playerLimit = botCount + playerCount;
-        if (playerLimit == 0) {
+        // player limit
+        if (playerCount == 0) {
             return true;
         }
 
@@ -561,7 +533,6 @@ public class GameSettingsViewController extends Controller implements Initializa
 
         System.out.println(
                 "Joinable Players: " + playerCount + "\n" +
-                "Bots: " + botCount + "\n" +
                 "Name: " + gameName + "\n" +
                 "Desc: " + gameDesc + "\n" +
                 "Time: " + timeLimit + "\n" +
@@ -572,7 +543,7 @@ public class GameSettingsViewController extends Controller implements Initializa
                 "QBR: " + quadrantBottomRight + "\n"
         );
 
-        store.dispatchOld(new HostGameAction(gameName, gameDesc, playerLimit, timeLimit, turnLimit,
+        store.dispatchOld(new HostGameAction(gameName, gameDesc, playerCount, timeLimit, turnLimit,
                 quadrantUpperLeft, quadrantUpperRight, quadrantBottomLeft, quadrantBottomRight));
 
         return false;

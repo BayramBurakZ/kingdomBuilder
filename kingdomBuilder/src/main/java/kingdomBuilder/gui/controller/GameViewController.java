@@ -1,5 +1,8 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,6 +21,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
@@ -31,6 +35,7 @@ import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -197,6 +202,22 @@ public class GameViewController extends Controller implements Initializable {
     private Fog shadow;
 
     /**
+     * The time remaining in the current turn.
+     */
+    private int timeRemaining;
+
+    /**
+     * The maximum allowed time of one turn.
+     */
+    private int timeLimit;
+
+    /**
+     * The timeline used for regularly updating the displayed time limit and remaining time.
+     */
+    private Timeline timeLabelTimeline;
+
+
+    /**
      * Constructs the GameView with the given store.
      *
      * @param store the Store for access to the state.
@@ -238,6 +259,7 @@ public class GameViewController extends Controller implements Initializable {
         store.subscribe(this::onLastTurnChanged, "gameLastTurn");
         store.subscribe(this::onNextPlayer, "nextPlayer");
         store.subscribe(this::onCurrentPlayerChanged, "currentPlayer");
+        store.subscribe(this::onTurnCountChanged, "turnCount");
 
         // WIN SITUATION
         store.subscribe(state -> {
@@ -507,6 +529,26 @@ public class GameViewController extends Controller implements Initializable {
     }
 
     /**
+     * Updates the time limit label with the specified values.
+     * @param timeRemaining the time remaining in the current turn.
+     * @param timeLimit the maximum allowed time of one turn.
+     */
+    private void setTimeLabel(int timeRemaining, int timeLimit) {
+        if (timeLimit > -1) {
+            // could also try LocalTime.ofSecondOfDay(timeRemaining).toString()
+            timeRemaining = Math.max(timeRemaining, 0);
+            String minutesRemaining = String.format("%02d", timeRemaining / 60);
+            String secondsRemaining = String.format("%02d", timeRemaining % 60);
+            String minutesLimit = String.format("%02d", timeLimit / 60);
+            String secondsLimit = String.format("%02d", timeLimit % 60);
+            game_label_time.setText(resourceBundle.getObject("timeLimit:") + " "
+                    + minutesRemaining + ":" + secondsRemaining + "/" + minutesLimit + ":" + secondsLimit);
+        } else {
+            game_label_time.setText("");
+        }
+    }
+
+    /**
      * Updates the GUI whenever the MyGameReply changed (happens only when the game starts).
      *
      * @param kbState the current state.
@@ -515,12 +557,14 @@ public class GameViewController extends Controller implements Initializable {
         MyGameReply myGame = kbState.myGameReply();
         if (myGame != null) {
             // display time limit
-            int time;
-
-            if (myGame.timeLimit() != -1) {
-                time = myGame.timeLimit() / 1000;
-                game_label_time.setText(resourceBundle.getObject("timeLimit:")
-                        + " " + time);
+            timeLimit = myGame.timeLimit();
+            if (timeLimit > -1) {
+                timeRemaining = timeLimit = myGame.timeLimit() / 1000;
+                setTimeLabel(timeRemaining, timeLimit);
+                timeLabelTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event ->
+                        setTimeLabel(--timeRemaining, timeLimit)
+                ));
+                timeLabelTimeline.setCycleCount(Animation.INDEFINITE);
             }
 
             // display turn limit
@@ -548,6 +592,30 @@ public class GameViewController extends Controller implements Initializable {
      */
     private void onCurrentPlayerChanged(KBState kbState) {
         updateTokens(kbState);
+    }
+
+    /**
+     * Updates the turn (limit) label with the specified values.
+     * @param turnCount the current turn.
+     * @param turnLimit the maximum allowed turns of the game.
+     */
+    private void setTurnLabel(int turnCount, int turnLimit) {
+        if (turnLimit > -1) {
+            game_label_turn.setText(resourceBundle.getObject("turnLimit:") + " " + turnCount + "/" + turnLimit);
+        } else {
+            game_label_turn.setText(resourceBundle.getObject("turn:") + " " + turnCount);
+        }
+    }
+
+    /**
+     * Updates the GUI whenever the turn count changes.
+     *
+     * @param kbState the current state.
+     */
+    private void onTurnCountChanged(KBState kbState) {
+        if (kbState.myGameReply() != null) {
+            setTurnLabel(kbState.turnCount(), kbState.myGameReply().turnLimit());
+        }
     }
 
     /**
@@ -601,6 +669,13 @@ public class GameViewController extends Controller implements Initializable {
             if (kbState.nextPlayer() == kbState.client().getClientId())
                 highlightTerrain(Game.allBasicTurnTiles(
                         kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
+
+        if (timeLimit != -1 && timeLabelTimeline != null) {
+            timeLabelTimeline.stop();
+            timeRemaining = timeLimit;
+            setTimeLabel(timeRemaining, timeLimit);
+            timeLabelTimeline.play();
+        }
     }
 
     /**
