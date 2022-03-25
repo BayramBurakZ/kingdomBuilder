@@ -13,9 +13,9 @@ public enum TileType {
      * Represents the grass type. It is a normal type.
      * Is part of following enum sets: regularTileTypes.
      */
-    GRAS {
+    GRAS{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("gras");
         }
@@ -26,7 +26,7 @@ public enum TileType {
      */
     FLOWER{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("flower");
         }
@@ -37,7 +37,7 @@ public enum TileType {
      */
     FORREST{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("forrest");
         }
@@ -48,7 +48,7 @@ public enum TileType {
      */
     CANYON{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("canyon");
         }
@@ -59,7 +59,7 @@ public enum TileType {
      */
     DESERT{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("desert");
         }
@@ -70,7 +70,7 @@ public enum TileType {
      */
     WATER{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("water");
         }
@@ -81,7 +81,7 @@ public enum TileType {
      */
     MOUNTAIN{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("mountain");
         }
@@ -92,7 +92,7 @@ public enum TileType {
      */
     CASTLE{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("castle");
         }
@@ -103,7 +103,7 @@ public enum TileType {
      */
     ORACLE{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("oracle");
         }
@@ -114,7 +114,7 @@ public enum TileType {
      */
     FARM{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("farm");
         }
@@ -125,7 +125,7 @@ public enum TileType {
      */
     TAVERN{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("tavern");
         }
@@ -136,7 +136,7 @@ public enum TileType {
      */
     TOWER{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("tower");
         }
@@ -147,7 +147,7 @@ public enum TileType {
      */
     HARBOR{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("harbor");
         }
@@ -158,7 +158,7 @@ public enum TileType {
      */
     PADDOCK{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("paddock");
         }
@@ -169,7 +169,7 @@ public enum TileType {
      */
     BARN{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("barn");
         }
@@ -180,7 +180,7 @@ public enum TileType {
      */
     OASIS{
         @Override
-        public String toString() {
+        public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
                     SceneLoader.getLocale()).getString("oasis");
         }
@@ -201,4 +201,8 @@ public enum TileType {
      * Types of regular tiles.
      */
     public static EnumSet<TileType> regularTileTypes = EnumSet.range(GRAS, MOUNTAIN);
+    /**
+     * Returns the name of this enum constant formatted and localized regarding the language setting in the game.
+     */
+    public abstract String toStringLocalized();
 }

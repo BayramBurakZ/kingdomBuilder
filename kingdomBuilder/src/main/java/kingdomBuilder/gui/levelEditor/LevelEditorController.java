@@ -234,7 +234,7 @@ public class LevelEditorController extends Controller implements Initializable {
         editor_comboBox.setConverter(new StringConverter<TileType>() {
             @Override
             public String toString(TileType object) {
-                return object.toString();
+                return object.toStringLocalized();
             }
 
             @Override
