@@ -30,6 +30,8 @@ public class GameMap implements Iterable<Tile> {
      */
     private final Set<Tile> tileSet;
 
+    private final Set<Tile> specialPlaces;
+
     /**
      * Represents the width of a quadrant.
      */
@@ -56,6 +58,7 @@ public class GameMap implements Iterable<Tile> {
         quadrantWidth = gameMap.quadrantWidth;
         mapWidth = gameMap.mapWidth;
         startingTokenCount = gameMap.startingTokenCount;
+        specialPlaces = gameMap.specialPlaces;
     }
     /**
      * Creates the map from the given quadrants.
@@ -92,28 +95,70 @@ public class GameMap implements Iterable<Tile> {
         quadrantWidth = (int) roundedWith;
         mapWidth = 2 * quadrantWidth;
         tiles = new Tile[topLeft.length * 4];
+        specialPlaces = new HashSet<>();
+        int index;
 
         // combines top left and top right into tiles array
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
-                tiles[to1DIndexTopLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y, topLeft[x * quadrantWidth + y], startingTokenCount);
+                index = to1DIndexTopLeft(x, y, quadrantWidth);
+                tiles[index] =
+                        new Tile(
+                                x,
+                                y,
+                                topLeft[x * quadrantWidth + y],
+                                startingTokenCount,
+                                quadrantWidth);
+                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
+                {
+                    specialPlaces.add(tiles[index]);
+                }
             }
             for (int x = 0; x < quadrantWidth; x++) {
-                tiles[to1DIndexTopRight(x, y, quadrantWidth)] =
-                        new Tile(x + quadrantWidth, y, topRight[x * quadrantWidth + y], startingTokenCount);
+                index = to1DIndexTopRight(x, y, quadrantWidth);
+                tiles[index] =
+                        new Tile(
+                                x + quadrantWidth,
+                                y,
+                                topRight[x * quadrantWidth + y],
+                                startingTokenCount,
+                                quadrantWidth);
+                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
+                {
+                    specialPlaces.add(tiles[index]);
+                }
             }
         }
 
         // combines bottom left and bottom right into tiles array
         for (int y = 0; y < quadrantWidth; y++) {
             for (int x = 0; x < quadrantWidth; x++) {
-                tiles[to1DIndexBottomLeft(x, y, quadrantWidth)] =
-                        new Tile(x, y + quadrantWidth, bottomLeft[x * quadrantWidth + y], startingTokenCount);
+                index = to1DIndexBottomLeft(x, y, quadrantWidth);
+                tiles[index] =
+                        new Tile(
+                                x,
+                                y + quadrantWidth,
+                                bottomLeft[x * quadrantWidth + y],
+                                startingTokenCount,
+                                quadrantWidth);
+                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
+                {
+                    specialPlaces.add(tiles[index]);
+                }
             }
             for (int x = 0; x < quadrantWidth; x++) {
-                tiles[to1DIndexBottomRight(x, y, quadrantWidth)] =
-                        new Tile(x + quadrantWidth, y + quadrantWidth, bottomRight[x * quadrantWidth + y], startingTokenCount);
+                index = to1DIndexBottomRight(x, y, quadrantWidth);
+                tiles[index] =
+                        new Tile(
+                                x + quadrantWidth,
+                                y + quadrantWidth,
+                                bottomRight[x * quadrantWidth + y],
+                                startingTokenCount,
+                                quadrantWidth);
+                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
+                {
+                    specialPlaces.add(tiles[index]);
+                }
             }
         }
 
@@ -555,7 +600,7 @@ public class GameMap implements Iterable<Tile> {
      * @return all tiles occupied by the player in the given quadrant.
      */
     public Stream<Tile> getSettlementsOfQuadrant(Player player, Quadrants quadrant) {
-        return getSettlements(player).filter(t -> t.getQuadrant(quadrantWidth, mapWidth) == quadrant);
+        return getSettlements(player).filter(t -> t.quadrant == quadrant);
     }
 
     /**
@@ -629,5 +674,35 @@ public class GameMap implements Iterable<Tile> {
             return 1;
 
         return 0;
+    }
+
+    /**
+     * Filters the special places the settlements of the player connect.
+     *
+     * @param player player as the owner of the settlements we are interested in.
+     * @return the special places the settlements connect.
+     */
+    public Stream<Tile> connectedSpecialPlaces(Player player) {
+        //TODO: fertig machen (wird am 26. von Linda gepusht)
+        Stream<Tile> settlements = getSettlements(player);
+
+        Set<Tile> group = new HashSet<>();
+
+        Set<Tile> nextToSpecial = new HashSet<>();
+        HashMap<Tile, Set<Tile>> specialToGroup = new HashMap<>();
+
+        specialPlaces.stream().filter(t -> {
+            Stream<Tile> set = t.surroundingTiles(this).filter(p -> p.occupiedBy == player);
+            if(set.count() == 0)
+                return false;
+            else {
+                set.forEach(m -> nextToSpecial.add(m));
+                specialToGroup.put(t, nextToSpecial);
+                nextToSpecial.clear();
+                return true;
+            }
+        });
+
+        return settlements;
     }
 }

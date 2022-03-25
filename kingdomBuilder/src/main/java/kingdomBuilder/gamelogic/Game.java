@@ -679,9 +679,24 @@ public class Game {
         return highestAmount * 2;
     }
 
-    // TODO: JavaDoc
+    /**
+     * Calculates the score for the given player on the given map with the win condition "merchant".
+     * This win condition gives four points for each
+     *
+     * @param gameMap the map on which the score should be calculated.
+     * @param player the player for which the score should be calculated.
+     * @return the score for the win condition "merchant".
+     */
     static int scoreMerchant(GameMap gameMap, Player player) {
-        return 0; // TODO: Implementation
+        /**Stream<Tile> settlements = gameMap.getSettlements(player);
+        Set<Tile> groupOfSettlements = new HashSet<>();
+
+        settlements.forEach(t -> {
+            gameMap.getSettlementGroup(groupOfSettlements, player, t.x, t.y);
+        });*/
+
+
+        return 4;
     }
 
     /**

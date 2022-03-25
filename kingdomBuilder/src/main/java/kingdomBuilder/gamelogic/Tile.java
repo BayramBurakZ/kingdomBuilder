@@ -18,6 +18,11 @@ public class Tile {
     public final int x, y;
 
     /**
+     * The quadrant of the tile.
+     */
+    public final Quadrants quadrant;
+
+    /**
      * The tile type of the tile.
      */
     public final TileType tileType;
@@ -41,6 +46,7 @@ public class Tile {
 
         this.x = tile.x;
         this.y = tile.y;
+        this.quadrant = tile.quadrant;
         this.tileType = tile.tileType;
 
         this.occupiedBy = tile.occupiedBy;
@@ -54,11 +60,13 @@ public class Tile {
      * @param y               the y-coordinate.
      * @param tileType        the tileType.
      * @param remainingTokens the amount of tokens that remains on that tile.
+     * @param quadrantWidth   the quadrantWidth of the map.
      */
-    public Tile(int x, int y, TileType tileType, int remainingTokens) {
+    public Tile(int x, int y, TileType tileType, int remainingTokens, int quadrantWidth) {
 
         this.x = x;
         this.y = y;
+        quadrant = calculateQuadrant(quadrantWidth);
         this.tileType = tileType;
 
         this.occupiedBy = null;
@@ -499,12 +507,18 @@ public class Tile {
         return tileType;
     }
 
-    public Quadrants getQuadrant(int quadrantWidth, int mapWidth){
+    /**
+     * Calculates the quadrant in which the tile is located in.
+     *
+     * @param quadrantWidth the width of quadrant.
+     * @return the quadrant in which the tile is located.
+     */
+    public Quadrants calculateQuadrant(int quadrantWidth){
         if(x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.TOPLEFT;
-        else if(x >= quadrantWidth && x < mapWidth && y >= 0 && y < quadrantWidth)
+        else if(x >= quadrantWidth && x < 2*quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.TOPRIGHT;
-        else if(x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < mapWidth)
+        else if(x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < 2*quadrantWidth)
             return Quadrants.BOTTOMLEFT;
             //if(x >= quadrantWidth && x < mapWidth && y >= quadrantWidth && y < mapWidth)
         else
