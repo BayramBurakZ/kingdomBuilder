@@ -134,7 +134,7 @@ public class SceneLoader {
     /**
      * Represents the locale for language settings.
      */
-    private Locale locale;
+    private static Locale locale;
 
     /**
      * Constructor that initially loads every view.
@@ -486,7 +486,7 @@ public class SceneLoader {
      * Gets the current locale.
      * @return the locale.
      */
-    public Locale getLocale() {
+    public static Locale getLocale() {
         return locale;
     }
 }

@@ -37,6 +37,10 @@ public class Game {
     }
 
     // TODO: maybe use this later
+
+    /**
+     * Ends the turn.
+     */
     public static void endTurn() {
         // placeholder, in case it's needed later
         //
@@ -112,6 +116,7 @@ public class Game {
      * Show all possible placements at the start of the turn.
      *
      * @param gameMap the map.
+     * @param player  the player for whom the tiles are searched for.
      * @return all possible tiles at the start of the game.
      */
     public static Stream<Tile> allBasicTurnTiles(GameMap gameMap, Player player) {
@@ -202,10 +207,12 @@ public class Game {
     }
 
     /**
-     * Returns all possible places with using an oracle token AFTER selecting a settlement to move.
+     * Returns all possible places with using an oracle token BEFORE or AFTER selecting a settlement to move.
      *
-     * @param gameMap the map.
-     * @param player  the player to update for.
+     * @param gameMap              the map.
+     * @param player               the player to update for.
+     * @param highlightDestination whether the tile BEFORE selecting a settlement should be highlighted or
+     *                             the tile AFTER selecting (the destination) is highlighted.
      * @return all tiles that are placeable with token harbor.
      */
     public static Stream<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
@@ -258,10 +265,12 @@ public class Game {
     }
 
     /**
-     * Returns all possible places with using a barn token AFTER selecting a settlement to move.
+     * Returns all possible places with using a barn token BEFORE or AFTER selecting a settlement to move.
      *
-     * @param gameMap the map.
-     * @param player  the player to update for.
+     * @param gameMap              the map.
+     * @param player               the player to update for.
+     * @param highlightDestination whether the tile BEFORE selecting a settlement should be highlighted or
+     *                             the tile AFTER selecting (the destination) is highlighted.
      * @return all tiles that are placeable with token barn.
      */
     public static Stream<Tile> allTokenBarnTiles(GameMap gameMap, Player player, boolean highlightDestination) {
@@ -682,14 +691,14 @@ public class Game {
      * If more players placed the highest number of settlements in the same quadrant each of the players get 12 points.
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
      * @param players the players of the game.
      * @return the score for the win condition "lords".
      */
     static int scoreLord(GameMap gameMap, Player player, List<Player> players) {
         int factorOfPoints = 0;
 
-        for(Quadrants c : Quadrants.values())
+        for (Quadrants c : Quadrants.values())
             factorOfPoints += gameMap.rankOfSettlementsInQuadrant(player, players, c);
 
         return (factorOfPoints * 6);

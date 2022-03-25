@@ -14,6 +14,9 @@ import kingdomBuilder.redux.Store;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * This class controls all functions for the WinView.
+ */
 public class WinViewController extends Controller implements Initializable {
 
     /**
@@ -66,6 +69,7 @@ public class WinViewController extends Controller implements Initializable {
 
     /**
      * Constructs the WinViewController with the given store.
+     *
      * @param store the Store for access to the state.
      */
     public WinViewController(Store<KBState> store) {
@@ -75,7 +79,7 @@ public class WinViewController extends Controller implements Initializable {
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location the location used to resolve relative paths for the root object,
+     * @param location  the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
@@ -85,6 +89,7 @@ public class WinViewController extends Controller implements Initializable {
 
     /**
      * Sets the score and name for every player.
+     *
      * @param scores the network message with all data.
      */
     public void setScoreWithName(Scores scores) {
@@ -109,6 +114,7 @@ public class WinViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the Ok Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML

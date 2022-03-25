@@ -45,7 +45,8 @@ public class StateProcessor extends AbstractProcessor {
                 .flatMap(Set::stream)
                 .collect(Collectors.toSet());
 
-        System.out.println("HERE");
+        // debug message
+        //System.out.println("HERE");
 
         if(elements.isEmpty()) return false;
         if(elements.size() > 1) {

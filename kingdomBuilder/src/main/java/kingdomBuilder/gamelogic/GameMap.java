@@ -419,6 +419,11 @@ public class GameMap implements Iterable<Tile> {
         return stream().filter(t -> t.tileType == terrain);
     }
 
+    /**
+     * Gets an iterator over all tiles that are located at the border of the map.
+     *
+     * @return the iterator over all tiles at the boarder.
+     */
     public @NotNull Iterator<Tile> getTilesAtBorderIterator() {
         return new Iterator<Tile>() {
 

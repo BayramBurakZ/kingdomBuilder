@@ -1,6 +1,9 @@
 package kingdomBuilder.gamelogic;
 
+import kingdomBuilder.gui.SceneLoader;
+
 import java.util.EnumSet;
+import java.util.ResourceBundle;
 
 /**
  * Tiles that represent a hexagon in game board.
@@ -10,82 +13,178 @@ public enum TileType {
      * Represents the grass type. It is a normal type.
      * Is part of following enum sets: regularTileTypes.
      */
-    GRAS,
+    GRAS {
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("gras");
+        }
+    },
     /**
      * Represents the flower type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    FLOWER,
+    FLOWER{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("flower");
+        }
+    },
     /**
      * Represents the forest type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    FORREST,
+    FORREST{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("forrest");
+        }
+    },
     /**
      * Represents the canyon type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    CANYON,
+    CANYON{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("canyon");
+        }
+    },
     /**
      * Represents the desert type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    DESERT,
+    DESERT{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("desert");
+        }
+    },
     /**
      * Represents the water type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    WATER,
+    WATER{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("water");
+        }
+    },
     /**
      * Represents the mountain type. It is a normal type.
      * Is part of following enum sets: regularTileTypes.
      */
-    MOUNTAIN,
+    MOUNTAIN{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("mountain");
+        }
+    },
     /**
      * Represents the castle type. It is a normal type.
      * Is part of following enum sets: nonPlaceableTileTypes.
      */
-    CASTLE,
+    CASTLE{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("castle");
+        }
+    },
     /**
      * Represents the oracle type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes.
      */
-    ORACLE,
+    ORACLE{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("oracle");
+        }
+    },
     /**
      * Represents the farm type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    FARM,
+    FARM{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("farm");
+        }
+    },
     /**
      * Represents the tavern type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    TAVERN,
+    TAVERN{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("tavern");
+        }
+    },
     /**
      * Represents the tower type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    TOWER,
+    TOWER{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("tower");
+        }
+    },
     /**
      * Represents the harbor type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    HARBOR,
+    HARBOR{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("harbor");
+        }
+    },
     /**
      * Represents the paddock type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    PADDOCK,
+    PADDOCK{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("paddock");
+        }
+    },
     /**
      * Represents the barn type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    BARN,
+    BARN{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("barn");
+        }
+    },
     /**
      * Represents the oasis type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    OASIS;
+    OASIS{
+        @Override
+        public String toString() {
+            return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
+                    SceneLoader.getLocale()).getString("oasis");
+        }
+    };
     /**
      * Types of token that can be acquired.
      */

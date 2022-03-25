@@ -23,6 +23,7 @@ public class ChatReducer extends Reducer<KBState> {
 
     /**
      * Constructs a new RootReducer and registers himself.
+     * @see Reducer#registerReducers
      */
     public ChatReducer() { registerReducers(this);}
 

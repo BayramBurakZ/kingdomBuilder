@@ -13,6 +13,8 @@ public class Util {
 
     /**
      * Sets the initial light for a board.
+     * @param boardGroup the group where the light is added to.
+     * @param boardCenter the center of the board where the spotlight is directed to.
      */
     public static void setupLight(Group boardGroup, Point3D boardCenter) {
         AmbientLight al = new AmbientLight(Color.gray(0.4));

@@ -71,17 +71,7 @@ public class BotReducer extends Reducer<KBState> {
         // but it does not affect the gamelogic because a player only gets one token from the same special place
         //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
 
-        String aiName;
-        switch (difficulty){
-
-            case EASY -> aiName = "Easy AI";
-            case NORMAL -> aiName = "Normal AI";
-            case HARD -> aiName = "Hard AI";
-            case EXPERT -> aiName = "Expert AI";
-            default -> aiName = "AI";
-        }
-
-        client.login(aiName);
+        client.login(difficulty + " AI");
         client.loadNamespace();
         client.joinGame(oldState.client().getGameId());
 

@@ -528,16 +528,22 @@ public abstract class Client {
 
     /**
      * Sends the ?playersofgame to the server.
+     *
+     * @param gameId the id of the game to get the players from.
      */
     public abstract void playersOfGame(int gameId);
 
     /**
      * Sends the root message to the server.
+     *
+     * @param password the password the user tries to get root access.
      */
     public abstract void root(String password);
 
     /**
      * Sends the kick client message to the server.
+     *
+     * @param clientId the id of the client to kick.
      */
     public abstract void kickClient(int clientId);
 

@@ -122,6 +122,13 @@ public record UploadQuadrant(
         String fieldType99,
         String fieldType100
 ) {
+
+    /**
+     * Creates an instance of UploadQuadrant with the given string of fields.
+     *
+     * @param fields String with fields, separated by coma.
+     * @return a new UploadQuadrant instance.
+     */
     public static UploadQuadrant fromString(String fields) {
         String[] fieldsArray = fields.split(";");
         return new UploadQuadrant(

@@ -89,9 +89,10 @@ public record KBState(SceneLoader sceneLoader,
                       ClientState clientState
 ) {
 
-    //TODO: JavaDoc!
     /**
      * Initializes the state with initial value.
+     *
+     * @throws IOException when something goes wrong.
      */
     public KBState() throws IOException {
         this(null,

@@ -18,6 +18,7 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
 import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
@@ -297,13 +298,11 @@ public class GameSettingsViewController extends Controller implements Initializa
      */
     private void initializeLegend() {
         var children = gamesettings_legend_vbox.getChildren();
-        // TODO: get locale for the bundle from SceneLoader
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("kingdomBuilder/gui/gui");
         for (var entry : tileTypeColorMap.entrySet()) {
             Rectangle rectangle = new Rectangle(20, 20, entry.getValue());
             rectangle.setStroke(Color.BLACK);
             rectangle.setStrokeWidth(1);
-            Label label = new Label(resourceBundle.getString(entry.getKey().toString().toLowerCase(Locale.ROOT)));
+            Label label = new Label(entry.getKey().toString());
             HBox hbox = new HBox(rectangle, label);
             hbox.setSpacing(5);
             children.add(hbox);

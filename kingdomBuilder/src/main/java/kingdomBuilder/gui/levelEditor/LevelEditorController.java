@@ -9,10 +9,12 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.UploadQuadrantAction;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.GameCamera;
+import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.gui.controller.Controller;
 import kingdomBuilder.gui.gameboard.Hexagon;
 import kingdomBuilder.gui.gameboard.HexagonTile;
@@ -82,7 +84,7 @@ public class LevelEditorController extends Controller implements Initializable {
      * Represents the ComboBox to select the Tile.
      */
     @FXML
-    private ComboBox<String> editor_comboBox;
+    private ComboBox<TileType> editor_comboBox;
 
     /**
      * Represents the gameBoard with data for the gui like hexagons and textures.
@@ -210,25 +212,38 @@ public class LevelEditorController extends Controller implements Initializable {
      * Setup combo box with tile names.
      */
     private void setupComboBox() {
-
         editor_comboBox.getItems().addAll(
-                "Canyon",
-                "Desert",
-                "Flower",
-                "Forest",
-                "Gras",
-                "Mountain",
-                "Water",
-                "Castle",
-                "Barn",
-                "Farm",
-                "Harbor",
-                "Oasis",
-                "Oracle",
-                "Paddock",
-                "Tavern",
-                "Tower"
+                TileType.CANYON,
+                TileType.DESERT,
+                TileType.FLOWER,
+                TileType.FORREST,
+                TileType.GRAS,
+                TileType.MOUNTAIN,
+                TileType.WATER,
+                TileType.CASTLE,
+                TileType.BARN,
+                TileType.FARM,
+                TileType.HARBOR,
+                TileType.OASIS,
+                TileType.ORACLE,
+                TileType.PADDOCK,
+                TileType.TAVERN,
+                TileType.TOWER
         );
+
+        editor_comboBox.setConverter(new StringConverter<TileType>() {
+            @Override
+            public String toString(TileType object) {
+                return object.toString();
+            }
+
+            @Override
+            public TileType fromString(String string) {
+                return null;
+            }
+        });
+
+        editor_comboBox.getSelectionModel().selectFirst();
     }
 
     /**
@@ -237,36 +252,7 @@ public class LevelEditorController extends Controller implements Initializable {
      * @return The tile type from combo box.
      */
     public TileType getTileTypeFromCombobox() {
-        return stringToTileType(editor_comboBox.getSelectionModel().getSelectedItem());
-    }
-
-    /**
-     * Translates a given string to a tile type.
-     *
-     * @param tileTypeString string to get translated into a tile type.
-     * @return The tile type as enum.
-     */
-    private TileType stringToTileType(String tileTypeString) {
-        if (tileTypeString == null) return null;
-        return switch (tileTypeString) {
-            case "Canyon" -> TileType.CANYON;
-            case "Desert" -> TileType.DESERT;
-            case "Flower" -> TileType.FLOWER;
-            case "Forest" -> TileType.FORREST;
-            case "Gras" -> TileType.GRAS;
-            case "Mountain" -> TileType.MOUNTAIN;
-            case "Water" -> TileType.WATER;
-            case "Castle" -> TileType.CASTLE;
-            case "Barn" -> TileType.BARN;
-            case "Farm" -> TileType.FARM;
-            case "Harbor" -> TileType.HARBOR;
-            case "Oasis" -> TileType.OASIS;
-            case "Oracle" -> TileType.ORACLE;
-            case "Paddock" -> TileType.PADDOCK;
-            case "Tavern" -> TileType.TAVERN;
-            case "Tower" -> TileType.TOWER;
-            default -> throw new InvalidParameterException("String doesn't match to Tile type.");
-        };
+        return editor_comboBox.getSelectionModel().getSelectedItem();
     }
 
     /**

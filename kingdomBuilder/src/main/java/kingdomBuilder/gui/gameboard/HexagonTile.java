@@ -54,10 +54,13 @@ public class HexagonTile extends Tile {
 
     /**
      * Creates a new Hexagon Tile at the given position with given Type.
-     * @param xPos the x-coordinate of the upper-left corner position.
-     * @param yPos the y-coordinate of the upper-left corner position.
+     * @param xPos the x-coordinate of the center position.
+     * @param yPos the y-coordinate of the center position.
+     * @param x the x-coordinate of the tile (0-19)
+     * @param y the y-coordinate of the tile (0-19)
      * @param tileType the TileType of the Hexagon.
      * @param resource the ResourceBundle to translate text.
+     * @param gameBoard the board which the tile is in.
      */
     public HexagonTile(double xPos, double yPos, int x, int y, TileType tileType, ResourceBundle resource,
                        GameBoard gameBoard) {
@@ -137,7 +140,9 @@ public class HexagonTile extends Tile {
 
     /**
      * Places a house with the given color.
+     *
      * @param color the color.
+     * @param betterColors whether better colors should be used or not.
      */
     public void placeSettlement(PlayerColor color, boolean betterColors) {
         switch (color) {

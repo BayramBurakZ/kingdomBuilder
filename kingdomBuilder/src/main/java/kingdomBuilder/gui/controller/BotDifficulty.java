@@ -1,5 +1,7 @@
 package kingdomBuilder.gui.controller;
 
+import kingdomBuilder.gui.SceneLoader;
+
 import java.util.ResourceBundle;
 
 /**
@@ -13,7 +15,7 @@ public enum BotDifficulty {
         @Override
         public String toString() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
-                    Controller.store.getState().sceneLoader().getLocale()).getString("easy");
+                    SceneLoader.getLocale()).getString("easy");
         }
     },
     /**
@@ -23,7 +25,7 @@ public enum BotDifficulty {
         @Override
         public String toString() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
-                    Controller.store.getState().sceneLoader().getLocale()).getString("normal");
+                    SceneLoader.getLocale()).getString("normal");
         }
     },
     /**
@@ -33,7 +35,7 @@ public enum BotDifficulty {
         @Override
         public String toString() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
-                    Controller.store.getState().sceneLoader().getLocale()).getString("hard");
+                    SceneLoader.getLocale()).getString("hard");
         }
     },
     /**
@@ -43,7 +45,7 @@ public enum BotDifficulty {
         @Override
         public String toString() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
-                    Controller.store.getState().sceneLoader().getLocale()).getString("expert");
+                    SceneLoader.getLocale()).getString("expert");
         }
     }
 }

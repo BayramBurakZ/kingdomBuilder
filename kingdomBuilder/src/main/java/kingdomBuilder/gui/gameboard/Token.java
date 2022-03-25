@@ -49,6 +49,7 @@ public class Token extends StackPane {
      * @param gameViewController the gameViewController (to deactivate other Tokens).
      * @param disable if the Token is at the beginning disabled.
      * @param resource the language support.
+     * @param store the store.
      */
     public Token(TileType tileType, int count, GameViewController gameViewController, boolean disable,
                  ResourceBundle resource, Store<KBState> store) {

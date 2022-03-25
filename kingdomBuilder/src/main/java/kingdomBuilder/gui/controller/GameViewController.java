@@ -1,6 +1,5 @@
 package kingdomBuilder.gui.controller;
 
-import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -12,18 +11,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.PixelReader;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.paint.Material;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
 import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
@@ -331,10 +324,10 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state.
      */
     private void onNextPlayer(KBState kbState) {
-        if (kbState.client() != null) {
-            String msg = String.format("(%d) Called onNextPlayer", kbState.client().getClientId());
-            System.out.println(msg);
-        }
+//        if (kbState.client() != null) {
+//            String msg = String.format("(%d) Called onNextPlayer", kbState.client().getClientId());
+//            System.out.println(msg);
+//        }
 
         if (kbState.nextPlayer() == -1 || kbState.client() == null)
             return;
@@ -712,15 +705,7 @@ public class GameViewController extends Controller implements Initializable {
         game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
 
         //Update Text
-        String cardDescription = "";
-        switch (tileType) {
-            case GRAS -> cardDescription = resourceBundle.getString("gras");
-            case FLOWER -> cardDescription = resourceBundle.getString("flower");
-            case DESERT -> cardDescription = resourceBundle.getString("desert");
-            case CANYON -> cardDescription = resourceBundle.getString("canyon");
-            case FORREST -> cardDescription = resourceBundle.getString("forrest");
-        }
-        game_label_carddescribtion.setText(cardDescription);
+        game_label_carddescribtion.setText(tileType.toString());
     }
 
     /**

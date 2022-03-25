@@ -93,12 +93,18 @@ public class Player {
         tokens.forEach((tileType, token) -> token.remaining = token.getTotal());
     }
 
-    // TODO: make it better
-    //  Problem here: more than one Terrain Card per Turn
+    /**
+     * Sets the type of the terrain for the turn.
+     *
+     * @param tileType the type of the terraincard.
+     */
     public void setTerrainCard(TileType tileType) {
         this.terrainCard = tileType;
     }
 
+    /**
+     * Ends the turn.
+     */
     void endTurn() {
         // placeholder, in case it's needed later
     }
@@ -250,6 +256,12 @@ public class Player {
     }
 
     // TODO: read-only map or iterator
+
+    /**
+     * Gets the information about the tokens of the player.
+     *
+     * @return a Hashmap with information about the type of the token and the origin, as well as the amount.
+     */
     public HashMap<TileType, Token> getTokens() {
         return tokens;
     }

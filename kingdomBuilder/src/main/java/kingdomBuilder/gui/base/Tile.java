@@ -47,6 +47,8 @@ public abstract class Tile extends Group {
 
     /**
      * Constructs a new Tile with the given parameters.
+     * @param x the x-coordinate of the hexagon.
+     * @param y the y-coordinate of the hexagon.
      * @param xPos the x position.
      * @param yPos the y position.
      * @param tileType the type of the hexagon.
