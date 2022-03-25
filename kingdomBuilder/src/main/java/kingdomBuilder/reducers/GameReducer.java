@@ -538,7 +538,6 @@ public class GameReducer extends Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
 
         oldState.client().endTurn();
-        //TODO: end turn in gamelogic
         return state;
     }
 

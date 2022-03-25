@@ -28,27 +28,6 @@ public class Game {
     //endregion constants
 
     /**
-     * Starts the next turn for the specified player.
-     *
-     * @param player the player whose turn it is next.
-     */
-    public static void startTurn(Player player) {
-        player.startTurn();
-    }
-
-    // TODO: maybe use this later
-
-    /**
-     * Ends the turn.
-     */
-    public static void endTurn() {
-        // placeholder, in case it's needed later
-        //
-        // maybe use startTurn() to set the player's terrain card as soon as it is known
-        // and use endTurn to actually set currentPlayer to the next player
-    }
-
-    /**
      * Checks if player can place settlement without the context of a terrain that is only usable with tower,
      * paddock or tavern token.
      *

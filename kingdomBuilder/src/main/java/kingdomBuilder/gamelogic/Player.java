@@ -49,19 +49,33 @@ public class Player {
      */
     private TurnState currentTurnState;
 
-    // TODO: maybe properly hide this class instead of moving it outside
-
     /**
-     * Class that represents a token.
+     * Class that represents an entry in the token map.
      */
     public static class Token {
+
+        /**
+         * Set that contains the special places the tokens have been received from.
+         */
         private final HashSet<Tile> originTiles = new HashSet<>();
+
+        /**
+         * The amount of token uses remaining for the current turn.
+         */
         private int remaining;
 
+        /**
+         * Gets the amount of token uses remaining for the current turn.
+         * @return the amount of token uses remaining for the current turn.
+         */
         public int getRemaining() {
             return remaining;
         }
 
+        /**
+         * Gets the total amount of token uses for a turn.
+         * @return the total amount of token uses for a turn.
+         */
         public int getTotal() {
             return originTiles.size();
         }
@@ -100,13 +114,6 @@ public class Player {
      */
     public void setTerrainCard(TileType tileType) {
         this.terrainCard = tileType;
-    }
-
-    /**
-     * Ends the turn.
-     */
-    void endTurn() {
-        // placeholder, in case it's needed later
     }
 
     /**
@@ -254,8 +261,6 @@ public class Player {
     public int getRemainingSettlementsOfTurn() {
         return remainingSettlementsOfTurn;
     }
-
-    // TODO: read-only map or iterator
 
     /**
      * Gets the information about the tokens of the player.
