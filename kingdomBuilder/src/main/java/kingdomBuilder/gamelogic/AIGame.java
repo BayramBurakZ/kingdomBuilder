@@ -37,11 +37,11 @@ public class AIGame {
     /**
      * The limit in expertAI for permutation.
      */
-    int PERMUTATION_LIMIT = 40;
+    int PERMUTATION_LIMIT = 50;
     /**
      * The amount of recursive calls the expertAI makes.
      */
-    int SEARCH_DEPTH = 3;
+    int SEARCH_DEPTH = 2;
 
     /**
      * The constructor for AIGame.
@@ -359,7 +359,6 @@ public class AIGame {
 
         var bestTurnKeys = bestTurns.keySet().stream().toList();
 
-        // TODO: AI that also expanded lower scored moves did not really performed well. More tests..
         // only keep the same highest score
         int max = Collections.max(bestTurns.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getValue();
         for (var k : bestTurnKeys) {
