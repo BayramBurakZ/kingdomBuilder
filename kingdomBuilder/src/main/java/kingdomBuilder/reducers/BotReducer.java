@@ -86,6 +86,9 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState onMakeTurnBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
+        if(oldState.nextTerrainCard() != null)
+            oldState.Bots().get(client).updateTerrainCards(oldState.nextTerrainCard());
+
         if (oldState.currentPlayer() != null
                 && client.getClientId() == oldState.nextPlayer()
                 && oldState.Bots().containsKey(client)
@@ -171,6 +174,7 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState setWinConditionBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
+        //TODO: this throws an exception
         if(oldState.Bots() != null)
             oldState.Bots().get(client).setWinConditions(oldState.winConditions());
 
@@ -181,7 +185,8 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState setPlayersBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        if(oldState.Bots() != null)
+        //TODO: this as well: can not call Bots Nullpointer!
+        if(store.getState().Bots() != null)
             oldState.Bots().get(client).setPlayers(oldState.players());
 
         return state;
