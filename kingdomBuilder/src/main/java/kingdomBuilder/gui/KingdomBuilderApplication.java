@@ -68,7 +68,6 @@ public class KingdomBuilderApplication extends Application {
      * Prepares for application exit and destroys resources.
      * @throws Exception if something goes wrong.
      */
-    // TODO: general closing mechanism
     @Override
     public void stop() throws Exception {
         store.dispatch(ApplicationReducer.EXIT_APPLICATION, null);

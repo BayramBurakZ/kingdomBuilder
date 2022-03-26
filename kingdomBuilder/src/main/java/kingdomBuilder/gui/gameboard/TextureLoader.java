@@ -168,9 +168,6 @@ public final class TextureLoader {
             case PADDOCK -> PADDOCK;
             case TAVERN -> TAVERN;
             case TOWER -> TOWER;
-
-            // TODO: generates an exception:
-            default -> null;
         };
     }
 
@@ -191,9 +188,6 @@ public final class TextureLoader {
             case MERCHANT -> MERCHANT;
             case MINER -> MINER;
             case WORKER -> WORKER;
-
-            // TODO: generates an exception:
-            default -> null;
         };
     }
 

@@ -657,7 +657,6 @@ public class GameViewController extends Controller implements Initializable {
      * @param color the color for the settlement.
      */
     private void setServerSettlement(int x, int y, PlayerColor color) {
-        // TODO: Camera movement
         gameBoard.placeSettlement(x, y, color);
     }
 
@@ -696,7 +695,6 @@ public class GameViewController extends Controller implements Initializable {
     private void moveServerSettlement(int fromX, int fromY, int toX, int toY, PlayerColor color) {
         //gameBoard.removeSettlement(fromX, fromY);
         gameBoard.moveAnimation(fromX, fromY, toX, toY, color);
-        //TODO: animation
         //gameBoard.placeSettlement(toX, toY, color);
     }
 
@@ -917,8 +915,6 @@ public class GameViewController extends Controller implements Initializable {
      * @param actionEvent the triggered event.
      */
     private void onTurnEndButtonPressed(ActionEvent actionEvent) {
-        // TODO: cancel token usage when we press this
-        // dispatch only if the basic turn is over
         if (store.getState().currentPlayer() != null
                 && store.getState().currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN
                 && store.getState().token() == null) {
@@ -932,12 +928,10 @@ public class GameViewController extends Controller implements Initializable {
      * @param actionEvent the triggered event.
      */
     private void onSpectateEndButtonPressed(ActionEvent actionEvent) {
-        // TODO: Network Message "unspectate"
         if (isOnline) {
             sceneLoader.showGameSelectionView();
             store.dispatch(GameReducer.UNSPECTATE_GAME, null);
         } else {
-            // TODO: Network End internal server
             sceneLoader.showMenuView();
         }
     }

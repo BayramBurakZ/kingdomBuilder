@@ -541,7 +541,8 @@ public class AIGame {
 
         if (bestTile == null) {
             Tile alternative = bestToken.stream().findAny().orElse(null);
-            return alternative.surroundingTiles(map).filter(freeTiles::contains).findAny().orElse(null);
+            if (alternative != null)
+                return alternative.surroundingTiles(map).filter(freeTiles::contains).findAny().orElse(null);
         }
 
         return bestTile;

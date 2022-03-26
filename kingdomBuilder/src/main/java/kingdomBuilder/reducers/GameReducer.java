@@ -760,15 +760,19 @@ public class GameReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle whenever the client wants to spectate a game.
      *
-     * @param unused the store.
+     * @param store the store.
      * @param oldState the old state.
      * @param unused2 an unused object.
      *
      * @return the deferredState.
      */
     @Reduce(action = UNSPECTATE_GAME)
-    public DeferredState onUnspectateGame(Store<KBState> unused, KBState oldState, Object unused2){
+    public DeferredState onUnspectateGame(Store<KBState> store, KBState oldState, Object unused2){
         DeferredState state = new DeferredState(oldState);
+
+        for (Client client : oldState.Bots().keySet()) {
+            store.dispatch(BotReducer.DISCONNECT_BOT, client);
+        }
 
         oldState.client().unspectateGame();
         state.setPlayers(null);

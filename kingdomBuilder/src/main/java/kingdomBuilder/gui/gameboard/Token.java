@@ -55,8 +55,6 @@ public class Token extends StackPane {
                  ResourceBundle resource, Store<KBState> store) {
         super();
 
-        // TODO: Subscribers:
-        //  - Token used -> tokenUsed
         hexagon = new Hexagon2D(tileType, gameViewController, store);
 
         // set resource

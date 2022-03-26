@@ -18,7 +18,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-//TODO: DELETE BOT WHEN GAME IS  FINISHED
 public class BotReducer extends Reducer<KBState> {
 
     public static final String CONNECT_BOT = "CONNECT_BOT";
@@ -67,15 +66,12 @@ public class BotReducer extends Reducer<KBState> {
                 , "players");
 
         client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
-        //TODO: unnecessary because the main client does this already
-        // but it does not affect the gamelogic because a player only gets one token from the same special place
         //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
 
         client.login(difficulty + " AI");
         client.loadNamespace();
         client.joinGame(oldState.client().getGameId());
 
-        //TODO: make difficulty changeable
         oldState.Bots().put(client, new AIGame(oldState.gameMap(), difficulty));
 
         state.setBots(oldState.Bots());
@@ -103,6 +99,7 @@ public class BotReducer extends Reducer<KBState> {
                 stack.push(moves.get(i));
             }
 
+            // TODO: stop timer when bot disconnects
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
@@ -160,6 +157,7 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState onDisconnectBOT(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
+        // TODO: don't unsubscribe, let the DISCONNECT_BOT action check if the bot is still present
         client.onGameOver.unsubscribe(m -> store.dispatch(DISCONNECT_BOT, client));
         client.onTerrainTypeOfTurn.unsubscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
 
@@ -174,7 +172,6 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState setWinConditionBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        //TODO: this throws an exception
         if(oldState.Bots() != null)
             oldState.Bots().get(client).setWinConditions(oldState.winConditions());
 

@@ -489,7 +489,6 @@ public class ChatViewController extends Controller implements Initializable {
         if (chatMsg == null)
             return;
 
-        //TODO: namings
         int senderID = chatMsg.clientId();
         String senderName = store.getState().clients().get(senderID).name();
         Integer[] receivers = chatMsg.receiverIds().toArray(new Integer[0]);
@@ -850,7 +849,6 @@ public class ChatViewController extends Controller implements Initializable {
         if (doc == null) {
             throw new NullPointerException("Document of " + webView + " was null!");
         }
-        // TODO: maybe return as HTMLDocument instead
         return doc;
     }
 
@@ -880,7 +878,6 @@ public class ChatViewController extends Controller implements Initializable {
      */
     private Node createHTMLElement(String textContent, MessageStyle messageStyle) {
         if (messageStyle == null) {
-            // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
             return getChatDocument().createTextNode(textContent);
         } else {
             Element element = createHTMLElement(messageStyle);
@@ -915,7 +912,6 @@ public class ChatViewController extends Controller implements Initializable {
      * @return HTML Element with the highlighting style.
      */
     private Element createHTMLElementByTag(String tagName) {
-        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
         return getChatDocument().createElement(tagName);
     }
 
@@ -952,7 +948,6 @@ public class ChatViewController extends Controller implements Initializable {
         }
 
         WebEngine webEngine = webView.getEngine();
-        // TODO: this uses the chat doc specifically, even though it creates an HTML element usable in any doc
         Document doc = getChatDocument();
 
         int scrollY = (Integer) webEngine.executeScript("window.scrollY");

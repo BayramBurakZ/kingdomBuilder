@@ -165,7 +165,7 @@ public class IAmViewController extends Controller implements Initializable {
     private void SetPreferredName() {
         String preferredName = iAmViewTextField.getText().trim();
         if (isNameValid(preferredName)) {
-            // TODO: could let dispatch throw in case the name isn't valid
+            // TODO: error message in case the name isn't valid
             store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
             sceneLoader.showMenuView();
         }

@@ -195,7 +195,6 @@ public class Game {
      * @return all tiles that are placeable with token harbor.
      */
     public static Stream<Tile> allTokenHarborTiles(GameMap gameMap, Player player, boolean highlightDestination) {
-        //TODO: possible bug: only settlement that is near water could be moved to the water.
         if (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.HARBOR))
             return Stream.empty();
@@ -209,7 +208,6 @@ public class Game {
                 () -> gameMap.getTiles(TileType.WATER).filter(t -> t.occupiedBy == null)
                 : allPlaceableTilesWater;
 
-        //TODO: Revisit all functions harbor is using
         return highlightDestination ? allPlaceableTilesWater.get() : gameMap.getSettlements(player);
     }
 

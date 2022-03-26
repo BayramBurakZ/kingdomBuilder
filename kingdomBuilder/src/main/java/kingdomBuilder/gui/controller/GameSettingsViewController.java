@@ -579,32 +579,6 @@ public class GameSettingsViewController extends Controller implements Initializa
     }
 
     /**
-     * Sets the functionality for the Host and Join Game Button.
-     *
-     * @param event contains the data from the event source.
-     */
-    @FXML
-    private void onHostAndJoinGameButtonPressed(Event event) {
-        if (hostGame())
-            return;
-        // TODO: Network Message "join" (with id from host-answer)
-        sceneLoader.showGameView(false, isOnlineGame);
-    }
-
-    /**
-     * Sets the functionality for the Host and Spectate Game Button.
-     *
-     * @param event contains the data from the event source.
-     */
-    @FXML
-    void onHostAndSpectateGameButtonPressed(Event event) {
-        if (hostGame())
-            return;
-        // TODO: Network Message "spectate" (with id from host-answer)
-        sceneLoader.showGameView(true, isOnlineGame);
-    }
-
-    /**
      * Sets the functionality for the GameList Button.
      *
      * @param event contains the data from the event source.

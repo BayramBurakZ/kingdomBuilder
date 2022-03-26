@@ -157,8 +157,7 @@ public class SceneLoader {
      * @param locale the language in which the views are loaded.
      */
     public void loadViews(Locale locale) {
-        // TODO: check which is still necessary
-        this.locale = locale;
+        SceneLoader.locale = locale;
         loadMenuView(locale);
         loadGameSettingsView(locale);
         loadGameView(locale);
@@ -224,7 +223,6 @@ public class SceneLoader {
         gameViewController.setSpectating(isSpectating);
         gameViewController.setIsOnline(isOnline);
 
-        //TODO: Focus-management
         gameViewController.getGame_subscene().getRoot().requestFocus();
     }
 
@@ -462,16 +460,6 @@ public class SceneLoader {
         Pair<Node, Controller> pair = loadView("controller/WinView.fxml", locale);
         winView = pair.getKey();
         winViewController = (WinViewController) pair.getValue();
-    }
-
-    // TODO: Remove getter for ChatViewController
-    // getter
-    /**
-     * Returns the ChatViewController.
-     * @return The ChatViewController with all functionalities for the ChatView.
-     */
-    public ChatViewController getChatViewController() {
-        return chatViewController;
     }
 
     /**

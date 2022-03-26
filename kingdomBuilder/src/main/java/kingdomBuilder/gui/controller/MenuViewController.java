@@ -127,7 +127,6 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     private void onExitButtonPressed(Event event) {
-        // TODO: general application close mechanism
         Stage stage = (Stage) menuview_vbox.getScene().getWindow();
         stage.close();
     }

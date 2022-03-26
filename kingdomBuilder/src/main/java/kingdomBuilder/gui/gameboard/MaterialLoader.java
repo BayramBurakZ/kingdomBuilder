@@ -151,9 +151,6 @@ public final class MaterialLoader {
             case PADDOCK -> PADDOCK;
             case TAVERN -> TAVERN;
             case TOWER -> TOWER;
-
-            // TODO: generates an exception:
-            default -> null;
         };
     }
 }
