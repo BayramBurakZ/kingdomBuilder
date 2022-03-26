@@ -159,6 +159,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Constructs the ChatViewController.
+     *
      * @param store the Application's store to set the field.
      */
     public ChatViewController(Store<KBState> store) {
@@ -167,8 +168,9 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location the location used to resolve relative paths for the root object,
-     *                 or null if the location is not known.
+     *
+     * @param location  the location used to resolve relative paths for the root object,
+     *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
@@ -207,10 +209,10 @@ public class ChatViewController extends Controller implements Initializable {
         System.out.println(version);
 
 
-        int versionInt = Character.getNumericValue(version.charAt(version.length()-3)) * 100 +
-                Character.getNumericValue(version.charAt(version.length()-1));
-        int requirementInt = Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length()-3)) * 100 +
-                Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length()-1));
+        int versionInt = Character.getNumericValue(version.charAt(version.length() - 3)) * 100 +
+                Character.getNumericValue(version.charAt(version.length() - 1));
+        int requirementInt = Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length() - 3)) * 100 +
+                Character.getNumericValue(minimumRequirement.charAt(minimumRequirement.length() - 1));
 
         // debug message
         //System.out.println(versionInt + "||" + requirementInt);
@@ -249,7 +251,7 @@ public class ChatViewController extends Controller implements Initializable {
                             return;
                         }
                     }
-                setStyle("");
+                    setStyle("");
                 }
             }
         });
@@ -287,7 +289,7 @@ public class ChatViewController extends Controller implements Initializable {
         });
 
         chatWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
-            globalChatBody = (Element) chatWebEngine.getDocument().getElementsByTagName("body").item(0));
+                globalChatBody = (Element) chatWebEngine.getDocument().getElementsByTagName("body").item(0));
 
         // Setup for turn log /////////////////////////
         webview_log.setContextMenuEnabled(false);
@@ -296,18 +298,19 @@ public class ChatViewController extends Controller implements Initializable {
         turnLogWebEngine.loadContent("<html><body></body></html>");
 
         turnLogWebEngine.getLoadWorker().workDoneProperty().addListener(observable ->
-            turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
+                turnLogBody = (Element) turnLogWebEngine.getDocument().getElementsByTagName("body").item(0));
     }
 
     /**
      * Sends a chat message when the player gain the root state or the player failed to get it.
+     *
      * @param kbState the current state.
      */
     private void onClientStatusChanged(KBState kbState) {
         //for the rare case something is broken
         if (kbState.clientState() == null) return;
 
-        switch ( kbState.clientState()) {
+        switch (kbState.clientState()) {
             case NO_ROOT -> {
                 chatview_button_kick.setVisible(false);
             }
@@ -315,20 +318,21 @@ public class ChatViewController extends Controller implements Initializable {
                 String text = resourceBundle.getString("invalidPassword");
                 globalChatAppendElement(
                         createMessage(MessageStyle.CLIENT,
-                        createHTMLElement(text, null)));
+                                createHTMLElement(text, null)));
                 store.dispatch(RootReducer.RESET_STATUS, null);
             }
             case ROOT -> {
                 chatview_button_kick.setVisible(true);
                 globalChatAppendElement(
                         createMessage(MessageStyle.CLIENT,
-                        createHTMLElement("You are (g)root!", null)));
+                                createHTMLElement("You are (g)root!", null)));
             }
         }
     }
 
     /**
      * Sends a message in the game log with a description of the win conditions for the current game.
+     *
      * @param kbState the current state.
      */
     private void onWinConditionsChanged(KBState kbState) {
@@ -359,18 +363,19 @@ public class ChatViewController extends Controller implements Initializable {
                 case WORKER -> winCondString = resourceBundle.getString("winCondWorker");
             }
 
-            String logMessage = (i+1) + ".: " + winCondString;
+            String logMessage = (i + 1) + ".: " + winCondString;
 
             turnLogAppendElement(
                     //whisper because its orange - no further reason
                     createMessage(MessageStyle.WHISPER,
-                        createHTMLElement(logMessage, null)
+                            createHTMLElement(logMessage, null)
                     ));
         }
     }
 
     /**
      * Sends chat message when the data structure for the quadrants has changed.
+     *
      * @param kbState the current state.
      */
     private void onQuadrantsUploadedChanged(KBState kbState) {
@@ -391,6 +396,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Prints the scores for each player in the Log.
+     *
      * @param kbState the current State.
      */
     private void onScoresChanged(KBState kbState) {
@@ -404,7 +410,7 @@ public class ChatViewController extends Controller implements Initializable {
         for (int i = 0; i < scores.size(); i++) {
             ScoresData x = scores.get(i);
             String clientName = kbState.clients().get(x.clientId()).name();
-            String chatMessage = i+1 + ". " + clientName;
+            String chatMessage = i + 1 + ". " + clientName;
 
             turnLogAppendElement(
                     //whisper because its orange - no further reason
@@ -416,13 +422,14 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the GUI when the client (dis-)connects to a server.
+     *
      * @param state the current state.
      */
     private void onConnect(KBState state) {
         if (state.isConnected() && !isConnected) {
             onConnect();
             isConnected = true;
-        } else if (!state.isConnected() && isConnected){
+        } else if (!state.isConnected() && isConnected) {
             onDisconnect();
             isConnected = false;
         }
@@ -474,6 +481,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView with the specific incoming message.
+     *
      * @param state the current state.
      */
     private void onMessageChanged(KBState state) {
@@ -504,7 +512,7 @@ public class ChatViewController extends Controller implements Initializable {
         } else {
 
             if (state.clients().get(chatMsg.clientId()).gameId() == state.client().getGameId() &&
-                            state.client().getGameId() != -1) {
+                    state.client().getGameId() != -1) {
                 // chat message
                 messageStyle = MessageStyle.GAME_CHAT;
             } else {
@@ -517,12 +525,13 @@ public class ChatViewController extends Controller implements Initializable {
 
         globalChatAppendElement(
                 createMessage(messageStyle,
-                createHTMLElement(chatMessage, MessageStyle.BOLD),
-                createHTMLElement(message, null)));
+                        createHTMLElement(chatMessage, MessageStyle.BOLD),
+                        createHTMLElement(message, null)));
     }
 
     /**
      * Updates the ChatView with the start of the next turn of the current game.
+     *
      * @param state the current state.
      */
     private void onTurnStartChanged(KBState state) {
@@ -541,6 +550,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView when joining a game.
+     *
      * @param kbState the current state.
      */
     private void onJoinedGameChanged(KBState kbState) {
@@ -555,6 +565,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Updates the ChatView with the settlement placement or movement of the current game.
+     *
      * @param state the current state.
      */
     private void onTurn(KBState state) {
@@ -562,10 +573,10 @@ public class ChatViewController extends Controller implements Initializable {
             return;
         }
         if (state.gameLastTurn() instanceof ServerTurn a) {
-            String textContent =  a.type == ServerTurn.TurnType.PLACE ?
+            String textContent = a.type == ServerTurn.TurnType.PLACE ?
                     " " + resourceBundle.getString("hasPlaced") + " (" + a.y + "," + a.x + ")" :
                     " " + resourceBundle.getString("hasMoved") + " (" + a.y + "," + a.x + ") " +
-                          resourceBundle.getString("to") + " (" + a.toY + "," + a.toX + ")";
+                            resourceBundle.getString("to") + " (" + a.toY + "," + a.toX + ")";
 
             turnLogAppendElement(createMessage(MessageStyle.GAME_CHAT,
                     createHTMLElement(state.currentPlayer().name, MessageStyle.BOLD),
@@ -600,7 +611,7 @@ public class ChatViewController extends Controller implements Initializable {
             for (ClientData cd : differences)
                 onClientJoined(cd);
 
-        } else if (clientsState.size() < clients.size()){
+        } else if (clientsState.size() < clients.size()) {
             // client left
             differences.addAll(clients);
             differences.removeAll(clientsState);
@@ -614,6 +625,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sends a chat message when another client left the server.
+     *
      * @param clientData the data of the client who left the server.
      */
     private void onClientLeft(ClientData clientData) {
@@ -623,6 +635,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sends a chat message when another client joined the server.
+     *
      * @param clientData the data of the client who joined the server.
      */
     private void onClientJoined(ClientData clientData) {
@@ -640,6 +653,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Processes every message which starts with '#'.
+     *
      * @param command the entered command.
      */
     private void enteredCommand(String command) {
@@ -709,11 +723,11 @@ public class ChatViewController extends Controller implements Initializable {
 
             String senderName = resourceBundle.getString("you") + ": ";
 
-            if(tab_global.isSelected()) {
+            if (tab_global.isSelected()) {
                 globalChatAppendElement(createMessage(MessageStyle.GLOBAL_CHAT,
                         createHTMLElement(senderName, MessageStyle.BOLD),
                         createHTMLElement(message, null)
-                        ));
+                ));
             } else {
                 globalChatAppendElement(createMessage(MessageStyle.GAME_CHAT,
                         createHTMLElement(senderName, MessageStyle.BOLD),
@@ -759,14 +773,14 @@ public class ChatViewController extends Controller implements Initializable {
                 receiverIds.add(receivers.get(i).clientId());
                 chatMessage += "@" + receivers.get(i).name() + ", ";
             }
-            receiverIds.add(receivers.get(receivers.size()-1).clientId());
-            chatMessage += "@" + receivers.get(receivers.size()-1).name() + ": ";
+            receiverIds.add(receivers.get(receivers.size() - 1).clientId());
+            chatMessage += "@" + receivers.get(receivers.size() - 1).name() + ": ";
 
             globalChatAppendElement(createMessage(
                     MessageStyle.WHISPER,
                     createHTMLElement(chatMessage, MessageStyle.BOLD),
                     createHTMLElement(message, null)
-                    ));
+            ));
 
             store.dispatch(ChatReducer.SEND_MESSAGE, new ChatSendAction(receiverIds, message));
         }
@@ -844,7 +858,7 @@ public class ChatViewController extends Controller implements Initializable {
      * Creates a html-element with a main message style and other elements.
      *
      * @param mainMessageStyle the style for the complete message.
-     * @param elements one or more elements that will be inside the message.
+     * @param elements         one or more elements that will be inside the message.
      * @return the complete message.
      */
     private Element createMessage(MessageStyle mainMessageStyle, Node... elements) {
@@ -859,7 +873,8 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Creates a HTML Element with the given text and style.
-     * @param textContent the text for the element.
+     *
+     * @param textContent  the text for the element.
      * @param messageStyle the style.
      * @return the finished element.
      */
@@ -906,6 +921,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Appends the element with the specified tag name to the global chat HTML body.
+     *
      * @param element the HTML element to be appended to the chat log.
      */
     private void globalChatAppendElement(Node element) {
@@ -914,6 +930,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Appends the element with the specified tag name to the global chat HTML body.
+     *
      * @param element the HTML element to be appended to the turn log.
      */
     private void turnLogAppendElement(Node element) {
@@ -922,9 +939,10 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Appends the element with the specified tag name to the specified HTML body.
+     *
      * @param element the HTML element to be appended to the specified body.
      * @param webView the WebView displaying the specified body.
-     * @param body the body to append the element to.
+     * @param body    the body to append the element to.
      */
     private void appendElement(Node element, WebView webView, Element body) {
 
@@ -938,8 +956,8 @@ public class ChatViewController extends Controller implements Initializable {
         Document doc = getChatDocument();
 
         int scrollY = (Integer) webEngine.executeScript("window.scrollY");
-        int scrollHeight = (Integer) webEngine.executeScript( "document.documentElement.scrollHeight");
-        int clientHeight = (Integer) webEngine.executeScript( "document.body.clientHeight");
+        int scrollHeight = (Integer) webEngine.executeScript("document.documentElement.scrollHeight");
+        int clientHeight = (Integer) webEngine.executeScript("document.body.clientHeight");
         boolean scrollToBottom = scrollY == (scrollHeight - clientHeight);
 
         body.appendChild(element);
@@ -993,6 +1011,7 @@ public class ChatViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for KeyEvents.
+     *
      * @param event contains the data from the event source.
      */
     public void onKeyPressed(KeyEvent event) {

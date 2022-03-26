@@ -232,6 +232,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Constructs the GameSettingsViewController.
+     *
      * @param store the Application's store to set the field.
      */
     public GameSettingsViewController(Store<KBState> store) {
@@ -241,7 +242,7 @@ public class GameSettingsViewController extends Controller implements Initializa
     /**
      * Called to initialize this controller after its root element has been completely processed.
      *
-     * @param location the location used to resolve relative paths for the root object,
+     * @param location  the location used to resolve relative paths for the root object,
      *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
@@ -319,7 +320,7 @@ public class GameSettingsViewController extends Controller implements Initializa
             Rectangle rectangle = new Rectangle(20, 20, entry.getValue());
             rectangle.setStroke(Color.BLACK);
             rectangle.setStrokeWidth(1);
-            Label label = new Label(entry.getKey().toString());
+            Label label = new Label(entry.getKey().toStringLocalized());
             HBox hbox = new HBox(rectangle, label);
             hbox.setSpacing(5);
             children.add(hbox);
@@ -449,7 +450,7 @@ public class GameSettingsViewController extends Controller implements Initializa
                     int pixelSize = QUADRANT_RESOLUTION / 10;
                     for (int w = 0; w < pixelSize; w++) {
                         for (int h = 0; h < pixelSize; h++) {
-                            pw.setColor(pixelSize*x+w, pixelSize*y+h, color);
+                            pw.setColor(pixelSize * x + w, pixelSize * y + h, color);
                         }
                     }
                     //*/
@@ -461,6 +462,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Checks if all information are given to host a game.
+     *
      * @return True, if something is missing.
      */
     private boolean hasAllHostInformation() {
@@ -495,6 +497,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Collects the information to host a game from GUI and if successful it creates a new game.
+     *
      * @return true if something is missing to host a game.
      */
     private boolean hostGame() {
@@ -532,15 +535,15 @@ public class GameSettingsViewController extends Controller implements Initializa
         int quadrantBottomRight = gamesettings_choicebox_bottomright.getValue();
 
         System.out.println(
-                "Joinable Players: " + playerCount + "\n" +
-                "Name: " + gameName + "\n" +
-                "Desc: " + gameDesc + "\n" +
-                "Time: " + timeLimit + "\n" +
-                "Turn: " + turnLimit + "\n" +
-                "QUL: " + quadrantUpperLeft + "\n" +
-                "QUR: " + quadrantUpperRight + "\n" +
-                "QBL: " + quadrantBottomLeft + "\n" +
-                "QBR: " + quadrantBottomRight + "\n"
+                "Players: " + playerCount + "\n" +
+                        "Name: " + gameName + "\n" +
+                        "Desc: " + gameDesc + "\n" +
+                        "Time: " + timeLimit + "\n" +
+                        "Turn: " + turnLimit + "\n" +
+                        "QUL: " + quadrantUpperLeft + "\n" +
+                        "QUR: " + quadrantUpperRight + "\n" +
+                        "QBL: " + quadrantBottomLeft + "\n" +
+                        "QBR: " + quadrantBottomRight + "\n"
         );
 
         store.dispatchOld(new HostGameAction(gameName, gameDesc, playerCount, timeLimit, turnLimit,
@@ -569,22 +572,24 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the Host Game Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
     private void onHostGameButtonPressed(Event event) {
-        if(hostGame())
+        if (hostGame())
             return;
         sceneLoader.showGameSelectionView();
     }
 
     /**
      * Sets the functionality for the Host and Join Game Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
     private void onHostAndJoinGameButtonPressed(Event event) {
-        if(hostGame())
+        if (hostGame())
             return;
         // TODO: Network Message "join" (with id from host-answer)
         sceneLoader.showGameView(false, isOnlineGame);
@@ -592,10 +597,12 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the Host and Spectate Game Button.
+     *
      * @param event contains the data from the event source.
      */
-    @FXML void onHostAndSpectateGameButtonPressed(Event event) {
-        if(hostGame())
+    @FXML
+    void onHostAndSpectateGameButtonPressed(Event event) {
+        if (hostGame())
             return;
         // TODO: Network Message "spectate" (with id from host-answer)
         sceneLoader.showGameView(true, isOnlineGame);
@@ -603,6 +610,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the functionality for the GameList Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -616,6 +624,7 @@ public class GameSettingsViewController extends Controller implements Initializa
 
     /**
      * Sets the field if the game is local or online.
+     *
      * @param isOnlineGame true for online, false for local.
      */
     public void setIsOnlineGame(boolean isOnlineGame) {
