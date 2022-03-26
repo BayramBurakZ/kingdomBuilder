@@ -41,7 +41,9 @@ public class ApplicationReducer extends Reducer<KBState> {
     public static final String SERVER_VERSION = "SERVER_VERSION";
 
 
-    public ApplicationReducer() { registerReducers(this);}
+    public ApplicationReducer() {
+        registerReducers(this);
+    }
 
     @Reduce(action = EXIT_APPLICATION)
     public DeferredState onExitApplication(Store<KBState> unused, KBState state, Object unused2) {
@@ -108,8 +110,8 @@ public class ApplicationReducer extends Reducer<KBState> {
         client.onGamesReply.subscribe(m -> {
             for (GameData g : m.games()) {
                 store.dispatch(
-                    GameReducer.ADD_GAME,
-                    new GameData(g.clientId(), g.gameType(), g.gameId(), g.gameName(),
+                        GameReducer.ADD_GAME,
+                        new GameData(g.clientId(), g.gameType(), g.gameId(), g.gameName(),
                                 g.gameDescription(), g.playerLimit(), g.playersJoined())
                 );
             }
@@ -140,8 +142,8 @@ public class ApplicationReducer extends Reducer<KBState> {
             TileType token = TileType.valueOf(m.tokenType());
             if (token == TileType.PADDOCK || token == TileType.BARN || token == TileType.HARBOR) {
                 store.dispatch(
-                    GameReducer.SERVER_TURN,
-                    new ServerTurn(m.clientId(), ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)
+                        GameReducer.SERVER_TURN,
+                        new ServerTurn(m.clientId(), ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1)
                 );
             }
         });
@@ -151,7 +153,7 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         client.login(oldState.clientPreferredName());
 
-        client.onQuadrantUploaded.subscribe(m ->{
+        client.onQuadrantUploaded.subscribe(m -> {
             store.dispatch(NEW_QUADRANT_UPLOADED, m);
             client.quadrantRequest(m.quadrantId());
         });
@@ -240,10 +242,9 @@ public class ApplicationReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to set the version of the server in the state.
      *
-     * @param unused the store.
+     * @param unused   the store.
      * @param oldState the old state.
-     * @param version the VersionReply with the server version.
-     *
+     * @param version  the VersionReply with the server version.
      * @return the deferredState that modifies the state.
      */
     @Reduce(action = SERVER_VERSION)
@@ -256,10 +257,9 @@ public class ApplicationReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to send the '?quadrants' message always after the namespace is loaded.
      *
-     * @param unused the store.
+     * @param unused   the store.
      * @param oldState the old state.
-     * @param unused2 an object that is unused in this case.
-     *
+     * @param unused2  an object that is unused in this case.
      * @return the deferredState.
      */
     @Reduce(action = NAMESPACE_LOADED)

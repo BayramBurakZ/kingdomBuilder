@@ -72,7 +72,7 @@
 		<Button onAction="#onLevelEditorButtonPressed" text="Level Editor" />
 		<Button onAction="#onCreateNewGameButtonPressed" prefWidth="120.0" text="%createNewGame" />
 		<Button onAction="#onJoinGamePressed" prefWidth="120.0" text="%joinGame" />
-		<Button prefWidth="120.0" text="%spectateGame" />
+		<Button onAction="#onSpectateGamePressed" prefWidth="120.0" text="%spectateGame" />
 		<padding>
 			<Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
 		</padding>

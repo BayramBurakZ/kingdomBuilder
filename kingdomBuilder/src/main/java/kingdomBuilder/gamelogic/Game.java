@@ -667,7 +667,7 @@ public class Game {
      * @return the score for the win condition "merchant".
      */
     static int scoreMerchant(GameMap gameMap, Player player) {
-        /**Stream<Tile> settlements = gameMap.getSettlements(player);
+        /*Stream<Tile> settlements = gameMap.getSettlements(player);
         Set<Tile> groupOfSettlements = new HashSet<>();
 
         settlements.forEach(t -> {

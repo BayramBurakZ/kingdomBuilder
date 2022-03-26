@@ -337,6 +337,24 @@ public class ClientImpl extends Client implements ProtocolConsumer {
      * {@inheritDoc}
      */
     @Override
+    public void spectateGame(int id){
+        final String command = ProtocolSerializer.serialize(new Spectate(id));
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unspectateGame(){
+        final String command = ProtocolSerializer.serialize(new Unspectate());
+        trySendCommand(command);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean hasPendingCommands() {
         return ioHandler.hasPendingCommands();
     }
@@ -461,11 +479,13 @@ public class ClientImpl extends Client implements ProtocolConsumer {
 
     @Override
     public void accept(YouSpectateGame message) {
+        gameId = message.gameId();
         onYouSpectateGame.dispatch(message);
     }
 
     @Override
     public void accept(StoppedSpectating message) {
+        gameId = NO_ID;
         onStoppedSpectating.dispatch(message);
     }
 

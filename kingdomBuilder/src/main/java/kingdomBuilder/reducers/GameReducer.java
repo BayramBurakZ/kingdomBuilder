@@ -97,6 +97,15 @@ public class GameReducer extends Reducer<KBState> {
      * Represents the String to identify the related {@link GameReducer#onPlayersOfGame reduce} methode.
      */
     public static final String PLAYERS_OF_GAME = "PLAYERS_OF_GAME";
+    /**
+     * Represents the String to identify the related {@link GameReducer#onSpectateGame reduce} methode.
+     */
+    public static final String SPECTATE_GAME = "SPECTATE_GAME";
+
+    /**
+     * Represents the String to identify the related {@link GameReducer#onUnspectateGame reduce} methode.
+     */
+    public static final String UNSPECTATE_GAME = "UNSPECTATE_GAME";
 
     /**
      * Constructs a new GameReducer and registers himself.
@@ -140,7 +149,7 @@ public class GameReducer extends Reducer<KBState> {
         state.setClients(clients);
 
         oldState.client().joinGame(gameId);
-        state.setClient(oldState.client());
+        //state.setClient(oldState.client());
         state.setJoinedGame(true);
         state.setTurnCount(0);
         return state;
@@ -721,6 +730,59 @@ public class GameReducer extends Reducer<KBState> {
 
         oldState.playersOfGame().put(reply.gameId(), reply.clientIds());
         state.setPlayersOfGame(oldState.playersOfGame());
+
+        return state;
+    }
+
+    /**
+     * Represents the reducer to handle whenever the client wants to spectate a game.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param gameId the game the client wants to spectate.
+     *
+     * @return the deferredState.
+     */
+    @Reduce(action = SPECTATE_GAME)
+    public DeferredState onSpectateGame(Store<KBState> unused, KBState oldState, int gameId){
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.client().spectateGame(gameId);
+        oldState.client().playersRequest();
+        oldState.client().myGameRequest();
+
+        state.setJoinedGame(true);
+        state.setTurnCount(0);
+
+        return state;
+    }
+
+    /**
+     * Represents the reducer to handle whenever the client wants to spectate a game.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param unused2 an unused object.
+     *
+     * @return the deferredState.
+     */
+    @Reduce(action = UNSPECTATE_GAME)
+    public DeferredState onUnspectateGame(Store<KBState> unused, KBState oldState, Object unused2){
+        DeferredState state = new DeferredState(oldState);
+
+        oldState.client().unspectateGame();
+        state.setPlayers(null);
+        state.setScores(null);
+        state.setGameLastTurn(null);
+        state.setNextTerrainCard(null);
+        state.setNextPlayer(-1);
+        state.setGameStarted(false);
+        state.setGameMap(null);
+        state.setMyGameReply(null);
+        state.setPlayersMap(null);
+        state.setCurrentPlayer(null);
+        state.setJoinedGame(false);
+        state.setWinConditions(new ArrayList<>());
 
         return state;
     }

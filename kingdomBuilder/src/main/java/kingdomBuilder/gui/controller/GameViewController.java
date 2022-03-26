@@ -264,6 +264,10 @@ public class GameViewController extends Controller implements Initializable {
         // WIN SITUATION
         store.subscribe(state -> {
             if (store.getState().scores() != null) {
+                if (isSpectating) {
+                    store.dispatch(GameReducer.UNSPECTATE_GAME, null);
+                    setSpectating(false);
+                }
                 sceneLoader.showWinView(state.scores());
                 hasMap = false;
             }
@@ -354,7 +358,9 @@ public class GameViewController extends Controller implements Initializable {
         if (kbState.nextPlayer() == -1 || kbState.client() == null)
             return;
 
-        game_button_end.setDisable(true);
+        if (!isSpectating) {
+            game_button_end.setDisable(true);
+        }
         basicTurnLeft(kbState);
 
         // Highlight whose turn it is
@@ -410,7 +416,7 @@ public class GameViewController extends Controller implements Initializable {
         }
 
         if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN
-            && kbState.client().getClientId() == kbState.currentPlayer().ID) {
+            && kbState.client().getClientId() == kbState.currentPlayer().ID && !isSpectating) {
             game_button_end.setDisable(false);
         }
 
@@ -517,7 +523,7 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state.
      */
     private void onPlayersChanged(KBState kbState) {
-        game_hbox_players.getChildren().clear();
+        game_hbox_players.getChildren().removeAll(players);
         players.clear();
         if (store.getState().players() != null) {
             int i = 0;
@@ -733,6 +739,7 @@ public class GameViewController extends Controller implements Initializable {
      */
     private void playingOrSpectating() {
         if (isSpectating) {
+            game_button_end.setDisable(false);
             game_button_end.setText(resourceBundle.getString("endSpectate"));
             game_button_end.setOnAction(this::onSpectateEndButtonPressed);
         } else {
@@ -780,7 +787,7 @@ public class GameViewController extends Controller implements Initializable {
         game_rectangle_card.setFill(new ImagePattern(img, 0.0f, 0.0f, 1.0f, 1.0f, true));
 
         //Update Text
-        game_label_carddescribtion.setText(tileType.toString());
+        game_label_carddescribtion.setText(tileType.toStringLocalized());
     }
 
     /**
@@ -927,7 +934,8 @@ public class GameViewController extends Controller implements Initializable {
     private void onSpectateEndButtonPressed(ActionEvent actionEvent) {
         // TODO: Network Message "unspectate"
         if (isOnline) {
-            sceneLoader.showGameSettingsView(true);
+            sceneLoader.showGameSelectionView();
+            store.dispatch(GameReducer.UNSPECTATE_GAME, null);
         } else {
             // TODO: Network End internal server
             sceneLoader.showMenuView();

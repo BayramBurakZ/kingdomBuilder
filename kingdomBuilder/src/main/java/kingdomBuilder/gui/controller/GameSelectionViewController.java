@@ -213,7 +213,7 @@ public class GameSelectionViewController extends Controller implements Initializ
                     else
                         name = "???";
 
-                    s += (i+1) + ": " + name + "\n";
+                    s += (i + 1) + ": " + name + "\n";
                 }
 
                 if (s.equals("")) {
@@ -279,6 +279,29 @@ public class GameSelectionViewController extends Controller implements Initializ
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
         store.dispatch(GameReducer.JOIN_GAME, id);
         sceneLoader.showGameView(false, true);
+    }
+
+    /**
+     * Sets the functionality for the CreateNewGame Button.
+     *
+     * @param event contains the data from the event source.
+     */
+    @FXML
+    private void onSpectateGamePressed(Event event) {
+        var tmp = gameselection_tableview.getSelectionModel().getSelectedItem();
+
+        if (tmp == null) {
+            // TODO: error message: no game selected
+            return;
+        }
+
+        if (tmp.playersJoined() == tmp.playerLimit()) {
+            // TODO: error message: game already started
+            return;
+        }
+        int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
+        store.dispatch(GameReducer.SPECTATE_GAME, id);
+        sceneLoader.showGameView(true, true);
     }
 
     /**

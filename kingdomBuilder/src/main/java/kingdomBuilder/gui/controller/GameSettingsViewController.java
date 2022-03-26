@@ -1,15 +1,13 @@
 package kingdomBuilder.gui.controller;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.image.*;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -18,12 +16,10 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
 import kingdomBuilder.gamelogic.TileType;
-import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 

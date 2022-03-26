@@ -553,6 +553,18 @@ public abstract class Client {
     public abstract void shutdownServer();
 
     /**
+     * Sends the spectate message to the server.
+     *
+     * @param id the id of the game to spectate.
+     */
+    public abstract void spectateGame(int id);
+
+    /**
+     * Sends the unspectate message to the server.
+     */
+    public abstract void unspectateGame();
+
+    /**
      * {@return whether the client has commands stored internally
      *  that were not transmitted successfully to the server yet.}
      */
