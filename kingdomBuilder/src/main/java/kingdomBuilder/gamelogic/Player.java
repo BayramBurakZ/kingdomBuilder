@@ -121,7 +121,7 @@ public class Player {
      *
      * @param originTile the tile whose token is given to the player.
      */
-    void addToken(Tile originTile) {
+    public void addToken(Tile originTile) {
 
         if (!TileType.tokenType.contains(originTile.tileType))
             throw new RuntimeException("The tile's type is not a token type!");
@@ -159,8 +159,6 @@ public class Player {
 
         Token token = tokens.get(originTile.tileType);
 
-        //if (!token.originTiles.contains(originTile))
-        //    throw new RuntimeException("The player doesn't own a token from this tile!");
 
         token.originTiles.remove(originTile);
     }

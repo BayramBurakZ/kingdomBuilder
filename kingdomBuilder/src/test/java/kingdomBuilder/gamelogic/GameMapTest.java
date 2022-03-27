@@ -69,6 +69,10 @@ public class GameMapTest {
 
     GameMap gameMap;
 
+    Player playerOne;
+    Player playerTwo;
+    Player playerThree;
+
     private final int QUADRANT_WIDTH = 10;
 
     @BeforeEach
@@ -79,6 +83,14 @@ public class GameMapTest {
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
 
         gameMap = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
+    }
+
+
+    @BeforeEach
+    public void testInitializePlayers() {
+        playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
+        playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
+        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
     }
 
     @Test
@@ -141,14 +153,14 @@ public class GameMapTest {
         assertEquals(TileType.FORREST, gameMap.at(forest.x, forest.y).tileType, "Type is not forest");
 
         // Gras
-        while( allGrasTiles.hasNext()){
+        while (allGrasTiles.hasNext()) {
             current = allGrasTiles.next();
 
-            if( current.x == gras.x && current.y == gras.y)
+            if (current.x == gras.x && current.y == gras.y)
                 foundTile = true;
         }
 
-        if(!foundTile)
+        if (!foundTile)
             fail("gras tile failed");
 
         foundTile = false;
@@ -198,7 +210,7 @@ public class GameMapTest {
     }
 
     @Test
-    public void testSpecialPlaceInSurroundingTileNextToSpecialPlace(){
+    public void testSpecialPlaceInSurroundingTileNextToSpecialPlace() {
         //TODO: clean up and finish it (maybe?)
         Tile tower = gameMap.at(5, 3);
         assertEquals(TileType.TOWER, gameMap.at(5, 3).tileType, "not a tower.");
@@ -211,30 +223,30 @@ public class GameMapTest {
 
     @Test
     @Disabled
-    public void testUseTokenOraclePlayerUsingToken(){
+    public void testUseTokenOraclePlayerUsingToken() {
         //TODO: clean up and finish it (maybe?)
         //need instance of a game to test this.
 
-        Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20 );
+        Player player = new Player(0, "TestPlayer", PlayerColor.BLUE, 20);
         //player.startTurn(TileType.FORREST);
         //player.addToken(TileType.ORACLE);
 
         //check if player has received that token
         assertTrue(player.playerHasTokenLeft(TileType.ORACLE), "failed to add Oracle token");
-       // assertEquals(1, player.getRemainingTokens(TileType.ORACLE), "Player doesn't have one Oracle token");
+        // assertEquals(1, player.getRemainingTokens(TileType.ORACLE), "Player doesn't have one Oracle token");
     }
 
     @Test
     void testGetAllPlaceableTilesNextToSettlements() {
-        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20);
         Set<Tile> result;
 
         //place a tile next to water and mountain and check if the result is the correct neighbouring tile
-        gameMap.at(2,9).placeSettlement(playerOne);
+        gameMap.at(2, 9).placeSettlement(playerOne);
         result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON).collect(Collectors.toSet());
 
         assertEquals(1, result.size());
-        assertTrue(result.contains(gameMap.at(1,9)));
+        assertTrue(result.contains(gameMap.at(1, 9)));
         result.clear();
 
         // no neighbouring tile with type forest
@@ -243,10 +255,10 @@ public class GameMapTest {
         result.clear();
 
         //reset placements
-        gameMap.at(2,9).removeSettlement();
+        gameMap.at(2, 9).removeSettlement();
 
         // multiple neighbouring tiles with type canyon
-        gameMap.at(9,15).placeSettlement(playerOne);
+        gameMap.at(9, 15).placeSettlement(playerOne);
         result = gameMap.getAllPlaceableTilesNextToSettlements(playerOne, TileType.CANYON).collect(Collectors.toSet());
         assertEquals(5, result.size());
         result.clear();
@@ -254,8 +266,8 @@ public class GameMapTest {
 
     @Test
     void testGetSettlements() {
-        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
-        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20 );
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20);
+        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20);
         Set<Tile> result;
 
         //no settlement placed
@@ -264,7 +276,7 @@ public class GameMapTest {
         result.clear();
 
         //one settlement placed
-        gameMap.at(4,5).placeSettlement(playerOne);
+        gameMap.at(4, 5).placeSettlement(playerOne);
         result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
 
         assertEquals(1, result.size());
@@ -272,8 +284,8 @@ public class GameMapTest {
         result.clear();
 
         //single settlements all over the map
-        gameMap.at(19,19).placeSettlement(playerOne);
-        gameMap.at(19,0).placeSettlement(playerOne);
+        gameMap.at(19, 19).placeSettlement(playerOne);
+        gameMap.at(19, 0).placeSettlement(playerOne);
 
         result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(3, result.size());
@@ -281,20 +293,20 @@ public class GameMapTest {
         result.clear();
 
         //remove these settlements for next part
-        gameMap.at(19,19).removeSettlement();
-        gameMap.at(19,0).removeSettlement();
+        gameMap.at(19, 19).removeSettlement();
+        gameMap.at(19, 0).removeSettlement();
 
         //small group
-        gameMap.at(3,5).placeSettlement(playerOne);
-        gameMap.at(2,5).placeSettlement(playerOne);
-        gameMap.at(3,4).placeSettlement(playerOne);
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
 
         result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(4, result.size());
         result.clear();
 
         //another player places one settlement (nothing should be changed)
-        gameMap.at(19,19).placeSettlement(playerTwo);
+        gameMap.at(19, 19).placeSettlement(playerTwo);
 
         result = gameMap.getSettlements(playerOne).collect(Collectors.toSet());
         assertEquals(4, result.size());
@@ -303,21 +315,21 @@ public class GameMapTest {
 
     @Test
     void testGetSettlementGroup() {
-        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20 );
-        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20 );
+        Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20);
+        Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20);
         Set<Tile> result = new HashSet<>();
 
         // group with one settlement
-        gameMap.at(4,5).placeSettlement(playerOne);
+        gameMap.at(4, 5).placeSettlement(playerOne);
         gameMap.getSettlementGroup(result, playerOne, 4, 5);
 
         assertEquals(1, result.size());
         result.clear();
 
         // expand the group
-        gameMap.at(3,5).placeSettlement(playerOne);
-        gameMap.at(2,5).placeSettlement(playerOne);
-        gameMap.at(3,4).placeSettlement(playerOne);
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
 
         gameMap.getSettlementGroup(result, playerOne, 4, 5);
 
@@ -325,7 +337,7 @@ public class GameMapTest {
         result.clear();
 
         // different player settlement next to it
-        gameMap.at(1,5).placeSettlement(playerTwo);
+        gameMap.at(1, 5).placeSettlement(playerTwo);
 
         gameMap.getSettlementGroup(result, playerOne, 4, 5);
 
@@ -333,11 +345,11 @@ public class GameMapTest {
         result.clear();
 
         // clear Map for maybe further use
-        gameMap.at(4,5).removeSettlement();
-        gameMap.at(3,5).removeSettlement();
-        gameMap.at(2,5).removeSettlement();
-        gameMap.at(3,4).removeSettlement();
-        gameMap.at(1,5).removeSettlement();
+        gameMap.at(4, 5).removeSettlement();
+        gameMap.at(3, 5).removeSettlement();
+        gameMap.at(2, 5).removeSettlement();
+        gameMap.at(3, 4).removeSettlement();
+        gameMap.at(1, 5).removeSettlement();
     }
 
     @Test
@@ -410,5 +422,102 @@ public class GameMapTest {
         for (int i = 0; i < distance; i++)
             correctX = GameMap.topRightX(correctX, y - i);
         assertEquals(correctX, GameMap.topRightX(x, y, distance));
+    }
+
+    @Test
+    void testIsWithinBounds() {
+
+        assertTrue(gameMap.isWithinBounds(0, 19));
+        assertTrue(gameMap.isWithinBounds(5, 12));
+        assertTrue(gameMap.isWithinBounds(1, 9));
+        assertTrue(gameMap.isWithinBounds(0, 0));
+        assertTrue(gameMap.isWithinBounds(19, 19));
+        assertTrue(gameMap.isWithinBounds(1, 0));
+
+        assertFalse(gameMap.isWithinBounds(20, 0));
+        assertFalse(gameMap.isWithinBounds(20, 1));
+        assertFalse(gameMap.isWithinBounds(10, -1));
+        assertFalse(gameMap.isWithinBounds(-1, 5));
+        assertFalse(gameMap.isWithinBounds(1, 20));
+
+    }
+
+    @Test
+    void testGetTilesAtBorder() {
+
+        Set<Tile> border = gameMap.getTilesAtBorder().collect(Collectors.toSet());
+
+        assertTrue(border.contains(gameMap.at(0, 10)));
+        assertTrue(border.contains(gameMap.at(10, 0)));
+        assertTrue(border.contains(gameMap.at(0, 0)));
+        assertTrue(border.contains(gameMap.at(19, 5)));
+        assertTrue(border.contains(gameMap.at(4, 19)));
+        assertTrue(border.contains(gameMap.at(0, 0)));
+
+        assertFalse(border.contains(gameMap.at(1, 10)));
+        assertFalse(border.contains(gameMap.at(2,8)));
+        assertFalse(border.contains(gameMap.at(7,8)));
+        assertFalse(border.contains(gameMap.at(2,2)));
+        assertFalse(border.contains(gameMap.at(18,18)));
+        assertFalse(border.contains(gameMap.at(9,9)));
+    }
+
+    @Test
+    void testGetPlaceableTilesAtBorder() {
+
+        Set<Tile> border = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
+
+        // Test1: Check placeable tiles.
+        assertTrue(border.contains(gameMap.at(0, 0)));
+        assertTrue(border.contains(gameMap.at(19, 10)));
+        assertTrue(border.contains(gameMap.at(9, 19)));
+
+        // Test2: Check correct placeable tiles.
+        border = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
+        gameMap.at(0,10).placeSettlement(playerOne);
+        gameMap.at(11, 0).placeSettlement(playerOne);
+        gameMap.at(19,18).placeSettlement(playerTwo);
+
+        assertTrue(border.contains(gameMap.at(0, 9)));
+        assertTrue(border.contains(gameMap.at(0, 11)));
+
+        assertTrue(border.contains(gameMap.at(10, 0)));
+        assertTrue(border.contains(gameMap.at(12, 0)));
+
+        //TODO: the following are failing
+        assertFalse(border.contains(gameMap.at(0, 10)));
+        assertFalse(border.contains(gameMap.at(19, 0)));
+        assertFalse(border.contains(gameMap.at(19, 17)));
+        assertFalse(border.contains(gameMap.at(19, 19)));
+
+        gameMap.at(0,10).removeSettlement();
+        gameMap.at(11, 0).removeSettlement();
+        gameMap.at(19,11).removeSettlement();
+    }
+
+
+    @Test
+    void getSettlementsOfQuadrant() {
+        // TODO: write test
+    }
+
+    @Test
+    void getSettlementGroup() {
+        // TODO: write test
+    }
+
+    @Test
+    void fewestSettlementsInAllQuadrants() {
+        // TODO: write test
+    }
+
+    @Test
+    void rankOfSettlementsInQuadrant() {
+        // TODO: write test
+    }
+
+    @Test
+    void connectedSpecialPlaces() {
+        // TODO: write test
     }
 }

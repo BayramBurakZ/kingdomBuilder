@@ -3,7 +3,6 @@ package kingdomBuilder.gamelogic;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -120,6 +119,7 @@ public class Tile {
      * @return Whether both tiles are neighbours.
      */
     public boolean areNeighbouringTiles(Tile other) {
+        //TODO: never used delete.
         // Compare Y
         if (Math.abs(y - other.y) > 1)
             return false;
@@ -410,7 +410,7 @@ public class Tile {
      * @param gameMap the map containing the tile.
      * @return all surrounding tiles that are special places.
      */
-    public Stream<Tile> surroundingSpecialPlaces(GameMap gameMap) {
+    public Stream<Tile> surroundingTokenTiles(GameMap gameMap) {
         return surroundingTiles(gameMap).filter(tile -> TileType.tokenType.contains(tile.tileType));
     }
 
@@ -506,6 +506,7 @@ public class Tile {
         remainingTokens--;
         return tileType;
     }
+
 
     /**
      * Calculates the quadrant in which the tile is located in.

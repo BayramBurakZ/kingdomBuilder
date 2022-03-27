@@ -235,7 +235,6 @@ public class Game {
      * @throws InvalidParameterException when player does not own a settlement at given position.
      */
     public static Stream<Tile> allTokenPaddockTiles(GameMap gameMap, Player player, int fromX, int fromY) {
-        // TODO: maybe throw or warning if the settlement at (fromX,fromY) doesn't match the specified player
         return (player.getCurrentTurnState() == TurnState.BASIC_TURN
                 || !player.playerHasTokenLeft(TileType.PADDOCK)) ?
                 Stream.empty() : gameMap.at(fromX, fromY).surroundingTilesPaddock(gameMap);
@@ -270,7 +269,7 @@ public class Game {
      */
     public static void unsafeCheckForTokens(GameMap gameMap, Player player, int x, int y) {
         Tile originTile = gameMap.at(x, y);
-        Stream<Tile> specialPlaces = originTile.surroundingSpecialPlaces(gameMap);
+        Stream<Tile> specialPlaces = originTile.surroundingTokenTiles(gameMap);
 
         // Player gets a token if settlement is next to special place
         specialPlaces.forEach(player::addToken);
@@ -287,6 +286,8 @@ public class Game {
     public static void unsafeRemoveToken(GameMap gameMap, Player player, int x, int y) {
         Tile specialPlace = gameMap.at(x, y);
         player.removeToken(specialPlace);
+        //TODO: we never added the token back. move this into token place and move.
+        //specialPlace.refillTokenFromSpecialPlace();
     }
 
     /**

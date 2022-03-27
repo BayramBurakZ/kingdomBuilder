@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -80,6 +82,7 @@ class GameTest {
         playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
     }
 
+
     @Test
     void testUnsafePlaceSettlement() {
         Game.unsafePlaceSettlement(gameMap, playerOne, 5, 8);
@@ -98,7 +101,118 @@ class GameTest {
     }
 
     @Test
+    void allBasicTurnTiles() {
+
+        var mapWithPlacements = gameMap;
+
+        //playerOne
+        gameMap.at(6,2).placeSettlement(playerOne);
+        mapWithPlacements.at(7,2).placeSettlement(playerOne);
+        mapWithPlacements.at(6,3).placeSettlement(playerOne);
+        mapWithPlacements.at(5,4).placeSettlement(playerOne);
+        mapWithPlacements.at(7,19).placeSettlement(playerOne);
+        mapWithPlacements.at(8,19).placeSettlement(playerOne);
+        mapWithPlacements.at(9,19).placeSettlement(playerOne);
+        mapWithPlacements.at(10,19).placeSettlement(playerOne);
+        mapWithPlacements.at(7,18).placeSettlement(playerOne);
+        mapWithPlacements.at(11,18).placeSettlement(playerOne);
+
+
+        //playerTwo
+        mapWithPlacements.at(6,10).placeSettlement(playerTwo);
+        mapWithPlacements.at(7,10).placeSettlement(playerTwo);
+        mapWithPlacements.at(8,10).placeSettlement(playerTwo);
+        mapWithPlacements.at(9,10).placeSettlement(playerTwo);
+        mapWithPlacements.at(8,16).placeSettlement(playerTwo);
+        mapWithPlacements.at(8,15).placeSettlement(playerTwo);
+        mapWithPlacements.at(9,15).placeSettlement(playerTwo);
+        mapWithPlacements.at(10,16).placeSettlement(playerTwo);
+        mapWithPlacements.at(9,17).placeSettlement(playerTwo);
+        mapWithPlacements.at(8,17).placeSettlement(playerTwo);
+
+
+        //playerThree
+        mapWithPlacements.at(12,8).placeSettlement(playerThree);
+        mapWithPlacements.at(12,7).placeSettlement(playerThree);
+        mapWithPlacements.at(15,16).placeSettlement(playerThree);
+        mapWithPlacements.at(16,16).placeSettlement(playerThree);
+        mapWithPlacements.at(17,16).placeSettlement(playerThree);
+        mapWithPlacements.at(18,16).placeSettlement(playerThree);
+        mapWithPlacements.at(18,15).placeSettlement(playerThree);
+        mapWithPlacements.at(19,15).placeSettlement(playerThree);
+        mapWithPlacements.at(19,14).placeSettlement(playerThree);
+        mapWithPlacements.at(19,13).placeSettlement(playerThree);
+
+        Set<Tile> basic = null;
+
+        // Test1: playerOne
+        playerOne.setTerrainCard(TileType.FORREST);
+        playerOne.remainingSettlementsOfTurn = 3;
+        basic = Game.allBasicTurnTiles(mapWithPlacements, playerOne).collect(Collectors.toSet());
+
+
+        assertTrue(basic.contains(mapWithPlacements.at(6,19)));
+        assertTrue(basic.contains(mapWithPlacements.at(6,18)));
+        assertTrue(basic.contains(mapWithPlacements.at(12,18)));
+
+        // Test2: playerTwo
+
+
+
+        // Test3: playerThree
+    }
+
+    @Test
+    void allTokenOracleTiles() {
+    }
+
+    @Test
+    void allTokenFarmTiles() {
+    }
+
+    @Test
+    void allTokenTavernTiles() {
+    }
+
+    @Test
+    void allTokenTowerTiles() {
+    }
+
+    @Test
+    void allTokenOasisTiles() {
+    }
+
+    @Test
+    void allTokenHarborTiles() {
+    }
+
+    @Test
+    void allTokenPaddockTiles() {
+    }
+
+    @Test
+    void testAllTokenPaddockTiles() {
+    }
+
+    @Test
+    void allTokenBarnTiles() {
+    }
+
+    @Test
+    void unsafeCheckForTokens() {
+    }
+
+    @Test
+    void unsafeRemoveToken() {
+    }
+
+    @Test
+    void calculateScore() {
+    }
+
+    @Test
     void testScoreCastles() {
+
         // just checking the coordinates of the castles
         assertSame(TileType.CASTLE, gameMap.at(7, 6).tileType);
         assertSame(TileType.CASTLE, gameMap.at(11, 7).tileType);
