@@ -9,6 +9,7 @@ import javafx.scene.paint.PhongMaterial;
 import javafx.util.Duration;
 import kingdomBuilder.gamelogic.PlayerColor;
 import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.base.Tile;
 
 import java.util.ResourceBundle;
@@ -212,7 +213,7 @@ public class HexagonTile extends Tile {
         double deltaY =  toY - yPos;
 
         // set up the move animation
-        Duration moveDuration = new Duration(1000);
+        Duration moveDuration = new Duration(SceneLoader.ANIMATION_TIME);
         TranslateTransition moveAnimation = new TranslateTransition(moveDuration);
 
         moveAnimation.setFromX(0);
@@ -234,7 +235,6 @@ public class HexagonTile extends Tile {
             settlement.setTranslateX(0);
             settlement.setTranslateY(0);
             settlement.setTranslateZ(- Hexagon.HEXAGON_DEPTH - Settlement.SETTLEMENT_DEPTH);
-            System.out.println("Finished Moving");
 
             gameBoard.placeSettlement(toXCoord, toYCoord, color);
         });

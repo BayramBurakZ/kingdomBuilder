@@ -743,6 +743,20 @@ public class GameMap implements Iterable<Tile> {
      * @return the count of special places connected by settlements of the player.
      */
     public long connectedSpecialPlaces(Player player) {
+        /*
+        var a = specialPlaces.stream()
+                .filter(t -> t.surroundingTiles(this).anyMatch(p -> p.occupiedBy == player))
+                .collect(Collectors.toSet());
+        var b = a.stream().map(t -> getSurroundingGroups(player, t)).collect(Collectors.toSet());
+        var c = b.stream().flatMap(Collection::stream).collect(Collectors.toSet());
+        var d = c.stream().map(this::getSpecialPlacesOfGroup).collect(Collectors.toSet());
+        var e = d.stream().filter(t -> t.size() >= 2).collect(Collectors.toSet());
+        var f = e.stream().flatMap(Set::stream).collect(Collectors.toSet());
+        var g = f.stream().distinct().collect(Collectors.toSet());
+        var h = g.stream().count();
+
+        return h;
+        */
         return specialPlaces
                 .stream()
                 .filter(t -> t.surroundingTiles(this).anyMatch(p -> p.occupiedBy == player))

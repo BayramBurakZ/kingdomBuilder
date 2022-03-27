@@ -517,4 +517,71 @@ public class GameMapTest {
     void connectedSpecialPlaces() {
         // TODO: write test
     }
+
+    @Test
+    void testGetSpecialPlacesOfGroup() {
+        //connection between special place - special place
+        Tile s1 = gameMap.at(17, 2);
+        Tile s2 = gameMap.at(15, 7);
+        assertSame(s1.tileType, TileType.OASIS);
+        assertSame(s2.tileType, TileType.OASIS);
+
+        gameMap.at(16,3).placeSettlement(playerOne);
+        gameMap.at(16,4).placeSettlement(playerOne);
+        gameMap.at(16,5).placeSettlement(playerOne);
+        gameMap.at(16,6).placeSettlement(playerOne);
+
+        Set<Tile> group = gameMap.getSettlementGroup(playerOne, gameMap.at(16,3));
+
+        Set<Tile> specialPlaces = gameMap.getSpecialPlacesOfGroup(group);
+
+        assertTrue(specialPlaces.contains(s1));
+        assertTrue(specialPlaces.contains(s2));
+
+        //connection between castle - special place
+
+        Tile s3 = gameMap.at(18, 12);
+        Tile s4 = gameMap.at(15, 17);
+        assertSame(s3.tileType, TileType.PADDOCK);
+        assertSame(s4.tileType, TileType.CASTLE);
+
+        gameMap.at(16,16).placeSettlement(playerOne);
+        gameMap.at(16,15).placeSettlement(playerOne);
+        gameMap.at(17,14).placeSettlement(playerOne);
+        gameMap.at(17,13).placeSettlement(playerOne);
+
+        group = gameMap.getSettlementGroup(playerOne, gameMap.at(17,14));
+
+        specialPlaces = gameMap.getSpecialPlacesOfGroup(group);
+
+        assertTrue(specialPlaces.contains(s3));
+        assertTrue(specialPlaces.contains(s4));
+
+        //connection between castle - special place - special place
+
+        Tile s5 = gameMap.at(11, 16);
+        Tile s6 = gameMap.at(7, 16);
+        Tile s7 = gameMap.at(3, 13);
+        assertSame(s5.tileType, TileType.PADDOCK);
+        assertSame(s6.tileType, TileType.TAVERN);
+        assertSame(s7.tileType, TileType.CASTLE);
+
+        gameMap.at(4,13).placeSettlement(playerOne);
+        gameMap.at(5,14).placeSettlement(playerOne);
+        gameMap.at(5,15).placeSettlement(playerOne);
+        gameMap.at(6,15).placeSettlement(playerOne);
+        gameMap.at(7,15).placeSettlement(playerOne);
+        gameMap.at(8,15).placeSettlement(playerOne);
+        gameMap.at(9,15).placeSettlement(playerOne);
+        gameMap.at(10,15).placeSettlement(playerOne);
+
+        group = gameMap.getSettlementGroup(playerOne, gameMap.at(4,13));
+
+        specialPlaces = gameMap.getSpecialPlacesOfGroup(group);
+
+        assertTrue(specialPlaces.contains(s5));
+        assertTrue(specialPlaces.contains(s6));
+        assertTrue(specialPlaces.contains(s7));
+
+    }
 }

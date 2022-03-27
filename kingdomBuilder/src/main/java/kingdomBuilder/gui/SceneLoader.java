@@ -27,6 +27,11 @@ import java.util.ResourceBundle;
  */
 public class SceneLoader {
 
+    /**
+     * Defines how long the animation is.
+     */
+    public static final double ANIMATION_TIME = 1000;
+
     //region Nodes for every View
 
     /**

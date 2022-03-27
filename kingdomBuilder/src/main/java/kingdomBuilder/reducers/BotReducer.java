@@ -2,6 +2,7 @@ package kingdomBuilder.reducers;
 
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.GameOver;
@@ -130,6 +131,7 @@ public class BotReducer extends Reducer<KBState> {
                 stack.push(moves.get(i));
             }
 
+            // timer is now depends on the animation timer
             aiGame.turnTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
@@ -157,7 +159,7 @@ public class BotReducer extends Reducer<KBState> {
                         case OASIS -> client.useTokenOasis(x, y);
                     }
                 }
-            }, 1000, 2 * 1000);
+            }, (int) (0.5 * SceneLoader.ANIMATION_TIME), (int) (1.1 * SceneLoader.ANIMATION_TIME));
         }
 
         return state;
@@ -187,8 +189,10 @@ public class BotReducer extends Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
 
         AIGame aiGame = oldState.Bots().get(client);
-        aiGame.turnTimer.cancel();
-        aiGame.turnTimer = null;
+        if (aiGame != null && aiGame.turnTimer != null) {
+            aiGame.turnTimer.cancel();
+            aiGame.turnTimer = null;
+        }
 
         client.disconnect();
         oldState.Bots().remove(client);

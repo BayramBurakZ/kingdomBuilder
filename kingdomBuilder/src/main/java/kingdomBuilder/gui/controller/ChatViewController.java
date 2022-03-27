@@ -13,6 +13,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
+import kingdomBuilder.gamelogic.Game;
+import kingdomBuilder.gamelogic.Player;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.WinCondition;
 import kingdomBuilder.gui.util.Util;
@@ -408,11 +410,22 @@ public class ChatViewController extends Controller implements Initializable {
         ArrayList<ScoresData> scores = new ArrayList<>(kbState.scores().scoresDataList());
         scores.sort(Comparator.comparing(ScoresData::score).reversed());
 
+
+
         //print the score into LOG
         for (int i = 0; i < scores.size(); i++) {
             ScoresData x = scores.get(i);
+
+            Player q = null;
+            for (Player p : kbState.players()) {
+                if (p.ID == x.clientId()) {
+                    q = p;
+                }
+            }
+
             String clientName = kbState.clients().get(x.clientId()).name();
-            String chatMessage = i + 1 + ". " + clientName;
+            String chatMessage = i + 1 + ". " + clientName + ": " +
+                    Game.calculateScore(kbState.gameMap(), q, kbState.winConditions(), kbState.players());
 
             turnLogAppendElement(
                     //whisper because its orange - no further reason
