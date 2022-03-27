@@ -271,6 +271,9 @@ public class Tile {
                 }
             }
 
+            /**
+             * {@inheritDoc}
+             */
             @Override
             public Tile next() {
                 switch (state) {
@@ -312,36 +315,6 @@ public class Tile {
 
         Iterable<Tile> iterable = () -> surroundingTilesIterator(gameMap);
         return StreamSupport.stream(iterable.spliterator(), false);
-
-        /*
-        Set<Tile> surroundingTiles = new HashSet<>();
-
-        // top left
-        if (GameMap.topLeftX(x, y) >= 0 && y > 0)
-            surroundingTiles.add(gameMap.at(GameMap.topLeftX(x, y), y - 1));
-
-        // top right
-        if (GameMap.topRightX(x, y) < gameMap.mapWidth && y > 0)
-            surroundingTiles.add(gameMap.at(GameMap.topRightX(x, y), y - 1));
-
-        // left
-        if (x - 1 >= 0)
-            surroundingTiles.add(gameMap.at(x - 1, y));
-
-        // right
-        if (x + 1 < gameMap.mapWidth)
-            surroundingTiles.add(gameMap.at(x + 1, y));
-
-        // bottom left
-        if (GameMap.bottomLeftX(x, y) >= 0 && y + 1 < gameMap.mapWidth)
-            surroundingTiles.add(gameMap.at(GameMap.bottomLeftX(x, y), y + 1));
-
-        // bottom right
-        if (GameMap.bottomRightX(x, y) < gameMap.mapWidth && y + 1 < gameMap.mapWidth)
-            surroundingTiles.add(gameMap.at(GameMap.bottomRightX(x, y), y + 1));
-
-        return surroundingTiles;
-        */
     }
 
     /**
@@ -514,12 +487,12 @@ public class Tile {
      * @param quadrantWidth the width of quadrant.
      * @return the quadrant in which the tile is located.
      */
-    public Quadrants calculateQuadrant(int quadrantWidth){
-        if(x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
+    public Quadrants calculateQuadrant(int quadrantWidth) {
+        if (x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.TOPLEFT;
-        else if(x >= quadrantWidth && x < 2*quadrantWidth && y >= 0 && y < quadrantWidth)
+        else if (x >= quadrantWidth && x < 2 * quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.TOPRIGHT;
-        else if(x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < 2*quadrantWidth)
+        else if (x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < 2 * quadrantWidth)
             return Quadrants.BOTTOMLEFT;
             //if(x >= quadrantWidth && x < mapWidth && y >= quadrantWidth && y < mapWidth)
         else

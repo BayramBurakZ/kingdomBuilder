@@ -61,37 +61,6 @@ public class Game {
     }
 
     /**
-     * Checks if the given settlement can be moved without context of terrain.
-     *
-     * @param gameMap the map.
-     * @param player  the player whose turn it is and who owns the settlement.
-     * @param fromX   the old horizontal position of the settlement on the map.
-     * @param fromY   the old vertical position of the settlement on the map.
-     * @param toX     the new horizontal position of the settlement on the map.
-     * @param toY     the new vertical position of the settlement on the map.
-     * @return true if settlement can be moved. False otherwise.
-     */
-    protected static boolean canMoveSettlement(GameMap gameMap, Player player, int fromX, int fromY, int toX, int toY) {
-        return (gameMap.at(fromX, fromY).occupiedBy == player || canUseBasicTurn(gameMap, player, toX, toY));
-    }
-
-    /**
-     * Checks if the given settlement can be moved with context of terrain.
-     *
-     * @param gameMap the map.
-     * @param player  the player whose turn it is and who owns the settlement.
-     * @param terrain the terrain where the settlement will be placed.
-     * @param fromX   the old horizontal position of the settlement on the map.
-     * @param fromY   the old vertical position of the settlement on the map.
-     * @param toX     the new horizontal position of the settlement on the map.
-     * @param toY     the new vertical position of the settlement on the map.
-     * @return true if settlement can be placed at that position. False otherwise.
-     */
-    protected static boolean canMoveSettlement(GameMap gameMap, Player player, TileType terrain, int fromX, int fromY, int toX, int toY) {
-        return (gameMap.at(fromX, fromY).occupiedBy == player || canUseBasicTurn(gameMap, player, terrain, toX, toY));
-    }
-
-    /**
      * Show all possible placements at the start of the turn.
      *
      * @param gameMap the map.
@@ -212,7 +181,7 @@ public class Game {
     }
 
     /**
-     * Returns all possible places with using a harbor token.
+     * Returns all possible places with using a paddock token BEFORE selecting a settlement to move.
      *
      * @param gameMap the map.
      * @param player  the player whose turn it is.
@@ -286,8 +255,6 @@ public class Game {
     public static void unsafeRemoveToken(GameMap gameMap, Player player, int x, int y) {
         Tile specialPlace = gameMap.at(x, y);
         player.removeToken(specialPlace);
-        //TODO: we never added the token back. move this into token place and move.
-        //specialPlace.refillTokenFromSpecialPlace();
     }
 
     /**
@@ -332,8 +299,6 @@ public class Game {
             throw new RuntimeException("Can't place settlement on"
                     + " tile: " + gameMap.at(x, y).tileType + " at " + x + "," + y);
 
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
         player.useBasicTurn();
     }
 
@@ -342,13 +307,9 @@ public class Game {
      * the players' terrain card.
      *
      * @param player the player that is using the token.
-     * @param x      the x position of the settlement to place.
-     * @param y      the y position of the settlement to place.
      * @throws RuntimeException gets thrown when player can not use oracle token.
      */
-    public static void useTokenOracle(Player player, int x, int y) {
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
+    public static void useTokenOracle(Player player) {
         player.useToken(TileType.ORACLE);
     }
 
@@ -356,13 +317,9 @@ public class Game {
      * Use the farm token. The player can place an extra settlement on gras.
      *
      * @param player the player that is using the token.
-     * @param x      the x position of the settlement to place.
-     * @param y      the y position of the settlement to place.
      * @throws RuntimeException gets thrown when player can not use farm token.
      */
-    public static void useTokenFarm(Player player, int x, int y) {
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
+    public static void useTokenFarm(Player player) {
         player.useToken(TileType.FARM);
     }
 
@@ -371,13 +328,9 @@ public class Game {
      * chain of settlements that is owned by the player.
      *
      * @param player the player that is using the token.
-     * @param x      the x position of the settlement to place.
-     * @param y      the y position of the settlement to place.
      * @throws RuntimeException gets thrown when player can not use tavern token.
      */
-    public static void useTokenTavern(Player player, int x, int y) {
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
+    public static void useTokenTavern(Player player) {
         player.useToken(TileType.TAVERN);
     }
 
@@ -385,13 +338,9 @@ public class Game {
      * Use tower token. The player can place a token at the border of the map.
      *
      * @param player that is using the token.
-     * @param x      the x position of the settlement to place.
-     * @param y      the y position of the settlement to place.
      * @throws RuntimeException gets thrown when player can not use tower token.
      */
-    public static void useTokenTower(Player player, int x, int y) {
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
+    public static void useTokenTower(Player player) {
         player.useToken(TileType.TOWER);
     }
 
@@ -399,13 +348,9 @@ public class Game {
      * Use Oasis token. The player can place an extra settlement on Desert.
      *
      * @param player the player that is using the token.
-     * @param x      the x position of the settlement to place.
-     * @param y      the y position of the settlement to place.
      * @throws RuntimeException gets thrown when player can not use oasis token.
      */
-    public static void useTokenOasis(Player player, int x, int y) {
-        // simply read server message
-        //unsafePlaceSettlement(player, x, y);
+    public static void useTokenOasis(Player player) {
         player.useToken(TileType.OASIS);
     }
 
@@ -413,15 +358,9 @@ public class Game {
      * Use Harbor token. The player can move a settlement from any tile to a water tile.
      *
      * @param player the player that is using the token.
-     * @param fromX  the x coordinate of settlement to move.
-     * @param fromY  the y coordinate of settlement to move.
-     * @param toX    the x coordinate of target tile to put settlement.
-     * @param toY    the y coordinate of target tile to put settlement.
      * @throws RuntimeException gets thrown when player can not use harbor token.
      */
-    public static void useTokenHarbor(Player player, int fromX, int fromY, int toX, int toY) {
-        // simply read server message
-        //moveSettlementOnTerrain(player, TileType.WATER, fromX, fromY, toX, toY);
+    public static void useTokenHarbor(Player player) {
         player.useToken(TileType.HARBOR);
     }
 
@@ -430,15 +369,9 @@ public class Game {
      * direction.
      *
      * @param player the player that is using the token.
-     * @param fromX  the x coordinate of settlement to move.
-     * @param fromY  the y coordinate of settlement to move.
-     * @param toX    the x coordinate of target tile to put settlement.
-     * @param toY    the y coordinate of target tile to put settlement.
      * @throws RuntimeException gets thrown when player can not use paddock token.
      */
-    public static void useTokenPaddock(Player player, int fromX, int fromY, int toX, int toY) {
-        // simply read server message
-        //unsafeMoveSettlement(player, fromX, fromY, toX, toY);
+    public static void useTokenPaddock(Player player) {
         player.useToken(TileType.PADDOCK);
     }
 
@@ -446,15 +379,9 @@ public class Game {
      * Use Barn token. The player can move a settlement on a tile with current terrain  card.
      *
      * @param player the player that is using the token.
-     * @param fromX  the x coordinate of settlement to move.
-     * @param fromY  the y coordinate of settlement to move.
-     * @param toX    the x coordinate of target tile to put settlement.
-     * @param toY    the y coordinate of target tile to put settlement.
      * @throws RuntimeException gets thrown when player can not use barn token.
      */
-    public static void useTokenBarn(Player player, int fromX, int fromY, int toX, int toY) {
-        // simply read server message
-        //moveSettlementOnTerrain(player, player.terrainCard, fromX, fromY, toX, toY);
+    public static void useTokenBarn(Player player) {
         player.useToken(TileType.BARN);
     }
 
@@ -474,52 +401,42 @@ public class Game {
             switch (c) {
                 case LORDS -> {
                     int tmp = scoreLord(gameMap, player, players);
-                    //System.out.println("Points for Lord: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case MINER -> {
                     int tmp = scoreMiner(gameMap, player);
-                    //System.out.println("Points for Miner: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case FARMER -> {
                     int tmp = scoreFarmer(gameMap, player);
-                    //System.out.println("Points for Farmer: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case FISHER -> {
                     int tmp = scoreFisher(gameMap, player);
-                    //System.out.println("Points for Fisher: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case KNIGHT -> {
                     int tmp = scoreKnight(gameMap, player);
-                    //System.out.println("Points for Knight: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case WORKER -> {
                     int tmp = scoreWorker(gameMap, player);
-                    //System.out.println("Points for Worker: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case CITIZEN -> {
                     int tmp = scoreCitizen(gameMap, player);
-                    //System.out.println("Points for Citizen: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case EXPLORER -> {
                     int tmp = scoreExplorer(gameMap, player);
-                    //System.out.println("Points for Explorer: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case MERCHANT -> {
                     int tmp = scoreMerchant(gameMap, player);
-                    //System.out.println("Points for Merchant: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
                 case ANCHORITE -> {
                     int tmp = scoreAnchorite(gameMap, player);
-                    //System.out.println("Points for Anchorite: " + tmp + " for player: " + player.name);
                     score += tmp;
                 }
             }
@@ -544,7 +461,6 @@ public class Game {
                 castleScore += 3;
             }
         }
-        //System.out.println("Points for Castles: " + castleScore);
 
         return castleScore;
     }
@@ -602,9 +518,7 @@ public class Game {
             }
         });
 
-        int score = (int) (ref.biggestGroupSize / 2);
-
-        return score;
+        return ref.biggestGroupSize / 2;
     }
 
     /**
@@ -662,7 +576,7 @@ public class Game {
      * This win condition gives four points for each
      *
      * @param gameMap the map on which the score should be calculated.
-     * @param player the player for which the score should be calculated.
+     * @param player  the player for which the score should be calculated.
      * @return the score for the win condition "merchant".
      */
     static int scoreMerchant(GameMap gameMap, Player player) {
@@ -726,9 +640,7 @@ public class Game {
         Stream<Tile> specialPlaces = gameMap.getTiles().filter(
                 t -> TileType.tokenType.contains(t.tileType) || t.tileType == TileType.CASTLE);
 
-        specialPlaces.forEach(t -> {
-            score.addAndGet((int) t.surroundingSettlements(gameMap, player).count());
-        });
+        specialPlaces.forEach(t -> score.addAndGet((int) t.surroundingSettlements(gameMap, player).count()));
 
         return score.get();
     }

@@ -481,27 +481,27 @@ public class GameReducer extends Reducer<KBState> {
             }
 
             case ORACLE -> {
-                Game.useTokenOracle(player, x, y);
+                Game.useTokenOracle(player);
                 oldState.client().useTokenOracle(x, y);
                 state.setToken(null);
             }
             case FARM -> {
-                Game.useTokenFarm(player, x, y);
+                Game.useTokenFarm(player);
                 oldState.client().useTokenFarm(x, y);
                 state.setToken(null);
             }
             case TAVERN -> {
-                Game.useTokenTavern(player, x, y);
+                Game.useTokenTavern(player);
                 oldState.client().useTokenTavern(x, y);
                 state.setToken(null);
             }
             case TOWER -> {
-                Game.useTokenTower(player, x, y);
+                Game.useTokenTower(player);
                 oldState.client().useTokenTower(x, y);
                 state.setToken(null);
             }
             case HARBOR -> {
-                Game.useTokenHarbor(player, x, y, toX, toY);
+                Game.useTokenHarbor(player);
                 oldState.client().useTokenHarbor(x,y, toX, toY);
                 store.dispatch(SERVER_TURN,
                         new ServerTurn(oldState.client().getClientId(),
@@ -509,7 +509,7 @@ public class GameReducer extends Reducer<KBState> {
                 state.setToken(null);
             }
             case PADDOCK -> {
-                Game.useTokenPaddock(player, x, y, toX, toY);
+                Game.useTokenPaddock(player);
                 oldState.client().useTokenPaddock(x, y, toX, toY);
                 store.dispatch(SERVER_TURN,
                         new ServerTurn(oldState.client().getClientId(),
@@ -517,7 +517,7 @@ public class GameReducer extends Reducer<KBState> {
                 state.setToken(null);
             }
             case BARN -> {
-                Game.useTokenBarn(player, x, y, toX, toY);
+                Game.useTokenBarn(player);
                 oldState.client().useTokenBarn(x, y, toX, toY);
                 store.dispatch(SERVER_TURN,
                         new ServerTurn(oldState.client().getClientId(),
@@ -525,7 +525,7 @@ public class GameReducer extends Reducer<KBState> {
                 state.setToken(null);
             }
             case OASIS -> {
-                Game.useTokenOasis(player, x, y);
+                Game.useTokenOasis(player);
                 oldState.client().useTokenOasis(x, y);
                 state.setToken(null);
             }

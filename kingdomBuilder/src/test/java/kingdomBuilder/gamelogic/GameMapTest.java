@@ -470,10 +470,10 @@ public class GameMapTest {
         assertTrue(border.contains(gameMap.at(9, 19)));
 
         // Test2: Check correct placeable tiles.
-        border = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
         gameMap.at(0,10).placeSettlement(playerOne);
         gameMap.at(11, 0).placeSettlement(playerOne);
         gameMap.at(19,18).placeSettlement(playerTwo);
+        border = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
 
         assertTrue(border.contains(gameMap.at(0, 9)));
         assertTrue(border.contains(gameMap.at(0, 11)));

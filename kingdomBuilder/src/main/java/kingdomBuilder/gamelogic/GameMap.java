@@ -30,6 +30,9 @@ public class GameMap implements Iterable<Tile> {
      */
     private final Set<Tile> tileSet;
 
+    /**
+     * Represents all special places within the map.
+     */
     private final Set<Tile> specialPlaces;
 
     /**
@@ -49,6 +52,7 @@ public class GameMap implements Iterable<Tile> {
 
     /**
      * Creates a copy of a Map.
+     *
      * @param gameMap The Map to copy.
      */
     public GameMap(GameMap gameMap) {
@@ -60,6 +64,7 @@ public class GameMap implements Iterable<Tile> {
         startingTokenCount = gameMap.startingTokenCount;
         specialPlaces = gameMap.specialPlaces;
     }
+
     /**
      * Creates the map from the given quadrants.
      *
@@ -109,8 +114,7 @@ public class GameMap implements Iterable<Tile> {
                                 topLeft[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
-                {
+                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -123,8 +127,7 @@ public class GameMap implements Iterable<Tile> {
                                 topRight[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
-                {
+                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -141,8 +144,7 @@ public class GameMap implements Iterable<Tile> {
                                 bottomLeft[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
-                {
+                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -155,8 +157,7 @@ public class GameMap implements Iterable<Tile> {
                                 bottomRight[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if(EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType))
-                {
+                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -388,22 +389,44 @@ public class GameMap implements Iterable<Tile> {
         return Arrays.stream(tiles).iterator();
     }
 
+    /**
+     * Class to create a new collector for surrounding tiles.
+     */
     private class SurroundingTilesCollector implements Collector<Tile, Set<Tile>, Set<Tile>> {
 
+        /**
+         * Represents the current map.
+         */
         private final GameMap gameMap;
+
+        /**
+         * Represents the set of tiles.
+         */
         private final Set<Tile> originalTiles;
 
+        /**
+         * Constructs a new Collector for Tiles.
+         *
+         * @param gameMap the map.
+         * @param tiles   the tiles.
+         */
         private SurroundingTilesCollector(GameMap gameMap, Set<Tile> tiles) {
             super();
             this.gameMap = gameMap;
             this.originalTiles = tiles;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Supplier<Set<Tile>> supplier() {
             return HashSet::new;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public BiConsumer<Set<Tile>, Tile> accumulator() {
             return (set, tile) -> {
@@ -414,6 +437,9 @@ public class GameMap implements Iterable<Tile> {
             };
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public BinaryOperator<Set<Tile>> combiner() {
             return (set1, set2) -> {
@@ -422,11 +448,17 @@ public class GameMap implements Iterable<Tile> {
             };
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Function<Set<Tile>, Set<Tile>> finisher() {
             return Function.identity();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Set<Characteristics> characteristics() {
             return Set.of(Characteristics.CONCURRENT, Characteristics.UNORDERED, Characteristics.IDENTITY_FINISH);
@@ -435,6 +467,7 @@ public class GameMap implements Iterable<Tile> {
 
     /**
      * Returns a set of all surrounding tiles of the given tiles.
+     *
      * @param tiles tiles of the map.
      * @return a set of all surrounding tiles of the given tiles.
      */
@@ -470,7 +503,7 @@ public class GameMap implements Iterable<Tile> {
      * @return the iterator over all tiles at the boarder.
      */
     public @NotNull Iterator<Tile> getTilesAtBorderIterator() {
-        return new Iterator<Tile>() {
+        return new Iterator<>() {
 
             int border = 0;
             int index = 0;
@@ -518,21 +551,6 @@ public class GameMap implements Iterable<Tile> {
 
         Iterable<Tile> iterable = this::getTilesAtBorderIterator;
         return StreamSupport.stream(iterable.spliterator(), false);
-        /*
-        Set<Tile> border = new HashSet<>();
-
-        for (int x = 0; x < mapWidth; x++) {
-            border.add(at(x, 0));
-            border.add(at(x, mapWidth - 1));
-        }
-
-        for (int y = 0; y < mapWidth; y++) {
-            border.add(at(0, y));
-            border.add(at(mapWidth - 1, y));
-        }
-
-        return border;
-         */
     }
 
     /**
@@ -543,7 +561,7 @@ public class GameMap implements Iterable<Tile> {
      */
     public Stream<Tile> getPlaceableTilesAtBorder(Player player) {
         Supplier<Stream<Tile>> tilesOnBorder = () -> getTilesAtBorder().filter(tile -> !tile.isBlocked()
-                        && tile.hasSurroundingSettlement(this, player ));
+                && tile.hasSurroundingSettlement(this, player));
 
         return tilesOnBorder.get().findAny().isEmpty() ?
                 getTilesAtBorder().filter(t -> !t.isBlocked()) : tilesOnBorder.get();
@@ -563,7 +581,7 @@ public class GameMap implements Iterable<Tile> {
 
         return getTiles(terrain).filter(tile ->
                 !tile.isBlocked()
-                && tile.hasSurroundingSettlement(this, player));
+                        && tile.hasSurroundingSettlement(this, player));
     }
 
     /**
@@ -595,7 +613,7 @@ public class GameMap implements Iterable<Tile> {
     /**
      * Gets all tiles occupied by the player in the given quadrant.
      *
-     * @param player the player as the owner of the settlements.
+     * @param player   the player as the owner of the settlements.
      * @param quadrant the quadrant to which the tiles belong to.
      * @return all tiles occupied by the player in the given quadrant.
      */
@@ -606,18 +624,18 @@ public class GameMap implements Iterable<Tile> {
     /**
      * Adds all settlements of a group of settlements into the given Set of Tiles.
      *
-     * @param tiles the result.
+     * @param tiles  the result.
      * @param player the player of the group.
-     * @param x the x-coordinate of the beginning settlement.
-     * @param y the y-coordinate of the beginning settlement.
+     * @param x      the x-coordinate of the beginning settlement.
+     * @param y      the y-coordinate of the beginning settlement.
      */
     public void getSettlementGroup(Set<Tile> tiles, Player player, int x, int y) {
-        if (at(x,y).occupiedBy == null)
+        if (at(x, y).occupiedBy == null)
             throw new InvalidParameterException("Not an occupied tile!");
 
-        Stream<Tile> surroundings = at(x,y).surroundingSettlements(this, player);
+        Stream<Tile> surroundings = at(x, y).surroundingSettlements(this, player);
 
-        tiles.add(at(x,y));
+        tiles.add(at(x, y));
 
         // remove all checked tiles
         surroundings.filter(o -> !tiles.contains(o)).forEach(t -> {
@@ -634,10 +652,10 @@ public class GameMap implements Iterable<Tile> {
      * @return lowest number of settlements the player placed in each quadrant.
      */
     public int fewestSettlementsInAllQuadrants(Player player) {
-        int quadrant1 = (int)getSettlementsOfQuadrant(player, Quadrants.TOPLEFT).count();
-        int quadrant2 = (int)getSettlementsOfQuadrant(player, Quadrants.TOPRIGHT).count();
-        int quadrant3 = (int)getSettlementsOfQuadrant(player, Quadrants.BOTTOMLEFT).count();
-        int quadrant4 = (int)getSettlementsOfQuadrant(player, Quadrants.BOTTOMRIGHT).count();
+        int quadrant1 = (int) getSettlementsOfQuadrant(player, Quadrants.TOPLEFT).count();
+        int quadrant2 = (int) getSettlementsOfQuadrant(player, Quadrants.TOPRIGHT).count();
+        int quadrant3 = (int) getSettlementsOfQuadrant(player, Quadrants.BOTTOMLEFT).count();
+        int quadrant4 = (int) getSettlementsOfQuadrant(player, Quadrants.BOTTOMRIGHT).count();
 
         return IntStream
                 .of(quadrant1, quadrant2, quadrant3, quadrant4)
@@ -648,29 +666,28 @@ public class GameMap implements Iterable<Tile> {
     /**
      * Checks whether the player has the most, second most or fewer settlements in the given quadrant.
      *
-     * @param player player as the owner of the settlements we are interested in.
-     * @param players players of the game.
+     * @param player   player as the owner of the settlements we are interested in.
+     * @param players  players of the game.
      * @param quadrant the quadrant we look at.
      * @return the factor of points. two for the most settlements, one for the second most settlements - zero otherwise.
      */
-    public int rankOfSettlementsInQuadrant(Player player, List<Player> players, Quadrants quadrant)
-    {
+    public int rankOfSettlementsInQuadrant(Player player, List<Player> players, Quadrants quadrant) {
         HashMap<Player, Integer> countsOfPlayers = new HashMap<>();
         int[] countsOfSettlements = new int[players.size()];
 
-        for(int i = 0; i < players.size(); i++) {
-           countsOfSettlements[i] = (int) getSettlementsOfQuadrant(players.get(i), quadrant).count();
-           countsOfPlayers.put(players.get(i), countsOfSettlements[i]);
+        for (int i = 0; i < players.size(); i++) {
+            countsOfSettlements[i] = (int) getSettlementsOfQuadrant(players.get(i), quadrant).count();
+            countsOfPlayers.put(players.get(i), countsOfSettlements[i]);
         }
 
         int highestCount = Arrays.stream(countsOfSettlements).max().getAsInt();
 
-        if(countsOfPlayers.get(player) == highestCount)
+        if (countsOfPlayers.get(player) == highestCount)
             return 2;
 
         int secondHighCount = Arrays.stream(countsOfSettlements).filter(i -> i != highestCount).max().getAsInt();
 
-        if(countsOfPlayers.get(player) == secondHighCount)
+        if (countsOfPlayers.get(player) == secondHighCount)
             return 1;
 
         return 0;
@@ -693,7 +710,7 @@ public class GameMap implements Iterable<Tile> {
 
         specialPlaces.stream().filter(t -> {
             Stream<Tile> set = t.surroundingTiles(this).filter(p -> p.occupiedBy == player);
-            if(set.count() == 0)
+            if (set.count() == 0)
                 return false;
             else {
                 set.forEach(m -> nextToSpecial.add(m));

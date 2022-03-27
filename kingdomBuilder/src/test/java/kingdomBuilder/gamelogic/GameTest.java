@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,10 +55,19 @@ class GameTest {
             "FLOWER;FLOWER;FLOWER;GRAS;GRAS;FORREST;DESERT;DESERT;FLOWER;FLOWER;FLOWER;FLOWER;FLOWER;FORREST;" +
             "FORREST;FORREST";
 
+    String fifth = "GRAS;GRAS;GRAS;FLOWER;FLOWER;MOUNTAIN;CANYON;CANYON;WATER;WATER;GRAS;GRAS;FLOWER;FLOWER;FLOWER;" +
+            "MOUNTAIN;CANYON;CANYON;WATER;WATER;GRAS;GRAS;FLOWER;CANYON;FLOWER;CANYON;CANYON;CASTLE;WATER;WATER;" +
+            "FORREST;CASTLE;GRAS;GRAS;CANYON;GRAS;MOUNTAIN;DESERT;DESERT;WATER;FORREST;FORREST;FORREST;FORREST;" +
+            "CANYON;GRAS;GRAS;MOUNTAIN;DESERT;DESERT;WATER;WATER;FORREST;WATER;WATER;WATER;FLOWER;DESERT;DESERT;" +
+            "DESERT;GRAS;GRAS;WATER;FLOWER;FLOWER;WATER;FLOWER;FLOWER;DESERT;DESERT;FORREST;FORREST;GRAS;ORACLE;" +
+            "FLOWER;WATER;FLOWER;FLOWER;MOUNTAIN;DESERT;FORREST;FORREST;GRAS;FORREST;WATER;DESERT;DESERT;CANYON;" +
+            "CANYON;DESERT;FORREST;FORREST;FORREST;FORREST;WATER;DESERT;DESERT;CANYON;CANYON;CANYON";
+
     TileType[] quadrant1;
     TileType[] quadrant2;
     TileType[] quadrant3;
     TileType[] quadrant4;
+    TileType[] quadrant5;
 
     GameMap gameMap;
     GameMap mapWithPlacements;
@@ -78,6 +88,7 @@ class GameTest {
         quadrant2 = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
+        quadrant5 = Arrays.stream(fifth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
 
         gameMap = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
 
@@ -141,71 +152,325 @@ class GameTest {
 
     @Test
     void testAllBasicTurnTiles() {
+        Set<Tile> actualTiles;
 
-        Set<Tile> basic;
-
-        // Test1: playerOne
+        // Test1: samples
         playerOne.setTerrainCard(TileType.FORREST);
         playerOne.remainingSettlementsOfTurn = 3;
-        basic = Game.allBasicTurnTiles(mapWithPlacements, playerOne).collect(Collectors.toSet());
+        actualTiles = Game.allBasicTurnTiles(mapWithPlacements, playerOne).collect(Collectors.toSet());
 
-
-        System.out.println(mapWithPlacements.at(7, 2).occupiedBy);
         assertTrue(mapWithPlacements.at(7,2).isBlocked());
-        assertTrue(basic.contains(mapWithPlacements.at(6,19)));
-        assertTrue(basic.contains(mapWithPlacements.at(6,18)));
-        assertTrue(basic.contains(mapWithPlacements.at(12,18)));
+        assertTrue(actualTiles.contains(mapWithPlacements.at(6,19)));
+        assertTrue(actualTiles.contains(mapWithPlacements.at(6,18)));
+        assertTrue(actualTiles.contains(mapWithPlacements.at(12,18)));
 
-        // Test2: playerTwo
+        // Test2: check if allBasicTurnTiles contains all tiles
 
+        playerTwo.setTerrainCard(TileType.FORREST);
+        actualTiles = Game.allBasicTurnTiles(gameMap, playerOne).collect(Collectors.toSet());
 
+        Set<Tile> expectedTiles = new HashSet<>();
 
-        // Test3: playerThree
+       gameMap.getTiles().forEach(tile -> {
+           if (tile.tileType == TileType.FORREST)
+               expectedTiles.add(tile);
+       });
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
     void testAllTokenOracleTiles() {
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
+
+        Tile oracle = new Tile(19, 19, TileType.ORACLE, 2, 20);
+        playerOne.addToken(oracle);
+        playerOne.startTurn();
+
+        playerFour.addToken(oracle);
+        playerFour.startTurn();
+
+        // no settlements remaining ---------------------
+        assertTrue(Game.allTokenOracleTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.setTerrainCard(TileType.FORREST);
+        playerFour.decrementRemainingSettlements();
+
+        assertTrue(Game.allTokenOracleTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        playerOne.setTerrainCard(TileType.DESERT);
+
+        Set<Tile> actualTiles = Game.allTokenOracleTiles(gameMap, playerOne).collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                gameMap.getAllPlaceableTiles(playerOne, TileType.DESERT).collect(Collectors.toSet()));
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
     void testAllTokenFarmTiles() {
-    }
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
 
-    @Test
-    void testAllTokenTavernTiles() {
-    }
+        Tile farm = new Tile(19, 19, TileType.FARM, 2, 20);
+        playerOne.addToken(farm);
+        playerOne.startTurn();
 
-    @Test
-    void testAllTokenTowerTiles() {
+        playerFour.addToken(farm);
+        playerFour.startTurn();
+
+        // no settlements remaining ---------------------
+        assertTrue(Game.allTokenFarmTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+
+        assertTrue(Game.allTokenFarmTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        Set<Tile> actualTiles = Game.allTokenFarmTiles(gameMap, playerOne).collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                gameMap.getAllPlaceableTiles(playerOne, TileType.GRAS).collect(Collectors.toSet()));
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
     void testAllTokenOasisTiles() {
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
+
+        Tile oasis = new Tile(19, 19, TileType.OASIS, 2, 20);
+        playerOne.addToken(oasis);
+        playerOne.startTurn();
+
+        playerFour.addToken(oasis);
+        playerFour.startTurn();
+
+        // no settlements remaining ---------------------
+        assertTrue(Game.allTokenOasisTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+
+        assertTrue(Game.allTokenOasisTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        Set<Tile> actualTiles = Game.allTokenOasisTiles(gameMap, playerOne).collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                gameMap.getAllPlaceableTiles(playerOne, TileType.DESERT).collect(Collectors.toSet()));
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+    }
+
+    @Test
+    void testAllTokenTavernTiles() {
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
+
+        Tile tavern = new Tile(19, 19, TileType.TAVERN, 2, 20);
+        playerOne.addToken(tavern);
+        playerOne.startTurn();
+
+        playerFour.addToken(tavern);
+        playerFour.startTurn();
+
+        // no settlements remaining ---------------------
+        assertTrue(Game.allTokenTavernTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+
+        assertTrue(Game.allTokenTavernTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        gameMap.at(5,10).placeSettlement(playerOne);
+        gameMap.at(6,10).placeSettlement(playerOne);
+        gameMap.at(7,10).placeSettlement(playerOne);
+
+        Set<Tile> actualTiles = Game.allTokenTavernTiles(gameMap, playerOne).collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>();
+        expectedTiles.add(gameMap.at(8,10));
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+    }
+
+    @Test
+    void testAllTokenTowerTiles() {
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
+
+        Tile tower = new Tile(19, 19, TileType.TOWER, 2, 20);
+        playerOne.addToken(tower);
+        playerOne.startTurn();
+
+        playerFour.addToken(tower);
+        playerFour.startTurn();
+
+        // no settlements remaining ---------------------
+        assertTrue(Game.allTokenTowerTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+
+        assertTrue(Game.allTokenTowerTiles(mapWithPlacements, playerFour).collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+
+        Set<Tile> actualTiles = Game.allTokenTowerTiles(gameMap, playerOne).collect(Collectors.toSet());
+        Set<Tile> expectedTiles = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+
+        gameMap.at(19, 14).placeSettlement(playerOne);
+
+        actualTiles = Game.allTokenTowerTiles(gameMap, playerOne).collect(Collectors.toSet());
+        expectedTiles = gameMap.getPlaceableTilesAtBorder(playerOne).collect(Collectors.toSet());
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+    }
+
+    @Test
+    void testAllTokenBarnTiles() {
+        Tile barn = new Tile(19, 19, TileType.BARN, 2, 20);
+        playerOne.addToken(barn);
+        playerOne.startTurn();
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+        playerOne.addToken(barn);
+
+        assertTrue(Game.allTokenBarnTiles(mapWithPlacements, playerFour, false)
+                .collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        // settlements
+        gameMap.at(5,10).placeSettlement(playerOne);
+
+        Set<Tile> actualTiles = Game.allTokenBarnTiles(mapWithPlacements, playerOne, false)
+                .collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                mapWithPlacements.getSettlements(playerOne).collect(Collectors.toSet())
+        );
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+
+        // test on preset map so it has more variety
+        actualTiles = Game.allTokenBarnTiles(mapWithPlacements, playerOne, true)
+                .collect(Collectors.toSet());
+        expectedTiles = mapWithPlacements.getAllPlaceableTiles(playerOne, playerOne.getTerrainCard()).collect(Collectors.toSet());
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
     void testAllTokenHarborTiles() {
+        Tile harbor = new Tile(19, 19, TileType.HARBOR, 2, 20);
+        playerOne.addToken(harbor);
+        playerOne.startTurn();
+
+        //-----------------------------------------------
+        // in middle of basic turn
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+        playerOne.addToken(harbor);
+
+        assertTrue(Game.allTokenHarborTiles(mapWithPlacements, playerFour, false)
+                .collect(Collectors.toSet()).isEmpty());
+
+        //-----------------------------------------------
+        // normal function
+        // settlements
+        gameMap.at(5,10).placeSettlement(playerOne);
+
+        Set<Tile> actualTiles = Game.allTokenHarborTiles(mapWithPlacements, playerOne, false)
+                .collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                mapWithPlacements.getSettlements(playerOne).collect(Collectors.toSet())
+        );
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+
+        // test on preset map so it has more variety
+        actualTiles = Game.allTokenHarborTiles(gameMap, playerOne, true)
+                .collect(Collectors.toSet());
+        expectedTiles = gameMap.getTiles(TileType.WATER).collect(Collectors.toSet());
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
     void testAllTokenPaddockTiles() {
-    }
+        Tile paddock = new Tile(19, 19, TileType.PADDOCK, 2, 20);
+        playerOne.addToken(paddock);
+        playerOne.startTurn();
 
+        //-----------------------------------------------
+        // in middle of basic turn
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 20);
+        playerFour.decrementRemainingSettlements();
+        playerOne.addToken(paddock);
 
-    @Test
-    void allTokenBarnTiles() {
-    }
+        assertTrue(Game.allTokenPaddockTiles(mapWithPlacements, playerFour)
+                .collect(Collectors.toSet()).isEmpty());
 
-    @Test
-    void unsafeCheckForTokens() {
-    }
+        //-----------------------------------------------
+        // normal function
+        // settlements
+        gameMap.at(5,10).placeSettlement(playerOne);
 
-    @Test
-    void unsafeRemoveToken() {
-    }
+        Set<Tile> actualTiles = Game.allTokenPaddockTiles(mapWithPlacements, playerOne)
+                .collect(Collectors.toSet());
+        Set<Tile> expectedTiles = new HashSet<>(
+                mapWithPlacements.getSettlements(playerOne).collect(Collectors.toSet())
+        );
 
-    @Test
-    void calculateScore() {
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
+
+        // test on preset map so it has more variety
+        actualTiles = Game.allTokenPaddockTiles(gameMap, playerOne, 5, 10)
+                .collect(Collectors.toSet());
+        expectedTiles.clear();
+        expectedTiles.add(gameMap.at(6,8));
+        expectedTiles.add(gameMap.at(7,10));
+        expectedTiles.add(gameMap.at(6,12));
+        expectedTiles.add(gameMap.at(4, 12));
+
+        assertTrue(actualTiles.containsAll(expectedTiles));
+        assertTrue(expectedTiles.containsAll(actualTiles));
     }
 
     @Test
@@ -586,18 +851,29 @@ class GameTest {
         gameMap.at(14,15).removeSettlement();
     }
 
-    @Test @Disabled
+    @Test
     void testScoreFarmer() {
         //Test#1: no settlement placed
         assertEquals(0, Game.scoreFarmer(gameMap, playerOne));
 
-        //Test#2: one settlement in upper left quadrant (largest group)
+        // place in every quadrant 1 settlement
+        gameMap.at(4,4).placeSettlement(playerOne);
+        gameMap.at(14,14).placeSettlement(playerOne);
+        gameMap.at(4,14).placeSettlement(playerOne);
+        gameMap.at(14,4).placeSettlement(playerOne);
+
+        gameMap.at(5,5).placeSettlement(playerTwo);
+        gameMap.at(15,15).placeSettlement(playerTwo);
+        gameMap.at(5,15).placeSettlement(playerTwo);
+        gameMap.at(15,5).placeSettlement(playerTwo);
+
+        //Test#2: add one settlement in upper left quadrant (largest group)
         gameMap.at(0,0).placeSettlement(playerOne);
         assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
         gameMap.at(0,0).removeSettlement();
 
         //Test#3: settlements in different quadrants with different size
-        // one settlement upper left, 2 settlement bottom right
+        // add one settlement upper left, add 2 settlement bottom right
         gameMap.at(0,0).placeSettlement(playerOne);
         gameMap.at(19,19).placeSettlement(playerOne);
         gameMap.at(18,19).placeSettlement(playerOne);
@@ -611,23 +887,18 @@ class GameTest {
         gameMap.at(19,19).placeSettlement(playerOne);
         assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
         gameMap.at(0,0).removeSettlement();
-        gameMap.at(18,19).removeSettlement();
+        gameMap.at(19,19).removeSettlement();
 
         //Test#5: more than one as the least settlement count (not connected)
         gameMap.at(0,0).placeSettlement(playerOne);
-        gameMap.at(9,9).placeSettlement(playerOne);
-        assertEquals(6, Game.scoreFarmer(gameMap, playerOne));
-        gameMap.at(9,9).removeSettlement();
-        gameMap.at(0,0).removeSettlement();
-
-        //Test#6: quadrant border
-        gameMap.at(9,0).placeSettlement(playerOne);
-        gameMap.at(10,0).placeSettlement(playerOne);
+        gameMap.at(19,19).placeSettlement(playerOne);
+        gameMap.at(0,19).placeSettlement(playerOne);
         gameMap.at(19,0).placeSettlement(playerOne);
-        assertEquals(3, Game.scoreFarmer(gameMap, playerOne));
-        gameMap.at(9,0).removeSettlement();
-        gameMap.at(10,0).removeSettlement();
+        assertEquals(6, Game.scoreFarmer(gameMap, playerOne));
         gameMap.at(19,0).removeSettlement();
+        gameMap.at(0,19).removeSettlement();
+        gameMap.at(19,19).removeSettlement();
+        gameMap.at(0,0).removeSettlement();
     }
 
     @Test @Disabled
@@ -821,5 +1092,218 @@ class GameTest {
         gameMap.at(9, 18).placeSettlement(playerOne);
 
         assertEquals(16, Game.scoreMiner(gameMap, playerOne));
+    }
+
+    @Test
+    void testCanUseBasicTurn() {
+
+        //out of bounds
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerOne, 20, 20));
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerOne, -1, -1));
+
+        // set internal card to grass
+        playerOne.setTerrainCard(TileType.GRAS);
+
+        // free space adjacent
+        assertTrue(Game.canUseBasicTurn(mapWithPlacements, playerOne, 5, 1));
+
+        // free space NOT adjacent
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerOne, 0, 0));
+
+        // blocked space
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerOne, 6, 2));
+
+        // create new player with no settlements left
+        Player playerFour = new Player(4, "TestPlayer4", PlayerColor.WHITE, 0);
+        playerFour.setTerrainCard(TileType.FORREST);
+
+        // no remaining Settlements
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerFour, 0, 0));
+
+        // wrong terrain card (Card: Grass, Tile: Forest)
+        assertFalse(Game.canUseBasicTurn(mapWithPlacements, playerOne, 19, 6));
+
+        // no settlement placed yet
+        assertTrue(Game.canUseBasicTurn(gameMap, playerOne, 6, 0));
+        assertTrue(Game.canUseBasicTurn(gameMap, playerOne, 9, 9));
+        assertTrue(Game.canUseBasicTurn(gameMap, playerOne, 15, 4));
+
+        // reset internal card
+        playerOne.setTerrainCard(null);
+    }
+
+    @Test
+    void testUnsafeCheckForTokens() {
+        gameMap.at(3, 16).placeSettlement(playerOne);
+        Game.unsafeCheckForTokens(gameMap, playerOne, 3, 16);
+
+        assertSame(gameMap.at(2, 16).tileType, TileType.TAVERN);
+
+        assertEquals(1, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+        // add another token
+        gameMap.at(6, 16).placeSettlement(playerOne);
+        Game.unsafeCheckForTokens(gameMap, playerOne, 6, 16);
+
+        assertSame(gameMap.at(7, 16).tileType, TileType.TAVERN);
+
+        assertEquals(2, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+        // add another type of token
+        gameMap.at(3, 7).placeSettlement(playerOne);
+        Game.unsafeCheckForTokens(gameMap, playerOne, 3, 7);
+
+        assertSame(gameMap.at(2, 7).tileType, TileType.TOWER);
+
+        assertEquals(1, playerOne.getTokens().get(TileType.TOWER).getTotal());
+        assertEquals(2, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+        // place another settlement next to a special place where we already have a token
+        // still 1 tower token
+        gameMap.at(1, 7).placeSettlement(playerOne);
+        Game.unsafeCheckForTokens(gameMap, playerOne, 3, 7);
+
+        assertSame(gameMap.at(2, 7).tileType, TileType.TOWER);
+
+        assertEquals(1, playerOne.getTokens().get(TileType.TOWER).getTotal());
+        assertEquals(2, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+    }
+
+    @Test
+    void testUnsafeRemoveToken() {
+        // get a token
+        // same code as testUnsafeCheckForTokens
+        gameMap.at(3, 16).placeSettlement(playerOne);
+        assertSame(gameMap.at(2, 16).tileType, TileType.TAVERN);
+        Game.unsafeCheckForTokens(gameMap, playerOne, 3, 16);
+
+        assertEquals(1, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+        gameMap.at(3, 16).removeSettlement();
+        Game.unsafeRemoveToken(gameMap, playerOne, 2, 16);
+        assertEquals(0, playerOne.getTokens().get(TileType.TAVERN).getTotal());
+
+    }
+
+    @Test
+    void testUseTokenOracle() {
+        TileType t = TileType.ORACLE;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenOracle(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenFarm() {
+        TileType t = TileType.FARM;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenFarm(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenTavern() {
+        TileType t = TileType.TAVERN;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenTavern(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenTower() {
+        TileType t = TileType.TOWER;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenTower(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenOasis() {
+        TileType t = TileType.OASIS;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenOasis(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenHarbor() {
+        TileType t = TileType.HARBOR;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenHarbor(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenPaddock() {
+        TileType t = TileType.PADDOCK;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenPaddock(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseTokenBarn() {
+        TileType t = TileType.BARN;
+        Tile token = new Tile(19, 19, t, 2, 20);
+        playerOne.addToken(token);
+        playerOne.startTurn();
+
+        Game.useTokenBarn(playerOne);
+
+        assertSame(0, playerOne.getTokens().get(t).getRemaining());
+    }
+
+    @Test
+    void testUseBasicTurn() {
+        playerOne.setTerrainCard(TileType.FORREST);
+        playerOne.startTurn();
+
+        assertSame(TurnState.START_OF_TURN, playerOne.getCurrentTurnState());
+        assertSame(3, playerOne.getRemainingSettlementsOfTurn());
+
+        // first placement of basic turn
+        Game.useBasicTurn(gameMap, playerOne, 0, 0);
+        assertSame(TurnState.BASIC_TURN, playerOne.getCurrentTurnState());
+        assertSame(2, playerOne.getRemainingSettlementsOfTurn());
+
+        // second placement of basic turn
+        Game.useBasicTurn(gameMap, playerOne, 0, 0);
+        assertSame(1, playerOne.getRemainingSettlementsOfTurn());
+
+        // third placement of basic turn
+        Game.useBasicTurn(gameMap, playerOne, 0, 0);
+        assertSame(0, playerOne.getRemainingSettlementsOfTurn());
+
+        assertSame(TurnState.END_OF_TURN, playerOne.getCurrentTurnState());
+
     }
 }

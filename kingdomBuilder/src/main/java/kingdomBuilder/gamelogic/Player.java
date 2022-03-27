@@ -269,6 +269,10 @@ public class Player {
         return tokens;
     }
 
+    /**
+     * Gets the current turn state.
+     * @return the current turn state.
+     */
     public TurnState getCurrentTurnState() {
         return currentTurnState;
     }
