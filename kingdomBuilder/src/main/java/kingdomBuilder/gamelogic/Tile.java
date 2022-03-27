@@ -3,6 +3,7 @@ package kingdomBuilder.gamelogic;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -424,6 +425,18 @@ public class Tile {
                 && (gameMap.at(GameMap.bottomLeftX(x, y), y - 1).occupiedBy() == player);
     }
 
+    /**
+     * Computes a set of surrounding special places.
+     *
+     * @param gameMap the game map containing the tile.
+     * @return set of surrounding special places.
+     */
+    public Set<Tile> isNextToSpecial(GameMap gameMap) {
+        return surroundingTiles(gameMap)
+                .filter(t -> TileType.specialPlacesTypes.contains(t.tileType))
+                .collect(Collectors.toSet());
+    }
+
     ////////////////////////////////////////////////
     // Setter Methods //////////////////////////////
 
@@ -489,13 +502,12 @@ public class Tile {
      */
     public Quadrants calculateQuadrant(int quadrantWidth) {
         if (x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
-            return Quadrants.TOPLEFT;
+            return Quadrants.TOP_LEFT;
         else if (x >= quadrantWidth && x < 2 * quadrantWidth && y >= 0 && y < quadrantWidth)
-            return Quadrants.TOPRIGHT;
+            return Quadrants.TOP_RIGHT;
         else if (x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < 2 * quadrantWidth)
-            return Quadrants.BOTTOMLEFT;
-            //if(x >= quadrantWidth && x < mapWidth && y >= quadrantWidth && y < mapWidth)
+            return Quadrants.BOTTOM_LEFT;
         else
-            return Quadrants.BOTTOMRIGHT;
+            return Quadrants.BOTTOM_RIGHT;
     }
 }

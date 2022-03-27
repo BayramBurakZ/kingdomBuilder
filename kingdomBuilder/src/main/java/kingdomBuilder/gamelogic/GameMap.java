@@ -31,7 +31,7 @@ public class GameMap implements Iterable<Tile> {
     private final Set<Tile> tileSet;
 
     /**
-     * Represents all special places within the map.
+     * Represents all special places of the map.
      */
     private final Set<Tile> specialPlaces;
 
@@ -114,7 +114,7 @@ public class GameMap implements Iterable<Tile> {
                                 topLeft[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
+                if (TileType.specialPlacesTypes.contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -127,7 +127,7 @@ public class GameMap implements Iterable<Tile> {
                                 topRight[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
+                if (TileType.specialPlacesTypes.contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -144,7 +144,7 @@ public class GameMap implements Iterable<Tile> {
                                 bottomLeft[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
+                if (TileType.specialPlacesTypes.contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -157,7 +157,7 @@ public class GameMap implements Iterable<Tile> {
                                 bottomRight[x * quadrantWidth + y],
                                 startingTokenCount,
                                 quadrantWidth);
-                if (EnumSet.range(TileType.CASTLE, TileType.OASIS).contains(tiles[index].tileType)) {
+                if (TileType.specialPlacesTypes.contains(tiles[index].tileType)) {
                     specialPlaces.add(tiles[index]);
                 }
             }
@@ -645,6 +645,52 @@ public class GameMap implements Iterable<Tile> {
     }
 
     /**
+     * Adds all settlements of a group of settlements into the given Set of Tiles.
+     *
+     * @param player the player as the owner of the group.
+     * @param tile the tile of the beginning settlement.
+     * @return set of settlement group.
+     */
+    public Set<Tile> getSettlementGroup(Player player, Tile tile) {
+        Set<Tile> group = new HashSet<>();
+
+        getSettlementGroup(group, player, tile.x, tile.y);
+
+        return group;
+    }
+
+    /**
+     * Computes all groups of settlements of the player that surrounds the given tile.
+     *
+     * @param player the player as the owner of the group.
+     * @param tile the tile that is surrounded by the groups of settlements of the player.
+     * @return a list of groups of settlements of the player surrounding a tile.
+     */
+    public List<Set<Tile>> getSurroundingGroups(Player player, Tile tile) {
+        return tile.surroundingSettlements(this, player)
+                .map(t -> getSettlementGroup(player, t))
+                .filter(t -> !t.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Computes all special places adjacent a group of settlements.
+     *
+     * @param group group of settlements.
+     * @return special places adjacent to the given group of settlements.
+     */
+    public Set<Tile> getSpecialPlacesOfGroup(Set<Tile> group){
+        Set<Tile> specials = new HashSet<>();
+
+        for(Tile tile : group){
+            tile.isNextToSpecial(this).forEach(t -> specials.add(t));
+        }
+
+        return specials;
+    }
+
+    /**
      * Computes the lowest number of settlements the player placed in each quadrant if the player has
      * settlements in every quadrant.
      *
@@ -652,13 +698,10 @@ public class GameMap implements Iterable<Tile> {
      * @return lowest number of settlements the player placed in each quadrant.
      */
     public int fewestSettlementsInAllQuadrants(Player player) {
-        int quadrant1 = (int) getSettlementsOfQuadrant(player, Quadrants.TOPLEFT).count();
-        int quadrant2 = (int) getSettlementsOfQuadrant(player, Quadrants.TOPRIGHT).count();
-        int quadrant3 = (int) getSettlementsOfQuadrant(player, Quadrants.BOTTOMLEFT).count();
-        int quadrant4 = (int) getSettlementsOfQuadrant(player, Quadrants.BOTTOMRIGHT).count();
-
-        return IntStream
-                .of(quadrant1, quadrant2, quadrant3, quadrant4)
+        return Arrays
+                .stream(Quadrants.values())
+                .map(q -> getSettlementsOfQuadrant(player, q).count())
+                .mapToInt(Math::toIntExact)
                 .min()
                 .orElseThrow(NoSuchElementException::new);
     }
@@ -694,32 +737,21 @@ public class GameMap implements Iterable<Tile> {
     }
 
     /**
-     * Filters the special places the settlements of the player connect.
+     * Computes the count of special places the settlements of the player connect.
      *
      * @param player player as the owner of the settlements we are interested in.
-     * @return the special places the settlements connect.
+     * @return the count of special places connected by settlements of the player.
      */
-    public Stream<Tile> connectedSpecialPlaces(Player player) {
-        //TODO: fertig machen (wird am 26. von Linda gepusht)
-        Stream<Tile> settlements = getSettlements(player);
-
-        Set<Tile> group = new HashSet<>();
-
-        Set<Tile> nextToSpecial = new HashSet<>();
-        HashMap<Tile, Set<Tile>> specialToGroup = new HashMap<>();
-
-        specialPlaces.stream().filter(t -> {
-            Stream<Tile> set = t.surroundingTiles(this).filter(p -> p.occupiedBy == player);
-            if (set.count() == 0)
-                return false;
-            else {
-                set.forEach(m -> nextToSpecial.add(m));
-                specialToGroup.put(t, nextToSpecial);
-                nextToSpecial.clear();
-                return true;
-            }
-        });
-
-        return settlements;
+    public long connectedSpecialPlaces(Player player) {
+        return specialPlaces
+                .stream()
+                .filter(t -> t.surroundingTiles(this).anyMatch(p -> p.occupiedBy == player))
+                .map(t -> getSurroundingGroups(player, t))
+                .flatMap(Collection::stream)
+                .map(this::getSpecialPlacesOfGroup)
+                .filter(t -> t.size() >= 2)
+                .flatMap(Set::stream)
+                .distinct()
+                .count();
     }
 }

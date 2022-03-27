@@ -7,17 +7,17 @@ public enum Quadrants {
     /**
      * Represents top left quadrant of the board.
      */
-    TOPLEFT,
+    TOP_LEFT,
     /**
      * Represents top right quadrant of the board.
      */
-    TOPRIGHT,
+    TOP_RIGHT,
     /**
      * Represents bottom left quadrant of the board.
      */
-    BOTTOMLEFT,
+    BOTTOM_LEFT,
     /**
      * Represents bottom right quadrant of the board.
      */
-    BOTTOMRIGHT
+    BOTTOM_RIGHT
 }

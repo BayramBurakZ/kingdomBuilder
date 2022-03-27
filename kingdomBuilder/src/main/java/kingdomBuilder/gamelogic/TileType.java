@@ -202,6 +202,10 @@ public enum TileType {
      */
     public static EnumSet<TileType> regularTileTypes = EnumSet.range(GRAS, MOUNTAIN);
     /**
+     * Types of special tiles.
+     */
+    public static EnumSet<TileType> specialPlacesTypes = EnumSet.range(TOWER, OASIS);
+    /**
      * Returns the name of this enum constant formatted and localized regarding the language setting in the game.
      */
     public abstract String toStringLocalized();
