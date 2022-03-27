@@ -4,6 +4,7 @@ import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.network.Client;
+import kingdomBuilder.network.protocol.GameOver;
 import kingdomBuilder.network.protocol.TokenReceived;
 import kingdomBuilder.redux.Reduce;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.function.Consumer;
 
 
 public class BotReducer extends Reducer<KBState> {
@@ -33,6 +35,21 @@ public class BotReducer extends Reducer<KBState> {
      */
     public BotReducer() {
         registerReducers(this);
+    }
+
+    public static void subscribeMethods(Store<KBState> store) {
+        store.subscribe(kbState -> kbState.Bots().keySet().forEach(
+                c -> store.dispatch(MAKE_TURN_BOT, c)), "nextTerrainCard");
+
+        store.subscribe(kbState -> {
+            if (kbState.winConditions() != null && !kbState.winConditions().isEmpty())
+                kbState.Bots().keySet().forEach(c -> store.dispatch(SET_WIN_CONDITION_BOT, c));
+        },"winConditions");
+
+        store.subscribe(kbState -> {
+                    if (kbState.players() != null && !kbState.players().isEmpty())
+                        kbState.Bots().keySet().forEach(c -> store.dispatch(SET_PLAYERS_BOT, c));
+        }, "players");
     }
 
     @Reduce(action = CONNECT_BOT)
@@ -54,6 +71,7 @@ public class BotReducer extends Reducer<KBState> {
         - Game Over (self destruct)
         */
         //client.onYourTerrainCard.subscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
+        /* don't subscribe every client individually, just subscribe once and iterate through the Bots() map
         store.subscribe(kbState -> store.dispatch(MAKE_TURN_BOT, client), "nextTerrainCard");
         store.subscribe(kbState -> {
             if(kbState.winConditions() != null && !kbState.winConditions().isEmpty())
@@ -64,8 +82,17 @@ public class BotReducer extends Reducer<KBState> {
                 if(kbState.players() != null && !kbState.players().isEmpty())
                     store.dispatch(SET_PLAYERS_BOT, client);}
                 , "players");
+         */
 
-        client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
+        client.onGameOver.subscribe(new Consumer<GameOver>() {
+            @Override
+            public void accept(GameOver m) {
+                store.dispatch(DISCONNECT_BOT, client);
+                // anonymous class allows reference to itself via 'this' unlike lambdas
+                // allows executing the method a single time by unsubscribing immediately afterwards
+                client.onGameOver.unsubscribe(this);
+            }
+        });
         //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
 
         client.login(difficulty + " AI");
@@ -82,13 +109,17 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState onMakeTurnBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
+        AIGame aiGame = oldState.Bots().get(client);
+
+        if (aiGame == null)
+            return state;
+
         if(oldState.nextTerrainCard() != null)
-            oldState.Bots().get(client).updateTerrainCards(oldState.nextTerrainCard());
+            aiGame.updateTerrainCards(oldState.nextTerrainCard());
 
         if (oldState.currentPlayer() != null
                 && client.getClientId() == oldState.nextPlayer()
-                && oldState.Bots().containsKey(client)
-                && oldState.Bots().get(client).aiPlayer.getRemainingSettlementsOfTurn() > 0) {
+                && aiGame.aiPlayer.getRemainingSettlementsOfTurn() > 0) {
 
             //System.out.println(oldState.nextPlayer() + " || " + client.getClientId());
             List<ClientTurn> moves = oldState.Bots().get(client).chooseAI();
@@ -99,9 +130,7 @@ public class BotReducer extends Reducer<KBState> {
                 stack.push(moves.get(i));
             }
 
-            // TODO: stop timer when bot disconnects
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
+            aiGame.turnTimer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
                     if (stack.empty()) {
@@ -157,9 +186,9 @@ public class BotReducer extends Reducer<KBState> {
     public DeferredState onDisconnectBOT(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        // TODO: don't unsubscribe, let the DISCONNECT_BOT action check if the bot is still present
-        client.onGameOver.unsubscribe(m -> store.dispatch(DISCONNECT_BOT, client));
-        client.onTerrainTypeOfTurn.unsubscribe(m -> store.dispatch(MAKE_TURN_BOT, client));
+        AIGame aiGame = oldState.Bots().get(client);
+        aiGame.turnTimer.cancel();
+        aiGame.turnTimer = null;
 
         client.disconnect();
         oldState.Bots().remove(client);

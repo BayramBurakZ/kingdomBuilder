@@ -10,7 +10,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.network.protocol.ClientData;
 import kingdomBuilder.network.protocol.GameData;
 import kingdomBuilder.reducers.ApplicationReducer;
@@ -273,7 +275,7 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private void onJoinGamePressed(Event event) {
         if (gameselection_tableview.getSelectionModel().getSelectedItem() == null) {
-            // TODO: error message
+            Util.showLocalizedPopupMessage("noGameSelected", (Stage) sceneLoader.getScene().getWindow());
             return;
         }
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();
@@ -291,12 +293,12 @@ public class GameSelectionViewController extends Controller implements Initializ
         var tmp = gameselection_tableview.getSelectionModel().getSelectedItem();
 
         if (tmp == null) {
-            // TODO: error message: no game selected
+            Util.showLocalizedPopupMessage("noGameSelected", (Stage) sceneLoader.getScene().getWindow());
             return;
         }
 
         if (tmp.playersJoined() == tmp.playerLimit()) {
-            // TODO: error message: game already started
+            Util.showLocalizedPopupMessage("gameAlreadyStarted", (Stage) sceneLoader.getScene().getWindow());
             return;
         }
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();

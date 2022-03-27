@@ -40,6 +40,8 @@ public class KingdomBuilderApplication extends Application {
                 new RootReducer(),
                 new BotReducer()
         );
+        // idk where to put this
+        BotReducer.subscribeMethods(store);
     }
 
     /**

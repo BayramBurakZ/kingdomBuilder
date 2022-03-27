@@ -1,11 +1,13 @@
 package kingdomBuilder.reducers;
 
+import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.*;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.generated.DeferredState;
 import kingdomBuilder.gui.SceneLoader;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -169,7 +171,7 @@ public class ApplicationReducer extends Reducer<KBState> {
     public DeferredState onDisconnect(Store<KBState> unused, KBState oldState, Boolean wasKicked) {
         DeferredState state = new DeferredState(oldState);
 
-        // TODO: error message for being kicked
+        Util.showLocalizedPopupMessage("kicked", (Stage) oldState.sceneLoader().getScene().getWindow());
         /*
         if (wasKicked) {
             var sceneLoader = oldState.sceneLoader();

@@ -10,10 +10,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.chat.ChatSendAction;
 import kingdomBuilder.gamelogic.ServerTurn;
 import kingdomBuilder.gamelogic.WinCondition;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.*;
 import kingdomBuilder.reducers.ChatReducer;
@@ -436,11 +438,13 @@ public class ChatViewController extends Controller implements Initializable {
 
         // Failed to connect
         if (state.failedToConnect()) {
-            // TODO: error message instead of Chat message (because the chat is not visible)
+            Util.showLocalizedPopupMessage("failedToConnect", (Stage) sceneLoader.getScene().getWindow());
+            /* error message instead of Chat message (because the chat is not visible)
             var elem = createHTMLElement(
                     "<--- " + resourceBundle.getString("failedToConnect") + " --->",
                     MessageStyle.WARNING);
             globalChatAppendElement(elem);
+            */
         }
     }
 

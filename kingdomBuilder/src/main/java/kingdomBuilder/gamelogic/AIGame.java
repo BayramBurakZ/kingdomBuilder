@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 public class AIGame {
 
     /**
+     * The timer used for delaying turns over time.
+     */
+    public Timer turnTimer = new Timer();
+    /**
      * The map that is shared  between  all  players.
      */
     private GameMap gameMap;

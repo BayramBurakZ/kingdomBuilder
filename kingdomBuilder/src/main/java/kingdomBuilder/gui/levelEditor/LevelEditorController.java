@@ -9,6 +9,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.game.UploadQuadrantAction;
@@ -149,8 +150,7 @@ public class LevelEditorController extends Controller implements Initializable {
     @FXML
     private void onUploadButtonPressed() {
         if (!allTilesArePlaced()) {
-            // TODO: Error Message
-            return;
+            Util.showLocalizedPopupMessage("notAllTilesPlaced", (Stage) sceneLoader.getScene().getWindow());
         }
         else {
             uploadQuadrant();

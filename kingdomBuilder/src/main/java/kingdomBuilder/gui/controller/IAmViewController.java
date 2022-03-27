@@ -11,8 +11,11 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gui.SceneLoader;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
@@ -165,9 +168,10 @@ public class IAmViewController extends Controller implements Initializable {
     private void SetPreferredName() {
         String preferredName = iAmViewTextField.getText().trim();
         if (isNameValid(preferredName)) {
-            // TODO: error message in case the name isn't valid
             store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
             sceneLoader.showMenuView();
+        } else {
+            Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
         }
     }
 
@@ -179,8 +183,6 @@ public class IAmViewController extends Controller implements Initializable {
     private boolean isNameValid(String name) {
         if(name.isEmpty()) return false;
         // invalid characters: [ ] ( )
-        if (name.matches(".*\\[.*|.*\\].*|.*\\(.*|.*\\).*"))
-            return false;
-        return true;
+        return !name.matches(".*\\[.*|.*\\].*|.*\\(.*|.*\\).*");
     }
 }

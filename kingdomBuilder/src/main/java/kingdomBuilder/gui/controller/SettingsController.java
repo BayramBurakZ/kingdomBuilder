@@ -9,8 +9,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
@@ -129,7 +131,7 @@ public class SettingsController extends Controller implements Initializable {
         if (isNameValid(preferredName))
             store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
         else
-            ; // TODO: Error Message if Name is not valid!
+            Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
 
 
         // color mode
