@@ -60,53 +60,30 @@ class GameTest {
     TileType[] quadrant4;
 
     GameMap gameMap;
+    GameMap mapWithPlacements;
 
     Player playerOne;
     Player playerTwo;
     Player playerThree;
 
+
     @BeforeEach
     public void testInitializeMap() {
+
+        playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
+        playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
+        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
+
         quadrant1 = Arrays.stream(first.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant2 = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant4 = Arrays.stream(fourth.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
 
         gameMap = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
-    }
-
-    @BeforeEach
-    public void testInitializePlayers() {
-        playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
-        playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
-        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
-    }
-
-
-    @Test
-    void testUnsafePlaceSettlement() {
-        Game.unsafePlaceSettlement(gameMap, playerOne, 5, 8);
-        assertSame(playerOne, gameMap.at(5, 8).occupiedBy);
-    }
-
-    @Test
-    void testUnsafeMoveSettlement() {
-        // place a settlement and move it
-        // check if the old tile is empty and the new one occupied
-        gameMap.at(7,6).placeSettlement(playerOne);
-        Game.unsafeMoveSettlement(gameMap, playerOne, 7, 6, 11, 7);
-
-        assertSame(null, gameMap.at(7,6).occupiedBy);
-        assertSame(playerOne, gameMap.at(11,7).occupiedBy);
-    }
-
-    @Test
-    void allBasicTurnTiles() {
-
-        var mapWithPlacements = gameMap;
 
         //playerOne
-        gameMap.at(6,2).placeSettlement(playerOne);
+        mapWithPlacements = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
+        mapWithPlacements.at(6,2).placeSettlement(playerOne);
         mapWithPlacements.at(7,2).placeSettlement(playerOne);
         mapWithPlacements.at(6,3).placeSettlement(playerOne);
         mapWithPlacements.at(5,4).placeSettlement(playerOne);
@@ -142,8 +119,30 @@ class GameTest {
         mapWithPlacements.at(19,15).placeSettlement(playerThree);
         mapWithPlacements.at(19,14).placeSettlement(playerThree);
         mapWithPlacements.at(19,13).placeSettlement(playerThree);
+    }
 
-        Set<Tile> basic = null;
+
+    @Test
+    void testUnsafePlaceSettlement() {
+        Game.unsafePlaceSettlement(gameMap, playerOne, 5, 8);
+        assertSame(playerOne, gameMap.at(5, 8).occupiedBy);
+    }
+
+    @Test
+    void testUnsafeMoveSettlement() {
+        // place a settlement and move it
+        // check if the old tile is empty and the new one occupied
+        gameMap.at(7,6).placeSettlement(playerOne);
+        Game.unsafeMoveSettlement(gameMap, playerOne, 7, 6, 11, 7);
+
+        assertSame(null, gameMap.at(7,6).occupiedBy);
+        assertSame(playerOne, gameMap.at(11,7).occupiedBy);
+    }
+
+    @Test
+    void testAllBasicTurnTiles() {
+
+        Set<Tile> basic;
 
         // Test1: playerOne
         playerOne.setTerrainCard(TileType.FORREST);
@@ -151,6 +150,8 @@ class GameTest {
         basic = Game.allBasicTurnTiles(mapWithPlacements, playerOne).collect(Collectors.toSet());
 
 
+        System.out.println(mapWithPlacements.at(7, 2).occupiedBy);
+        assertTrue(mapWithPlacements.at(7,2).isBlocked());
         assertTrue(basic.contains(mapWithPlacements.at(6,19)));
         assertTrue(basic.contains(mapWithPlacements.at(6,18)));
         assertTrue(basic.contains(mapWithPlacements.at(12,18)));
@@ -163,36 +164,33 @@ class GameTest {
     }
 
     @Test
-    void allTokenOracleTiles() {
+    void testAllTokenOracleTiles() {
     }
 
     @Test
-    void allTokenFarmTiles() {
+    void testAllTokenFarmTiles() {
     }
 
     @Test
-    void allTokenTavernTiles() {
+    void testAllTokenTavernTiles() {
     }
 
     @Test
-    void allTokenTowerTiles() {
+    void testAllTokenTowerTiles() {
     }
 
     @Test
-    void allTokenOasisTiles() {
+    void testAllTokenOasisTiles() {
     }
 
     @Test
-    void allTokenHarborTiles() {
-    }
-
-    @Test
-    void allTokenPaddockTiles() {
+    void testAllTokenHarborTiles() {
     }
 
     @Test
     void testAllTokenPaddockTiles() {
     }
+
 
     @Test
     void allTokenBarnTiles() {

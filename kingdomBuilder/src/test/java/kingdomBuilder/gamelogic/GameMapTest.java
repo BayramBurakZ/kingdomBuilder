@@ -77,6 +77,10 @@ public class GameMapTest {
 
     @BeforeEach
     public void testInitializeMap() {
+        playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
+        playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
+        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
+
         quadrant1 = Arrays.stream(first.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant2 = Arrays.stream(second.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
         quadrant3 = Arrays.stream(third.split(";")).map(TileType::valueOf).toArray(TileType[]::new);
@@ -85,13 +89,6 @@ public class GameMapTest {
         gameMap = new GameMap(2, quadrant1, quadrant2, quadrant3, quadrant4);
     }
 
-
-    @BeforeEach
-    public void testInitializePlayers() {
-        playerOne = new Player(0, "TestPlayer1", PlayerColor.RED, 40);
-        playerTwo = new Player(1, "TestPlayer2", PlayerColor.BLUE, 40);
-        playerThree = new Player(2, "TestPlayer3", PlayerColor.BLACK, 40);
-    }
 
     @Test
     public void testMapCreationFromQuadrants() {
@@ -492,7 +489,7 @@ public class GameMapTest {
 
         gameMap.at(0,10).removeSettlement();
         gameMap.at(11, 0).removeSettlement();
-        gameMap.at(19,11).removeSettlement();
+        gameMap.at(19,18).removeSettlement();
     }
 
 
