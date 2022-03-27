@@ -264,7 +264,6 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private void onReturnToMenuButtonPressed(Event event) {
         store.dispatch(ApplicationReducer.DISCONNECT, Boolean.FALSE);
-        sceneLoader.showMenuView();
     }
 
     /**
@@ -274,8 +273,15 @@ public class GameSelectionViewController extends Controller implements Initializ
      */
     @FXML
     private void onJoinGamePressed(Event event) {
-        if (gameselection_tableview.getSelectionModel().getSelectedItem() == null) {
+        var tmp = gameselection_tableview.getSelectionModel().getSelectedItem();
+
+        if (tmp == null) {
             Util.showLocalizedPopupMessage("noGameSelected", (Stage) sceneLoader.getScene().getWindow());
+            return;
+        }
+
+        if (tmp.playersJoined() == tmp.playerLimit()) {
+            Util.showLocalizedPopupMessage("gameAlreadyStarted", (Stage) sceneLoader.getScene().getWindow());
             return;
         }
         int id = gameselection_tableview.getSelectionModel().getSelectedItem().gameId();

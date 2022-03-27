@@ -20,6 +20,7 @@ import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.ArrayList;
 
 /**
  * Handles all application related actions.
@@ -104,6 +105,7 @@ public class ApplicationReducer extends Reducer<KBState> {
         client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
         client.onPlayersOfGameReply.subscribe(m -> store.dispatch(GameReducer.PLAYERS_OF_GAME, m));
         client.onNamespaceLoaded.subscribe(m -> store.dispatch(NAMESPACE_LOADED, null));
+        client.onKicked.subscribe(m -> store.dispatch(DISCONNECT, Boolean.TRUE));
         // root stuff
         client.onWrongPassword.subscribe(m -> store.dispatch(RootReducer.WRONG_PASSWORD, null));
         client.onYouAreRoot.subscribe(m -> store.dispatch(RootReducer.ON_ROOT, null));
@@ -168,16 +170,10 @@ public class ApplicationReducer extends Reducer<KBState> {
     }
 
     @Reduce(action = DISCONNECT)
-    public DeferredState onDisconnect(Store<KBState> unused, KBState oldState, Boolean wasKicked) {
+    public DeferredState onDisconnect(Store<KBState> store, KBState oldState, Boolean wasKicked) {
         DeferredState state = new DeferredState(oldState);
 
-        Util.showLocalizedPopupMessage("kicked", (Stage) oldState.sceneLoader().getScene().getWindow());
-        /*
-        if (wasKicked) {
-            var sceneLoader = oldState.sceneLoader();
-            sceneLoader.getChatViewController().onYouHaveBeenKicked();
-        }
-         */
+        oldState.sceneLoader().showMenuView();
 
         oldState.client().disconnect();
         state.setClient(null);
@@ -189,6 +185,26 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         oldState.games().clear();
         state.setGames(oldState.games());
+
+        if (wasKicked) {
+            Util.showLocalizedPopupMessage("kicked", (Stage) oldState.sceneLoader().getScene().getWindow());
+            if (oldState.joinedGame()) {
+                oldState.Bots().keySet().forEach(c -> store.dispatch(BotReducer.DISCONNECT_BOT, c));
+                state.setPlayers(null);
+                state.setScores(null);
+                state.setToken(null);
+                state.setGameLastTurn(null);
+                state.setNextTerrainCard(null);
+                state.setNextPlayer(-1);
+                state.setGameStarted(false);
+                state.setGameMap(null);
+                state.setMyGameReply(null);
+                state.setPlayersMap(null);
+                state.setCurrentPlayer(null);
+                state.setJoinedGame(false);
+                state.setWinConditions(new ArrayList<>());
+            }
+        }
 
         return state;
     }

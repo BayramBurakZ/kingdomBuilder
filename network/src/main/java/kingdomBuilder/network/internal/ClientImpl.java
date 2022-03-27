@@ -432,7 +432,6 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public void accept(YouHaveBeenKicked message) {
         this.ioHandler.disconnect();
         this.onKicked.dispatch(this);
-        System.out.println("KICKED!");
     }
 
     /**
