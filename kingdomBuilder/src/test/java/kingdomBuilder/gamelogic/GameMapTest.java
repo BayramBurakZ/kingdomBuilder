@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.security.InvalidParameterException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GameMapTest {
@@ -311,6 +308,167 @@ public class GameMapTest {
     }
 
     @Test
+    void testGetSettlementsOfQuadrant() {
+        Set<Tile> result;
+
+        //no settlement placed
+        //top left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //top right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //bottom right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //one settlement placed
+        gameMap.at(4, 5).placeSettlement(playerOne);
+
+        //top left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
+
+        assertEquals(1, result.size());
+        assertTrue(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //top right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
+
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //bottom right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_RIGHT).collect(Collectors.toSet());
+
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        result.clear();
+
+        //single settlements all over the map
+        gameMap.at(19, 19).placeSettlement(playerOne);
+        gameMap.at(19, 0).placeSettlement(playerOne);
+
+        //top left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
+        assertEquals(1, result.size());
+        assertTrue(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(19, 19)));
+        assertFalse(result.contains(gameMap.at(19, 0)));
+        result.clear();
+
+        //top right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
+        assertEquals(1, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(19, 19)));
+        assertTrue(result.contains(gameMap.at(19, 0)));
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(19, 19)));
+        assertFalse(result.contains(gameMap.at(19, 0)));
+        result.clear();
+
+        //bottom right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_RIGHT).collect(Collectors.toSet());
+        assertEquals(1, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertTrue(result.contains(gameMap.at(19, 19)));
+        assertFalse(result.contains(gameMap.at(19, 0)));
+        result.clear();
+
+        //remove these settlements for next part
+        gameMap.at(19, 19).removeSettlement();
+        gameMap.at(19, 0).removeSettlement();
+
+        //small group
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
+
+        //top left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
+        assertEquals(4, result.size());
+        assertTrue(result.contains(gameMap.at(4, 5)));
+        assertTrue(result.contains(gameMap.at(3, 5)));
+        assertTrue(result.contains(gameMap.at(2, 5)));
+        assertTrue(result.contains(gameMap.at(3, 4)));
+        result.clear();
+
+        //top right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(3, 5)));
+        assertFalse(result.contains(gameMap.at(2, 5)));
+        assertFalse(result.contains(gameMap.at(3, 4)));
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(3, 5)));
+        assertFalse(result.contains(gameMap.at(2, 5)));
+        assertFalse(result.contains(gameMap.at(3, 4)));
+        result.clear();
+
+        //bottom right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(3, 5)));
+        assertFalse(result.contains(gameMap.at(2, 5)));
+        assertFalse(result.contains(gameMap.at(3, 4)));
+        result.clear();
+
+        //another player places one settlement (nothing should be changed)
+        gameMap.at(19, 19).placeSettlement(playerTwo);
+
+        //top left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
+        assertEquals(4, result.size());
+        result.clear();
+
+        //top right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+
+        //bottom right quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_RIGHT).collect(Collectors.toSet());
+        assertEquals(0, result.size());
+        result.clear();
+    }
+
+    @Test
     void testGetSettlementGroup() {
         Player playerOne = new Player(0, "PlayerOne", PlayerColor.RED, 20);
         Player playerTwo = new Player(1, "PlayerTwo", PlayerColor.BLUE, 20);
@@ -339,6 +497,80 @@ public class GameMapTest {
         gameMap.getSettlementGroup(result, playerOne, 4, 5);
 
         assertEquals(4, result.size());
+        result.clear();
+
+        // clear Map for maybe further use
+        gameMap.at(4, 5).removeSettlement();
+        gameMap.at(3, 5).removeSettlement();
+        gameMap.at(2, 5).removeSettlement();
+        gameMap.at(3, 4).removeSettlement();
+        gameMap.at(1, 5).removeSettlement();
+    }
+
+    @Test
+    void getSettlementGroup() {
+        Set<Tile> result;
+
+        // group with one settlement
+        gameMap.at(4, 5).placeSettlement(playerOne);
+        result = gameMap.getSettlementGroup(playerOne, gameMap.at(4, 5));
+
+        assertEquals(1, result.size());
+        result.clear();
+
+        // expand the group
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
+
+        result = gameMap.getSettlementGroup(playerOne, gameMap.at(4, 5));
+
+        assertEquals(4, result.size());
+        result.clear();
+
+        // different player settlement next to it
+        gameMap.at(1, 5).placeSettlement(playerTwo);
+
+        result = gameMap.getSettlementGroup(playerOne, gameMap.at(4, 5));
+
+        assertEquals(4, result.size());
+        result.clear();
+
+        // clear Map for maybe further use
+        gameMap.at(4, 5).removeSettlement();
+        gameMap.at(3, 5).removeSettlement();
+        gameMap.at(2, 5).removeSettlement();
+        gameMap.at(3, 4).removeSettlement();
+        gameMap.at(1, 5).removeSettlement();
+    }
+
+    @Test
+    void testGetSurroundingGroups() {
+        List<Set<Tile>> result;
+
+        // group with one settlement
+        gameMap.at(4, 5).placeSettlement(playerOne);
+        result = gameMap.getSurroundingGroups(playerOne, gameMap.at(3, 5));
+
+        assertEquals(1, result.size());
+        result.clear();
+
+        // expand the group
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
+
+        result = gameMap.getSurroundingGroups(playerOne, gameMap.at(4, 4));
+
+        assertEquals(1, result.size());
+        result.clear();
+
+        // different player settlement next to it
+        gameMap.at(1, 5).placeSettlement(playerTwo);
+
+        result = gameMap.getSurroundingGroups(playerOne, gameMap.at(5, 5));
+
+        assertEquals(1, result.size());
         result.clear();
 
         // clear Map for maybe further use
@@ -494,28 +726,102 @@ public class GameMapTest {
 
 
     @Test
-    void getSettlementsOfQuadrant() {
-        // TODO: write test
-    }
-
-    @Test
-    void getSettlementGroup() {
-        // TODO: write test
-    }
-
-    @Test
     void fewestSettlementsInAllQuadrants() {
-        // TODO: write test
+        //one settlement placed
+        gameMap.at(4, 5).placeSettlement(playerOne);
+        assertEquals(0, gameMap.fewestSettlementsInAllQuadrants(playerOne));
+
+
+        //single settlements in all quadrants
+        gameMap.at(19, 19).placeSettlement(playerOne);
+        gameMap.at(19, 0).placeSettlement(playerOne);
+        gameMap.at(3, 10).placeSettlement(playerOne);
+
+        assertEquals(1, gameMap.fewestSettlementsInAllQuadrants(playerOne));
+
+        //small group
+        gameMap.at(3, 5).placeSettlement(playerOne);
+        gameMap.at(2, 5).placeSettlement(playerOne);
+        gameMap.at(3, 4).placeSettlement(playerOne);
+
+        assertEquals(1, gameMap.fewestSettlementsInAllQuadrants(playerOne));
+
+        //another player places one settlement (nothing should be changed)
+        gameMap.at(19, 18).placeSettlement(playerTwo);
+
+        assertEquals(1, gameMap.fewestSettlementsInAllQuadrants(playerOne));
     }
 
     @Test
-    void rankOfSettlementsInQuadrant() {
-        // TODO: write test
+    void testRankOfSettlementsInQuadrant() {
+        List<Player> players = Arrays.asList(playerOne, playerTwo, playerThree);
+
+        //place settlements in top left quadrant
+        gameMap.at(2,2).placeSettlement(playerOne);
+        gameMap.at(2,3).placeSettlement(playerOne);
+        gameMap.at(3,2).placeSettlement(playerOne);
+
+        gameMap.at(5,5).placeSettlement(playerTwo);
+        gameMap.at(5,6).placeSettlement(playerTwo);
+
+        gameMap.at(7,7).placeSettlement(playerThree);
+
+        //top left quadrant
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.TOP_LEFT));
+        assertEquals(1, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.TOP_LEFT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_LEFT));
+
+        //top right quadrant
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.TOP_RIGHT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.TOP_RIGHT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_RIGHT));
+
+        //bottom left quadrant
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_LEFT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_LEFT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_LEFT));
+
+        //bottom right quadrant
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_RIGHT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_RIGHT));
+        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_RIGHT));
     }
 
     @Test
     void connectedSpecialPlaces() {
-        // TODO: write test
+        //connecting 2 special places
+        gameMap.at(5,4).placeSettlement(playerOne);
+        gameMap.at(6,4).placeSettlement(playerOne);
+        gameMap.at(7,4).placeSettlement(playerOne);
+        gameMap.at(7,5).placeSettlement(playerOne);
+
+        assertEquals(2, gameMap.connectedSpecialPlaces(playerOne));
+
+        //connecting 3 special places
+        gameMap.at(5,6).placeSettlement(playerOne);
+        gameMap.at(6,6).placeSettlement(playerOne);
+        gameMap.at(4,6).placeSettlement(playerOne);
+        gameMap.at(3,6).placeSettlement(playerOne);
+
+        assertEquals(3, gameMap.connectedSpecialPlaces(playerOne));
+
+        //connecting 2 special places with settlements of playerOne
+        //and connecting 3 special places with settlements mixed of playerOne and playerTwo
+        gameMap.at(5,4).removeSettlement();
+        gameMap.at(6,4).removeSettlement();
+
+        gameMap.at(5,4).placeSettlement(playerTwo);
+        gameMap.at(6,4).placeSettlement(playerTwo);
+
+        assertEquals(2, gameMap.connectedSpecialPlaces(playerOne));
+
+        //connecting 0 special places but surround special places
+        gameMap.at(5,6).removeSettlement();
+        gameMap.at(6,6).removeSettlement();
+        gameMap.at(5,4).removeSettlement();
+        gameMap.at(6,4).removeSettlement();
+
+        assertEquals(0, gameMap.connectedSpecialPlaces(playerOne));
     }
 
     @Test
