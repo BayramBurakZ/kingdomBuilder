@@ -227,8 +227,10 @@ public class AIGame {
 
 
         // if it is not the first call than change the reference of the original move List.
-        if (followingScore != 0)
+        if (depth < SEARCH_DEPTH){
             bestTurn = new ArrayList<>();
+            aiPlayer.setTerrainCard(terrain);
+        }
 
         if (settlementsLeft <= 0 || depth <= 0)
             return followingScore;
@@ -422,12 +424,10 @@ public class AIGame {
                           int followingScore) {
 
         // get turn.
-        GameMap tempGM1 = new GameMap(map); //PASS each
-        Map<TileType, Integer> tempPC1 = playedCards; //pass
-        ArrayList<TileType> predictions = predictTerrainCard(playedCards);
+        GameMap tempGM1 = new GameMap(map);
 
         // update local map.
-        int tempSL = settlementsLeft; //PASS
+        int tempSL = settlementsLeft;
         for (ClientTurn clientTurn : original) {
             if (!tempGM1.at(clientTurn.x, clientTurn.y).isBlocked())
                 tempGM1.at(clientTurn.x, clientTurn.y).placeSettlement(aiPlayer);
@@ -437,33 +437,34 @@ public class AIGame {
         followingScore += Game.calculateScore(tempGM1, aiPlayer, winConditions, players);
 
         // use token at the end
-        tempSL = useTokenAI(tempGM1, original, tempSL, true); //PASS
+        tempSL = useTokenAI(tempGM1, original, tempSL, true);
 
         GameMap tempGM2 = new GameMap(tempGM1);
         GameMap tempGM3 = new GameMap(tempGM1);
 
-        Map<TileType, Integer> tempPC2 =
-                playedCards.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        Map<TileType, Integer> tempPC3 =
-                playedCards.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<TileType, Integer> tempPC1 = playedCards;
+        Map<TileType, Integer> tempPC2 = playedCards;
+        Map<TileType, Integer> tempPC3 = playedCards;
 
-        int temp = playedTerrainCards.get(predictions.get(0));
-        playedTerrainCards.put(predictions.get(0), temp + 1);
+        ArrayList<TileType> predictions = predictTerrainCard(playedCards);
 
-        temp = playedTerrainCards.get(predictions.get(1));
-        playedTerrainCards.put(predictions.get(1), temp + 1);
+        int temp = tempPC1.get(predictions.get(0));
+        tempPC1.put(predictions.get(0), temp + 1);
 
-        temp = playedTerrainCards.get(predictions.get(1));
-        playedTerrainCards.put(predictions.get(1), temp + 1);
+        temp = tempPC2.get(predictions.get(1));
+        tempPC2.put(predictions.get(1), temp + 1);
+
+        temp = tempPC3.get(predictions.get(1));
+        tempPC3.put(predictions.get(1), temp + 1);
 
 
         followingScore += expertAITurn(tempGM1, null, tempPC1, predictions.get(0),
                 tempSL, depth - 1, followingScore);
 
-        followingScore += expertAITurn(tempGM2, null, tempPC1, predictions.get(1),
+        followingScore += expertAITurn(tempGM2, null, tempPC2, predictions.get(1),
                 tempSL, depth - 1, followingScore);
 
-        followingScore += expertAITurn(tempGM3, null, tempPC1, predictions.get(2),
+        followingScore += expertAITurn(tempGM3, null, tempPC3, predictions.get(2),
                 tempSL, depth - 1, followingScore);
 
         return followingScore;
