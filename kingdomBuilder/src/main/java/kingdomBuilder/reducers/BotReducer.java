@@ -7,6 +7,7 @@ import kingdomBuilder.gui.controller.BotDifficulty;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.protocol.GameOver;
 import kingdomBuilder.network.protocol.TokenReceived;
+import kingdomBuilder.network.protocol.YouHaveBeenKicked;
 import kingdomBuilder.redux.Reduce;
 
 import kingdomBuilder.generated.DeferredState;
@@ -79,13 +80,10 @@ public class BotReducer extends Reducer<KBState> {
                 , "players");
          */
 
-        client.onGameOver.subscribe(new Consumer<GameOver>() {
-            @Override
-            public void accept(GameOver m) {
+        client.onGameOver.subscribe(m -> store.dispatch(DISCONNECT_BOT, client));
+        client.onKicked.subscribe(c -> {
+            if (c == client) {
                 store.dispatch(DISCONNECT_BOT, client);
-                // anonymous class allows reference to itself via 'this' unlike lambdas
-                // allows executing the method a single time by unsubscribing immediately afterwards
-                client.onGameOver.unsubscribe(this);
             }
         });
         //client.onTokenReceived.subscribe(m -> store.dispatch(GRANT_TOKEN_BOT, m));
