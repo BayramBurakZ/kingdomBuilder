@@ -29,7 +29,6 @@ public class BotReducer extends Reducer<KBState> {
     public static final String ACTIVATE_TOKEN_BOT = "ACTIVATE_TOKEN_BOT";
     public static final String DISCONNECT_BOT = "DISCONNECT_BOT";
     public static final String SET_WIN_CONDITION_BOT = "SET_WIN_CONDITION_BOT";
-    public static final String SET_PLAYERS_BOT = "SET_PLAYERS_BOT";
 
     /**
      * Constructs a new BotReducer and registers himself.
@@ -40,17 +39,12 @@ public class BotReducer extends Reducer<KBState> {
 
     public static void subscribeMethods(Store<KBState> store) {
         store.subscribe(kbState -> kbState.Bots().keySet().forEach(
-                c -> store.dispatch(MAKE_TURN_BOT, c)), "nextTerrainCard");
+                c -> store.dispatch(MAKE_TURN_BOT, c)), "nextTerrainCard", "gameStarted");
 
         store.subscribe(kbState -> {
             if (kbState.winConditions() != null && !kbState.winConditions().isEmpty())
                 kbState.Bots().keySet().forEach(c -> store.dispatch(SET_WIN_CONDITION_BOT, c));
         },"winConditions");
-
-        store.subscribe(kbState -> {
-                    if (kbState.players() != null && !kbState.players().isEmpty())
-                        kbState.Bots().keySet().forEach(c -> store.dispatch(SET_PLAYERS_BOT, c));
-        }, "players");
     }
 
     @Reduce(action = CONNECT_BOT)
@@ -112,7 +106,7 @@ public class BotReducer extends Reducer<KBState> {
 
         AIGame aiGame = oldState.Bots().get(client);
 
-        if (aiGame == null)
+        if (aiGame == null || !oldState.gameStarted())
             return state;
 
         if(oldState.nextTerrainCard() != null)
@@ -207,16 +201,6 @@ public class BotReducer extends Reducer<KBState> {
 
         if(oldState.Bots() != null)
             oldState.Bots().get(client).setWinConditions(oldState.winConditions());
-
-        return state;
-    }
-
-    @Reduce(action = SET_PLAYERS_BOT)
-    public DeferredState setPlayersBot(Store<KBState> store, KBState oldState, Client client) {
-        DeferredState state = new DeferredState(oldState);
-
-        if(oldState.Bots().get(client) != null)
-            oldState.Bots().get(client).setPlayers(oldState.players());
 
         return state;
     }

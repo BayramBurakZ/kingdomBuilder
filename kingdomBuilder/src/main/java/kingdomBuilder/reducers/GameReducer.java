@@ -299,10 +299,15 @@ public class GameReducer extends Reducer<KBState> {
             playerGame.add(p);
             playerMap.put(cd.clientId(), p);
 
-            for( Client client : oldState.Bots().keySet()){
-                if(client.getClientId() == pd.clientId())
+            for (Client client : oldState.Bots().keySet()) {
+                if (client.getClientId() == pd.clientId()) {
                     oldState.Bots().get(client).setAiPlayer(p);
+                }
             }
+        }
+
+        for (Client client : oldState.Bots().keySet()) {
+            oldState.Bots().get(client).setPlayers(playerGame);
         }
 
         state.setPlayers(playerGame);
