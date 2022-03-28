@@ -114,31 +114,6 @@ public class Tile {
     }
 
     /**
-     * Checks if two tiles are neighbours in the hexagon map.
-     *
-     * @param other the second tile.
-     * @return Whether both tiles are neighbours.
-     */
-    public boolean areNeighbouringTiles(Tile other) {
-        //TODO: never used delete.
-        // Compare Y
-        if (Math.abs(y - other.y) > 1)
-            return false;
-        // Neighbour in same row
-        if (y == other.y && Math.abs(x - other.x) > 1)
-            return false;
-        if (y % 2 == 0) {
-            // even row
-            // top/bottom left or top/bottom right
-            return x == other.x - 1 || x == other.x;
-        } else {
-            // odd row
-            // top/bottom right or top/bottom left
-            return x == other.x + 1 || x == other.x;
-        }
-    }
-
-    /**
      * Check if a tile is at the front or back part of a chain of settlements that are owned by the specified player.
      *
      * @param gameMap the map containing the tile.

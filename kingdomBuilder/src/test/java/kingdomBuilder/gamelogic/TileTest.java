@@ -152,7 +152,7 @@ class TileTest {
     @Test
     void testHasTokens() {
 
-        // Test1: normal tile has no tokens
+        // Test1: normal tile has no tokens.
         Exception exception = assertThrows(RuntimeException.class, () -> {gameMap.at(10,1).hasTokens();});
         assertEquals("The tile is not a special place!", exception.getMessage());
 
@@ -163,8 +163,13 @@ class TileTest {
         // Test3: Token tile has tokens left.
         assertTrue(gameMap.at(15,7).hasTokens());
 
-        //TODO: more tests.
+        //Test4: token tile has one token left.
+        gameMap.at(15,7).takeTokenFromSpecialPlace();
+        assertTrue(gameMap.at(15,7).hasTokens());
 
+        //Test5: token tile has zero token left.
+        gameMap.at(15,7).takeTokenFromSpecialPlace();
+        assertFalse(gameMap.at(15,7).hasTokens());
     }
 
     @Test
