@@ -66,6 +66,7 @@ public class Player {
 
         /**
          * Gets the amount of token uses remaining for the current turn.
+         *
          * @return the amount of token uses remaining for the current turn.
          */
         public int getRemaining() {
@@ -74,6 +75,7 @@ public class Player {
 
         /**
          * Gets the total amount of token uses for a turn.
+         *
          * @return the total amount of token uses for a turn.
          */
         public int getTotal() {
@@ -110,7 +112,7 @@ public class Player {
     /**
      * Sets the type of the terrain for the turn.
      *
-     * @param tileType the type of the terraincard.
+     * @param tileType the type of the terrain card.
      */
     public void setTerrainCard(TileType tileType) {
         this.terrainCard = tileType;
@@ -271,6 +273,7 @@ public class Player {
 
     /**
      * Gets the current turn state.
+     *
      * @return the current turn state.
      */
     public TurnState getCurrentTurnState() {

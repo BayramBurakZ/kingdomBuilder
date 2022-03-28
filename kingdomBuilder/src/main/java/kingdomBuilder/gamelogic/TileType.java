@@ -13,7 +13,7 @@ public enum TileType {
      * Represents the grass type. It is a normal type.
      * Is part of following enum sets: regularTileTypes.
      */
-    GRAS{
+    GRAS {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -24,7 +24,7 @@ public enum TileType {
      * Represents the flower type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    FLOWER{
+    FLOWER {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -35,7 +35,7 @@ public enum TileType {
      * Represents the forest type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    FORREST{
+    FORREST {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -46,7 +46,7 @@ public enum TileType {
      * Represents the canyon type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    CANYON{
+    CANYON {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -57,7 +57,7 @@ public enum TileType {
      * Represents the desert type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    DESERT{
+    DESERT {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -68,7 +68,7 @@ public enum TileType {
      * Represents the water type. It is a normal type.
      * Is part of following enum sets: regularTileTypes, placeableTileTypes.
      */
-    WATER{
+    WATER {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -79,7 +79,7 @@ public enum TileType {
      * Represents the mountain type. It is a normal type.
      * Is part of following enum sets: regularTileTypes.
      */
-    MOUNTAIN{
+    MOUNTAIN {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -90,7 +90,7 @@ public enum TileType {
      * Represents the castle type. It is a normal type.
      * Is part of following enum sets: nonPlaceableTileTypes.
      */
-    CASTLE{
+    CASTLE {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -101,7 +101,7 @@ public enum TileType {
      * Represents the oracle type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes.
      */
-    ORACLE{
+    ORACLE {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -112,7 +112,7 @@ public enum TileType {
      * Represents the farm type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    FARM{
+    FARM {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -123,7 +123,7 @@ public enum TileType {
      * Represents the tavern type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    TAVERN{
+    TAVERN {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -134,7 +134,7 @@ public enum TileType {
      * Represents the tower type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    TOWER{
+    TOWER {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -145,7 +145,7 @@ public enum TileType {
      * Represents the harbor type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    HARBOR{
+    HARBOR {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -156,7 +156,7 @@ public enum TileType {
      * Represents the paddock type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    PADDOCK{
+    PADDOCK {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -167,7 +167,7 @@ public enum TileType {
      * Represents the barn type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    BARN{
+    BARN {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -178,7 +178,7 @@ public enum TileType {
      * Represents the oasis type. It is a token type.
      * Is part of following enum sets: nonPlaceableTileTypes, tokenType.
      */
-    OASIS{
+    OASIS {
         @Override
         public String toStringLocalized() {
             return ResourceBundle.getBundle("kingdomBuilder/gui/gui",
@@ -205,6 +205,7 @@ public enum TileType {
      * Types of special tiles.
      */
     public static EnumSet<TileType> specialPlacesTypes = EnumSet.range(CASTLE, OASIS);
+
     /**
      * Returns the name of this enum constant formatted and localized regarding the language setting in the game.
      */
