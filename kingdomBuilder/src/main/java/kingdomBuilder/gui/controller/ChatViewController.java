@@ -425,7 +425,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             String clientName = kbState.clients().get(x.clientId()).name();
             String chatMessage = i + 1 + ". " + clientName + ": " +
-                    Game.calculateScore(kbState.gameMap(), q, kbState.winConditions(), kbState.players());
+                    Game.calculateAndPrintScore(kbState.gameMap(), q, kbState.winConditions(), kbState.players());
 
             turnLogAppendElement(
                     //whisper because its orange - no further reason

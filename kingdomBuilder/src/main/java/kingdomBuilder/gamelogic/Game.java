@@ -399,50 +399,93 @@ public class Game {
         int score = 0;
         for (WinCondition c : winConditions) {
             switch (c) {
+                case LORDS -> score += scoreLord(gameMap, player, players);
+                case MINER -> score += scoreMiner(gameMap, player);
+                case FARMER -> score += scoreFarmer(gameMap, player);
+                case FISHER -> score += scoreFisher(gameMap, player);
+                case KNIGHT -> score += scoreKnight(gameMap, player);
+                case WORKER -> score +=  scoreWorker(gameMap, player);
+                case CITIZEN -> score += scoreCitizen(gameMap, player);
+                case EXPLORER -> score += scoreExplorer(gameMap, player);
+                case MERCHANT -> score += scoreMerchant(gameMap, player);
+                case ANCHORITE -> score += scoreAnchorite(gameMap, player);
+            }
+        }
+        return score + scoreCastles(gameMap, player);
+    }
+
+    /**
+     * Calculates the score for a specific player on the given map with the given WinConditions and prints the score
+     * for each score condition to the console.
+     *
+     * @param gameMap       the map.
+     * @param player        the player for which the score should be calculated.
+     * @param winConditions the winConditions
+     * @param players       the players of the game.
+     * @return the score for the specified player.
+     */
+    public static int calculateAndPrintScore(GameMap gameMap, Player player, List<WinCondition> winConditions,
+                                     List<Player> players) {
+        int score = 0;
+        System.out.println("Score for current player " + player.name + ":");
+        for (WinCondition c : winConditions) {
+            switch (c) {
                 case LORDS -> {
                     int tmp = scoreLord(gameMap, player, players);
+                    System.out.println("Lords: " + tmp);
                     score += tmp;
                 }
                 case MINER -> {
                     int tmp = scoreMiner(gameMap, player);
+                    System.out.println("Miner: " + tmp);
                     score += tmp;
                 }
                 case FARMER -> {
                     int tmp = scoreFarmer(gameMap, player);
+                    System.out.println("Farmer: " + tmp);
                     score += tmp;
                 }
                 case FISHER -> {
                     int tmp = scoreFisher(gameMap, player);
+                    System.out.println("Fisher: " + tmp);
                     score += tmp;
                 }
                 case KNIGHT -> {
                     int tmp = scoreKnight(gameMap, player);
+                    System.out.println("Knight: " + tmp);
                     score += tmp;
                 }
                 case WORKER -> {
                     int tmp = scoreWorker(gameMap, player);
+                    System.out.println("Worker: " + tmp);
                     score += tmp;
                 }
                 case CITIZEN -> {
                     int tmp = scoreCitizen(gameMap, player);
+                    System.out.println("citizen: " + tmp);
                     score += tmp;
                 }
                 case EXPLORER -> {
                     int tmp = scoreExplorer(gameMap, player);
+                    System.out.println("Explorer: " + tmp);
                     score += tmp;
                 }
                 case MERCHANT -> {
                     int tmp = scoreMerchant(gameMap, player);
+                    System.out.println("Merchant: " + tmp);
                     score += tmp;
                 }
                 case ANCHORITE -> {
                     int tmp = scoreAnchorite(gameMap, player);
+                    System.out.println("Anchorite: " + tmp);
                     score += tmp;
                 }
             }
         }
-
-        return score + scoreCastles(gameMap, player);
+        int tmp = scoreCastles(gameMap, player);
+        System.out.println("Castles: " + tmp);
+        System.out.println("----------------------------------------");
+        return score + tmp;
     }
 
     /**

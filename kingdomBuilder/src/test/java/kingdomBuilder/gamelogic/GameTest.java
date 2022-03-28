@@ -901,7 +901,7 @@ class GameTest {
         gameMap.at(0,0).removeSettlement();
     }
 
-    @Test @Disabled
+    @Test
     void testScoreMerchant() {
         //Test#1: no settlement placed
         assertEquals(0, Game.scoreMerchant(gameMap, playerOne));
