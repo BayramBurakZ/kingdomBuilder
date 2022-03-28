@@ -5,12 +5,9 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import kingdomBuilder.KBState;
 import kingdomBuilder.reducers.*;
-import kingdomBuilder.network.internal.ClientSelectorImpl;
 import kingdomBuilder.redux.Store;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Represents the specified JavaFX application for the KingdomBuilder.

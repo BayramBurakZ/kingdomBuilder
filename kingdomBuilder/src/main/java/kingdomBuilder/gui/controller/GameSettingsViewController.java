@@ -441,15 +441,12 @@ public class GameSettingsViewController extends Controller implements Initializa
             for (int y = 0; y < 10; y++) {
                 for (int x = 0; x < 10; x++) {
                     Color color = tileTypeColorMap.get(tileTypes[i++]);
-                    //pw.setColor(x, y, color);
-                    ///*
                     int pixelSize = QUADRANT_RESOLUTION / 10;
                     for (int w = 0; w < pixelSize; w++) {
                         for (int h = 0; h < pixelSize; h++) {
-                            pw.setColor(pixelSize * x + w, pixelSize * y + h, color);
+                            pw.setColor(pixelSize * y + w, pixelSize * x + h, color);
                         }
                     }
-                    //*/
                 }
             }
         }

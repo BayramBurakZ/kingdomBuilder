@@ -26,41 +26,86 @@ import java.util.ArrayList;
  * Handles all application related actions.
  */
 public class ApplicationReducer extends Reducer<KBState> {
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onExitApplication reduce} method.
+     */
     public static final String EXIT_APPLICATION = "EXIT_APPLICATION";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onConnect reduce} method.
+     */
     public static final String CONNECT = "CONNECT";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onDisconnect reduce} method.
+     */
     public static final String DISCONNECT = "DISCONNECT";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onAddClient reduce} method.
+     */
     public static final String ADD_CLIENT = "ADD_CLIENT";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onRemoveClient reduce} method.
+     */
     public static final String REMOVE_CLIENT = "REMOVE_CLIENT";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onLogin reduce} method.
+     */
     public static final String LOGIN = "LOGIN";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onSetSceneLoader reduce} method.
+     */
     public static final String SET_SCENELOADER = "SET_SCENELOADER";
+    /**
+     * Represents the String to identify the related {@link ApplicationReducer#onNewQuadrantUploaded reduce} method.
+     */
     public static final String NEW_QUADRANT_UPLOADED = "NEW_QUADRANT_UPLOADED";
     /**
-     * Represents the String to identify the related reduce methode.
+     * Represents the String to identify the related {@link ApplicationReducer#onNameSpaceLoaded reduce} method.
      */
     public static final String NAMESPACE_LOADED = "NAMESPACE_LOADED";
     /**
-     * Represents the String to identify the related reduce methode.
+     * Represents the String to identify the related {@link ApplicationReducer#onServerVersion reduce} method.
      */
     public static final String SERVER_VERSION = "SERVER_VERSION";
 
-
+    /**
+     * Constructs a new ApplicationReducer and lets it register itself.
+     * @see Reducer#registerReducers
+     */
     public ApplicationReducer() {
         registerReducers(this);
     }
 
+    /**
+     * Represents the reducer to set the preferred name of the user.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param unused2 an unused object.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = EXIT_APPLICATION)
-    public DeferredState onExitApplication(Store<KBState> unused, KBState state, Object unused2) {
+    public DeferredState onExitApplication(Store<KBState> unused, KBState oldState, Object unused2) {
         System.out.println("Exiting application!");
-        ClientSelector selector = state.selector();
+        ClientSelector selector = oldState.selector();
         if (selector != null && selector.isRunning()) selector.stop();
 
-        Thread selectorThread = state.selectorThread();
+        Thread selectorThread = oldState.selectorThread();
         if (selectorThread != null && selectorThread.isAlive()) selectorThread.interrupt();
 
         // Return old state, so that no other subscribers are called.
-        return new DeferredState(state);
+        return new DeferredState(oldState);
     }
 
+    /**
+     * Represents the reducer to connect the main client to a server.
+     *
+     * @param store the store.
+     * @param oldState the old state.
+     * @param address the IP and port of the server.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = CONNECT)
     public DeferredState onConnect(Store<KBState> store, KBState oldState, InetSocketAddress address) {
         DeferredState state = new DeferredState(oldState);
@@ -169,6 +214,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to disconnect the main client from the server they're currently connected to.
+     *
+     * @param store the store.
+     * @param oldState the old state.
+     * @param wasKicked whether the client was kicked from the server.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = DISCONNECT)
     public DeferredState onDisconnect(Store<KBState> store, KBState oldState, Boolean wasKicked) {
         DeferredState state = new DeferredState(oldState);
@@ -209,6 +263,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to log in to the server after a connection has been established.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param unused2 an unused object.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = LOGIN)
     public DeferredState onLogin(Store<KBState> unused, KBState oldState, Object unused2) {
         DeferredState state = new DeferredState(oldState);
@@ -223,6 +286,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to add a client to the state's list of clients.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param payload the data object of the client to be added.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = ADD_CLIENT)
     public DeferredState onAddClient(Store<KBState> unused, KBState oldState, ClientData payload) {
         DeferredState state = new DeferredState(oldState);
@@ -233,6 +305,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to remove a client from the state's list of clients.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param payload the data object of the client to be removed.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = REMOVE_CLIENT)
     public DeferredState onRemoveClient(Store<KBState> unused, KBState oldState, ClientData payload) {
         DeferredState state = new DeferredState(oldState);
@@ -243,6 +324,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to set the SceneLoader in the state.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param sceneLoader the SceneLoader object to be set.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = SET_SCENELOADER)
     public DeferredState onSetSceneLoader(Store<KBState> unused, KBState oldState, SceneLoader sceneLoader) {
         DeferredState state = new DeferredState(oldState);
@@ -250,6 +340,15 @@ public class ApplicationReducer extends Reducer<KBState> {
         return state;
     }
 
+    /**
+     * Represents the reducer to handle the confirmation of a newly uploaded quadrant and its uploader.
+     *
+     * @param unused the store.
+     * @param oldState the old state.
+     * @param payload the data object containing the ID of the newly uploaded quadrant and the ID of the uploader.
+     *
+     * @return the deferredState.
+     */
     @Reduce(action = NEW_QUADRANT_UPLOADED)
     public DeferredState onNewQuadrantUploaded(Store<KBState> unused, KBState oldState, QuadrantUploaded payload) {
         DeferredState state = new DeferredState(oldState);
@@ -277,7 +376,7 @@ public class ApplicationReducer extends Reducer<KBState> {
      *
      * @param unused   the store.
      * @param oldState the old state.
-     * @param unused2  an object that is unused in this case.
+     * @param unused2  an unused object.
      * @return the deferredState.
      */
     @Reduce(action = NAMESPACE_LOADED)

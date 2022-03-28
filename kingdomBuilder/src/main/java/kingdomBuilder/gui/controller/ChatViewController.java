@@ -423,7 +423,13 @@ public class ChatViewController extends Controller implements Initializable {
                 }
             }
 
-            String clientName = kbState.clients().get(x.clientId()).name();
+            String clientName = "???";
+            for (Player player : kbState.players()) {
+                if (player.ID == x.clientId()) {
+                    clientName = player.name;
+                }
+            }
+
             String chatMessage = i + 1 + ". " + clientName + ": " +
                     Game.calculateAndPrintScore(kbState.gameMap(), q, kbState.winConditions(), kbState.players());
 

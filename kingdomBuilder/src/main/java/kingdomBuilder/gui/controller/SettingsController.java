@@ -128,11 +128,14 @@ public class SettingsController extends Controller implements Initializable {
     @FXML
     private void onApplyButtonPressed(Event event) {
         String preferredName = textField_name.getText().trim();
-        if (isNameValid(preferredName))
-            store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
-        else
-            Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
-
+        if (preferredName.length() > 0) {
+            if (isNameValid(preferredName)) {
+                store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
+            } else {
+                Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
+                return;
+            }
+        }
 
         // color mode
         if (store.getState().betterColorsActive() != settings_checkBox_colors.isSelected()) {

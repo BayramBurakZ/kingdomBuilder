@@ -37,7 +37,7 @@ public class RootReducer extends Reducer<KBState> {
     public static final String SHUTDOWN_SERVER = "SHUTDOWN_SERVER";
 
     /**
-     * Constructs a new RootReducer and registers himself.
+     * Constructs a new RootReducer and lets it register itself.
      */
     public RootReducer() {
         registerReducers(this);
