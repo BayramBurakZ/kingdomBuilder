@@ -364,8 +364,8 @@ public class GameMapTest {
         result.clear();
 
         //single settlements all over the map
-        gameMap.at(19, 19).placeSettlement(playerOne);
-        gameMap.at(19, 0).placeSettlement(playerOne);
+        gameMap.at(19, 19).placeSettlement(playerOne); //bottom right
+        gameMap.at(19, 0).placeSettlement(playerOne);//bottom left
 
         //top left quadrant
         result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_LEFT).collect(Collectors.toSet());
@@ -377,18 +377,18 @@ public class GameMapTest {
 
         //top right quadrant
         result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.TOP_RIGHT).collect(Collectors.toSet());
-        assertEquals(1, result.size());
-        assertFalse(result.contains(gameMap.at(4, 5)));
-        assertFalse(result.contains(gameMap.at(19, 19)));
-        assertTrue(result.contains(gameMap.at(19, 0)));
-        result.clear();
-
-        //bottom left quadrant
-        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
         assertEquals(0, result.size());
         assertFalse(result.contains(gameMap.at(4, 5)));
         assertFalse(result.contains(gameMap.at(19, 19)));
         assertFalse(result.contains(gameMap.at(19, 0)));
+        result.clear();
+
+        //bottom left quadrant
+        result = gameMap.getSettlementsOfQuadrant(playerOne, Quadrants.BOTTOM_LEFT).collect(Collectors.toSet());
+        assertEquals(1, result.size());
+        assertFalse(result.contains(gameMap.at(4, 5)));
+        assertFalse(result.contains(gameMap.at(19, 19)));
+        assertTrue(result.contains(gameMap.at(19, 0)));
         result.clear();
 
         //bottom right quadrant
@@ -498,13 +498,6 @@ public class GameMapTest {
 
         assertEquals(4, result.size());
         result.clear();
-
-        // clear Map for maybe further use
-        gameMap.at(4, 5).removeSettlement();
-        gameMap.at(3, 5).removeSettlement();
-        gameMap.at(2, 5).removeSettlement();
-        gameMap.at(3, 4).removeSettlement();
-        gameMap.at(1, 5).removeSettlement();
     }
 
     @Test
@@ -535,13 +528,6 @@ public class GameMapTest {
 
         assertEquals(4, result.size());
         result.clear();
-
-        // clear Map for maybe further use
-        gameMap.at(4, 5).removeSettlement();
-        gameMap.at(3, 5).removeSettlement();
-        gameMap.at(2, 5).removeSettlement();
-        gameMap.at(3, 4).removeSettlement();
-        gameMap.at(1, 5).removeSettlement();
     }
 
     @Test
@@ -572,13 +558,6 @@ public class GameMapTest {
 
         assertEquals(1, result.size());
         result.clear();
-
-        // clear Map for maybe further use
-        gameMap.at(4, 5).removeSettlement();
-        gameMap.at(3, 5).removeSettlement();
-        gameMap.at(2, 5).removeSettlement();
-        gameMap.at(3, 4).removeSettlement();
-        gameMap.at(1, 5).removeSettlement();
     }
 
     @Test
@@ -718,10 +697,6 @@ public class GameMapTest {
         assertFalse(border.contains(gameMap.at(19, 0)));
         assertFalse(border.contains(gameMap.at(19, 17)));
         assertFalse(border.contains(gameMap.at(19, 19)));
-
-        gameMap.at(0,10).removeSettlement();
-        gameMap.at(11, 0).removeSettlement();
-        gameMap.at(19,18).removeSettlement();
     }
 
 
@@ -730,7 +705,6 @@ public class GameMapTest {
         //one settlement placed
         gameMap.at(4, 5).placeSettlement(playerOne);
         assertEquals(0, gameMap.fewestSettlementsInAllQuadrants(playerOne));
-
 
         //single settlements in all quadrants
         gameMap.at(19, 19).placeSettlement(playerOne);

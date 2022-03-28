@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -357,6 +358,20 @@ class TileTest {
     }
 
     @Test
+    void testIsNextToSpecial() {
+        Set<Tile> specials = new HashSet<>();
+        specials.add(gameMap.at(2,7));
+
+        gameMap.at(2,8).placeSettlement(playerOne);
+        assertEquals(specials, gameMap.at(2,8).isNextToSpecial(gameMap));
+
+        specials.clear();
+
+        gameMap.at(2,9).placeSettlement(playerOne);
+        assertEquals(specials, gameMap.at(2,9).isNextToSpecial(gameMap));
+    }
+
+    @Test
     void testPlaceSettlement() {
         // Test1: placed successfully
         gameMap.at(4,12).placeSettlement(playerOne);
@@ -391,11 +406,40 @@ class TileTest {
 
     @Test
     void testTakeTokenFromSpecialPlace() {
-        // TODO: test this.
+        assertEquals(2, gameMap.at(2,7).remainingTokens);
+
+        gameMap.at(2,7).takeTokenFromSpecialPlace();
+        assertEquals(1, gameMap.at(2,7).remainingTokens);
+
+        gameMap.at(2,7).takeTokenFromSpecialPlace();
+        assertEquals(0, gameMap.at(2,7).remainingTokens);
+
+        Exception exception =
+                assertThrows(
+                        HasNoTokenException.class,
+                        () -> gameMap.at(2,7).takeTokenFromSpecialPlace());
+
+        String expectedMessage = "No more tokens remaining!";
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+
+        exception =
+                assertThrows(
+                        HasNoTokenException.class,
+                        () -> gameMap.at(2,6).takeTokenFromSpecialPlace());
+
+        expectedMessage = "Can't take a token from a non special place!";
+        actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
     void testCalculateQuadrant() {
-        // TODO: test this.
+        assertEquals(Quadrants.TOP_LEFT, gameMap.at(2,2).calculateQuadrant(10));
+        assertEquals(Quadrants.TOP_RIGHT, gameMap.at(0, 10).calculateQuadrant(10));
+        assertEquals(Quadrants.BOTTOM_LEFT, gameMap.at(12,2).calculateQuadrant(10));
+        assertEquals(Quadrants.BOTTOM_RIGHT, gameMap.at(12, 12).calculateQuadrant(10));
     }
 }

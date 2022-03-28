@@ -493,7 +493,6 @@ public class Tile {
         return tileType;
     }
 
-
     /**
      * Calculates the quadrant in which the tile is located in.
      *
@@ -503,9 +502,9 @@ public class Tile {
     public Quadrants calculateQuadrant(int quadrantWidth) {
         if (x >= 0 && x < quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.TOP_LEFT;
-        else if (x >= quadrantWidth && x < 2 * quadrantWidth && y >= 0 && y < quadrantWidth)
-            return Quadrants.TOP_RIGHT;
         else if (x >= 0 && x < quadrantWidth && y >= quadrantWidth && y < 2 * quadrantWidth)
+            return Quadrants.TOP_RIGHT;
+        else if (x >= quadrantWidth && x < 2 * quadrantWidth && y >= 0 && y < quadrantWidth)
             return Quadrants.BOTTOM_LEFT;
         else
             return Quadrants.BOTTOM_RIGHT;
