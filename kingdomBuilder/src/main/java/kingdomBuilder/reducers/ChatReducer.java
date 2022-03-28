@@ -13,19 +13,19 @@ import kingdomBuilder.network.protocol.Message;
  */
 public class ChatReducer extends Reducer<KBState> {
     /**
-     * Represents the String to identify the related reduce methode.
+     * Represents the String to identify the related {@link ChatReducer#onReceiveMessage reduce} method.
      */
     public static final String RECEIVE_MESSAGE = "RECEIVE_MESSAGE";
     /**
-     * Represents the String to identify the related reduce methode.
+     * Represents the String to identify the related {@link ChatReducer#onSendMessage reduce} method.
      */
     public static final String SEND_MESSAGE = "SEND_MESSAGE";
 
     /**
-     * Constructs a new RootReducer and registers himself.
+     * Constructs a new RootReducer and lets it register itself.
      * @see Reducer#registerReducers
      */
-    public ChatReducer() { registerReducers(this);}
+    public ChatReducer() { registerReducers(this); }
 
     /**
      * Represents the reducer to handle an incoming message.

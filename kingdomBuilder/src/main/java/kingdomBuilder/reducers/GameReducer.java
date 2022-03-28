@@ -20,95 +20,97 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * This Reducer handles everything about game messages.
+ */
 public class GameReducer extends Reducer<KBState> {
     /**
-     * Represents the String to identify the related {@link GameReducer#onSetPreferredName reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onSetPreferredName reduce} method.
      */
     public static final String SET_PREFERRED_NAME = "SET_PREFERRED_NAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onJoinGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onJoinGame reduce} method.
      */
     public static final String JOIN_GAME = "JOIN_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onSetPlayers reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onSetPlayers reduce} method.
      */
     public static final String SET_PLAYERS = "SET_PLAYERS";
     /**
-     * Represents the String to identify the related {@link GameReducer#onActivateToken reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onActivateToken reduce} method.
      */
     public static final String ACTIVATE_TOKEN = "ACTIVATE_TOKEN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onScore reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onScore reduce} method.
      */
     public static final String SCORE = "SCORE";
     /**
-     * Represents the String to identify the related {@link GameReducer#onStartTurn reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onStartTurn reduce} method.
      */
     public static final String START_TURN = "START_TURN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onClientTurn reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onClientTurn reduce} method.
      */
     public static final String CLIENT_TURN = "CLIENT_TURN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onServerTurn reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onServerTurn reduce} method.
      */
     public static final String SERVER_TURN = "SERVER_TURN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onEndTurn reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onEndTurn reduce} method.
      */
     public static final String END_TURN = "END_TURN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onGrantToken reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onGrantToken reduce} method.
      */
     public static final String GRANT_TOKEN = "GRANT_TOKEN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onRevokeToken reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onRevokeToken reduce} method.
      */
     public static final String REVOKE_TOKEN = "REVOKE_TOKEN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onReadyGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onReadyGame reduce} method.
      */
     public static final String READY_GAME = "READY_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onEndGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onEndGame reduce} method.
      */
     public static final String END_GAME = "END_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onMyGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onMyGame reduce} method.
      */
     public static final String MY_GAME = "MY_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onTerrainOfTurn reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onTerrainOfTurn reduce} method.
      */
     public static final String TERRAIN_OF_TURN = "TERRAIN_OF_TURN";
     /**
-     * Represents the String to identify the related {@link GameReducer#onBetterColors reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onBetterColors reduce} method.
      */
     public static final String BETTER_COLOR_MODE = "BETTER_COLOR_MODE";
     /**
-     * Represents the String to identify the related {@link GameReducer#onAddGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onAddGame reduce} method.
      */
     public static final String ADD_GAME = "ADD_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onSetWinConditions reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onSetWinConditions reduce} method.
      */
     public static final String SET_WIN_CONDITION = "SET_WIN_CONDITION";
     /**
-     * Represents the String to identify the related {@link GameReducer#onPlayersOfGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onPlayersOfGame reduce} method.
      */
     public static final String PLAYERS_OF_GAME = "PLAYERS_OF_GAME";
     /**
-     * Represents the String to identify the related {@link GameReducer#onSpectateGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onSpectateGame reduce} method.
      */
     public static final String SPECTATE_GAME = "SPECTATE_GAME";
-
     /**
-     * Represents the String to identify the related {@link GameReducer#onUnspectateGame reduce} methode.
+     * Represents the String to identify the related {@link GameReducer#onUnspectateGame reduce} method.
      */
     public static final String UNSPECTATE_GAME = "UNSPECTATE_GAME";
 
     /**
-     * Constructs a new GameReducer and registers himself.
+     * Constructs a new GameReducer and lets it register itself.
      * @see Reducer#registerReducers
      */
     public GameReducer() {
@@ -132,11 +134,11 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle that the client tries join a game.
+     * Represents the reducer to handle joining a game.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param gameId the ID of the game the client tires to join.
+     * @param gameId the ID of the game the client attempts to join.
      *
      * @return the deferredState.
      */
@@ -453,9 +455,7 @@ public class GameReducer extends Reducer<KBState> {
                             turn.clientId, ServerTurn.TurnType.MOVE, turn.x, turn.y, lastTurn.toX, lastTurn.toY));
                 }
             }
-            case TOKEN_USED -> {
-                state.setGameLastTurn(turn);
-            }
+            case TOKEN_USED -> state.setGameLastTurn(turn);
         }
         return state;
     }

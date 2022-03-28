@@ -147,6 +147,6 @@ public record KBState(SceneLoader sceneLoader,
         /**
          * Represents the status when the client tried to get the root status but failed with a wrong password.
          */
-        ERROR;
+        ERROR
     }
 }

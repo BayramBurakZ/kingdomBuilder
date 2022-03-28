@@ -127,8 +127,6 @@ public class PLYLoader {
 
             return mesh;
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -284,11 +284,12 @@ public class SceneLoader {
 
     /**
      * Loads the WinView into the center of the main borderPane.
+     * @param scores the message containing the scores of the players.
      */
     public void showWinView(Scores scores) {
         //reloads the view so its completely empty
         loadWinView(locale);
-        winViewController.setScoreWithName(scores);;
+        winViewController.setScoreWithName(scores);
 
         borderPane.setCenter(winView);
     }
