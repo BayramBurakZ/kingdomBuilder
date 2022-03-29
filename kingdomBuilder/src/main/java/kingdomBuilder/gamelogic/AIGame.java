@@ -2,6 +2,7 @@ package kingdomBuilder.gamelogic;
 
 import kingdomBuilder.gui.controller.BotDifficulty;
 
+import java.lang.ref.Cleaner;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -108,7 +109,7 @@ public class AIGame {
         int settlementsLeft = aiPlayer.getRemainingSettlements();
 
         // AI uses token before basic turn except there can be one collected on basic turn.
-        if(!tokenAvailableOnSet(aiGameMap, freeTiles))
+        if (!tokenAvailableOnSet(aiGameMap, freeTiles))
             settlementsLeft = useTokenAI(aiGameMap, moves, aiPlayer.getRemainingSettlements(), false);
 
         // AI does basic turn.
@@ -230,7 +231,7 @@ public class AIGame {
             return followingScore;
 
         // if it is not the first call than change the reference of the original move List.
-        if (depth < SEARCH_DEPTH){
+        if (depth < SEARCH_DEPTH) {
             bestTurn = new ArrayList<>();
             aiPlayer.startTurn();
             aiPlayer.setTerrainCard(terrain);
@@ -243,33 +244,19 @@ public class AIGame {
 
         // use greedyAI to collect token at first move
         Set<Tile> first = map.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
-        if(tokenAvailableOnSet(map, first)){
+
+        if (tokenAvailableOnSet(map, first)) {
             bestTurn.addAll(greedyAI(map));
             return Game.calculateScore(map, aiPlayer, winConditions, players);
         }
 
+
         // AI uses token as pre basic turn
-        settlementsLeft = useTokenAI(map, preMoves, aiPlayer.getRemainingSettlements(), false);
-
-        /*
-        // anything worse than greedy can be skipped.
-        int temp = settlementsLeft;
-        turn = new ArrayList<>(preMoves);
-        settlementsLeft = greedyBasicTurn(map, turn, settlementsLeft);
-        bestTurns.put(turn, Game.calculateScore(map, aiPlayer, winConditions, players));
-
-        // remove all new settlements again from basic turn.
-        for (int i = temp - settlementsLeft; i > 0; i--) {
-            ClientTurn t = turn.get(turn.size() - i);
-            map.at(t.x, t.y).removeSettlement();
-            settlementsLeft++;
-        }
-
-         */
-
+        settlementsLeft = useTokenAI(map, preMoves, settlementsLeft, false);
 
         first = map.getAllPlaceableTiles(aiPlayer, terrain).collect(Collectors.toSet());
         int score = 0;
+        int placementCount = 0;
 
         outerLoop:
         for (Tile t : first) {
@@ -309,15 +296,18 @@ public class AIGame {
                         switch (settlementsLeft) {
                             case -2 -> {
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, t.x, t.y, -1, -1));
+                                placementCount = 1;
                             }
                             case -1 -> {
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, t.x, t.y, -1, -1));
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, l.x, l.y, -1, -1));
+                                placementCount = 2;
                             }
                             default -> {
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, t.x, t.y, -1, -1));
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, l.x, l.y, -1, -1));
                                 turn.add(new ClientTurn(aiPlayer.ID, ClientTurn.TurnType.PLACE, k.x, k.y, -1, -1));
+                                placementCount = 3;
                             }
                         }
 
@@ -344,7 +334,8 @@ public class AIGame {
             settlementsLeft++;
         }
 
-        // stop expanding when token is found.
+        settlementsLeft -= placementCount;
+
         if (tokenAvailable) {
             useTokenAI(map, bestTurn, settlementsLeft, true);
             return Game.calculateScore(map, aiPlayer, winConditions, players);
@@ -364,10 +355,11 @@ public class AIGame {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         // does not expand if only entry
-        if (bestTurnKeys.size() == 1) {
+        if (bestTurnKeys.size() <= 1) {
             bestTurn.addAll(bestTurnKeys.get(0));
             useTokenAI(map, bestTurn, settlementsLeft, true);
-            return followingScore;
+
+            return Game.calculateScore(map, aiPlayer, winConditions, players);
         }
 
         // simulate future placements
@@ -388,7 +380,12 @@ public class AIGame {
         // get the best of those moves.
         var moves = Collections.max(bestTurns.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
 
-        bestTurn.addAll(moves);
+       bestTurn.addAll(moves);
+
+       //bestTurn.stream().distinct().collect(Collectors.toList());
+        Set<ClientTurn> test = new LinkedHashSet<>(bestTurn);
+
+       bestTurn = test.stream().toList(); // necessary because it duplicates sometimes moves from "moves"...
         return followingScore;
     }
 
@@ -442,8 +439,8 @@ public class AIGame {
         temp = tempPC2.get(predictions.get(1));
         tempPC2.put(predictions.get(1), temp + 1);
 
-        temp = tempPC3.get(predictions.get(1));
-        tempPC3.put(predictions.get(1), temp + 1);
+        temp = tempPC3.get(predictions.get(2));
+        tempPC3.put(predictions.get(2), temp + 1);
 
 
         followingScore += expertAITurn(tempGM1, null, tempPC1, predictions.get(0),
@@ -563,7 +560,7 @@ public class AIGame {
     /**
      * Checks if there can be a token collected within free tiles.
      *
-     * @param map  the map of the AI.
+     * @param map       the map of the AI.
      * @param freeTiles all tiles that of possible settlement placements.
      * @return true if token can be collected. False otherwise.
      */
@@ -583,7 +580,6 @@ public class AIGame {
                     possibleToken.add(t);
         });
 
-        Set<Tile> collectableToken = new HashSet<>();
         for (Tile t : possibleToken)
             if (t.hasTokens() && t.surroundingSettlements(map, aiPlayer).collect(Collectors.toSet()).isEmpty())
                 return true;
