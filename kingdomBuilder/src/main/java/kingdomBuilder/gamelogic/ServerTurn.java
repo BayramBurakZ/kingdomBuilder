@@ -12,6 +12,7 @@ public final class ServerTurn extends Turn {
 
     /**
      * Creates a new ServerTurn.
+     * @param playerId the id of the player who makes a turn.
      * @param type the type of turn the server sends.
      * @param x the x-coordinate for placing/removing a settlement.
      * @param y the y-coordinate for placing/removing a settlement.

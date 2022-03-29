@@ -11,6 +11,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
@@ -27,6 +28,13 @@ import java.util.ResourceBundle;
  * This class controls the functions of the IAmView.
  */
 public class IAmViewController extends Controller implements Initializable {
+
+    /**
+     * Represents the vBox.
+     */
+    @FXML
+    private VBox iamView_vbox;
+
     /**
      * Represents the TextField to enter the preferred name.
      */
@@ -55,6 +63,10 @@ public class IAmViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        iamView_vbox.setStyle("""
+                -fx-background-image: url(kingdomBuilder/gui/textures/Background.png);
+                -fx-background-size: cover;
+                """);
         setupEventHandler();
         setupCheckBox(resources);
     }

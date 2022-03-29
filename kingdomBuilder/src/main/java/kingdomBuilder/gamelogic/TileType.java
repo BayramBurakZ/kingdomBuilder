@@ -208,6 +208,8 @@ public enum TileType {
 
     /**
      * Returns the name of this enum constant formatted and localized regarding the language setting in the game.
+     *
+     * @return the string in the localized form.
      */
     public abstract String toStringLocalized();
 }

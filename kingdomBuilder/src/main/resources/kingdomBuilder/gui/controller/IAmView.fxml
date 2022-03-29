@@ -4,11 +4,10 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.2"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.IAmViewController">
+<VBox fx:id="iamView_vbox" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.IAmViewController">
 
     <HBox alignment="CENTER">
-        <Label text="%selectLanguage">
+        <Label text="%selectLanguage" textFill="WHITE" style="-fx-font-weight: bold">
             <padding>
                 <Insets right="5.0" />
             </padding>
@@ -16,7 +15,7 @@
         <ComboBox fx:id="comboBox_language" onAction="#onCheckBoxSelectionPressed" prefWidth="150.0" visibleRowCount="2" />
     </HBox>
 
-    <Label text="%register"> </Label>
+    <Label text="%register" textFill="WHITE" style="-fx-font-weight: bold"/>
     <TextField fx:id="iAmViewTextField" maxWidth="200.0" promptText="%enterHere" />
     <Button onAction="#onButtonMainMenuShow" text="Ok" />
     <padding>

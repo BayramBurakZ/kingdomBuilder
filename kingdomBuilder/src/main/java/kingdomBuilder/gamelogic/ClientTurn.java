@@ -12,6 +12,7 @@ public final class ClientTurn extends Turn {
 
     /**
      * Creates a new client turn.
+     * @param playerId the id of the player who makes the turn.
      * @param type the type of turn which the client did.
      * @param x the x-coordinate to place/remove the settlement.
      * @param y the y-coordinate to place/remove the settlement.

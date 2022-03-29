@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.TimerTask;
 
-
+/**
+ * This Reducer handles everything about bots messages.
+ */
 public class BotReducer extends Reducer<KBState> {
 
     /**
@@ -54,25 +56,25 @@ public class BotReducer extends Reducer<KBState> {
 
     /**
      * Utility method for subscribing the bots to the relevant attributes of the state.
+     *
      * @param store the store.
      */
     public static void subscribeMethods(Store<KBState> store) {
         store.subscribe(kbState -> kbState.Bots().keySet().forEach(
-                c -> store.dispatch(MAKE_TURN_BOT, c)), "nextTerrainCard", "gameStarted");
+                c -> store.dispatch(MAKE_TURN_BOT, c)), "nextTerrainCard");
 
         store.subscribe(kbState -> {
             if (kbState.winConditions() != null && !kbState.winConditions().isEmpty())
                 kbState.Bots().keySet().forEach(c -> store.dispatch(SET_WIN_CONDITION_BOT, c));
-        },"winConditions");
+        }, "winConditions");
     }
 
     /**
      * Represents the reducer to handle connecting a new bot client to the server the main client is currently connected to.
      *
-     * @param store the store.
-     * @param oldState the old state.
+     * @param store      the store.
+     * @param oldState   the old state.
      * @param difficulty the difficulty setting of the new bot.
-     *
      * @return the deferredState.
      */
     @Reduce(action = CONNECT_BOT)
@@ -128,10 +130,9 @@ public class BotReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle the next turn of a bot.
      *
-     * @param unused the store.
+     * @param unused   the store.
      * @param oldState the old state.
-     * @param client the bot client whose turn it is.
-     *
+     * @param client   the bot client whose turn it is.
      * @return the deferredState.
      */
     @Reduce(action = MAKE_TURN_BOT)
@@ -143,7 +144,7 @@ public class BotReducer extends Reducer<KBState> {
         if (aiGame == null || !oldState.gameStarted())
             return state;
 
-        if(oldState.nextTerrainCard() != null)
+        if (oldState.nextTerrainCard() != null)
             aiGame.updateTerrainCards(oldState.nextTerrainCard());
 
         if (oldState.currentPlayer() != null
@@ -155,7 +156,7 @@ public class BotReducer extends Reducer<KBState> {
 
             // adding turns in reverse on the stack, so pop() gets the turns in order
             Stack<ClientTurn> stack = new Stack<>();
-            for (int i = moves.size()-1; i >= 0; i--) {
+            for (int i = moves.size() - 1; i >= 0; i--) {
                 stack.push(moves.get(i));
             }
 
@@ -196,10 +197,9 @@ public class BotReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle granting a token to a bot.
      *
-     * @param unused the store.
+     * @param unused   the store.
      * @param oldState the old state.
-     * @param payload the data object containing the token information and the receiving client's ID.
-     *
+     * @param payload  the data object containing the token information and the receiving client's ID.
      * @return the deferredState.
      */
     @Reduce(action = GRANT_TOKEN_BOT)
@@ -215,10 +215,9 @@ public class BotReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle activating a bot's token.
      *
-     * @param unused the store.
+     * @param unused   the store.
      * @param oldState the old state.
      * @param tileType the type of token to be used by the bot.
-     *
      * @return the deferredState.
      */
     @Reduce(action = ACTIVATE_TOKEN_BOT)
@@ -233,10 +232,9 @@ public class BotReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle disconnecting a bot from the server they're currently connected to.
      *
-     * @param store the store.
+     * @param store    the store.
      * @param oldState the old state.
-     * @param client the bot client to be disconnected.
-     *
+     * @param client   the bot client to be disconnected.
      * @return the deferredState.
      */
     @Reduce(action = DISCONNECT_BOT)
@@ -259,17 +257,16 @@ public class BotReducer extends Reducer<KBState> {
     /**
      * Represents the reducer to handle setting the win conditions relevant to a bot.
      *
-     * @param store the store.
+     * @param store    the store.
      * @param oldState the old state.
-     * @param client the bot client whose win conditions to set.
-     *
+     * @param client   the bot client whose win conditions to set.
      * @return the deferredState.
      */
     @Reduce(action = SET_WIN_CONDITION_BOT)
     public DeferredState onSetWinConditionBot(Store<KBState> store, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
 
-        if(oldState.Bots() != null)
+        if (oldState.Bots() != null)
             oldState.Bots().get(client).setWinConditions(oldState.winConditions());
 
         return state;

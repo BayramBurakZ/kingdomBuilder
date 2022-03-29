@@ -1,9 +1,13 @@
 package kingdomBuilder.gui.controller;
 
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import kingdomBuilder.actions.*;
@@ -18,6 +22,7 @@ import java.util.ResourceBundle;
  * This Class controls the MenuViewController with all its functions.
  */
 public class MenuViewController extends Controller implements Initializable {
+
 
     //region FXML-Imports
 
@@ -55,6 +60,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the store.
+     *
      * @param store the store to set.
      */
     public MenuViewController(Store<KBState> store) {
@@ -63,25 +69,17 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Called to initialize this controller after its root element has been completely processed.
-     * @param location the location used to resolve relative paths for the root object,
-     *                 or null if the location is not known.
+     *
+     * @param location  the location used to resolve relative paths for the root object,
+     *                  or null if the location is not known.
      * @param resources the resources used to localize the root object, or null if the root object was not localized.
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        /*
-        store.subscribe(s -> {
-            state = s;
-            if(s.isConnected) onConnect();
-            else              onDisconnect();
-        }, "isConnected");
-
-        store.subscribe(s -> {
-            menuview_connect_button.setDisable(s.isConnecting);
-        }, "isConnecting");
-         */
-
-        //setupLayout();
+        menuview_vbox.setStyle("""
+                -fx-background-image: url(kingdomBuilder/gui/textures/Background.png);
+                -fx-background-size: cover;
+                """);
     }
 
     /**
@@ -96,6 +94,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the LocalGame Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -105,6 +104,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the OnlineGame Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -114,6 +114,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the Settings Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
@@ -123,6 +124,7 @@ public class MenuViewController extends Controller implements Initializable {
 
     /**
      * Sets the functionality for the Exit Button.
+     *
      * @param event contains the data from the event source.
      */
     @FXML
