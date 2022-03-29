@@ -746,19 +746,26 @@ public class GameMapTest {
         assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_LEFT));
 
         //top right quadrant
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.TOP_RIGHT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.TOP_RIGHT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.TOP_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.TOP_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_RIGHT));
 
         //bottom left quadrant
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_LEFT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_LEFT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_LEFT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_LEFT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_LEFT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_LEFT));
 
         //bottom right quadrant
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_RIGHT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_RIGHT));
-        assertEquals(0, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.BOTTOM_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.BOTTOM_RIGHT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.BOTTOM_RIGHT));
+
+        //two players have the same count of settlements in same quadrant
+        gameMap.at(5,7).placeSettlement(playerTwo);
+
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerOne, players, Quadrants.TOP_LEFT));
+        assertEquals(2, gameMap.rankOfSettlementsInQuadrant(playerTwo, players, Quadrants.TOP_LEFT));
+        assertEquals(1, gameMap.rankOfSettlementsInQuadrant(playerThree, players, Quadrants.TOP_LEFT));
     }
 
     @Test

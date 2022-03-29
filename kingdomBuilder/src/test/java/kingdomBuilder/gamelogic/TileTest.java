@@ -248,7 +248,6 @@ class TileTest {
 
     @Test
     void testSurroundingTiles() {
-
         // Test1: surrounding tiles of tile (3,6)
         Set<Tile> surroundingTiles = gameMap.at(3, 6).surroundingTiles(gameMap).collect(Collectors.toSet());
 
