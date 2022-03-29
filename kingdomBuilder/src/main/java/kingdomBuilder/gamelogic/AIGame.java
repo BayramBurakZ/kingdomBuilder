@@ -364,6 +364,7 @@ public class AIGame {
 
         // simulate future placements
         switch (bestTurnKeys.size()) {
+            case 4:
             case 3:
                 bestTurns.put(bestTurnKeys.get(2),
                         splitTree(map, bestTurnKeys.get(2), tempPC1, settlementsLeft, depth, followingScore));
