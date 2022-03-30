@@ -100,7 +100,6 @@ public class IOHandler {
         buffer.clear();
         buffer.rewind();
 
-        //System.out.println("START");
 
         Scanner t = new Scanner(contents);
         while(t.hasNextLine()) {
@@ -109,12 +108,6 @@ public class IOHandler {
                 ProtocolDeserializer.deserialize(line, consumer);
         }
 
-        //System.out.println("END");
-/*
-        if(consumer != null)
-            ProtocolDeserializer.deserialize(contents, consumer);
-
- */
     }
 
     /**

@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
+import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
@@ -87,7 +88,7 @@ public class IAmViewController extends Controller implements Initializable {
         Button addButton = new Button();
         Button removeButton = new Button();
 
-        field.setPromptText("%enterHere");
+        field.setPromptText(getPlaceholder("enterHere"));
         field.setMaxWidth(200);
         field.setId("iAmViewTextField");
 
@@ -237,5 +238,10 @@ public class IAmViewController extends Controller implements Initializable {
         if(name.isEmpty()) return false;
         // invalid characters: [ ] ( )
         return !name.matches(".*\\[.*|.*\\].*|.*\\(.*|.*\\).*");
+    }
+
+    private String getPlaceholder(String placeholder) {
+        ResourceBundle rb = ResourceBundle.getBundle("kingdomBuilder/gui/gui", SceneLoader.getLocale());
+        return rb.getString(placeholder);
     }
 }
