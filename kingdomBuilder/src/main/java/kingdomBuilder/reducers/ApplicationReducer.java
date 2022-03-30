@@ -425,6 +425,13 @@ public class ApplicationReducer extends Reducer<KBState> {
         return new DeferredState(oldState);
     }
 
+    /**
+     * Launches the embedded server as a local process, unless an instance is already running.
+     * @param unused the state store; not used by this reducer.
+     * @param oldState the old state prior invoking this reducer.
+     * @param unused2 the payload for the reducer; not used by this reducer.
+     * @return an instance of {@link DeferredState} containing a set of "transactions" issued by the reducers.
+     */
     @Reduce(action = LAUNCH_LOCAL_SERVER)
     public DeferredState launchLocalServer(Store<KBState> unused, KBState oldState, Object unused2) {
 

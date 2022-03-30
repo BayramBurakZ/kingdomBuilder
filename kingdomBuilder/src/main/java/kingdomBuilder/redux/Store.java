@@ -40,8 +40,8 @@ public class Store<State> {
 
     /**
      * Creates a new Store object with the given state and combines the reducers.
-     * @param state
-     * @param reducers
+     * @param state the initial state of the application.
+     * @param reducers a list of reducers mutating the state via actions.
      */
     @SafeVarargs
     public Store(State state, Reducer<State>... reducers) {
@@ -78,6 +78,11 @@ public class Store<State> {
         });
     }
 
+    /**
+     * Dispatches an action invoking an reducer in the process, which may mutate the application state.
+     * @param action the type of action as string.
+     * @param payload the payload passed to the reducer.
+     */
     public synchronized void dispatch(String action, Object payload) {
         System.out.println("Reducer Log: " + action);
         Platform.runLater(() -> {
@@ -96,8 +101,8 @@ public class Store<State> {
 
     /**
      * Subscribes an entity, which is then informed, when the state changes.
-     * @param subscriber
-     * @param attributes
+     * @param subscriber the subscriber, which is notified when the state changes.
+     * @param attributes a list of attribute names for which the subscriber listens.
      */
     public void subscribe(Subscriber<State> subscriber, String... attributes) {
         final Set<String> attributeSet = Set.of(attributes);

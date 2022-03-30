@@ -15,7 +15,7 @@ public class Boot {
      * Starts the application.
      * @param args the command line arguments.
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Application.launch(KingdomBuilderApplication.class);
     }
 
