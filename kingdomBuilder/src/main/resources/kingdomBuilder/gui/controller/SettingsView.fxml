@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.2"
+<VBox fx:id="root" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/11.0.2"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="kingdomBuilder.gui.controller.SettingsController">
 
     <HBox alignment="CENTER">
@@ -17,6 +17,7 @@
                   visibleRowCount="2"/>
     </HBox>
 
+    <!--
     <HBox alignment="CENTER">
         <Label text="%changePreferredName">
             <padding>
@@ -25,10 +26,11 @@
         </Label>
         <TextField fx:id="textField_name" maxWidth="200.0" promptText="%enterHere"/>
     </HBox>
+    -->
 
     <CheckBox fx:id="settings_checkBox_colors" text="%betterColors" />
 
-    <Button onAction="#onApplyButtonPressed" text="%apply"/>
+    <Button fx:id="proceed_button" onAction="#onApplyButtonPressed" text="%apply"/>
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>

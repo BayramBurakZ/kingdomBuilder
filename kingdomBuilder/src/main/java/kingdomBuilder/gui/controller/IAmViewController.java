@@ -7,10 +7,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -40,12 +37,6 @@ public class IAmViewController extends Controller implements Initializable {
     private VBox iamView_vbox;
 
     /**
-     * Represents the TextField to enter the preferred name.
-     */
-    @FXML
-    private TextField iAmViewTextField;
-
-    /**
      * Represents the ComboBox to select the language.
      */
     @FXML
@@ -54,10 +45,10 @@ public class IAmViewController extends Controller implements Initializable {
     @FXML
     private Button proceed_button;
 
-
+    /**
+     *
+     */
     private List<TextField> iAmTextFields;
-
-    private int playerCount;
 
     /**
      * Sets the store in the {@link Controller}.
@@ -76,7 +67,7 @@ public class IAmViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        addPlayer();
+        addPlayer(null);
 
         iamView_vbox.setStyle("""
                 -fx-background-image: url(kingdomBuilder/gui/textures/Background.png);
@@ -86,8 +77,11 @@ public class IAmViewController extends Controller implements Initializable {
         setupCheckBox(resources);
     }
 
-    private void addPlayer() {
-        VBox parent = (VBox) proceed_button.getParent();
+    private void addPlayer(String name) {
+        if(iAmTextFields.size() >= 4)
+            return;
+
+        VBox parent = iamView_vbox;
         HBox box = new HBox();
         TextField field = new TextField("");
         Button addButton = new Button();
@@ -97,8 +91,11 @@ public class IAmViewController extends Controller implements Initializable {
         field.setMaxWidth(200);
         field.setId("iAmViewTextField");
 
+        if(name != null)
+            field.setText(name);
+
         addButton.setText("+");
-        addButton.setOnMouseClicked(ev -> { addPlayer(); });
+        addButton.setOnMouseClicked(ev -> { addPlayer(null); });
 
         removeButton.setText("-");
         removeButton.setOnMouseClicked(ev -> {
@@ -113,6 +110,9 @@ public class IAmViewController extends Controller implements Initializable {
 
         int idx = parent.getChildren().indexOf(proceed_button);
         parent.getChildren().add(idx, box);
+
+        if(iAmTextFields.size() == 0)
+            removeButton.setDisable(true);
 
         iAmTextFields.add(field);
     }
@@ -178,12 +178,14 @@ public class IAmViewController extends Controller implements Initializable {
     private void onCheckBoxSelectionPressed(Event event) {
         String selectedLanguage = comboBox_language.getSelectionModel().getSelectedItem().getDisplayLanguage();
         System.out.println("Changed Language to: " + selectedLanguage);
-        String name = iAmViewTextField.getText().trim();
 
         //reload
         sceneLoader.loadViews(comboBox_language.getSelectionModel().getSelectedItem());
         sceneLoader.showIAmView();
-        sceneLoader.getIAmViewController().iAmViewTextField.setText(name);
+
+        iAmTextFields.clear();
+        addPlayer(null);
+
     }
 
     /**
@@ -205,23 +207,7 @@ public class IAmViewController extends Controller implements Initializable {
     /**
      * Creates the EventHandler that is responsible for the Key events.
      */
-    private void setupKeyEventHandler() {
-        if(iAmViewTextField == null) return;
-
-        iAmViewTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            /**
-             * Invoked when a specific event of the type for which this handler is registered happens.
-             * @param event the event which occurred.
-             */
-            @Override
-            public void handle(KeyEvent event) {
-                if (event.getCode() == KeyCode.ENTER) {
-                    setPreferredNames();
-                }
-            }
-        });
-
-    }
+    private void setupKeyEventHandler() {}
 
     /**
      * Sets the user's preferred name.

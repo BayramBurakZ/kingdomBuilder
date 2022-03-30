@@ -5,10 +5,10 @@ import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.TextField;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
@@ -17,6 +17,8 @@ import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -24,6 +26,9 @@ import java.util.ResourceBundle;
  * This class controls all functions for the settings menu.
  */
 public class SettingsController extends Controller implements Initializable {
+
+    @FXML
+    private VBox root;
 
     /**
      * Represents the ComboBox to change the language.
@@ -43,6 +48,19 @@ public class SettingsController extends Controller implements Initializable {
     @FXML
     private CheckBox settings_checkBox_colors;
 
+    @FXML
+    private Button proceed_button;
+
+    /**
+     * Stores all dynamically allocated boxes.
+     */
+    private List<HBox> boxes;
+
+    /**
+     * Stores all dynamically allocated input fields.
+     */
+    private List<TextField> iAmTextFields;
+
     /**
      * Constructs the Settings View with the given store.
      * @param store the Store for access to the state.
@@ -55,6 +73,23 @@ public class SettingsController extends Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setupCheckBox(resources);
         settings_checkBox_colors.setSelected(store.getState().betterColorsActive());
+        this.iAmTextFields = new ArrayList<>();
+        this.boxes = new ArrayList<>();
+
+
+        store.subscribe(s -> {
+            iAmTextFields.clear();
+            var names = s.clientPreferredNames();
+            if(names == null || names.isEmpty()) return;
+
+            for(var box: boxes)
+                root.getChildren().remove(box);
+
+            for(int it = 0; it < names.size(); ++it) {
+                addPlayer(names.get(it));
+                System.out.println("Added player!");
+            }
+        }, "preferredNames");
     }
 
     /**
@@ -127,15 +162,18 @@ public class SettingsController extends Controller implements Initializable {
      */
     @FXML
     private void onApplyButtonPressed(Event event) {
-        String preferredName = textField_name.getText().trim();
-        if (preferredName.length() > 0) {
-            if (isNameValid(preferredName)) {
-                store.dispatch(GameReducer.SET_PREFERRED_NAMES, preferredName);
-            } else {
-                Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
-                return;
-            }
+        List<String> preferredNames = iAmTextFields
+                .stream()
+                .map(f -> f.getText().trim())
+                .toList();
+
+        final boolean allNamesAreValid = preferredNames.stream().allMatch(this::isNameValid);
+        if(!allNamesAreValid) {
+            Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
+            return;
         }
+
+        store.dispatch(GameReducer.SET_PREFERRED_NAMES, preferredNames);
 
         // color mode
         if (store.getState().betterColorsActive() != settings_checkBox_colors.isSelected()) {
@@ -156,6 +194,49 @@ public class SettingsController extends Controller implements Initializable {
         if (name.matches(".*\\[.*|.*\\].*|.*\\(.*|.*\\).*"))
             return false;
         return true;
+    }
 
+    private void addPlayer(String name) {
+
+        if(iAmTextFields.size() >= 4)
+            return;
+
+        System.out.println("Added button");
+
+        VBox parent = (VBox) proceed_button.getParent();
+        HBox box = new HBox();
+        TextField field = new TextField("");
+        Button addButton = new Button();
+        Button removeButton = new Button();
+
+        field.setPromptText("%enterHere");
+        field.setMaxWidth(200);
+        field.setId("iAmViewTextField");
+
+        if(name != null)
+            field.setText(name);
+
+        addButton.setText("+");
+        addButton.setOnMouseClicked(ev -> { addPlayer(null); });
+
+        removeButton.setText("-");
+        removeButton.setOnMouseClicked(ev -> {
+            if(iAmTextFields.size() > 1) {
+                parent.getChildren().remove(box);
+                iAmTextFields.remove(field);
+            }
+        });
+
+        box.setAlignment(Pos.CENTER);
+        box.getChildren().addAll(field, addButton, removeButton);
+
+        int idx = parent.getChildren().indexOf(proceed_button);
+        parent.getChildren().add(idx, box);
+
+        if(iAmTextFields.size() == 0)
+            removeButton.setDisable(true);
+
+        boxes.add(box);
+        iAmTextFields.add(field);
     }
 }
