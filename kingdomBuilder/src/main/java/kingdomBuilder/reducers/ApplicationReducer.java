@@ -8,6 +8,7 @@ import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.generated.DeferredState;
 import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.util.Util;
+import kingdomBuilder.misc.Server;
 import kingdomBuilder.network.Client;
 import kingdomBuilder.network.ClientSelector;
 import kingdomBuilder.network.protocol.ClientData;
@@ -434,10 +435,20 @@ public class ApplicationReducer extends Reducer<KBState> {
      */
     @Reduce(action = LAUNCH_LOCAL_SERVER)
     public DeferredState launchLocalServer(Store<KBState> unused, KBState oldState, Object unused2) {
+        DeferredState state = new DeferredState(oldState);
 
+        if(oldState.server() != null)
+            return state;
 
+        Process process;
+        try {
+            process = Server.launch();
+        } catch(IOException exc) {
+            return state;
+        }
 
-        return new DeferredState(oldState);
+        state.setServer(process);
+        return state;
     }
 
 
