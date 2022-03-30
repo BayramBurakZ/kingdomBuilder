@@ -57,7 +57,7 @@ public class ChatViewController extends Controller implements Initializable {
     //region FXML-Imports
 
     /**
-     * Represents the button to kick a client.
+     * Represents the button to kick a mainClient.
      */
     @FXML
     private Button chatview_button_kick;
@@ -69,13 +69,13 @@ public class ChatViewController extends Controller implements Initializable {
     private TableView<ClientData> tableview_chat;
 
     /**
-     * Represents the column for the client ids of the clients on the server in the table.
+     * Represents the column for the mainClient ids of the clients on the server in the table.
      */
     @FXML
     private TableColumn<ClientData, String> column_id;
 
     /**
-     * Represents the column for the client names of the clients on the server.
+     * Represents the column for the mainClient names of the clients on the server.
      */
     @FXML
     private TableColumn<ClientData, String> column_name;
@@ -152,7 +152,7 @@ public class ChatViewController extends Controller implements Initializable {
     private Element turnLogBody;
 
     /**
-     * Represents the Gui State, if the client is connected.
+     * Represents the Gui State, if the mainClient is connected.
      */
     private boolean isConnected;
 
@@ -239,14 +239,14 @@ public class ChatViewController extends Controller implements Initializable {
         column_name.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().name())));
         column_gameid.setCellValueFactory(param -> new SimpleStringProperty(String.valueOf(param.getValue().gameId())));
 
-        // highlight own client in table
+        // highlight own mainClient in table
         tableview_chat.setRowFactory(param -> new TableRow<>() {
             @Override
             protected void updateItem(ClientData item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null) {
                     setStyle("");
-                } else if (item.clientId() == store.getState().client().getClientId()) {
+                } else if (item.clientId() == store.getState().mainClient().getClientId()) {
                     setStyle("-fx-background-color: #ff9966;");
                 } else {
                     for (Client c : store.getState().Bots().keySet()) {
@@ -442,7 +442,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the GUI when the client (dis-)connects to a server.
+     * Updates the GUI when the mainClient (dis-)connects to a server.
      *
      * @param state the current state.
      */
@@ -468,7 +468,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the UI elements that are important when the client connects to a server.
+     * Updates the UI elements that are important when the mainClient connects to a server.
      */
     private void onConnect() {
         if (!isConnected) {
@@ -487,7 +487,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the UI elements that are important when the client disconnects from a server.
+     * Updates the UI elements that are important when the mainClient disconnects from a server.
      */
     private void onDisconnect() {
         if (isConnected) {
@@ -524,7 +524,7 @@ public class ChatViewController extends Controller implements Initializable {
             messageStyle = MessageStyle.WHISPER;
             chatMessage = senderName + " " + resourceBundle.getString("whisperToYou");
             for (Integer receiver : receivers) {
-                if (receiver.equals(store.getState().client().getClientId())) {
+                if (receiver.equals(store.getState().mainClient().getClientId())) {
                     continue;
                 }
 
@@ -533,8 +533,8 @@ public class ChatViewController extends Controller implements Initializable {
             chatMessage += ": ";
         } else {
 
-            if (state.clients().get(chatMsg.clientId()).gameId() == state.client().getGameId() &&
-                    state.client().getGameId() != -1) {
+            if (state.clients().get(chatMsg.clientId()).gameId() == state.mainClient().getGameId() &&
+                    state.mainClient().getGameId() != -1) {
                 // chat message
                 messageStyle = MessageStyle.GAME_CHAT;
             } else {
@@ -608,10 +608,10 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sends a chat message when a client joined the server or left it.
+     * Sends a chat message when a mainClient joined the server or left it.
      */
     private void onClientChanges(KBState state) {
-        // update client list ///////////////////////
+        // update mainClient list ///////////////////////
         tableview_chat.getItems().setAll(state.clients().values());
 
         //send join/left-message ///////////////////
@@ -624,17 +624,17 @@ public class ChatViewController extends Controller implements Initializable {
         }
 
         if (clientsState.size() > clients.size()) {
-            // client joined
+            // mainClient joined
             differences.addAll(clientsState);
             differences.removeAll(clients);
 
-            differences.removeIf(cd -> cd.clientId() == store.getState().client().getClientId());
+            differences.removeIf(cd -> cd.clientId() == store.getState().mainClient().getClientId());
 
             for (ClientData cd : differences)
                 onClientJoined(cd);
 
         } else if (clientsState.size() < clients.size()) {
-            // client left
+            // mainClient left
             differences.addAll(clients);
             differences.removeAll(clientsState);
 
@@ -646,9 +646,9 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sends a chat message when another client left the server.
+     * Sends a chat message when another mainClient left the server.
      *
-     * @param clientData the data of the client who left the server.
+     * @param clientData the data of the mainClient who left the server.
      */
     private void onClientLeft(ClientData clientData) {
         String text = "<--- " + clientData.name() + " " + resourceBundle.getString("leftTheServer") + ". --->";
@@ -656,9 +656,9 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Sends a chat message when another client joined the server.
+     * Sends a chat message when another mainClient joined the server.
      *
-     * @param clientData the data of the client who joined the server.
+     * @param clientData the data of the mainClient who joined the server.
      */
     private void onClientJoined(ClientData clientData) {
         String text = "<--- " + clientData.name() + " " + resourceBundle.getString("joinedTheServer") + ". --->";
@@ -666,7 +666,7 @@ public class ChatViewController extends Controller implements Initializable {
     }
 
     /**
-     * Updates the UI when this client was kicked from the server.
+     * Updates the UI when this mainClient was kicked from the server.
      */
     public void onYouHaveBeenKicked() {
         String text = "<--- " + resourceBundle.getString("kickedFromServer") + " --->";
@@ -735,13 +735,13 @@ public class ChatViewController extends Controller implements Initializable {
                 }
             } else {
                 for (var c : store.getState().clients().entrySet()) {
-                    if (c.getValue().gameId() == store.getState().client().getGameId())
+                    if (c.getValue().gameId() == store.getState().mainClient().getGameId())
                         receiverIds.add(c.getKey());
                 }
             }
 
             // don't send message to ourselves
-            receiverIds.remove((Integer) store.getState().client().getClientId());
+            receiverIds.remove((Integer) store.getState().mainClient().getClientId());
 
             String senderName = resourceBundle.getString("you") + ": ";
 
@@ -779,7 +779,7 @@ public class ChatViewController extends Controller implements Initializable {
 
             // don't send message to ourselves
             var receivers = tableview_chat.getSelectionModel().getSelectedItems()
-                    .filtered(clientData -> clientData.clientId() != store.getState().client().getClientId());
+                    .filtered(clientData -> clientData.clientId() != store.getState().mainClient().getClientId());
 
             // no receivers selected
             if (receivers.isEmpty()) {
@@ -789,7 +789,7 @@ public class ChatViewController extends Controller implements Initializable {
             // creates message for the chat textarea
             chatMessage = resourceBundle.getString("youWhisper") + " ";
             for (int i = 0; i < receivers.size() - 1; i++) {
-                if (receivers.get(i).clientId() == store.getState().client().getClientId()) {
+                if (receivers.get(i).clientId() == store.getState().mainClient().getClientId()) {
                     continue;
                 }
                 receiverIds.add(receivers.get(i).clientId());
@@ -844,7 +844,7 @@ public class ChatViewController extends Controller implements Initializable {
         BOLD,
 
         /**
-         * Text should be highlighted as a client message.
+         * Text should be highlighted as a mainClient message.
          */
         CLIENT
     }
@@ -924,7 +924,7 @@ public class ChatViewController extends Controller implements Initializable {
             case GAME_CHAT -> createHTMLElementByTag("game");
             case WHISPER -> createHTMLElementByTag("whisper");
             case BOLD -> createHTMLElementByTag("b");
-            case CLIENT -> createHTMLElementByTag("client");
+            case CLIENT -> createHTMLElementByTag("mainClient");
         };
     }
 

@@ -86,9 +86,9 @@ public class Player {
     /**
      * Constructs a new player object with the given information.
      *
-     * @param ID               the client id.
-     * @param name             the name of the client.
-     * @param color            the color of the client.
+     * @param ID               the mainClient id.
+     * @param name             the name of the mainClient.
+     * @param color            the color of the mainClient.
      * @param totalSettlements the amount of settlement that the player has.
      */
     public Player(int ID, String name, PlayerColor color, int totalSettlements) {

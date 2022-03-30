@@ -6,21 +6,25 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import kingdomBuilder.KBState;
-import kingdomBuilder.gui.SceneLoader;
 import kingdomBuilder.gui.util.Util;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -47,12 +51,21 @@ public class IAmViewController extends Controller implements Initializable {
     @FXML
     private ComboBox<Locale> comboBox_language;
 
+    @FXML
+    private Button proceed_button;
+
+
+    private List<TextField> iAmTextFields;
+
+    private int playerCount;
+
     /**
      * Sets the store in the {@link Controller}.
      * @param store the store to set.
      */
     public IAmViewController(Store<KBState> store) {
         super.store = store;
+        this.iAmTextFields = new ArrayList<>();
     }
 
     /**
@@ -63,12 +76,45 @@ public class IAmViewController extends Controller implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        addPlayer();
+
         iamView_vbox.setStyle("""
                 -fx-background-image: url(kingdomBuilder/gui/textures/Background.png);
                 -fx-background-size: cover;
                 """);
         setupEventHandler();
         setupCheckBox(resources);
+    }
+
+    private void addPlayer() {
+        VBox parent = (VBox) proceed_button.getParent();
+        HBox box = new HBox();
+        TextField field = new TextField("");
+        Button addButton = new Button();
+        Button removeButton = new Button();
+
+        field.setPromptText("%enterHere");
+        field.setMaxWidth(200);
+        field.setId("iAmViewTextField");
+
+        addButton.setText("+");
+        addButton.setOnMouseClicked(ev -> { addPlayer(); });
+
+        removeButton.setText("-");
+        removeButton.setOnMouseClicked(ev -> {
+            if(iAmTextFields.size() > 1) {
+                parent.getChildren().remove(box);
+                iAmTextFields.remove(field);
+            }
+        });
+
+        box.setAlignment(Pos.CENTER);
+        box.getChildren().addAll(field, addButton, removeButton);
+
+        int idx = parent.getChildren().indexOf(proceed_button);
+        parent.getChildren().add(idx, box);
+
+        iAmTextFields.add(field);
     }
 
     /**
@@ -146,7 +192,7 @@ public class IAmViewController extends Controller implements Initializable {
      */
     @FXML
     private void onButtonMainMenuShow(Event event) {
-        SetPreferredName();
+        setPreferredNames();
     }
 
     /**
@@ -160,6 +206,8 @@ public class IAmViewController extends Controller implements Initializable {
      * Creates the EventHandler that is responsible for the Key events.
      */
     private void setupKeyEventHandler() {
+        if(iAmViewTextField == null) return;
+
         iAmViewTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
             /**
              * Invoked when a specific event of the type for which this handler is registered happens.
@@ -168,23 +216,30 @@ public class IAmViewController extends Controller implements Initializable {
             @Override
             public void handle(KeyEvent event) {
                 if (event.getCode() == KeyCode.ENTER) {
-                    SetPreferredName();
+                    setPreferredNames();
                 }
             }
         });
+
     }
 
     /**
      * Sets the user's preferred name.
      */
-    private void SetPreferredName() {
-        String preferredName = iAmViewTextField.getText().trim();
-        if (isNameValid(preferredName)) {
-            store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
-            sceneLoader.showMenuView();
-        } else {
+    private void setPreferredNames() {
+        List<String> preferredNames = iAmTextFields
+            .stream()
+            .map(f -> f.getText().trim())
+            .toList();
+
+        final boolean allNamesAreValid = preferredNames.stream().allMatch(this::isNameValid);
+        if(!allNamesAreValid) {
             Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
+            return;
         }
+
+        store.dispatch(GameReducer.SET_PREFERRED_NAMES, preferredNames);
+        sceneLoader.showMenuView();
     }
 
     /**

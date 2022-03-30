@@ -21,6 +21,8 @@ import kingdomBuilder.redux.Store;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Handles all application related actions.
@@ -68,6 +70,11 @@ public class ApplicationReducer extends Reducer<KBState> {
     public static final String SERVER_VERSION = "SERVER_VERSION";
 
     /**
+     *
+     */
+    public static final String LAUNCH_LOCAL_SERVER = "LAUNCH_LOCAL_SERVER";
+
+    /**
      * Constructs a new ApplicationReducer and lets it register itself.
      * @see Reducer#registerReducers
      */
@@ -98,7 +105,7 @@ public class ApplicationReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to connect the main client to a server.
+     * Represents the reducer to connect the main mainClient to a server.
      *
      * @param store the store.
      * @param oldState the old state.
@@ -110,14 +117,20 @@ public class ApplicationReducer extends Reducer<KBState> {
     public DeferredState onConnect(Store<KBState> store, KBState oldState, InetSocketAddress address) {
         DeferredState state = new DeferredState(oldState);
 
-        Client client;
+        List<Client> clients = new ArrayList<>();
+
         try {
-            client = oldState.selector().connect(address);
+            for(String unused: oldState.clientPreferredNames()) {
+                Client client = oldState.selector().connect(address);
+                clients.add(client);
+            }
         } catch (IOException exc) {
             state.setFailedToConnect(true);
             return state;
         }
 
+
+        Client mainClient = clients.get(0);
         state.setServerAddress(address);
 
         Thread selectorThread = oldState.selectorThread();
@@ -131,32 +144,32 @@ public class ApplicationReducer extends Reducer<KBState> {
             state.setSelectorThread(selectorThread);
         }
 
-        client.onVersionReply.subscribe(m -> store.dispatch(SERVER_VERSION, m));
-        client.onLoggedIn.subscribe(m -> store.dispatch(LOGIN, m));
-        client.onClientsReply.subscribe(m -> m.clients().forEach(c -> store.dispatch(ADD_CLIENT, c)));
-        client.onClientJoined.subscribe(m -> store.dispatch(ADD_CLIENT, m.clientData()));
-        client.onClientLeft.subscribe(m -> store.dispatch(REMOVE_CLIENT, m.clientData()));
-        client.onQuadrantReply.subscribe(m -> store.dispatchOld(new QuadrantAddAction(m)));
-        client.onPlayerJoined.subscribe(m -> store.dispatchOld(new PlayerAddAction(m)));
-        client.onPlayerLeft.subscribe(m -> store.dispatchOld(new PlayerRemoveAction(m)));
-        client.onGameHosted.subscribe(m -> store.dispatch(GameReducer.ADD_GAME, m.gameData()));
-        client.onPlayersReply.subscribe(m -> store.dispatch(GameReducer.SET_PLAYERS, m));
-        client.onMyGameReply.subscribe(m -> store.dispatch(GameReducer.MY_GAME, m));
-        client.onWinCondition.subscribe(m -> store.dispatch(GameReducer.SET_WIN_CONDITION, m));
-        client.onTurnStart.subscribe(m -> store.dispatch(GameReducer.START_TURN, m));
-        client.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(GameReducer.TERRAIN_OF_TURN, m));
-        client.onTokenReceived.subscribe(m -> store.dispatch(GameReducer.GRANT_TOKEN, m));
-        client.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
-        client.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
-        client.onPlayersOfGameReply.subscribe(m -> store.dispatch(GameReducer.PLAYERS_OF_GAME, m));
-        client.onNamespaceLoaded.subscribe(m -> store.dispatch(NAMESPACE_LOADED, null));
-        client.onKicked.subscribe(m -> store.dispatch(DISCONNECT, Boolean.TRUE));
+        mainClient.onVersionReply.subscribe(m -> store.dispatch(SERVER_VERSION, m));
+        mainClient.onLoggedIn.subscribe(m -> store.dispatch(LOGIN, m));
+        mainClient.onClientsReply.subscribe(m -> m.clients().forEach(c -> store.dispatch(ADD_CLIENT, c)));
+        mainClient.onClientJoined.subscribe(m -> store.dispatch(ADD_CLIENT, m.clientData()));
+        mainClient.onClientLeft.subscribe(m -> store.dispatch(REMOVE_CLIENT, m.clientData()));
+        mainClient.onQuadrantReply.subscribe(m -> store.dispatchOld(new QuadrantAddAction(m)));
+        mainClient.onPlayerJoined.subscribe(m -> store.dispatchOld(new PlayerAddAction(m)));
+        mainClient.onPlayerLeft.subscribe(m -> store.dispatchOld(new PlayerRemoveAction(m)));
+        mainClient.onGameHosted.subscribe(m -> store.dispatch(GameReducer.ADD_GAME, m.gameData()));
+        mainClient.onPlayersReply.subscribe(m -> store.dispatch(GameReducer.SET_PLAYERS, m));
+        mainClient.onMyGameReply.subscribe(m -> store.dispatch(GameReducer.MY_GAME, m));
+        mainClient.onWinCondition.subscribe(m -> store.dispatch(GameReducer.SET_WIN_CONDITION, m));
+        mainClient.onTurnStart.subscribe(m -> store.dispatch(GameReducer.START_TURN, m));
+        mainClient.onTerrainTypeOfTurn.subscribe(m -> store.dispatch(GameReducer.TERRAIN_OF_TURN, m));
+        mainClient.onTokenReceived.subscribe(m -> store.dispatch(GameReducer.GRANT_TOKEN, m));
+        mainClient.onTokenLost.subscribe(m -> store.dispatch(GameReducer.REVOKE_TOKEN, m));
+        mainClient.onScores.subscribe(m -> store.dispatch(GameReducer.SCORE, m));
+        mainClient.onPlayersOfGameReply.subscribe(m -> store.dispatch(GameReducer.PLAYERS_OF_GAME, m));
+        mainClient.onNamespaceLoaded.subscribe(m -> store.dispatch(NAMESPACE_LOADED, null));
+        mainClient.onKicked.subscribe(m -> store.dispatch(DISCONNECT, Boolean.TRUE));
         // root stuff
-        client.onWrongPassword.subscribe(m -> store.dispatch(RootReducer.WRONG_PASSWORD, null));
-        client.onYouAreRoot.subscribe(m -> store.dispatch(RootReducer.ON_ROOT, null));
+        mainClient.onWrongPassword.subscribe(m -> store.dispatch(RootReducer.WRONG_PASSWORD, null));
+        mainClient.onYouAreRoot.subscribe(m -> store.dispatch(RootReducer.ON_ROOT, null));
 
 
-        client.onGamesReply.subscribe(m -> {
+        mainClient.onGamesReply.subscribe(m -> {
             for (GameData g : m.games()) {
                 store.dispatch(
                         GameReducer.ADD_GAME,
@@ -166,28 +179,28 @@ public class ApplicationReducer extends Reducer<KBState> {
             }
         });
 
-        client.onQuadrantsReply.subscribe(m -> {
+        mainClient.onQuadrantsReply.subscribe(m -> {
             for (int quadrantId : m.quadrantIds()) {
-                client.quadrantRequest(quadrantId);
+                mainClient.quadrantRequest(quadrantId);
             }
         });
 
-        client.onWelcomeToGame.subscribe(m -> {
-            client.myGameRequest();
-            client.playersRequest();
+        mainClient.onWelcomeToGame.subscribe(m -> {
+            mainClient.myGameRequest();
+            mainClient.playersRequest();
         });
 
-        client.onSettlementPlaced.subscribe(m -> store.dispatch(
+        mainClient.onSettlementPlaced.subscribe(m -> store.dispatch(
                 GameReducer.SERVER_TURN,
                 new ServerTurn(m.clientId(), ServerTurn.TurnType.PLACE, m.row(), m.column(), -1, -1))
         );
 
-        client.onSettlementRemoved.subscribe(m -> store.dispatch(
+        mainClient.onSettlementRemoved.subscribe(m -> store.dispatch(
                 GameReducer.SERVER_TURN,
                 new ServerTurn(m.clientId(), ServerTurn.TurnType.REMOVE, m.row(), m.column(), -1, -1))
         );
 
-        client.onTokenUsed.subscribe(m -> {
+        mainClient.onTokenUsed.subscribe(m -> {
             TileType token = TileType.valueOf(m.tokenType());
             if (token == TileType.PADDOCK || token == TileType.BARN || token == TileType.HARBOR) {
                 store.dispatch(
@@ -200,26 +213,34 @@ public class ApplicationReducer extends Reducer<KBState> {
         store.subscribe(kbState -> store.dispatch(GameReducer.READY_GAME, null),
                 "players", "nextTerrainCard", "nextPlayer");
 
-        client.login(oldState.clientPreferredName());
+        for(int it = 0; it < oldState.clientPreferredNames().size(); ++it) {
+            Client client = clients.get(it);
+            String name = oldState.clientPreferredNames().get(it);
+            client.login(name);
+            client.onLoggedIn.subscribe(m -> store.dispatch(LOGIN, m));
+        }
 
-        client.onQuadrantUploaded.subscribe(m -> {
+        mainClient.onQuadrantUploaded.subscribe(m -> {
             store.dispatch(NEW_QUADRANT_UPLOADED, m);
-            client.quadrantRequest(m.quadrantId());
+            mainClient.quadrantRequest(m.quadrantId());
         });
 
-        client.onMessageReceived.subscribe(m -> store.dispatch(ChatReducer.RECEIVE_MESSAGE, m));
-        state.setClient(client);
+        mainClient.onMessageReceived.subscribe(m -> store.dispatch(ChatReducer.RECEIVE_MESSAGE, m));
+        state.setMainClient(mainClient);
         state.setIsConnecting(true);
+
+        clients.remove(0);
+        state.setHotSeatClients(clients);
 
         return state;
     }
 
     /**
-     * Represents the reducer to disconnect the main client from the server they're currently connected to.
+     * Represents the reducer to disconnect the main mainClient from the server they're currently connected to.
      *
      * @param store the store.
      * @param oldState the old state.
-     * @param wasKicked whether the client was kicked from the server.
+     * @param wasKicked whether the mainClient was kicked from the server.
      *
      * @return the deferredState.
      */
@@ -229,8 +250,8 @@ public class ApplicationReducer extends Reducer<KBState> {
 
         oldState.sceneLoader().showMenuView();
 
-        oldState.client().disconnect();
-        state.setClient(null);
+        oldState.mainClient().disconnect();
+        state.setMainClient(null);
         state.setIsConnected(false);
         state.setClientState(KBState.ClientState.NO_ROOT);
 
@@ -268,30 +289,47 @@ public class ApplicationReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param unused2 an unused object.
+     * @param client the client that successfully logged in.
      *
      * @return the deferredState.
      */
     @Reduce(action = LOGIN)
-    public DeferredState onLogin(Store<KBState> unused, KBState oldState, Object unused2) {
+    public DeferredState onLogin(Store<KBState> unused, KBState oldState, Client client) {
         DeferredState state = new DeferredState(oldState);
-        state.setIsConnecting(false);
-        state.setIsConnected(true);
-        System.out.println("Is connected.");
 
-        oldState.client().serverVersion();
-        oldState.client().loadNamespace();
-        oldState.client().clientsRequest();
-        oldState.client().gamesRequest();
+        boolean hotSeatClientsLoggedIn = oldState.hotSeatClients().isEmpty()
+                || oldState
+            .hotSeatClients()
+            .stream()
+            .allMatch(Client::isLoggedIn);
+
+        if(oldState.mainClient().isConnected() && hotSeatClientsLoggedIn) {
+            state.setIsConnecting(false);
+            state.setIsConnected(true);
+            System.out.println("Is connected.");
+        }
+
+        boolean isMainClient = oldState.mainClient() == client;
+
+        if(isMainClient)
+            client.serverVersion();
+
+        client.loadNamespace();
+
+        if(isMainClient) {
+            client.clientsRequest();
+            client.gamesRequest();
+        }
+
         return state;
     }
 
     /**
-     * Represents the reducer to add a client to the state's list of clients.
+     * Represents the reducer to add a mainClient to the state's list of clients.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param payload the data object of the client to be added.
+     * @param payload the data object of the mainClient to be added.
      *
      * @return the deferredState.
      */
@@ -306,11 +344,11 @@ public class ApplicationReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to remove a client from the state's list of clients.
+     * Represents the reducer to remove a mainClient from the state's list of clients.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param payload the data object of the client to be removed.
+     * @param payload the data object of the mainClient to be removed.
      *
      * @return the deferredState.
      */
@@ -383,7 +421,17 @@ public class ApplicationReducer extends Reducer<KBState> {
     public DeferredState onNameSpaceLoaded(Store<KBState> unused, KBState oldState, Object unused2) {
         //This prevents the bug, that the server processes the '?quadrants' message before
         // it starts to load the namespace.
-        oldState.client().quadrantsRequest();
+        oldState.mainClient().quadrantsRequest();
         return new DeferredState(oldState);
     }
+
+    @Reduce(action = LAUNCH_LOCAL_SERVER)
+    public DeferredState launchLocalServer(Store<KBState> unused, KBState oldState, Object unused2) {
+
+
+
+        return new DeferredState(oldState);
+    }
+
+
 }

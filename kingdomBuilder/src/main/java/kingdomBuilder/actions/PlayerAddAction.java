@@ -11,8 +11,8 @@ import kingdomBuilder.redux.Action;
 public class PlayerAddAction extends PlayerAction {
 
     /**
-     * Creates a new PlayerAddAction with the client id and game id.
-     * @param clientId the id of the client.
+     * Creates a new PlayerAddAction with the mainClient id and game id.
+     * @param clientId the id of the mainClient.
      * @param gameId the id of the game.
      */
     public PlayerAddAction(int clientId, int gameId) {

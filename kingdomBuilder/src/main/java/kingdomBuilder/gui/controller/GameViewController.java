@@ -35,7 +35,6 @@ import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
 import java.net.URL;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -243,8 +242,8 @@ public class GameViewController extends Controller implements Initializable {
         // START TURN
         store.subscribe(kbState -> {
             if (kbState.nextPlayer() >= 0 && kbState.gameStarted() && kbState.nextTerrainCard() != null) {
-                // only preview for this client
-                if (kbState.nextPlayer() == kbState.client().getClientId())
+                // only preview for the local players on this PC.
+                if (isNextLocalClient(kbState))
                     highlightTerrain(Game.allBasicTurnTiles(
                             kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
             }
@@ -350,17 +349,15 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state.
      */
     private void onNextPlayer(KBState kbState) {
-//        if (kbState.client() != null) {
-//            String msg = String.format("(%d) Called onNextPlayer", kbState.client().getClientId());
+//        if (kbState.mainClient() != null) {
+//            String msg = String.format("(%d) Called onNextPlayer", kbState.mainClient().getClientId());
 //            System.out.println(msg);
 //        }
 
-        if (kbState.nextPlayer() == -1 || kbState.client() == null)
+        if (kbState.nextPlayer() == -1 || kbState.mainClient() == null)
             return;
 
-        if (!isSpectating) {
-            game_button_end.setDisable(true);
-        }
+        game_button_end.setDisable(!isSpectating);
         basicTurnLeft(kbState);
 
         // Highlight whose turn it is
@@ -397,8 +394,8 @@ public class GameViewController extends Controller implements Initializable {
                 default -> setServerSettlement(lastTurn.x, lastTurn.y, color);
             }
         }
-        // Highlight Terrain only for client
-        if (kbState.nextPlayer() == kbState.client().getClientId()) {
+        // Highlight Terrain only for mainClient
+        if (isNextLocalClient(kbState)) {
             highlightTerrain(Game.allBasicTurnTiles(
                     kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
         }
@@ -416,7 +413,7 @@ public class GameViewController extends Controller implements Initializable {
         }
 
         if (kbState.currentPlayer() != null && kbState.currentPlayer().getCurrentTurnState() == TurnState.END_OF_TURN
-            && kbState.client().getClientId() == kbState.currentPlayer().ID && !isSpectating) {
+            /*&& kbState.mainClient().getClientId() == kbState.currentPlayer().ID*/ && !isSpectating) {
             game_button_end.setDisable(false);
         }
 
@@ -436,13 +433,13 @@ public class GameViewController extends Controller implements Initializable {
      * @param kbState the current state
      */
     private void basicTurnLeft(KBState kbState) {
-        if (kbState.currentPlayer() != null && kbState.currentPlayer().ID == kbState.client().getClientId()) {
+        if (kbState.currentPlayer() != null && kbState.currentPlayer().ID == kbState.mainClient().getClientId()) {
             int basicSettlementsLeft = kbState.currentPlayer().getRemainingSettlementsOfTurn();
-            if (basicSettlementsLeft > 0) {
-                game_label_basic.setText(resourceBundle.getString("basicLeft") + " " + basicSettlementsLeft);
-            } else {
-                game_label_basic.setText("");
-            }
+            final String text = basicSettlementsLeft > 0
+                    ? resourceBundle.getString("basicLeft") + " " + basicSettlementsLeft
+                    : "";
+
+            game_label_basic.setText(text);
         }
     }
 
@@ -606,11 +603,11 @@ public class GameViewController extends Controller implements Initializable {
      * @param turnLimit the maximum allowed turns of the game.
      */
     private void setTurnLabel(int turnCount, int turnLimit) {
-        if (turnLimit > -1) {
-            game_label_turn.setText(resourceBundle.getObject("turnLimit:") + " " + turnCount + "/" + turnLimit);
-        } else {
-            game_label_turn.setText(resourceBundle.getObject("turn:") + " " + turnCount);
-        }
+        final String text = turnLimit > -1
+            ? resourceBundle.getObject("turnLimit:") + " " + turnCount + "/" + turnLimit
+            : resourceBundle.getObject("turn:") + " " + turnCount;
+
+        game_label_turn.setText(text);
     }
 
     /**
@@ -633,9 +630,7 @@ public class GameViewController extends Controller implements Initializable {
         tokens.clear();
         game_hbox_tokens.getChildren().clear();
 
-        // check if the current player is the own client
-        // TODO: fix for Hotseat
-        if (kbState.currentPlayer() != null && kbState.currentPlayer().ID == kbState.client().getClientId()) {
+        if (isCurrentLocalClient(kbState)) {
             for (var entry : kbState.currentPlayer().getTokens().entrySet()) {
                 if (entry.getValue().getTotal() == 0)
                     continue;
@@ -670,10 +665,10 @@ public class GameViewController extends Controller implements Initializable {
             updateCardDescription(kbState.nextTerrainCard());
         }
 
-        if (kbState.currentPlayer() != null)
-            if (kbState.nextPlayer() == kbState.client().getClientId())
+        if (kbState.currentPlayer() != null && isNextLocalClient(kbState)) {
                 highlightTerrain(Game.allBasicTurnTiles(
                         kbState.gameMap(), kbState.playersMap().get(kbState.nextPlayer())));
+        }
 
         if (timeLimit != -1 && timeLabelTimeline != null) {
             timeLabelTimeline.stop();
@@ -954,4 +949,36 @@ public class GameViewController extends Controller implements Initializable {
         this.isOnline = isOnline;
         playingOrSpectating();
     }
+
+    /**
+     * @param state the state to checkj against.
+     * {@return whether the next turn belongs to a local client.}
+     */
+    private static boolean isNextLocalClient(KBState state) {
+        final boolean isHotSeat = state
+            .hotSeatClients()
+            .stream()
+            .anyMatch(c -> c.getClientId() == state.nextPlayer());
+
+        final boolean isMain = state.nextPlayer() == state.mainClient().getClientId();
+
+        return isMain || isHotSeat;
+    }
+
+    /**
+     * @param state the state to check against.
+     * {@return whether the current turn belongs to a local client.}
+     */
+    private static boolean isCurrentLocalClient(KBState state) {
+        if(state.currentPlayer() == null) return false;
+
+        final boolean isHotSeat = state
+            .hotSeatClients()
+            .stream()
+            .anyMatch(c -> c.getClientId() == state.currentPlayer().ID);
+
+        final boolean isMain = state.currentPlayer().ID == state.mainClient().getClientId();
+        return isHotSeat || isMain;
+    }
+
 }

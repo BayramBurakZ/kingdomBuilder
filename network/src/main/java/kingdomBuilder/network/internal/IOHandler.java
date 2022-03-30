@@ -183,6 +183,7 @@ public class IOHandler {
      */
     private void tryFlush() throws IOException {
         SelectionKey key = channel.keyFor(selector);
+        if(key == null) return;
 
         if(!connected.get()) {
             key.interestOpsOr(SelectionKey.OP_WRITE);

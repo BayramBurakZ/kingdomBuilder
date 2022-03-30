@@ -20,14 +20,14 @@ import java.util.Map;
  * Represents the state of the Kingdom Builder application.
  *
  * @param sceneLoader         represents the SceneLoader.
- * @param clients             maps client id to the client info of connected clients.
+ * @param clients             maps mainClient id to the mainClient info of connected clients.
  * @param games               maps game id to the game info of created games.
  * @param selector            stores the selector, which handles network IO.
  * @param selectorThread      stores the thread, which runs the selector.
- * @param client              represents the main client.
- * @param clientPreferredName represents the login name entered by the player.
- * @param isConnecting        shows whether the client is currently connecting or not.
- * @param isConnected         shows whether the client is connected to the server.
+ * @param mainClient              represents the main mainClient.
+ * @param clientPreferredNames represents the login name entered by the player.
+ * @param isConnecting        shows whether the mainClient is currently connecting or not.
+ * @param isConnected         shows whether the mainClient is connected to the server.
  * @param failedToConnect     shows whether the connection to the server failed.
  * @param betterColorsActive  shows whether the better color mode is active.
  * @param quadrants           represents a map with all the available quadrants on the server.
@@ -44,15 +44,15 @@ import java.util.Map;
  * @param myGameReply         represents the network message with all information about the current game.
  * @param winConditions       represents a list of the three win conditions of the current game.
  * @param playersMap          represents a map of the players playing in the game.
- *                            The Key represents the client ID.
+ *                            The Key represents the mainClient ID.
  * @param currentPlayer       represents the current player on turn.
- * @param joinedGame          shows whether the client has joined a game.
+ * @param joinedGame          shows whether the mainClient has joined a game.
  * @param quadrantUploaded    represents the message whenever a quadrant is uploaded.
  * @param serverVersion       represents a String with the version of the server.
  * @param playersOfGame       represents a map with the gameID and a list with all clientIDs.
  * @param serverAddress       represents the server address.
  * @param Bots                represents the Map for the bots.
- * @param clientState         represents the state of the client (Root or non-Root).
+ * @param clientState         represents the state of the mainClient (Root or non-Root).
  */
 @State
 public record KBState(SceneLoader sceneLoader,
@@ -60,8 +60,9 @@ public record KBState(SceneLoader sceneLoader,
                       Map<Integer, GameData> games,
                       ClientSelector selector,
                       Thread selectorThread,
-                      Client client,
-                      String clientPreferredName,
+                      Client mainClient,
+                      List<Client> hotSeatClients,
+                      List<String> clientPreferredNames,
                       boolean isConnecting,
                       boolean isConnected,
                       boolean failedToConnect,
@@ -102,6 +103,7 @@ public record KBState(SceneLoader sceneLoader,
                 new ClientSelectorImpl(),
                 null,
                 null,
+                new ArrayList<>(),
                 null,
                 false,
                 false,
@@ -137,15 +139,15 @@ public record KBState(SceneLoader sceneLoader,
      */
     public enum ClientState{
         /**
-         * Represents the status when the client has not gained the root status yet.
+         * Represents the status when the mainClient has not gained the root status yet.
          */
         NO_ROOT,
         /**
-         * Represents the status when the client has gained the root status.
+         * Represents the status when the mainClient has gained the root status.
          */
         ROOT,
         /**
-         * Represents the status when the client tried to get the root status but failed with a wrong password.
+         * Represents the status when the mainClient tried to get the root status but failed with a wrong password.
          */
         ERROR
     }

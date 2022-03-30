@@ -55,7 +55,7 @@ public class ChatReducer extends Reducer<KBState> {
      */
     @Reduce(action = SEND_MESSAGE)
     public DeferredState onSendMessage(Store<KBState> unused, KBState oldState, ChatSendAction sendAction) {
-        oldState.client().chat(sendAction.receiverIds, sendAction.message);
+        oldState.mainClient().chat(sendAction.receiverIds, sendAction.message);
         return new DeferredState(oldState);
     }
 }

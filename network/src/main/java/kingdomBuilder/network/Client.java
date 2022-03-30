@@ -24,10 +24,16 @@ public abstract class Client {
      * Represents the id of a client.
      */
     protected int clientId;
+
     /**
      * Represents the game-ID of the game in which the client plays.
      */
     protected int gameId;
+
+    /**
+     * Stores whether the client logged in or not.
+     */
+    protected boolean loggedIn;
 
     /**
      * Event that gets dispatched when the connection closed unexpectedly.
@@ -333,6 +339,11 @@ public abstract class Client {
     public int getGameId() {
         return gameId;
     }
+
+    /**
+     * {@return whether the client is currently logged in or not.}
+     */
+    public boolean isLoggedIn() { return loggedIn; }
 
     /**
      * Logs into the server with a preferred name.

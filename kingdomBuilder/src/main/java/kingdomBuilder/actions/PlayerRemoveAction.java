@@ -12,8 +12,8 @@ import kingdomBuilder.redux.Action;
 public class PlayerRemoveAction extends PlayerAction {
 
     /**
-     * Creates a new PlayerRemoveAction with the id of the client and the game.
-     * @param clientId the id of the client.
+     * Creates a new PlayerRemoveAction with the id of the mainClient and the game.
+     * @param clientId the id of the mainClient.
      * @param gameId the id of the game.
      */
     public PlayerRemoveAction(int clientId, int gameId) {

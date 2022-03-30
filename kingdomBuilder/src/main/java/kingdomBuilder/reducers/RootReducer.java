@@ -54,7 +54,7 @@ public class RootReducer extends Reducer<KBState> {
      */
     @Reduce(action = SEND_ROOT)
     public DeferredState sendRoot(Store<KBState> unused, KBState oldState, String password) {
-        oldState.client().root(password);
+        oldState.mainClient().root(password);
         return new DeferredState(oldState);
     }
 
@@ -92,22 +92,22 @@ public class RootReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to send a 'kick client' message to the server.
+     * Represents the reducer to send a 'kick mainClient' message to the server.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param integer the id of the client to kick.
+     * @param integer the id of the mainClient to kick.
      *
      * @return the deferredState.
      */
     @Reduce(action = KICK_CLIENT)
     public DeferredState kickClient(Store<KBState> unused, KBState oldState, Integer integer) {
-        oldState.client().kickClient(integer);
+        oldState.mainClient().kickClient(integer);
         return new DeferredState(oldState);
     }
 
     /**
-     * Represents the reducer to reset the client status in the state after an error.
+     * Represents the reducer to reset the mainClient status in the state after an error.
      *
      * @param unused the store.
      * @param oldState the old state.
@@ -133,7 +133,7 @@ public class RootReducer extends Reducer<KBState> {
      */
     @Reduce(action = SHUTDOWN_SERVER)
     public DeferredState shutdownServer(Store<KBState> unused, KBState oldState, Object unused2) {
-        oldState.client().shutdownServer();
+        oldState.mainClient().shutdownServer();
         return new DeferredState(oldState);
     }
 }

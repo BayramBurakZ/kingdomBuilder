@@ -6,7 +6,7 @@ package kingdomBuilder.gamelogic;
 public abstract class Turn {
 
     /**
-     * Represents the client that did the turn.
+     * Represents the mainClient that did the turn.
      */
     public final int clientId;
 
@@ -32,7 +32,7 @@ public abstract class Turn {
 
     /**
      * Creates a new turn.
-     * @param clientId the id of the client
+     * @param clientId the id of the mainClient
      * @param x the x-coordinate to place a settlement or remove it.
      * @param y the y-coordinate to place a settlement or remove it.
      * @param toX the x-coordinate to move the settlement to.

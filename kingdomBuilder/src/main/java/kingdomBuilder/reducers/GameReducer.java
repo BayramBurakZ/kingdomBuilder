@@ -27,7 +27,7 @@ public class GameReducer extends Reducer<KBState> {
     /**
      * Represents the String to identify the related {@link GameReducer#onSetPreferredName reduce} method.
      */
-    public static final String SET_PREFERRED_NAME = "SET_PREFERRED_NAME";
+    public static final String SET_PREFERRED_NAMES = "SET_PREFERRED_NAME";
     /**
      * Represents the String to identify the related {@link GameReducer#onJoinGame reduce} method.
      */
@@ -122,14 +122,14 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param name the name that the user sets.
+     * @param names the names that the user(s) sets.
      *
      * @return the deferredState.
      */
-    @Reduce(action = SET_PREFERRED_NAME)
-    public DeferredState onSetPreferredName(Store<KBState> unused, KBState oldState, String name) {
+    @Reduce(action = SET_PREFERRED_NAMES)
+    public DeferredState onSetPreferredName(Store<KBState> unused, KBState oldState, List<String> names) {
         DeferredState state = new DeferredState(oldState);
-        state.setClientPreferredName(name);
+        state.setClientPreferredNames(names);
         return state;
     }
 
@@ -138,7 +138,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param gameId the ID of the game the client attempts to join.
+     * @param gameId the ID of the game the mainClient attempts to join.
      *
      * @return the deferredState.
      */
@@ -146,12 +146,14 @@ public class GameReducer extends Reducer<KBState> {
     public DeferredState onJoinGame(Store<KBState> unused, KBState oldState, Integer gameId) {
         DeferredState state = new DeferredState(oldState);
         final var clients = oldState.clients();
-        var clientData = clients.get(oldState.client().getClientId());
+        var clientData = clients.get(oldState.mainClient().getClientId());
         clients.put(clientData.clientId(), new ClientData(clientData.clientId(), clientData.name(), gameId));
         state.setClients(clients);
 
-        oldState.client().joinGame(gameId);
-        //state.setClient(oldState.client());
+        oldState.mainClient().joinGame(gameId);
+        for(Client client: oldState.hotSeatClients())
+            client.joinGame(gameId);
+
         state.setJoinedGame(true);
         state.setTurnCount(0);
         return state;
@@ -178,7 +180,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param a the information about the client who joined game.
+     * @param a the information about the mainClient who joined game.
      *
      * @return the deferredState.
      */
@@ -190,12 +192,12 @@ public class GameReducer extends Reducer<KBState> {
         clients.put(a.clientId, new ClientData(a.clientId, clientData.name(), a.gameId));
         state.setClients(clients);
 
-        if (a.gameId == oldState.client().getGameId()) {
+        if (a.gameId == oldState.mainClient().getGameId()) {
             // for some reason you only get the color of a player via ?players
-            oldState.client().playersRequest();
+            oldState.mainClient().playersRequest();
         }
-        oldState.client().gamesRequest();
-        oldState.client().playersOfGame(a.gameId);
+        oldState.mainClient().gamesRequest();
+        oldState.mainClient().playersOfGame(a.gameId);
 
         return state;
     }
@@ -205,7 +207,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param a the information about the client who left a game.
+     * @param a the information about the mainClient who left a game.
      *
      * @return the deferredState.
      */
@@ -220,7 +222,7 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client wants to host a new game.
+     * Represents the reducer to handle whenever the mainClient wants to host a new game.
      *
      * @param unused the store.
      * @param oldState the old state.
@@ -231,7 +233,7 @@ public class GameReducer extends Reducer<KBState> {
     @Reduce(action = "HostGameAction")
     public DeferredState onHostGame(Store<KBState> unused, KBState oldState, HostGameAction a) {
         DeferredState state = new DeferredState(oldState);
-        oldState.client().hostGame(a.gameName, a.gameDescription, a.playerLimit, a.timeLimit, a.turnLimit,
+        oldState.mainClient().hostGame(a.gameName, a.gameDescription, a.playerLimit, a.timeLimit, a.turnLimit,
                 a.quadrantId1, a.quadrantId2, a.quadrantId3, a.quadrantId4);
         return state;
     }
@@ -252,7 +254,7 @@ public class GameReducer extends Reducer<KBState> {
         games.put(gameData.gameId(), gameData);
         state.setGames(games);
 
-        oldState.client().playersOfGame(gameData.gameId());
+        oldState.mainClient().playersOfGame(gameData.gameId());
         return state;
     }
 
@@ -394,7 +396,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param turnStart the information about the client whose turn it is.
+     * @param turnStart the information about the mainClient whose turn it is.
      *
      * @return the deferredState.
      */
@@ -403,18 +405,18 @@ public class GameReducer extends Reducer<KBState> {
         DeferredState state = new DeferredState(oldState);
 
         if (oldState.players() != null && !oldState.playersMap().isEmpty()) {
-
             oldState.playersMap().get(turnStart.clientId()).startTurn();
             state.setCurrentPlayer(oldState.playersMap().get(turnStart.clientId()));
         }
 
         state.setNextPlayer(turnStart.clientId());
         state.setTurnCount(oldState.turnCount() + 1);
+
         return state;
     }
 
     /**
-     * Represents the reducer to handle whenever the server sends the client a turn.
+     * Represents the reducer to handle whenever the server sends the mainClient a turn.
      *
      * @param unused the store.
      * @param oldState the old state.
@@ -461,11 +463,11 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle when the client made a turn.
+     * Represents the reducer to handle when the mainClient made a turn.
      *
      * @param store the store.
      * @param oldState the old state.
-     * @param clientTurn the information about the turn that the client made.
+     * @param clientTurn the information about the turn that the mainClient made.
      *
      * @return the deferredState.
      */
@@ -479,59 +481,61 @@ public class GameReducer extends Reducer<KBState> {
         int toX = clientTurn.toX;
         int toY = clientTurn.toY;
 
+        final Client client = getClient(oldState, clientTurn.clientId);
+
         switch (clientTurn.type) {
             case PLACE -> {
                 Game.useBasicTurn(oldState.gameMap(), player, x, y);
-                oldState.client().placeSettlement(x, y);
+                client.placeSettlement(x, y);
             }
 
             case ORACLE -> {
                 Game.useTokenOracle(player);
-                oldState.client().useTokenOracle(x, y);
+                client.useTokenOracle(x, y);
                 state.setToken(null);
             }
             case FARM -> {
                 Game.useTokenFarm(player);
-                oldState.client().useTokenFarm(x, y);
+                client.useTokenFarm(x, y);
                 state.setToken(null);
             }
             case TAVERN -> {
                 Game.useTokenTavern(player);
-                oldState.client().useTokenTavern(x, y);
+                client.useTokenTavern(x, y);
                 state.setToken(null);
             }
             case TOWER -> {
                 Game.useTokenTower(player);
-                oldState.client().useTokenTower(x, y);
+                client.useTokenTower(x, y);
                 state.setToken(null);
             }
             case HARBOR -> {
                 Game.useTokenHarbor(player);
-                oldState.client().useTokenHarbor(x,y, toX, toY);
+                client.useTokenHarbor(x,y, toX, toY);
                 store.dispatch(SERVER_TURN,
-                        new ServerTurn(oldState.client().getClientId(),
+                        new ServerTurn(client.getClientId(),
                                 ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1));
                 state.setToken(null);
             }
             case PADDOCK -> {
                 Game.useTokenPaddock(player);
-                oldState.client().useTokenPaddock(x, y, toX, toY);
+                client.useTokenPaddock(x, y, toX, toY);
                 store.dispatch(SERVER_TURN,
-                        new ServerTurn(oldState.client().getClientId(),
+                        new ServerTurn(client.getClientId(),
                                 ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1));
                 state.setToken(null);
             }
             case BARN -> {
                 Game.useTokenBarn(player);
-                oldState.client().useTokenBarn(x, y, toX, toY);
+                client.useTokenBarn(x, y, toX, toY);
                 store.dispatch(SERVER_TURN,
-                        new ServerTurn(oldState.client().getClientId(),
+                        new ServerTurn(client.getClientId(),
                                 ServerTurn.TurnType.TOKEN_USED, -1, -1, -1, -1));
                 state.setToken(null);
             }
             case OASIS -> {
                 Game.useTokenOasis(player);
-                oldState.client().useTokenOasis(x, y);
+                client.useTokenOasis(x, y);
                 state.setToken(null);
             }
         }
@@ -541,7 +545,7 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client ends the turn.
+     * Represents the reducer to handle whenever the mainClient ends the turn.
      *
      * @param unused the store.
      * @param oldState the old state.
@@ -553,12 +557,14 @@ public class GameReducer extends Reducer<KBState> {
     public DeferredState onEndTurn(Store<KBState> unused, KBState oldState, Void unused2) {
         DeferredState state = new DeferredState(oldState);
 
-        oldState.client().endTurn();
+        Client client = getClient(oldState, oldState.currentPlayer().ID);
+        client.endTurn();
+
         return state;
     }
 
     /**
-     * Represents the reducer to handle whenever a game starts while the client need to wait for remaining replies.
+     * Represents the reducer to handle whenever a game starts while the mainClient need to wait for remaining replies.
      *
      * @param unused the store.
      * @param oldState the old state.
@@ -598,7 +604,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param payload the information about the client who received a token from an origin tile.
+     * @param payload the information about the mainClient who received a token from an origin tile.
      *
      * @return the deferredState.
      */
@@ -618,7 +624,7 @@ public class GameReducer extends Reducer<KBState> {
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param payload the information about the client who lost a token and the information about the origin
+     * @param payload the information about the mainClient who lost a token and the information about the origin
      *                of the token.
      *
      * @return the deferredState.
@@ -634,11 +640,11 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client want to use a token.
+     * Represents the reducer to handle whenever the mainClient want to use a token.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param tileType the type of token the client wants to use.
+     * @param tileType the type of token the mainClient wants to use.
      *
      * @return the deferredState.
      */
@@ -670,7 +676,7 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client wants to upload a quadrant that was created in the
+     * Represents the reducer to handle whenever the mainClient wants to upload a quadrant that was created in the
      * leveleditor.
      *
      * @param unused the store.
@@ -683,7 +689,7 @@ public class GameReducer extends Reducer<KBState> {
     public DeferredState onUploadQuadrant(Store<KBState> unused, KBState oldState, UploadQuadrantAction a){
         DeferredState state = new DeferredState(oldState);
 
-        oldState.client().uploadQuadrant(a.quadrant);
+        oldState.mainClient().uploadQuadrant(a.quadrant);
         return state;
     }
 
@@ -714,7 +720,7 @@ public class GameReducer extends Reducer<KBState> {
         state.setJoinedGame(false);
         state.setWinConditions(new ArrayList<>());
 
-        oldState.client().clientsRequest();
+        oldState.mainClient().clientsRequest();
 
         return state;
     }
@@ -740,11 +746,11 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client wants to spectate a game.
+     * Represents the reducer to handle whenever the mainClient wants to spectate a game.
      *
      * @param unused the store.
      * @param oldState the old state.
-     * @param gameId the game the client wants to spectate.
+     * @param gameId the game the mainClient wants to spectate.
      *
      * @return the deferredState.
      */
@@ -752,9 +758,9 @@ public class GameReducer extends Reducer<KBState> {
     public DeferredState onSpectateGame(Store<KBState> unused, KBState oldState, int gameId){
         DeferredState state = new DeferredState(oldState);
 
-        oldState.client().spectateGame(gameId);
-        oldState.client().playersRequest();
-        oldState.client().myGameRequest();
+        oldState.mainClient().spectateGame(gameId);
+        oldState.mainClient().playersRequest();
+        oldState.mainClient().myGameRequest();
 
         state.setJoinedGame(true);
         state.setTurnCount(0);
@@ -763,7 +769,7 @@ public class GameReducer extends Reducer<KBState> {
     }
 
     /**
-     * Represents the reducer to handle whenever the client wants to spectate a game.
+     * Represents the reducer to handle whenever the mainClient wants to spectate a game.
      *
      * @param store the store.
      * @param oldState the old state.
@@ -779,7 +785,7 @@ public class GameReducer extends Reducer<KBState> {
             store.dispatch(BotReducer.DISCONNECT_BOT, client);
         }
 
-        oldState.client().unspectateGame();
+        oldState.mainClient().unspectateGame();
         state.setPlayers(null);
         state.setScores(null);
         state.setGameLastTurn(null);
@@ -795,4 +801,19 @@ public class GameReducer extends Reducer<KBState> {
 
         return state;
     }
+
+    /**
+     * {@return the current client.}
+     */
+    private Client getClient(KBState state, int id) {
+        return state.mainClient().getClientId() == id
+                ? state.mainClient()
+                : state
+                .hotSeatClients()
+                .stream()
+                .filter(c -> c.getClientId() == id)
+                .findFirst()
+                .orElseThrow();
+    }
+
 }

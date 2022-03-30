@@ -1,19 +1,19 @@
 package kingdomBuilder.gamelogic;
 
 /**
- * This describes a turn made by the client.
+ * This describes a turn made by the mainClient.
  */
 public final class ClientTurn extends Turn {
 
     /**
-     * Represents the type of turn the client did.
+     * Represents the type of turn the mainClient did.
      */
     public final TurnType type;
 
     /**
-     * Creates a new client turn.
+     * Creates a new mainClient turn.
      * @param playerId the id of the player who makes the turn.
-     * @param type the type of turn which the client did.
+     * @param type the type of turn which the mainClient did.
      * @param x the x-coordinate to place/remove the settlement.
      * @param y the y-coordinate to place/remove the settlement.
      * @param toX the x-coordinate for moving a settlement.
@@ -30,7 +30,7 @@ public final class ClientTurn extends Turn {
     }
 
     /**
-     * Represents the type of turn the client can perform.
+     * Represents the type of turn the mainClient can perform.
      */
     public enum TurnType {
         /**

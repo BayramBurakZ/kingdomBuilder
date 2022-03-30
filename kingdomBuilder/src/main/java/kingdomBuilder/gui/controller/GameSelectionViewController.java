@@ -320,6 +320,6 @@ public class GameSelectionViewController extends Controller implements Initializ
     @FXML
     private void onRefreshButtonPressed(Event event) {
         //TODO: maybe use an Action instead
-        store.getState().client().gamesRequest();
+        store.getState().mainClient().gamesRequest();
     }
 }

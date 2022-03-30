@@ -295,9 +295,11 @@ public class Game {
      * @param player  the player whose turn it is and who owns the settlement.
      */
     public static void useBasicTurn(GameMap gameMap, Player player, int x, int y) {
-        if (!canUseBasicTurn(gameMap, player, player.getTerrainCard(), x, y))
+        if (!canUseBasicTurn(gameMap, player, player.getTerrainCard(), x, y)) {
+            System.out.println("NAME: " + player.name);
             throw new RuntimeException("Can't place settlement on"
                     + " tile: " + gameMap.at(x, y).tileType + " at " + x + "," + y);
+        }
 
         player.useBasicTurn();
     }

@@ -1,3 +1,6 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.api.file.DuplicatesStrategy
+
 plugins {
     application
     idea
@@ -38,4 +41,27 @@ tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "kingdomBuilder.Boot"
     }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from(configurations
+            .runtimeClasspath
+            .get()
+            .onEach { println("Including dependency: ${it.name}") }
+            .map { if(it.isDirectory) it else zipTree(it) })
+
+    val sourcesMain = sourceSets.main.get()
+    sourcesMain
+        .allSource
+        .forEach { println("Including from sources: ${it.name}")}
+
+    from(sourcesMain.output)
+}
+
+tasks.withType<JavaExec> {
+    // Java3D only recognizes "official" drivers for OpenGL;
+    // recent drivers are not recognized on linux, especially when
+    // using a rolling release distribution like arch.
+    if(Os.isFamily(Os.FAMILY_UNIX))
+        jvmArgs?.add("-Dprism.forceGPU=true")
 }

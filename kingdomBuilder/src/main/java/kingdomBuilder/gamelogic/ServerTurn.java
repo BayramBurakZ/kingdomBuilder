@@ -1,7 +1,7 @@
 package kingdomBuilder.gamelogic;
 
 /**
- * This describes a turn made by the client.
+ * This describes a turn made by the mainClient.
  */
 public final class ServerTurn extends Turn {
 

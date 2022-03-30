@@ -4,6 +4,7 @@ import javafx.scene.Group;
 import kingdomBuilder.KBState;
 import kingdomBuilder.gamelogic.*;
 import kingdomBuilder.gui.base.Board;
+import kingdomBuilder.network.Client;
 import kingdomBuilder.reducers.GameReducer;
 import kingdomBuilder.redux.Store;
 
@@ -96,7 +97,8 @@ public class GameBoard extends Board {
      * @param y the y-coordinate.
      */
     public void hexagonClicked(int x, int y) {
-        int playerID = store.getState().client().getClientId();
+        final int playerID = store.getState().currentPlayer().ID;
+
         TileType token = store.getState().token();
 
         if (token == null) {
@@ -135,12 +137,11 @@ public class GameBoard extends Board {
      * @param isMove if the turn is a turn to move a settlement.
      */
     public void sendClientTurn(int id, int x, int y, int toX, int toY, boolean isToken, boolean isMove) {
-
         ClientTurn turn;
         if (!isToken) {
             // PLACING BASIC TURN
             turn = new ClientTurn(
-                    store.getState().client().getClientId(),
+                    id,
                     ClientTurn.TurnType.PLACE,
                     x,
                     y,
@@ -150,7 +151,7 @@ public class GameBoard extends Board {
         } else if (!isMove) {
             // PLACING TOKEN
             turn = new ClientTurn(
-                    store.getState().client().getClientId(),
+                    id,
                     ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token())),
                     x,
                     y,
@@ -160,7 +161,7 @@ public class GameBoard extends Board {
         } else {
             //MOVING TOKEN
             turn = new ClientTurn(
-                    store.getState().client().getClientId(),
+                    id,
                     ClientTurn.TurnType.valueOf(String.valueOf(store.getState().token())),
                     x,
                     y,

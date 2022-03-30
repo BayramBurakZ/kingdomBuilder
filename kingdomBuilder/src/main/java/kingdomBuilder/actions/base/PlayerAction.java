@@ -7,7 +7,7 @@ import kingdomBuilder.redux.Action;
  */
 public abstract class PlayerAction extends Action {
     /**
-     * Represents the id of a client.
+     * Represents the id of a mainClient.
      */
     public final int clientId;
     /**
@@ -17,7 +17,7 @@ public abstract class PlayerAction extends Action {
 
     /**
      * Creates a new PlayerAction.
-     * @param clientId the id of a client.
+     * @param clientId the id of a mainClient.
      * @param gameId the id of a game.
      */
     public PlayerAction(int clientId, int gameId) {

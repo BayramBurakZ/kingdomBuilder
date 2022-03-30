@@ -130,7 +130,7 @@ public class SettingsController extends Controller implements Initializable {
         String preferredName = textField_name.getText().trim();
         if (preferredName.length() > 0) {
             if (isNameValid(preferredName)) {
-                store.dispatch(GameReducer.SET_PREFERRED_NAME, preferredName);
+                store.dispatch(GameReducer.SET_PREFERRED_NAMES, preferredName);
             } else {
                 Util.showLocalizedPopupMessage("invalidName", (Stage) sceneLoader.getScene().getWindow());
                 return;

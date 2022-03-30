@@ -3,7 +3,7 @@ package kingdomBuilder.actions.game;
 import kingdomBuilder.redux.Action;
 
 /**
- * Represents the UploadQuadrantAction. Only triggered if another client left the server.
+ * Represents the UploadQuadrantAction. Only triggered if another mainClient left the server.
  * Used for the {@link kingdomBuilder.redux.Store#dispatchOld(Action) dispatch()}-method
  * in the {@link kingdomBuilder.redux.Store Store} so the reducer knows what type of action he needs to run.
  */

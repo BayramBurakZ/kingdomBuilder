@@ -25,6 +25,8 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     public ClientImpl(IOHandler ioHandler) {
         this.ioHandler = ioHandler;
         this.ioHandler.setConsumer(this);
+
+        this.onLoggedIn.subscribe(c -> { this.loggedIn = true; });
     }
 
     /**
