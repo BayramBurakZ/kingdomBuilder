@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.MissingResourceException;
 
 /**
@@ -20,7 +21,17 @@ public class Server {
     /**
      * Stores a path to the "java" binary used to launch the server.
      */
-    private static final Path javaPath = Path.of(System.getProperty("java.home"), "/bin/", "java");
+    private static final Path javaPath;
+
+    static {
+        final String javaHome = System.getProperty("java.home");
+        final String executableName = isWindows() ? "java.exe" : "java";
+        javaPath = Path.of(
+                javaHome,
+                "/bin/",
+                executableName
+        );
+    }
 
     /**
      * Launches the game server as an external process.
@@ -83,6 +94,13 @@ public class Server {
                 break;
 
         return process;
+    }
+
+    private static boolean isWindows() {
+        return System
+                .getProperty("os.name")
+                .toLowerCase()
+                .contains("win");
     }
 
 }
