@@ -12,6 +12,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,6 +30,8 @@ public class IOHandler {
     private final Queue<ByteBuffer> writeQueue;
     private final AtomicBoolean connected;
     private ByteBuffer buffer;
+    private String stringBuffer;
+    private String eol;
     private ProtocolConsumer consumer;
 
     /**
@@ -42,6 +45,8 @@ public class IOHandler {
         this.writeQueue = new ConcurrentLinkedQueue<>();
         this.connected = new AtomicBoolean(false);
         this.buffer = null;
+        this.stringBuffer = "";
+        this.eol = "";
         this.consumer = null;
     }
 
@@ -96,18 +101,50 @@ public class IOHandler {
         // on linux. Is this a bug in JRE?
         if(totalBytesRead <= 0) return;
 
-        String contents = new String(buffer.array(), 0, totalBytesRead).trim();
+        String contents = new String(buffer.array(), 0, totalBytesRead); // .trim();
         buffer.clear();
         buffer.rewind();
 
 
+        stringBuffer = stringBuffer + contents;
+
+        if(eol.isEmpty()) {
+            if(stringBuffer.contains("\r\n"))
+                eol = "\r\n";
+            else if(stringBuffer.contains("\n"))
+                eol = "\n";
+            // Haven't received a full command yet; returning till later.
+            else
+                return;
+        }
+
+        // Splits the string buffer into chunks like these:
+        // "COMMAND(eol)", "COMMAND2(eol)", "COMMAND3(eol)"
+        // the last split may not be a completely transmitted command yet,
+        // thus the delimiter is retained to check that each command is complete.
+        var commands = List.of(stringBuffer.split("(?<=\n)"));
+        commands
+            .forEach(c -> {
+                if(c.endsWith(eol))
+                    ProtocolDeserializer.deserialize(c.trim(), consumer);
+            });
+
+        String lastCommand = !commands.isEmpty()
+            ? commands.get(commands.size() - 1)
+            : "";
+
+        stringBuffer = !lastCommand.endsWith(eol)
+                ? lastCommand
+                : "";
+
+        /*
         Scanner t = new Scanner(contents);
         while(t.hasNextLine()) {
             String line = t.nextLine();
             if(consumer != null)
                 ProtocolDeserializer.deserialize(line, consumer);
         }
-
+        */
     }
 
     /**

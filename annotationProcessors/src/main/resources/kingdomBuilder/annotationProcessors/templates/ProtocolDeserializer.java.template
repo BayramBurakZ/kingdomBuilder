@@ -86,6 +86,7 @@ public class ProtocolDeserializer {
             payload = payload.substring(1, payload.length() - 1);
 
         return Arrays.stream(payload.split(",|;"))
+            .filter(s -> !s.isEmpty() && !s.isBlank())
             .mapToInt(Integer::parseInt)
             .boxed()
             .collect(Collectors.toList());

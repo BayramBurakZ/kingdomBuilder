@@ -378,8 +378,7 @@ public class ClientImpl extends Client implements ProtocolConsumer {
     @Override
     public void onFailure(String packet) {
         System.out.println("Failed to decode the following packet:");
-        System.out.print("\t");
-        System.out.println(packet);
+        System.out.println(">" + packet + "<");
     }
 
     /**
