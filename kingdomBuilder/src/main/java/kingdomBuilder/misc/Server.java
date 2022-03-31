@@ -1,7 +1,9 @@
 package kingdomBuilder.misc;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.MissingResourceException;
 
 /**
@@ -30,6 +32,14 @@ public class Server {
      * @throws IOException when the extraction of the server fails due to unforeseen circumstances.
      */
     public static Process launch() throws IOException {
+        Runtime.Version version = Runtime.version();
+        final List<Integer> versionNum = version.version();
+        final int major = versionNum.get(0);
+
+        if(major < 17) {
+            System.out.println("Your version is too old!\n");
+        }
+
         // Retrieve the input stream of the embedded server.
         InputStream stream = Server.class.getResourceAsStream(resourceKey);
         if(stream == null)
@@ -38,8 +48,11 @@ public class Server {
                     Server.class.getName(),
                     resourceKey);
 
-        // Create a temporary file to "temporarly extract" the server binary.
-        File binary = File.createTempFile("server", ".jar");
+        // Create a temporary file to "temporarily extract" the server binary.
+        File binaryDir = Files.createTempDirectory("server").toFile();
+        binaryDir.deleteOnExit();
+
+        File binary = File.createTempFile("gameserver-v1.3.2-complete", ".jar", binaryDir);
         binary.deleteOnExit();
 
         // Write binary to our temp file
@@ -47,15 +60,27 @@ public class Server {
             stream.transferTo(out);
         }
 
-        // Launch the server
+        System.out.println("Unpacked server to: " + binary.getAbsolutePath().toString());
+
         Process process = new ProcessBuilder(
                 javaPath.toString(),
                 "-jar",
-                binary.getAbsolutePath().toString()
-        ).start();
+                binary.getAbsolutePath()
+        )
+                // The server happily refuses to work properly if the jar is not the only binary
+                // in the current working directory.
+                .directory(binaryDir)
+                .start();
 
         // Invoked by the JVM when our calling process exits.
         Runtime.getRuntime().addShutdownHook(new Thread(process::destroy));
+
+        // Wait for the server to boot properly.
+        BufferedReader stdout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line = null;
+        while((line = stdout.readLine()) != null)
+            if(line.contains("...booted"))
+                break;
 
         return process;
     }

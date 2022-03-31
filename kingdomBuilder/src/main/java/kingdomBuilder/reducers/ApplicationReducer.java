@@ -19,7 +19,9 @@ import kingdomBuilder.redux.Reduce;
 import kingdomBuilder.redux.Reducer;
 import kingdomBuilder.redux.Store;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,10 +73,11 @@ public class ApplicationReducer extends Reducer<KBState> {
     public static final String SERVER_VERSION = "SERVER_VERSION";
 
     /**
-     *
+     * Represents the String to identify the related {@link ApplicationReducer#launchLocalServer(Store, KBState, Object) method.}
      */
     public static final String LAUNCH_LOCAL_SERVER = "LAUNCH_LOCAL_SERVER";
-
+    
+    
     /**
      * Constructs a new ApplicationReducer and lets it register itself.
      * @see Reducer#registerReducers
@@ -443,11 +446,14 @@ public class ApplicationReducer extends Reducer<KBState> {
         Process process;
         try {
             process = Server.launch();
+            System.out.println("Launched local server!");
         } catch(IOException exc) {
+            System.out.println("Failed to launch local server!");
             return state;
         }
 
         state.setServer(process);
+
         return state;
     }
 

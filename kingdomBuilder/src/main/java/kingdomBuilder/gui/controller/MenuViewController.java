@@ -11,11 +11,15 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import kingdomBuilder.actions.*;
+import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.redux.Store;
 import kingdomBuilder.KBState;
 import kingdomBuilder.redux.Store;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 
 /**
@@ -99,7 +103,10 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     private void onLocalGameButtonPressed(Event event) {
-        sceneLoader.showGameSettingsView(false);
+
+        // For now assuming that it's running.
+        store.dispatch(ApplicationReducer.LAUNCH_LOCAL_SERVER, null);
+        store.dispatch(ApplicationReducer.CONNECT, new InetSocketAddress("localhost", 6666));
     }
 
     /**

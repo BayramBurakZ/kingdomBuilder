@@ -16,9 +16,13 @@ import javafx.scene.shape.Rectangle;
 import kingdomBuilder.KBState;
 import kingdomBuilder.actions.HostGameAction;
 import kingdomBuilder.gamelogic.TileType;
+import kingdomBuilder.reducers.ApplicationReducer;
 import kingdomBuilder.redux.Store;
 
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -225,6 +229,11 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Represents the map specifying what color TileTypes should have for the quadrant previews.
      */
     private final Map<TileType, Color> tileTypeColorMap = new HashMap<>();
+
+    /**
+     * Stores whether the mask is used to create a local game.
+     */
+    private boolean isLocalGame;
 
     /**
      * Constructs the GameSettingsViewController.
@@ -540,7 +549,7 @@ public class GameSettingsViewController extends Controller implements Initializa
         );
 
         store.dispatchOld(new HostGameAction(gameName, gameDesc, playerCount, timeLimit, turnLimit,
-                quadrantUpperLeft, quadrantUpperRight, quadrantBottomLeft, quadrantBottomRight));
+            quadrantUpperLeft, quadrantUpperRight, quadrantBottomLeft, quadrantBottomRight));
 
         return false;
     }
@@ -549,11 +558,7 @@ public class GameSettingsViewController extends Controller implements Initializa
      * Activates the Host Game Button.
      */
     private void activateHostGameButton() {
-        // if the game is an online game, the user can host a game
-        // else the user is forced to join the game
-        if (isOnlineGame) {
-            gamesettings_button_host.setDisable(false);
-        }
+        gamesettings_button_host.setDisable(false);
     }
 
     /**
