@@ -18,7 +18,34 @@ dependencies {
     implementation(project(":network"))
     implementation(project(":annotations"))
     annotationProcessor(project(":annotationProcessors"))
+
+    // Explicitly state runtime dependencies;
+    // otherwise they won't be included in the resulting FatJar.
+    runtimeOnly("org.openjfx:javafx-web:17:win")
+    runtimeOnly("org.openjfx:javafx-web:17:linux")
+    runtimeOnly("org.openjfx:javafx-web:17:mac")
+
+    runtimeOnly("org.openjfx:javafx-media:17:win")
+    runtimeOnly("org.openjfx:javafx-media:17:linux")
+    runtimeOnly("org.openjfx:javafx-media:17:mac")
+
+    runtimeOnly("org.openjfx:javafx-fxml:17:win")
+    runtimeOnly("org.openjfx:javafx-fxml:17:linux")
+    runtimeOnly("org.openjfx:javafx-fxml:17:mac")
+
+    runtimeOnly("org.openjfx:javafx-controls:17:win")
+    runtimeOnly("org.openjfx:javafx-controls:17:linux")
+    runtimeOnly("org.openjfx:javafx-controls:17:mac")
+
+    runtimeOnly("org.openjfx:javafx-graphics:17:win")
+    runtimeOnly("org.openjfx:javafx-graphics:17:linux")
+    runtimeOnly("org.openjfx:javafx-graphics:17:mac")
+
+    runtimeOnly("org.openjfx:javafx-base:17:win")
+    runtimeOnly("org.openjfx:javafx-base:17:linux")
+    runtimeOnly("org.openjfx:javafx-base:17:mac")
 }
+
 
 javafx {
     version = "17"
