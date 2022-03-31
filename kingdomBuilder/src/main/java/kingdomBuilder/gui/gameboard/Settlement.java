@@ -4,6 +4,7 @@ import javafx.scene.shape.MeshView;
 import javafx.scene.shape.TriangleMesh;
 import kingdomBuilder.gui.util.PLYLoader;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
 
 /**
@@ -31,14 +32,11 @@ public class Settlement extends MeshView {
     public static final double SETTLEMENT_DEPTH = 15;
 
     static {
-        TriangleMesh loadedMesh = null;
-        try {
-            loadedMesh = PLYLoader.readFromPlyFile(
-                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/settlement.ply").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        settlementMesh = loadedMesh;
+        InputStream stream = HexagonTile
+                .class
+                .getResourceAsStream("/kingdomBuilder/gui/meshes/settlement.ply");
+
+        settlementMesh = PLYLoader.readfromPLYStream(stream);
     }
 
     /**

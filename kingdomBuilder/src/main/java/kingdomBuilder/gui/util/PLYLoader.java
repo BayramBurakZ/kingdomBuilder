@@ -17,7 +17,7 @@ public class PLYLoader {
      * @param uri the Location of the .ply-File.
      * @return The 3D Model or null if something goes wrong.
      */
-    public static TriangleMesh readFromPlyFile(URI uri) {
+    public static TriangleMesh readfromPLYStream(InputStream stream) {
         // Initialize
         TriangleMesh mesh = new TriangleMesh();
 
@@ -30,7 +30,8 @@ public class PLYLoader {
 
 
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(uri)));
+            //BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(uri)));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
 
             String line = bufferedReader.readLine();
 

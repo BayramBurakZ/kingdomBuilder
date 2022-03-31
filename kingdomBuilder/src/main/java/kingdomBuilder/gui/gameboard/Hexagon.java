@@ -6,6 +6,8 @@ import javafx.scene.shape.TriangleMesh;
 import kingdomBuilder.gamelogic.TileType;
 import kingdomBuilder.gui.util.PLYLoader;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
 
 /**
@@ -18,14 +20,11 @@ public class Hexagon extends MeshView {
     private static final TriangleMesh hexagonMesh;
 
     static {
-        TriangleMesh loadedMesh = null;
-        try {
-            loadedMesh = PLYLoader.readFromPlyFile(
-                    HexagonTile.class.getResource("/kingdomBuilder/gui/meshes/hexagon.ply").toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        hexagonMesh = loadedMesh;
+        InputStream stream = HexagonTile
+            .class
+            .getResourceAsStream("/kingdomBuilder/gui/meshes/hexagon.ply");
+
+        hexagonMesh = PLYLoader.readfromPLYStream(stream);
     }
 
     /**

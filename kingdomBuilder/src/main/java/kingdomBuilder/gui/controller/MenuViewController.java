@@ -103,8 +103,6 @@ public class MenuViewController extends Controller implements Initializable {
      */
     @FXML
     private void onLocalGameButtonPressed(Event event) {
-
-        // For now assuming that it's running.
         store.dispatch(ApplicationReducer.LAUNCH_LOCAL_SERVER, null);
         store.dispatch(ApplicationReducer.CONNECT, new InetSocketAddress("localhost", 6666));
     }
