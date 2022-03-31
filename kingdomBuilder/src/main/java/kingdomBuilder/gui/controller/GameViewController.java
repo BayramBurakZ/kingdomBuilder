@@ -295,7 +295,7 @@ public class GameViewController extends Controller implements Initializable {
     private void showPreStartButtons(boolean isDisplayed) {
         // initialize everything
         Button game_button_addBot = new Button("Add Bot");
-        Button game_button_addHotseat = new Button("Add Hotseat");
+        // Button game_button_addHotseat = new Button("Add Hotseat");
         ComboBox<BotDifficulty> game_comboBox_difficulty = new ComboBox<>();
         HBox game_hBox_addPlayerHBox = new HBox();
 
@@ -323,7 +323,7 @@ public class GameViewController extends Controller implements Initializable {
 
         // decide if it should be shown
         if (isDisplayed) {
-            game_hBox_addPlayerHBox.getChildren().addAll(game_button_addBot, game_button_addHotseat);
+            game_hBox_addPlayerHBox.getChildren().addAll(game_button_addBot);
             game_vBox_addPlayerVBox.getChildren().addAll(game_comboBox_difficulty, game_hBox_addPlayerHBox);
             game_hbox_players.getChildren().addAll(game_vBox_addPlayerVBox);
         } else {
