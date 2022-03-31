@@ -1,5 +1,6 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.api.file.DuplicatesStrategy
+import kotlin.collections.listOf
 
 plugins {
     application
@@ -11,44 +12,39 @@ repositories {
     mavenCentral()
 }
 
+group = "kingdomBuilder"
+version = "1.0"
+
+val javaFxVersion: String by extra
+val junitVersion: String by extra
+val jetbrainsAnnotationVersion: String by extra
+
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    implementation("org.jetbrains:annotations:16.0.2")
     implementation(project(":network"))
     implementation(project(":annotations"))
     annotationProcessor(project(":annotationProcessors"))
 
+    implementation("org.jetbrains:annotations:$jetbrainsAnnotationVersion")
+
     // Explicitly state runtime dependencies;
     // otherwise they won't be included in the resulting FatJar.
-    runtimeOnly("org.openjfx:javafx-web:17:win")
-    runtimeOnly("org.openjfx:javafx-web:17:linux")
-    runtimeOnly("org.openjfx:javafx-web:17:mac")
+    val targetPlatforms = listOf("win", "linux", "mac")
+    for(target in targetPlatforms) {
+        println(target)
+        runtimeOnly("org.openjfx:javafx-web:$javaFxVersion:$target")
+        runtimeOnly("org.openjfx:javafx-media:$javaFxVersion:$target")
+        runtimeOnly("org.openjfx:javafx-fxml:$javaFxVersion:$target")
+        runtimeOnly("org.openjfx:javafx-controls:$javaFxVersion:$target")
+        runtimeOnly("org.openjfx:javafx-graphics:$javaFxVersion:$target")
+        runtimeOnly("org.openjfx:javafx-base:$javaFxVersion:$target")
+    }
 
-    runtimeOnly("org.openjfx:javafx-media:17:win")
-    runtimeOnly("org.openjfx:javafx-media:17:linux")
-    runtimeOnly("org.openjfx:javafx-media:17:mac")
-
-    runtimeOnly("org.openjfx:javafx-fxml:17:win")
-    runtimeOnly("org.openjfx:javafx-fxml:17:linux")
-    runtimeOnly("org.openjfx:javafx-fxml:17:mac")
-
-    runtimeOnly("org.openjfx:javafx-controls:17:win")
-    runtimeOnly("org.openjfx:javafx-controls:17:linux")
-    runtimeOnly("org.openjfx:javafx-controls:17:mac")
-
-    runtimeOnly("org.openjfx:javafx-graphics:17:win")
-    runtimeOnly("org.openjfx:javafx-graphics:17:linux")
-    runtimeOnly("org.openjfx:javafx-graphics:17:mac")
-
-    runtimeOnly("org.openjfx:javafx-base:17:win")
-    runtimeOnly("org.openjfx:javafx-base:17:linux")
-    runtimeOnly("org.openjfx:javafx-base:17:mac")
+    testImplementation(platform("org.junit:junit-bom:$junitVersion"))
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 }
 
-
 javafx {
-    version = "17"
+    version = javaFxVersion
     modules("javafx.controls", "javafx.fxml", "javafx.web")
 }
 

@@ -7,13 +7,20 @@ repositories {
     mavenCentral()
 }
 
+group = "kingdomBuilder"
+version = "1.0"
+
+val junitVersion: String by extra
+
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.8.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
     implementation(project(":annotations"))
     annotationProcessor(project(":annotationProcessors"))
+
+    testImplementation(platform("org.junit:junit-bom:$junitVersion"))
+    testImplementation("org.junit.jupiter:junit-jupiter:$junitVersion")
 }
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
 }
+
